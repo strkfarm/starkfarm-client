@@ -1,4 +1,4 @@
-import CONSTANTS from "@/constants";
+import CONSTANTS, { TokenName } from "@/constants";
 import axios from 'axios'
 import { Category, PoolInfo, PoolType, ProtocolAtoms, StrkDexIncentivesAtom } from "./pools";
 import { Ekubo } from "./ekobu.store";
@@ -22,9 +22,9 @@ class Jediswap extends Ekubo {
                 category = Category.STRK;
             }
 
-            const tokens = poolName.split('/');
-            const logo1 = CONSTANTS.LOGOS[<any>tokens[0]];
-            const logo2 = CONSTANTS.LOGOS[<any>tokens[1]];
+            const tokens: TokenName[] = <TokenName[]>poolName.split('/');
+            const logo1 = CONSTANTS.LOGOS[tokens[0]];
+            const logo2 = CONSTANTS.LOGOS[tokens[1]];
             const poolInfo: PoolInfo = {
                 pool: {
                     name: poolName,

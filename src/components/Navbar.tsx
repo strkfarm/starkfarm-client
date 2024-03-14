@@ -15,7 +15,7 @@ export default function Navbar() {
 
     return <Container width={'100%'} padding={'20px 20px 10px'}>
         <Center marginLeft={'auto'}>
-            <Text fontSize={'30px'} color={'purple'} letterSpacing={'10px'}><b>ZK-Farmers</b></Text>
+            <Text fontSize={'35px'} color={'purple'} letterSpacing={'10px'}><b>🚀Starknet DeFi Spring</b></Text>
             {/* <Menu>
                 <MenuButton as={Button} rightIcon={<ChevronDownIcon />} bgColor={'highlight'} color='light_grey'>
                     <Center>

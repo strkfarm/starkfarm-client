@@ -60,7 +60,7 @@ const colourStyles: StylesConfig<Option, true> = {
     indicatorSeparator: (styles, {  }) => {
         return {
             ...styles,
-            color: 'var(--chakra-colors-color2)'
+            backgroundColor: 'var(--chakra-colors-color2)'
         }
     },
     menu: (styles, {  }) => {

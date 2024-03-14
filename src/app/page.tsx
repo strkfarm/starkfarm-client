@@ -60,8 +60,12 @@ export default function Home() {
       })}
     </Box>
     return <Tooltip hasArrow label={''} bg="gray.300" color="black">
-      <Center width={{base: '100%', md: '50%'}}>
-        <Avatar size='xs' bg={'black'} src={CONSTANTS.LOGOS.STRK} marginRight={'2px'} />
+      <Center width={{base: 'auto', md: '50%'}}
+        marginRight={'0px'}
+        marginLeft={{base: 'auto', md: '0px'}}
+        display={'flex'}
+      >
+        <Avatar size='xs' bg={'black'} src={CONSTANTS.LOGOS.STRK} marginRight={'2px'} alignContent={'right'}/>
         <Text  textAlign={{base: 'right', md: 'center'}} color='cyan' fontSize={'20px'}><b>{(pool.apr * 100).toFixed(2)}%</b></Text>
       </Center>
     </Tooltip>
@@ -69,7 +73,8 @@ export default function Home() {
 
   return (
     <Container maxWidth={'800px'} margin={'0 auto'} padding="0px">
-        <Text color='cyan' textAlign={'center'} fontSize={'18px'} marginBottom={'20px'}>This DeFi spring, identify the best rewarding $STRK pools and maximize your rewards</Text>
+        <Text color='cyan' textAlign={'center'} fontSize={'18px'} marginBottom={'20px'}>
+          Identify the best $STRK rewarding pools and maximize your rewards</Text>
         <Filters/>
         {pools.length > ITEMS_PER_PAGE && <Container width={'100%'} float={'left'} padding='0px'>
           <Pagination
@@ -158,6 +163,9 @@ export default function Home() {
             <Skeleton height='70px' />
           </Stack>}
         </Container>
+        <Box padding="10px 0" width={'100%'} float={'left'}>
+          <Text color='light_grey' textAlign={'center'}>More features coming soon!</Text>
+        </Box>
     </Container>
   );
 }

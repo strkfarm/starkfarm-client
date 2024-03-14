@@ -7,6 +7,7 @@ const LOGOS = {
     DAI: "https://app.zklend.com/icons/tokens/dai.svg?w=20"
 }
 
+export type TokenName = 'USDT' | 'USDC' | 'ETH' | 'STRK' | 'WBTC' | 'DAI'
 const CONSTANTS = {
     EKUBO: {
         INCENTIVE_URL: 'https://kx58j6x5me.execute-api.us-east-1.amazonaws.com//starknet/fetchFile?file=qa_strk_grant.json'
