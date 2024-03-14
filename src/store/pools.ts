@@ -11,6 +11,12 @@ export enum Category {
     Others = "Others"
 }
 
+export enum PoolType {
+    DEXV2 = 'Uniswap v2 Liquidity pool',
+    DEXV3 = 'Concentrated Liquidity pool',
+    Lending = 'Lending'
+}
+
 export interface APRSplit {
     apr: number,
     title: string,
@@ -27,7 +33,8 @@ export interface PoolInfo {
     tvl: number,
     apr: number, // not in %
     aprSplits: APRSplit[],
-    category: Category
+    category: Category,
+    type: PoolType
 }
 
 export const StrkDexIncentivesAtom = atomWithQuery((get) => ({

@@ -1,6 +1,6 @@
 import CONSTANTS from "@/constants";
 import axios from 'axios'
-import { Category, PoolInfo, StrkDexIncentivesAtom } from "./pools";
+import { Category, PoolInfo, PoolType, StrkDexIncentivesAtom } from "./pools";
 import { Ekubo } from "./ekobu.store";
 import { atom } from "jotai";
 
@@ -40,7 +40,8 @@ class Jediswap extends Ekubo {
                     title: 'STRK rewards',
                     description: 'Starknet DeFi Spring incentives',
                 }],
-                category: category
+                category: category,
+                type: PoolType.DEXV2,
             }
             pools.push(poolInfo);
         })

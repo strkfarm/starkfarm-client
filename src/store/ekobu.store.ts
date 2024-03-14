@@ -2,7 +2,7 @@
 
 import CONSTANTS from "@/constants";
 import axios from 'axios'
-import { Category, PoolInfo, StrkDexIncentivesAtom } from "./pools";
+import { Category, PoolInfo, PoolType, StrkDexIncentivesAtom } from "./pools";
 import { PrimitiveAtom, atom } from "jotai";
 import useSWR from "swr";
 const fetcher = (...args: any[]) => {
@@ -45,7 +45,8 @@ export class Ekubo {
                     title: 'STRK rewards',
                     description: 'Starknet DeFi Spring incentives',
                 }],
-                category: category
+                category: category,
+                type: PoolType.DEXV3
             }
             pools.push(poolInfo);
         })
