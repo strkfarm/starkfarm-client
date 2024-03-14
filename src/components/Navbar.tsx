@@ -1,7 +1,9 @@
-import { Badge, Box, Button, Center, Container, Flex, Menu, MenuButton, MenuItem, MenuList, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, Portal, Select, Spinner, Text } from "@chakra-ui/react";
+import { Avatar, Badge, Box, Button, Center, Container, Flex, Link, Menu, MenuButton, MenuItem, MenuList, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, Portal, Select, Spinner, Text } from "@chakra-ui/react";
 import { useAccount } from "@starknet-react/core";
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { num } from "starknet";
+import tg from '@/assets/tg.svg';
+import CONSTANTS from "@/constants";
 
 
 export default function Navbar() {
@@ -13,9 +15,22 @@ export default function Navbar() {
         return `${x.slice(0, 4)}...${x.slice(x.length - 4, x.length)}`
     }
 
-    return <Container width={'100%'} padding={'20px 20px 10px'}>
-        <Center marginLeft={'auto'}>
-            <Text fontSize={'35px'} color={'purple'} letterSpacing={'10px'} textAlign={'center'}><b>🚀Starknet DeFi Spring</b></Text>
+    return <Container width={'100%'} padding={'20px 20px 10px'} borderBottom={'1px solid var(--chakra-colors-color2)'}>
+        <Box width={'100%'} maxWidth='1000px' margin={'0px auto'}>
+            <Flex width={'100%'}>
+                <Text fontSize={'35px'}  margin='0 auto 0 0' color={'color2'} letterSpacing={'10px'} textAlign={'left'}><b>STRKFarm</b></Text>
+                <Link href={CONSTANTS.COMMUNITY_TG} isExternal>
+                    <Button margin='0 0 0 auto' 
+                        borderColor='color2' 
+                        color='color2' variant='outline' 
+                        rightIcon={ <Avatar size='sm' name='TG' src={tg.src} color='red' />}
+                        _hover={{
+                            bg: 'color2_50p'
+                        }}    
+                    >
+                        Join Telegram
+                    </Button>
+                </Link>
             {/* <Menu>
                 <MenuButton as={Button} rightIcon={<ChevronDownIcon />} bgColor={'highlight'} color='light_grey'>
                     <Center>
@@ -28,6 +43,7 @@ export default function Navbar() {
                     <MenuItem>Disconnect</MenuItem>
                 </MenuList>
             </Menu> */}
-        </Center>
+            </Flex>
+        </Box>
     </Container>
 }

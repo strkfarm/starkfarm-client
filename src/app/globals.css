@@ -31,3 +31,7 @@ body {
     text-wrap: balance;
   }
 }
+
+.pagination-container  {
+  padding: 20px 0px 2px 0px !important;
+}

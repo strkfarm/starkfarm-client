@@ -4,13 +4,13 @@ import { Category, PoolInfo, PoolType, ProtocolAtoms, StrkDexIncentivesAtom } fr
 import { Ekubo } from "./ekobu.store";
 import { atom } from "jotai";
 
-class Jediswap extends Ekubo {
+export class Jediswap extends Ekubo {
     name = 'Jediswap (v1)'
     link = 'https://app.jediswap.xyz/#/pool'
     logo = 'https://app.jediswap.xyz/favicon/favicon-32x32.png'
-
+    incentiveDataKey = 'Jediswap_v1'
     _computePoolsInfo(data: any) {
-        const myData = data?.Jediswap_v1;
+        const myData = data[this.incentiveDataKey];
         if (!myData) return [];
         const pools: PoolInfo[] = [];
         Object.keys(myData).forEach(poolName => {

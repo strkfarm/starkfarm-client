@@ -8,7 +8,7 @@ import "./globals.css";
 // });
 
 export const metadata: Metadata = {
-  title: "Zk-Farmers | Farm on the best pools of Starknet",
+  title: "STRKFarm | Earn $STRK Tokens",
   description: "Farm on the best pools of Starknet",
 }; 
 
@@ -19,6 +19,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/favicon.ico" />
+      </head>
       <body>{children}</body>
   </html>
   );

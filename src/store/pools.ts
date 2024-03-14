@@ -5,6 +5,11 @@ import { atomWithQuery } from 'jotai-tanstack-query'
 import EkuboAtoms, { ekubo } from "./ekobu.store";
 import JediAtoms, { jedi } from "./jedi.store";
 import MySwapAtoms, { mySwap } from "./myswap.store";
+import TenkSwapAtoms, { TenkSwap, tenkswap } from "./tenkswap.store";
+import HaikoAtoms, { haiko } from "./haiko.store";
+import StarkDefiAtoms, { starkDefi } from "./starkdefi.store";
+import NostraDexAtoms, { nostraDex } from "./nostradex.store";
+import SithswapAtoms, { sithswap } from "./sithswap.store";
 
 export enum Category {
     Stable = "Stable Pools",
@@ -15,7 +20,7 @@ export enum Category {
 export enum PoolType {
     DEXV2 = 'V2 LP DEX',
     DEXV3 = 'Concentrated LP DEX',
-    Lending = 'Lending'
+    // Lending = 'Lending'
 }
 
 export interface APRSplit {
@@ -54,6 +59,21 @@ const PROTOCOLS = [{
 }, {
     name: mySwap.name,
     atoms: MySwapAtoms
+}, {
+    name: tenkswap.name,
+    atoms: TenkSwapAtoms
+}, {
+    name: haiko.name,
+    atoms: HaikoAtoms
+}, {
+    name: nostraDex.name,
+    atoms: NostraDexAtoms
+}, {
+    name: starkDefi.name,
+    atoms: StarkDefiAtoms
+}, {
+    name: sithswap.name,
+    atoms: SithswapAtoms
 }]
 
 export const StrkDexIncentivesAtom = atomWithQuery((get) => ({

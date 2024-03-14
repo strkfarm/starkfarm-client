@@ -5,14 +5,14 @@ import EkuboAtoms from "@/store/ekobu.store";
 import Ekubo from "@/store/ekobu.store";
 import Jediswap from "@/store/jedi.store";
 import { PoolInfo, StrkDexIncentivesAtom, allPoolsAtomUnSorted, filteredPools, sortPoolsAtom } from "@/store/pools";
-import { Avatar, AvatarGroup, Box, Card, CardBody, CardHeader, Center, Container, Flex, HStack, Heading, Link, LinkBox, LinkOverlay, Skeleton, Stack, Text, Tooltip } from "@chakra-ui/react";
+import { Avatar, AvatarGroup, Box, Card, CardBody, CardHeader, Center, Container, Flex, HStack, Heading, Image, Link, LinkBox, LinkOverlay, Skeleton, Stack, Text, Tooltip } from "@chakra-ui/react";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import useSWR from 'swr'
 import { Pagination, PaginationContainer, usePagination, PaginationNext, PaginationPrevious, PaginationPage, PaginationPageGroup } from '@ajna/pagination';
 import CONSTANTS from "@/constants";
 import Filters from "@/components/Filters";
+import tg from '@/assets/tg.svg';
 
 export default function Home() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
@@ -24,7 +24,7 @@ export default function Home() {
     pagesCount,
     pages
   } = usePagination({
-    pagesCount: Math.floor(_filteredPools.length / ITEMS_PER_PAGE),
+    pagesCount: Math.floor(_filteredPools.length / ITEMS_PER_PAGE) + 1,
     initialState: { currentPage: 1 },
   });
 
@@ -73,11 +73,16 @@ export default function Home() {
 }
 
   return (
-    <Container maxWidth={'800px'} margin={'0 auto'} padding="0px">
-        <Text color='cyan' textAlign={'center'} fontSize={'18px'} marginBottom={'20px'}>
-          Identify the best $STRK rewarding pools and maximize your rewards</Text>
+    <Container maxWidth={'800px'} margin={'0 auto'}>
+        <Box padding={'15px 30px'} borderRadius='10px' margin='20px 0px'>
+          <Text fontSize={'35px'} color={'cyan'} textAlign={'center'}><b>🚀Starknet DeFi Spring</b></Text>
+          <Text color='color2' textAlign={'center'} fontSize={'18px'} marginBottom={'0px'}>
+            Identify the best $STRK rewarding pools and maximize your rewards</Text>
+            {/* <Text color='cyan' textAlign={'center'} fontSize={'18px'} marginBottom={'20px'}>
+            Pools: {_filteredPools.length}, pages: {pagesCount}</Text> */}
+        </Box>
         <Filters/>
-        {pools.length > ITEMS_PER_PAGE && <Container width={'100%'} float={'left'} padding='0px'>
+        {<Container width={'100%'} float={'left'} padding='0px'>
           <Pagination
             pagesCount={pagesCount}
             currentPage={currentPage}
@@ -114,6 +119,9 @@ export default function Home() {
             </PaginationContainer>
           </Pagination>
         </Container>}
+        {<Box padding="0px 0" width={'100%'} float={'left'}>
+            <Text color='light_grey' textAlign={'right'} fontSize={'12px'}>Max {ITEMS_PER_PAGE} per page, total {_filteredPools.length}</Text>
+        </Box>}
         <Container width='100%' float={'left'} padding={'0px'} marginTop={'10px'}>
           <Card variant={'filled'} bg='opacity_50p' color={'purple'}>
             <CardBody paddingTop={'5px'} paddingBottom={'5px'}>
@@ -167,10 +175,11 @@ export default function Home() {
             <Skeleton height='70px' />
           </Stack>}
         </Container>
-        <hr style={{width: '100%', borderColor: '#5f5f5f', float: 'left'}}/>
-        <Box padding="10px 0" width={'100%'} float={'left'}>
-          <Text color='light_grey' textAlign={'center'}>More features coming soon!</Text>
-        </Box>
+        <hr style={{width: '100%', borderColor: '#5f5f5f', float: 'left', margin: '20px 0'}}/>
+        <Text color='light_grey' textAlign={'center'} width={'100%'}>More features coming soon. Join our Telegram channel to discuss strategies, features and contribute.</Text>
+        <Center padding="10px 0" width={'100%'} float={'left'}>
+          <Link href={CONSTANTS.COMMUNITY_TG} isExternal><Image src={tg.src} width='50' margin='0 auto' href='google.com'/></Link>
+        </Center>
     </Container>
   );
 }

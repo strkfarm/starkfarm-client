@@ -16,6 +16,7 @@ const CONSTANTS = {
         INCENTIVE_URL: 'https://kx58j6x5me.execute-api.us-east-1.amazonaws.com//starknet/fetchFile?file=qa_strk_grant.json'
     },
     LOGOS,
+    COMMUNITY_TG:'https://t.me/+HQ_eHaXmF-1lZDc1'
 }
 
 export default CONSTANTS;
