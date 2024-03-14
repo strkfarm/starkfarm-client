@@ -178,7 +178,7 @@ export default function Home() {
         <hr style={{width: '100%', borderColor: '#5f5f5f', float: 'left', margin: '20px 0'}}/>
         <Text color='light_grey' textAlign={'center'} width={'100%'}>More features coming soon. Join our Telegram channel to discuss strategies, features and contribute.</Text>
         <Center padding="10px 0" width={'100%'} float={'left'}>
-          <Link href={CONSTANTS.COMMUNITY_TG} isExternal><Image src={tg.src} width='50' margin='0 auto' href='google.com'/></Link>
+          <Link href={CONSTANTS.COMMUNITY_TG} isExternal><Image src={tg.src} width='50' margin='0 auto'/></Link>
         </Center>
     </Container>
   );

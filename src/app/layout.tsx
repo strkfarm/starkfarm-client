@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 // import { Inter, Courier_Prime } from "next/font/google";
 import "./globals.css";
+import { GoogleAnalytics } from '@next/third-parties/google'
 
 // const courier = Courier_Prime({
 //   weight: '400',
@@ -23,6 +24,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" />
       </head>
       <body>{children}</body>
+      <GoogleAnalytics gaId="G-K05JV94KM9" />
   </html>
   );
 }
