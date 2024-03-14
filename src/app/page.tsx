@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import EkuboAtoms from "@/store/ekobu.store";
 import Ekubo from "@/store/ekobu.store";
 import Jediswap from "@/store/jedi.store";
-import { PoolInfo, StrkDexIncentivesAtom, allPools, upsertPoolsInfoAtom } from "@/store/pools";
+import { PoolInfo, StrkDexIncentivesAtom, allPools } from "@/store/pools";
 import { Avatar, Box, Card, CardBody, CardHeader, Container, Flex, HStack, Heading, Skeleton, Stack, Text } from "@chakra-ui/react";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import Image from "next/image";
