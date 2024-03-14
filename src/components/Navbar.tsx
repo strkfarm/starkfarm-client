@@ -1,4 +1,4 @@
-import { Avatar, Badge, Box, Button, Center, Container, Flex, Link, Menu, MenuButton, MenuItem, MenuList, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, Portal, Select, Spinner, Text } from "@chakra-ui/react";
+import { Avatar, Badge, Box, Button, Center, Container, Flex, IconButton, Link, Menu, MenuButton, MenuItem, MenuList, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, Portal, Select, Spinner, Text } from "@chakra-ui/react";
 import { useAccount } from "@starknet-react/core";
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { num } from "starknet";
@@ -17,22 +17,30 @@ export default function Navbar() {
 
     return <Container width={'100%'} padding={'0'} borderBottom={'1px solid var(--chakra-colors-color2)'}>
         <Center bg='highlight' color='orange' padding={0}>
-            <Text>{""}<b>Alpha version, report bugs in our Telegram group.</b> Lending pools coming soon.{""}</Text>
+            <Text textAlign={'center'} padding="0px 5px">{""}<b>Alpha version, report bugs in our Telegram group.</b> Lending pools coming soon.{""}</Text>
         </Center>
         <Box width={'100%'} maxWidth='1000px' margin={'0px auto'} padding={'20px 20px 10px'}>
             <Flex width={'100%'}>
-                <Text fontSize={'35px'}  margin='0 auto 0 0' color={'color2'} letterSpacing={'10px'} textAlign={'left'}><b>STRKFarm</b></Text>
+                <Text fontSize={'30px'}  margin='0 auto 0 0' color={'color2'} letterSpacing={'10px'} textAlign={'left'}><b>STRKFarm</b></Text>
                 <Link href={CONSTANTS.COMMUNITY_TG} isExternal>
                     <Button margin='0 0 0 auto' 
                         borderColor='color2' 
                         color='color2' variant='outline' 
-                        rightIcon={ <Avatar size='sm' name='TG' src={tg.src} color='red' />}
+                        rightIcon={ <Avatar size='sm' name='T G' src={tg.src} color='red' />}
                         _hover={{
                             bg: 'color2_50p'
                         }}    
+                        display={{base: 'none', md: 'flex'}}
                     >
                         Join Telegram
                     </Button>
+                    <IconButton
+                        aria-label="tg"
+                        variant={'ghost'}
+                        borderColor={'color2'}
+                        display={{base: 'block', md: 'none'}}
+                        icon={<Avatar size='sm' name='T G' src={tg.src} color='red' />}
+                    />
                 </Link>
             {/* <Menu>
                 <MenuButton as={Button} rightIcon={<ChevronDownIcon />} bgColor={'highlight'} color='light_grey'>
