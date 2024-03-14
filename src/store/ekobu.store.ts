@@ -2,7 +2,7 @@
 
 import CONSTANTS from "@/constants";
 import axios from 'axios'
-import { Category, PoolInfo, PoolType, StrkDexIncentivesAtom } from "./pools";
+import { Category, PoolInfo, PoolType, ProtocolAtoms, StrkDexIncentivesAtom } from "./pools";
 import { PrimitiveAtom, atom } from "jotai";
 import useSWR from "swr";
 const fetcher = (...args: any[]) => {
@@ -14,8 +14,9 @@ export class Ekubo {
     link = 'https://app.ekubo.org/positions'
     logo = 'https://app.ekubo.org/logo.svg'
 
+    incentiveDataKey = 'Ekubo'
     _computePoolsInfo(data: any) {
-        const myData = data?.Ekubo;
+        const myData = data[this.incentiveDataKey];
         if (!myData) return [];
         const pools: PoolInfo[] = [];
         Object.keys(myData).forEach(poolName => {
@@ -26,10 +27,16 @@ export class Ekubo {
             } else if (poolName.includes('STRK')) {
                 category = Category.STRK;
             }
+            
+            const tokens = poolName.split('/');
+            const logo1 = CONSTANTS.LOGOS[<any>tokens[0]];
+            const logo2 = CONSTANTS.LOGOS[<any>tokens[1]];
 
             const poolInfo: PoolInfo = {
-                name: poolName,
-                protocol: {
+                pool: {
+                    name: poolName,
+                    logos: [logo1, logo2]
+                }, protocol: {
                     name: this.name,
                     link: this.link,
                     logo: this.logo,
@@ -56,8 +63,8 @@ export class Ekubo {
 
 }
 
-const ekubo = new Ekubo();
-const EkuboAtoms = {
+export const ekubo = new Ekubo();
+const EkuboAtoms: ProtocolAtoms = {
     pools: atom((get) => {
         const poolsInfo = get(StrkDexIncentivesAtom)
         const empty: PoolInfo[] = [];

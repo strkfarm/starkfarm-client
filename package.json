@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@ajna/pagination": "^1.4.19",
     "@chakra-ui/icons": "^2.1.1",
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.3",
@@ -19,6 +20,7 @@
     "@tanstack/query-core": "^5.28.0",
     "axios": "^1.6.7",
     "bignumber.js": "^4.0.4",
+    "chroma.ts": "^1.0.10",
     "ethers": "^6.11.1",
     "framer-motion": "^11.0.5",
     "get-starknet-core": "^3.2.0",
@@ -29,7 +31,8 @@
     "react-dom": "^18",
     "react-pro-sidebar": "^1.1.0",
     "react-responsive-carousel": "^3.2.23",
-    "starknet": "^5.24.3",
+    "react-select": "^5.8.0",
+    "starknet": "^6.4.1",
     "swr": "^2.2.5",
     "wonka": "^6.3.4"
   },

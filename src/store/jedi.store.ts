@@ -1,6 +1,6 @@
 import CONSTANTS from "@/constants";
 import axios from 'axios'
-import { Category, PoolInfo, PoolType, StrkDexIncentivesAtom } from "./pools";
+import { Category, PoolInfo, PoolType, ProtocolAtoms, StrkDexIncentivesAtom } from "./pools";
 import { Ekubo } from "./ekobu.store";
 import { atom } from "jotai";
 
@@ -22,8 +22,14 @@ class Jediswap extends Ekubo {
                 category = Category.STRK;
             }
 
+            const tokens = poolName.split('/');
+            const logo1 = CONSTANTS.LOGOS[<any>tokens[0]];
+            const logo2 = CONSTANTS.LOGOS[<any>tokens[1]];
             const poolInfo: PoolInfo = {
-                name: poolName,
+                pool: {
+                    name: poolName,
+                    logos: [logo1, logo2]
+                },
                 protocol: {
                     name: this.name,
                     link: this.link,
@@ -52,8 +58,8 @@ class Jediswap extends Ekubo {
 }
 
 
-const jedi = new Jediswap();
-const JediAtoms = {
+export const jedi = new Jediswap();
+const JediAtoms: ProtocolAtoms = {
     pools: atom((get) => {
         const poolsInfo = get(StrkDexIncentivesAtom)
         const empty: PoolInfo[] = [];
