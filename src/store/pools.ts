@@ -87,7 +87,7 @@ export const updateFiltersAtom = atom(null, (get, set, type: 'categories' | 'poo
     }
 })
 
-const allPoolsAtomUnSorted = atom((get) => {
+export const allPoolsAtomUnSorted = atom((get) => {
     const pools: PoolInfo[] = [];
     return PROTOCOLS.reduce((_pools, p) => _pools.concat(get(p.atoms.pools)), pools)
 })

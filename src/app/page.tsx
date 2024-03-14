@@ -4,7 +4,7 @@ import Navbar from "@/components/Navbar";
 import EkuboAtoms from "@/store/ekobu.store";
 import Ekubo from "@/store/ekobu.store";
 import Jediswap from "@/store/jedi.store";
-import { PoolInfo, StrkDexIncentivesAtom, filteredPools, sortPoolsAtom } from "@/store/pools";
+import { PoolInfo, StrkDexIncentivesAtom, allPoolsAtomUnSorted, filteredPools, sortPoolsAtom } from "@/store/pools";
 import { Avatar, AvatarGroup, Box, Card, CardBody, CardHeader, Center, Container, Flex, HStack, Heading, Link, LinkBox, LinkOverlay, Skeleton, Stack, Text, Tooltip } from "@chakra-ui/react";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import Image from "next/image";
@@ -15,7 +15,8 @@ import CONSTANTS from "@/constants";
 import Filters from "@/components/Filters";
 
 export default function Home() {
-  const _allPools = useAtomValue(filteredPools);
+  const allPools = useAtomValue(allPoolsAtomUnSorted);
+  const _filteredPools = useAtomValue(filteredPools);
   const ITEMS_PER_PAGE = 15;
   const {
     currentPage,
@@ -23,14 +24,14 @@ export default function Home() {
     pagesCount,
     pages
   } = usePagination({
-    pagesCount: Math.floor(_allPools.length / ITEMS_PER_PAGE),
+    pagesCount: Math.floor(_filteredPools.length / ITEMS_PER_PAGE),
     initialState: { currentPage: 1 },
   });
 
   const pools = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
-    return _allPools.slice(startIndex, startIndex + ITEMS_PER_PAGE)
-  }, [_allPools, currentPage])
+    return _filteredPools.slice(startIndex, startIndex + ITEMS_PER_PAGE)
+  }, [_filteredPools, currentPage])
 
   const sortedPools = useAtomValue(sortPoolsAtom)
 
@@ -157,12 +158,16 @@ export default function Home() {
               </Card>
             ))}
           </Stack>}
-          {pools.length == 0 && <Stack>
+          {allPools.length > 0 && pools.length == 0 && <Box padding="10px 0" width={'100%'} float={'left'}>
+            <Text color='light_grey' textAlign={'center'}>No pools. Check filters.</Text>
+          </Box>}
+          {allPools.length == 0 && <Stack>
             <Skeleton height='70px' />
             <Skeleton height='70px' />
             <Skeleton height='70px' />
           </Stack>}
         </Container>
+        <hr style={{width: '100%', borderColor: '#5f5f5f', float: 'left'}}/>
         <Box padding="10px 0" width={'100%'} float={'left'}>
           <Text color='light_grey' textAlign={'center'}>More features coming soon!</Text>
         </Box>
