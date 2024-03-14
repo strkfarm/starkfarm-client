@@ -15,8 +15,11 @@ export default function Navbar() {
         return `${x.slice(0, 4)}...${x.slice(x.length - 4, x.length)}`
     }
 
-    return <Container width={'100%'} padding={'20px 20px 10px'} borderBottom={'1px solid var(--chakra-colors-color2)'}>
-        <Box width={'100%'} maxWidth='1000px' margin={'0px auto'}>
+    return <Container width={'100%'} padding={'0'} borderBottom={'1px solid var(--chakra-colors-color2)'}>
+        <Center bg='highlight' color='orange' padding={0}>
+            <Text>{""}Lending pools coming soon{""}</Text>
+        </Center>
+        <Box width={'100%'} maxWidth='1000px' margin={'0px auto'} padding={'20px 20px 10px'}>
             <Flex width={'100%'}>
                 <Text fontSize={'35px'}  margin='0 auto 0 0' color={'color2'} letterSpacing={'10px'} textAlign={'left'}><b>STRKFarm</b></Text>
                 <Link href={CONSTANTS.COMMUNITY_TG} isExternal>

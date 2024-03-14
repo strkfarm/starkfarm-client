@@ -128,8 +128,8 @@ export default function Home() {
               <HStack width={'100%'}>
                   <Heading width={{base: '50%', md: '33%'}} size='md'>Pool</Heading>
                   <Stack direction={{base: 'column', md: 'row'}} width={{base: '50%', md: '66%'}}>
-                    <Heading width={{base: '100%', md: '50%'}} size='md' textAlign={{base: 'right', md: 'center'}}>STRK APY (%)</Heading>
-                    <Heading width={{base: '100%', md: '50%'}} size='sm' textAlign={'right'}>TVL ($)</Heading>
+                    <Heading width={{base: '100%', md: '50%'}} size='md' textAlign={{base: 'right', md: 'center'}}>STRK APY(%)</Heading>
+                    <Heading width={{base: '100%', md: '50%'}} size='sm' textAlign={'right'}>TVL($)</Heading>
                   </Stack>
               </HStack>
             </CardBody>
