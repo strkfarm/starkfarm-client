@@ -17,7 +17,7 @@ export default function Navbar() {
 
     return <Container width={'100%'} padding={'0'} borderBottom={'1px solid var(--chakra-colors-color2)'}>
         <Center bg='highlight' color='orange' padding={0}>
-            <Text fontSize='12px' textAlign={'center'} padding="0px 5px">{""}<b>Alpha version, report bugs in our Telegram group.</b> Lending pools coming soon.{""}</Text>
+            <Text fontSize='12px' textAlign={'center'} padding="0px 5px">{""}<b>Alpha version, report bugs in our Telegram group.</b>{""}</Text>
         </Center>
         <Box width={'100%'} maxWidth='1000px' margin={'0px auto'} padding={'20px 20px 10px'}>
             <Flex width={'100%'}>

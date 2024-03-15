@@ -10,6 +10,10 @@ import HaikoAtoms, { haiko } from "./haiko.store";
 import StarkDefiAtoms, { starkDefi } from "./starkdefi.store";
 import NostraDexAtoms, { nostraDex } from "./nostradex.store";
 import SithswapAtoms, { sithswap } from "./sithswap.store";
+import ZkLendAtoms, { zkLend } from "./zklend.store";
+import NostraLendingAtoms, { NostraLending, nostraLending } from "./nostralending.store";
+import HashstackAtoms, { hashstack } from "./hashstack.store";
+import NimboraAtoms, { nimbora } from "./nimbora.store";
 
 export enum Category {
     Stable = "Stable Pools",
@@ -20,7 +24,7 @@ export enum Category {
 export enum PoolType {
     DEXV2 = 'V2 LP DEX',
     DEXV3 = 'Concentrated LP DEX',
-    // Lending = 'Lending'
+    Lending = 'Lending'
 }
 
 export interface APRSplit {
@@ -74,12 +78,32 @@ const PROTOCOLS = [{
 }, {
     name: sithswap.name,
     atoms: SithswapAtoms
+}, {
+    name: zkLend.name,
+    atoms: ZkLendAtoms
+}, {
+    name: nostraLending.name,
+    atoms: NostraLendingAtoms
+}, {
+    name: hashstack.name,
+    atoms: HashstackAtoms
+}, {
+    name: nimbora.name,
+    atoms: NimboraAtoms
 }]
 
 export const StrkDexIncentivesAtom = atomWithQuery((get) => ({
     queryKey: ['strk_dex_incentives'],
     queryFn: async ({ queryKey: [] }) => {
-        const res = await fetch(CONSTANTS.EKUBO.INCENTIVE_URL); // common for all
+        const res = await fetch(CONSTANTS.DEX_INCENTIVE_URL); // common for all
+        return res.json()
+    },
+}))
+
+export const StrkLendingIncentivesAtom = atomWithQuery((get) => ({
+    queryKey: ['strk_lending_incentives'],
+    queryFn: async ({ queryKey: [] }) => {
+        const res = await fetch(CONSTANTS.LENDING_INCENTIVES_URL); // common for all
         return res.json()
     },
 }))

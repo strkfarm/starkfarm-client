@@ -9,12 +9,8 @@ const LOGOS = {
 
 export type TokenName = 'USDT' | 'USDC' | 'ETH' | 'STRK' | 'WBTC' | 'DAI'
 const CONSTANTS = {
-    EKUBO: {
-        INCENTIVE_URL: 'https://kx58j6x5me.execute-api.us-east-1.amazonaws.com//starknet/fetchFile?file=qa_strk_grant.json'
-    },
-    JEDI_SWAP: {
-        INCENTIVE_URL: 'https://kx58j6x5me.execute-api.us-east-1.amazonaws.com//starknet/fetchFile?file=qa_strk_grant.json'
-    },
+    DEX_INCENTIVE_URL: 'https://kx58j6x5me.execute-api.us-east-1.amazonaws.com//starknet/fetchFile?file=qa_strk_grant.json',
+    LENDING_INCENTIVES_URL: 'https://kx58j6x5me.execute-api.us-east-1.amazonaws.com/starknet/fetchFile?file=qa_lending_strk_grant.json',
     LOGOS,
     COMMUNITY_TG:'https://t.me/+HQ_eHaXmF-1lZDc1'
 }
