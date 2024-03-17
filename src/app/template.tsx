@@ -38,7 +38,8 @@ import { RpcProvider, RpcProviderOptions, constants } from 'starknet';
 import mixpanel from 'mixpanel-browser';
 
 // ! make page view more dynamic
-mixpanel.init("118f29da6a372f0ccb6f541079cad56b", {track_pageview: "full-url"});
+mixpanel.init("118f29da6a372f0ccb6f541079cad56b");
+mixpanel.track('Page open')
 
 const theme = extendTheme({
   colors: {

@@ -1,6 +1,6 @@
 import CONSTANTS, { TokenName } from "@/constants";
 import axios from 'axios'
-import { APRSplit, Category, PoolInfo, PoolType, ProtocolAtoms, StrkDexIncentivesAtom } from "./pools";
+import { APRSplit, Category, PoolInfo, PoolMetadata, PoolType, ProtocolAtoms, StrkDexIncentivesAtom } from "./pools";
 import { Ekubo } from "./ekobu.store";
 import { atom } from "jotai";
 import { IDapp } from "./IDapp.store";
@@ -60,6 +60,13 @@ export class Jediswap extends IDapp<string> {
                 }],
                 category: category,
                 type: PoolType.DEXV2,
+                lending: {
+                    collateralFactor: 0,
+                },
+                borrow: {
+                    borrowFactor: 0,
+                    apr: 0
+                }
             }
             pools.push(poolInfo);
         })
@@ -71,6 +78,7 @@ export class Jediswap extends IDapp<string> {
         const aprData: MyBaseAprDoc[] = data.data;
         let baseAPY: number | 'Err' = 'Err'
         let splitApr: APRSplit | null = null;
+        const metadata: PoolMetadata | null = null;
         if (data.isSuccess) {
             const pairId = PairInfo[p.pool.name]
             const item = aprData.find((doc) => doc.id == pairId)
@@ -84,7 +92,7 @@ export class Jediswap extends IDapp<string> {
             }
         }
         return {
-            baseAPY, splitApr
+            baseAPY, splitApr, metadata
         }
     }
 }

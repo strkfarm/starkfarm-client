@@ -54,7 +54,14 @@ export class Ekubo {
                     description: 'Starknet DeFi Spring incentives',
                 }],
                 category: category,
-                type: PoolType.DEXV3
+                type: PoolType.DEXV3,
+                lending: {
+                    collateralFactor: 0,
+                },
+                borrow: {
+                    borrowFactor: 0,
+                    apr: 0
+                }
             }
             pools.push(poolInfo);
         })

@@ -51,7 +51,14 @@ export class Hashstack extends ZkLend {
                     description: 'Starknet DeFi Spring incentives',
                 }],
                 category: category,
-                type: PoolType.Lending
+                type: PoolType.Lending,
+                lending: {
+                    collateralFactor: 0,
+                },
+                borrow: {
+                    borrowFactor: 0,
+                    apr: 0
+                }
             }
             pools.push(poolInfo);
         })

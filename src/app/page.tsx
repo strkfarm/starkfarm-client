@@ -15,7 +15,6 @@ import Filters from "@/components/Filters";
 import tg from '@/assets/tg.svg';
 import Pools from "@/components/Pools";
 import Strategies from "@/components/Strategies";
-import { MdTrendingUp } from "react-icons/md";
 
 export default function Home() {
   
