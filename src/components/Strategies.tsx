@@ -154,7 +154,7 @@ export default function Strategies() {
                                         <Text width={'5%'} className="text-cell">{index + 1}</Text>
                                         <Text width={'45%'} className="text-cell">{action.name}</Text>
                                         <Text width={'15%'} className="text-cell"><Avatar size='2xs' bg={'black'} src={action.pool.protocol.logo} marginRight={'2px'}/> {action.pool.protocol.name}</Text>
-                                        <Text width={'15%'} className="text-cell" textAlign={'left'}><Avatar size='2xs' bg={'black'} src={action.pool.protocol.logo} marginRight={'2px'} /> {action.pool.pool.name}</Text>
+                                        <Text width={'15%'} className="text-cell" textAlign={'left'}><Avatar size='2xs' bg={'black'} src={action.pool.pool.logos[0]} marginRight={'2px'} /> {action.pool.pool.name}</Text>
                                         <Text width={'10%'} className="text-cell" textAlign={'right'}>${Number(action.amount).toLocaleString()}</Text>
                                         <Text width={'10%'} className="text-cell" textAlign={'right'}>{action.isDeposit ? (action.pool.apr * 100).toFixed(2) : -(action.pool.borrow.apr*100).toFixed(2)}%</Text>
                                     </Flex>)}
