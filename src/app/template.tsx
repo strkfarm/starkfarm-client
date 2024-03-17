@@ -134,7 +134,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
               </Menu>
             </Sidebar>
            */}
-            <Container  width={'100%'} padding='0px'>
+            <Container  width={'100%'} padding='0px' paddingTop='100px'>
               <Navbar></Navbar>
               {children}
             </Container>

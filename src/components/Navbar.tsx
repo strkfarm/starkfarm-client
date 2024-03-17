@@ -15,7 +15,7 @@ export default function Navbar() {
         return `${x.slice(0, 4)}...${x.slice(x.length - 4, x.length)}`
     }
 
-    return <Container width={'100%'} padding={'0'} borderBottom={'1px solid var(--chakra-colors-color2)'}>
+    return <Container width={'100%'} padding={'0'} borderBottom={'1px solid var(--chakra-colors-color2)'} position={'fixed'} bg='bg' zIndex={10000} top='0'>
         <Center bg='highlight' color='orange' padding={0}>
             <Text fontSize='12px' textAlign={'center'} padding="0px 5px">{""}<b>Alpha version, report bugs in our Telegram group.</b>{""}</Text>
         </Center>
@@ -31,7 +31,7 @@ export default function Navbar() {
                             bg: 'color2_50p'
                         }}    
                         display={{base: 'none !important', md: 'flex !important'}}
-                        // className="glow-button"
+                        className="glow-button"
                     >
                         Join Telegram
                     </Button>
