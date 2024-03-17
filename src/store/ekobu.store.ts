@@ -5,6 +5,7 @@ import axios from 'axios'
 import { Category, PoolInfo, PoolType, ProtocolAtoms, StrkDexIncentivesAtom } from "./pools";
 import { PrimitiveAtom, atom } from "jotai";
 import useSWR from "swr";
+import { atomWithQuery } from "jotai-tanstack-query";
 const fetcher = (...args: any[]) => {
     return fetch(args[0], args[1]).then(res => res.json())
 }
@@ -62,6 +63,7 @@ export class Ekubo {
     }
 
 }
+
 
 export const ekubo = new Ekubo();
 const EkuboAtoms: ProtocolAtoms = {

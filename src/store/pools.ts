@@ -1,7 +1,7 @@
 import CONSTANTS from "@/constants";
 import BigNumber from "bignumber.js";
 import { Atom, PrimitiveAtom, atom } from "jotai";
-import { atomWithQuery } from 'jotai-tanstack-query'
+import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query'
 import EkuboAtoms, { ekubo } from "./ekobu.store";
 import JediAtoms, { jedi } from "./jedi.store";
 import MySwapAtoms, { mySwap } from "./myswap.store";
@@ -28,12 +28,22 @@ export enum PoolType {
 }
 
 export interface APRSplit {
-    apr: number,
+    apr: number | 'Err',
     title: string,
     description: string
 }
 
-export interface PoolInfo {
+export interface PoolMetadata {
+    borrow: {
+        apr: number,
+        borrowFactor: number
+    },
+    lending: {
+        collateralFactor: number
+    }
+}
+
+export interface PoolInfo extends PoolMetadata {
     pool: {
         name: string,
         logos: string[]
@@ -47,50 +57,65 @@ export interface PoolInfo {
     apr: number, // not in %
     aprSplits: APRSplit[],
     category: Category,
-    type: PoolType
+    type: PoolType,
+    isLoading?: boolean,
 }
 
 export interface ProtocolAtoms {
-    pools: Atom<PoolInfo[]>
+    pools: Atom<PoolInfo[]>,
+    baseAPRs?: Atom<AtomWithQueryResult<any, Error>>
 }
 
-const PROTOCOLS = [{
+export const PROTOCOLS = [{
     name: ekubo.name,
+    class: ekubo,
     atoms: EkuboAtoms
 }, {
     name: jedi.name,
+    class: jedi,
     atoms: JediAtoms
 }, {
     name: mySwap.name,
+    class: mySwap,
     atoms: MySwapAtoms
 }, {
     name: tenkswap.name,
+    class: tenkswap,
     atoms: TenkSwapAtoms
 }, {
     name: haiko.name,
+    class: haiko,
     atoms: HaikoAtoms
 }, {
     name: nostraDex.name,
+    class: nostraDex,
     atoms: NostraDexAtoms
 }, {
     name: starkDefi.name,
+    class: starkDefi,
     atoms: StarkDefiAtoms
 }, {
     name: sithswap.name,
+    class: sithswap,
     atoms: SithswapAtoms
 }, {
     name: zkLend.name,
+    class: zkLend,
     atoms: ZkLendAtoms
 }, {
     name: nostraLending.name,
+    class: nostraLending,
     atoms: NostraLendingAtoms
 }, {
     name: hashstack.name,
+    class: hashstack,
     atoms: HashstackAtoms
 }, {
     name: nimbora.name,
+    class: nimbora,
     atoms: NimboraAtoms
 }]
+
 
 export const StrkDexIncentivesAtom = atomWithQuery((get) => ({
     queryKey: ['strk_dex_incentives'],

@@ -42,6 +42,7 @@ const theme = extendTheme({
     opacity_50p: 'rgba(0, 0, 0, 0.5)',
     color1: 'rgba(86, 118, 254, 1)',
     color1_50p: 'rgba(86, 118, 254, 0.5)',
+    color1_light: '#bcc9ff80',
     color2: 'rgb(127 73 229)',
     color2_50p: 'rgba(104, 51, 205, 0.5)',
     highlight: '#272932', // light grey

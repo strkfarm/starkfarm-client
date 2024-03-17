@@ -26,11 +26,12 @@ export default function Navbar() {
                     <Button margin='0 0 0 auto' 
                         borderColor='color2' 
                         color='color2' variant='outline' 
-                        rightIcon={ <Avatar size='sm' name='T G' src={tg.src} color='red' />}
+                        rightIcon={ <Avatar size='sm' bg='highlight' color='color2' name='T G' src={tg.src} />}
                         _hover={{
                             bg: 'color2_50p'
                         }}    
-                        display={{base: 'none', md: 'flex'}}
+                        display={{base: 'none !important', md: 'flex !important'}}
+                        // className="glow-button"
                     >
                         Join Telegram
                     </Button>
@@ -39,7 +40,7 @@ export default function Navbar() {
                         variant={'ghost'}
                         borderColor={'color2'}
                         display={{base: 'block', md: 'none'}}
-                        icon={<Avatar size='md' name='T G' src={tg.src} color='red' 
+                        icon={<Avatar size='md' bg='highlight' className="glow-button" name='T G' color='color2' src={tg.src}
                         _hover={{
                             bg: 'color2_50p'
                         }}  

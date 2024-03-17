@@ -33,6 +33,7 @@
     "react-pro-sidebar": "^1.1.0",
     "react-responsive-carousel": "^3.2.23",
     "react-select": "^5.8.0",
+    "react-share": "^5.1.0",
     "starknet": "^6.4.1",
     "swr": "^2.2.5",
     "wonka": "^6.3.4"

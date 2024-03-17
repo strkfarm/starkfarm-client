@@ -3,7 +3,8 @@ import Select, { StylesConfig } from 'react-select';
 import { ALL_FILTER, filterAtoms, filters, updateFiltersAtom } from '@/store/pools';
 import * as chroma from 'chroma.ts';
 import { useAtom, useSetAtom } from 'jotai';
-import { Box, Container, Stack } from '@chakra-ui/react';
+import { Accordion, AccordionButton, AccordionItem, AccordionPanel, Box, Container, Stack, Text } from '@chakra-ui/react';
+import { HamburgerIcon } from '@chakra-ui/icons';
 
 export interface Option {
     readonly value: string;
@@ -14,12 +15,12 @@ export interface Option {
 }
 
 const colourStyles: StylesConfig<Option, true> = {
-    control: (styles) => ({ ...styles, backgroundColor: 'var(--chakra-colors-highlight)', borderColor: 'var(--chakra-colors-highlight)' }),
+    control: (styles) => ({ ...styles, padding: '10px 0', backgroundColor: 'var(--chakra-colors-bg)', borderColor: 'var(--chakra-colors-bg)' }),
     option: (styles, { data, isDisabled, isFocused, isSelected }) => {
       const color = chroma.color(data.color);
       return {
         ...styles,
-        backgroundColor: 'var(--chakra-colors-highlight)',
+        backgroundColor: 'var(--chakra-colors-bg)',
         color: isDisabled
           ? '#ccc'
           : isSelected
@@ -112,50 +113,65 @@ export default function Filters() {
     const poolTypes: readonly Option[] = filters.types.map((p, index) => {
         return {value: p, label: p, color: colors[index % colors.length]}
     })
-  return <Container width={'100%'} padding="0">
-            <Select
-            closeMenuOnSelect={false}
-            defaultValue={[...protocolOptions]}
-            isMulti
-            placeholder="Select Protocols"
-            options={protocolOptions}
-            styles={colourStyles}
-            onChange={(x, b) => {
-                console.log(x, Array.isArray(x), b)
-                if (filters.protocols.length == x.length) {
-                    updateFilters('protocols', [ALL_FILTER])
-                } else {
-                    updateFilters('protocols', x.map(p => p.value))
-                }
-            }}
-        />
-        
-        <Stack marginTop={'5px'} direction={{base: 'column', md: 'row'}}>
-            <Box width={{base: '100%', md: '50%'}}>
-                <Select
-                closeMenuOnSelect={false}
-                defaultValue={[...categories]}
-                isMulti
-                placeholder="Select Categories"
-                options={categories}
-                styles={colourStyles}
-                onChange={(x, b) => {
-                    console.log(x, Array.isArray(x), b)
-                    updateFilters('categories', x.map(p => p.value))
-                }}/>
-            </Box>
-            <Box width={{base: '100%', md: '50%'}}>
-                <Select
-                closeMenuOnSelect={false}
-                defaultValue={[...poolTypes]}
-                isMulti
-                placeholder="Select Pool types"
-                options={poolTypes}
-                styles={colourStyles}
-                onChange={(x, b) => {
-                    updateFilters('poolTypes', x.map(p => p.value))
-                }}/>
-            </Box>
-        </Stack>
-    </Container>
+  return <Accordion allowToggle>
+          <AccordionItem borderTop='0px' borderBottom='1px' borderColor={'bg'}>
+            <h2>
+              <AccordionButton>
+                <Box as="span" flex='1' textAlign='right' color='color2' marginRight='10px' >
+                  Filters
+                </Box>
+                <HamburgerIcon color='color2' />
+              </AccordionButton>
+            </h2>
+            <AccordionPanel pb={4} bg='highlight' overflow={'visible'}>
+            <Text color='light_grey' fontSize={'14px'} width='100%'>Protocols:</Text>
+              <Select
+              closeMenuOnSelect={false}
+              defaultValue={[...protocolOptions]}
+              isMulti
+              placeholder="Select Protocols"
+              options={protocolOptions}
+              styles={colourStyles}
+              onChange={(x, b) => {
+                  console.log(x, Array.isArray(x), b)
+                  if (filters.protocols.length == x.length) {
+                      updateFilters('protocols', [ALL_FILTER])
+                  } else {
+                      updateFilters('protocols', x.map(p => p.value))
+                  }
+              }}
+          />
+          
+          <Stack marginTop={'5px'} direction={{base: 'column', md: 'row'}}>
+              <Box width={{base: '100%', md: '50%'}}>
+                  <Text color='light_grey' fontSize={'14px'} width='100%'>Categories:</Text>
+                  <Select
+                  closeMenuOnSelect={false}
+                  defaultValue={[...categories]}
+                  isMulti
+                  placeholder="Select Categories"
+                  options={categories}
+                  styles={colourStyles}
+                  onChange={(x, b) => {
+                      console.log(x, Array.isArray(x), b)
+                      updateFilters('categories', x.map(p => p.value))
+                  }}/>
+              </Box>
+              <Box width={{base: '100%', md: '50%'}}>
+                  <Text color='light_grey' fontSize={'14px'} width='100%'>Protocol types:</Text>  
+                  <Select
+                  closeMenuOnSelect={false}
+                  defaultValue={[...poolTypes]}
+                  isMulti
+                  placeholder="Select Pool types"
+                  options={poolTypes}
+                  styles={colourStyles}
+                  onChange={(x, b) => {
+                      updateFilters('poolTypes', x.map(p => p.value))
+                  }}/>
+              </Box>
+          </Stack>
+        </AccordionPanel>
+      </AccordionItem>
+    </Accordion>
 };
