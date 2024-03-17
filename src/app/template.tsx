@@ -35,6 +35,10 @@ import * as PlaySvg from '@public/play.svg';
 import Image from 'next/image';
 import Navbar from '@/components/Navbar';
 import { RpcProvider, RpcProviderOptions, constants } from 'starknet';
+import mixpanel from 'mixpanel-browser';
+
+// ! make page view more dynamic
+mixpanel.init("118f29da6a372f0ccb6f541079cad56b", {track_pageview: "full-url"});
 
 const theme = extendTheme({
   colors: {

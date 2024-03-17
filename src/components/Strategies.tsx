@@ -7,6 +7,7 @@ import { AddIcon } from "@chakra-ui/icons";
 import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Avatar, AvatarGroup, Box, Button, Card, CardBody, Center, Container, Flex, HStack, Heading, Link, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Skeleton, Stack, Table, TableCaption, TableContainer, Tbody, Td, Text, Th, Thead, Tooltip, Tr, Wrap, WrapItem, useDisclosure } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
 import React from "react";
+import mixpanel from 'mixpanel-browser';
 
 
 export default function Strategies() {
@@ -23,6 +24,9 @@ export default function Strategies() {
                     _hover={{
                         backgroundColor: 'bg'
                     }}
+                    onClick={()=> {
+                        mixpanel.track('Click one click deposit')
+                    }}
                 ><AddIcon/></Button>
         </PopoverTrigger>
         <PopoverContent bg='highlight' borderColor={'highlight'}>
@@ -37,33 +41,6 @@ export default function Strategies() {
             </PopoverBody>
         </PopoverContent>
       </Popover></Tooltip>
-    //     return <Box>
-    //         <Button variant={'solid'} size={'sm'} bg='highlight' color='cyan' float={'right'} 
-    //             marginTop={'10px'}
-    //             _hover={{
-    //                 backgroundColor: 'bg'
-    //             }}
-    //             onClick={onOpen}
-    //         ><AddIcon/></Button>
-
-    //         <Modal isOpen={isOpen} onClose={onClose}>
-    //             <ModalOverlay />
-    //             <ModalContent>
-    //                 <ModalHeader>Modal Title</ModalHeader>
-    //                 <ModalCloseButton />
-    //                 <ModalBody>
-    //                     Thanks for showing interest.
-    //                 </ModalBody>
-
-    //                 <ModalFooter>
-    //                     <Button colorScheme='blue' mr={3} onClick={onClose}>
-    //                     Close
-    //                     </Button>
-    //                     <Button variant='ghost'>Secondary Action</Button>
-    //                 </ModalFooter>
-    //             </ModalContent>
-    //         </Modal>
-    //   </Box>
     }
 
     function getStratCard(strat: StrategyInfo) {
