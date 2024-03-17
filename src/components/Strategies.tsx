@@ -35,7 +35,7 @@ export default function Strategies() {
           <PopoverBody marginTop={'20px'}>
             <Text fontSize={'14px'}>Thanks for showing interest in <b>`One Click Deposit` feature</b>. 
             We are developing this as you read this message and will be available soon. 
-            The button is to let you that we will be supporting this soon. 😎</Text>
+            The button is to let you know that we will be supporting this soon. 😎</Text>
             
             <Text fontSize={'14px'} color='light_grey' marginTop={'10px'}><b>Join our Telegram group to get instant updates. Link on the top.</b></Text>
             </PopoverBody>
