@@ -54,6 +54,11 @@ export default function Home() {
         <Center padding="10px 0" width={'100%'} float={'left'}>
           <Link href={CONSTANTS.COMMUNITY_TG} isExternal><Image src={tg.src} width='50' margin='0 auto'/></Link>
         </Center>
+        <Center width={'100%'} float='left'>
+          <Box width='300px' maxWidth={'100%'} marginTop={'20px'} borderTop={'1px solid var(--chakra-colors-highlight)'} textAlign={'center'} textColor={'color2'} padding='10px 0' fontSize={'13px'}>
+            Made with ❤️ on Starknet by <Link href='https://t.me/akiraonstarknet' target="_blank">@akiraonstarknet</Link>
+          </Box>
+        </Center>
     </Container>
   );
 }
