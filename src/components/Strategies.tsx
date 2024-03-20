@@ -4,9 +4,9 @@ import { StrategyInfo, strategiesAtom } from "@/store/strategies.atoms";
 import { StrategyAction } from "@/strategies/simple.stable.strat";
 import { getUnique, getUniqueById } from "@/utils";
 import { AddIcon } from "@chakra-ui/icons";
-import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Avatar, AvatarGroup, Box, Button, Card, CardBody, Center, Container, Flex, HStack, Heading, Link, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Skeleton, Stack, Table, TableCaption, TableContainer, Tbody, Td, Text, Th, Thead, Tooltip, Tr, Wrap, WrapItem, useDisclosure } from "@chakra-ui/react";
+import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Avatar, AvatarGroup, Box, Button, Card, CardBody, Center, Container, Flex, HStack, Heading, Link, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Skeleton, Stack, Table, TableCaption, TableContainer, Tbody, Td, Text, Th, Thead, Tooltip, Tr, VisuallyHidden, Wrap, WrapItem, useDisclosure } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
-import React from "react";
+import React, { useEffect } from "react";
 import mixpanel from 'mixpanel-browser';
 
 
@@ -16,31 +16,37 @@ export default function Strategies() {
 
     function DepositButton(strat: StrategyInfo) {
         // const { isOpen, onOpen, onClose } = useDisclosure()
-        return <Tooltip label='Deposit'><Popover >
-        <PopoverTrigger>
-            
-                <Button variant={'solid'} size={'sm'} bg='highlight' color='cyan' float={'right'} 
-                    marginTop={'10px'}
-                    _hover={{
-                        backgroundColor: 'bg'
-                    }}
-                    onClick={()=> {
-                        mixpanel.track('Click one click deposit')
-                    }}
-                ><AddIcon/></Button>
-        </PopoverTrigger>
-        <PopoverContent bg='highlight' borderColor={'highlight'}>
-          <PopoverArrow />
-          <PopoverCloseButton />
-          <PopoverBody marginTop={'20px'}>
-            <Text fontSize={'14px'}>Thanks for showing interest in <b>`One Click Deposit` feature</b>. 
-            We are developing this as you read this message and will be available soon. 
-            The button is to let you know that we will be supporting this soon. 😎</Text>
-            
-            <Text fontSize={'14px'} color='light_grey' marginTop={'10px'}><b>Join our Telegram group to get instant updates. Link on the top.</b></Text>
-            </PopoverBody>
-        </PopoverContent>
-      </Popover></Tooltip>
+        return <Box>
+            <AvatarGroup size='xs' max={2} marginRight={'5px'} float={'left'} visibility={'hidden'} display={{base: 'none', md: 'flex'}}>
+                {getUniqueById(strat.actions.map(p => ({id: p.pool.pool.name, logo: p.pool.pool.logos[0]}))).map((p: any) => <Avatar key={p.id} src={p.logo} />)}
+                </AvatarGroup>
+            <Box float={'left'} marginTop={{base: '7px', md: '15px'}} width={{base: 'calc(100% - 40px)', md: 'calc(100% - 80px)'}} opacity={'0.5'} fontSize={'15px'} fontFamily={'arial'}>{strat.description}</Box>
+            <Popover >
+                <PopoverTrigger>
+                    
+                        <Button variant={'solid'} size={'sm'} bg='highlight' color='cyan' float={'right'} 
+                            marginTop={'10px'}
+                            _hover={{
+                                backgroundColor: 'bg'
+                            }}
+                            onClick={()=> {
+                                mixpanel.track('Click one click deposit')
+                            }}
+                        ><AddIcon/></Button>
+                </PopoverTrigger>
+                <PopoverContent bg='highlight' borderColor={'highlight'}>
+                <PopoverArrow />
+                <PopoverCloseButton />
+                <PopoverBody marginTop={'20px'}>
+                    <Text fontSize={'14px'}>Thanks for showing interest in <b>`One Click Deposit` feature</b>. 
+                    We are developing this as you read this message and will be available soon. 
+                    The button is to let you know that we will be supporting this soon. 😎</Text>
+                    
+                    <Text fontSize={'14px'} color='light_grey' marginTop={'10px'}><b>Join our Telegram group to get instant updates. Link on the top.</b></Text>
+                    </PopoverBody>
+                </PopoverContent>
+            </Popover>
+      </Box>
     }
 
     function getStratCard(strat: StrategyInfo) {
@@ -88,7 +94,7 @@ export default function Strategies() {
         </Stack>
     }
     return <Container width='100%' float={'left'} padding={'0px'} marginTop={'10px'}>
-            <Text color='light_grey' fontSize={'13px'} marginBottom={'10px'}>Strategies are combination of deposit & borrow actions that combine various pools and risk combinations to maximize yield. 
+            <Text color='light_grey' fontSize={'13px'} marginBottom={'10px'} fontFamily={'arial'}>Strategies are combination of deposit & borrow actions that combine various pools and risk combinations to maximize yield. 
                 We currently have one High yield low risk strategy, and adding more as you read this.</Text>
           <Card variant={'filled'} bg='opacity_50p' color={'purple'} display={{base: 'none', md: 'visible'}}>
             <CardBody paddingTop={'5px'} paddingBottom={'5px'}>
@@ -110,7 +116,10 @@ export default function Strategies() {
                 >
                     <Accordion allowToggle display={{base: 'none', md: 'block'}}>
                         <AccordionItem border='0px'>
-                            <AccordionButton padding='0'>
+                            <AccordionButton padding='0' onClick={() => {
+                                mixpanel.track('Strategy expanded', {name: strat.name})
+                            }}>
+                                
                                 <Box width={'100%'} padding={'0px 10px 0 0'}>
                                     {getStratCard(strat)}
                                 </Box>

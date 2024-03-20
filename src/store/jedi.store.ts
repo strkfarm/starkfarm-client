@@ -29,9 +29,10 @@ export class Jediswap extends IDapp<string> {
         const myData = data[this.incentiveDataKey];
         if (!myData) return [];
         const pools: PoolInfo[] = [];
-        Object.keys(myData).forEach(poolName => {
+        Object.keys(myData).filter(this.commonVaultFilter).forEach(poolName => {
             const arr = myData[poolName];
             let category = Category.Others;
+            
             if (poolName == 'USDC/USDT') {
                 category = Category.Stable
             } else if (poolName.includes('STRK')) {
@@ -183,11 +184,12 @@ const JediAtoms: ProtocolAtoms = {
     pools: atom((get) => {
         const poolsInfo = get(StrkDexIncentivesAtom)
         const empty: PoolInfo[] = [];
-        if (!JediAtoms.baseAPRs) return empty;
-        const baseInfo = get(JediAtoms.baseAPRs)
+        // if (!JediAtoms.baseAPRs) return empty;
+        // const baseInfo = get(JediAtoms.baseAPRs)
         if (poolsInfo.data) {
             const pools = jedi._computePoolsInfo(poolsInfo.data);
-            return jedi.addBaseAPYs(pools, baseInfo);
+            // return jedi.addBaseAPYs(pools, baseInfo);
+            return pools;
         }
         else return empty;
     })

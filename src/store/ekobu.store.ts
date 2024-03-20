@@ -20,7 +20,7 @@ export class Ekubo {
         const myData = data[this.incentiveDataKey];
         if (!myData) return [];
         const pools: PoolInfo[] = [];
-        Object.keys(myData).forEach(poolName => {
+        Object.keys(myData).filter(this.commonVaultFilter).forEach(poolName => {
             const arr = myData[poolName];
             let category = Category.Others;
             if (poolName == 'USDC/USDT') {
@@ -67,6 +67,10 @@ export class Ekubo {
         })
         
         return pools;
+    }
+
+    commonVaultFilter(poolName: string) {
+        return !poolName.includes('DAI') && !poolName.includes('WSTETH') && !poolName.includes('BTC');
     }
 
 }

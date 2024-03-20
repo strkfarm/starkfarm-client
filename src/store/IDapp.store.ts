@@ -54,4 +54,8 @@ export class IDapp<BaseAPYT> {
     getMaxFactoredOut(positions: StrategyAction[], minHf: number): number {
         throw new Error('not implemented: getMaxFactoredOut')
     }
+
+    commonVaultFilter(poolName: string) {
+        return !poolName.includes('DAI') && !poolName.includes('WSTETH') && !poolName.includes('BTC');
+    }
 }

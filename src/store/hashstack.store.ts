@@ -17,7 +17,7 @@ export class Hashstack extends ZkLend {
         const myData = data[this.incentiveDataKey];
         if (!myData) return [];
         const pools: PoolInfo[] = [];
-        Object.keys(myData).forEach(poolName => {
+        Object.keys(myData).filter(this.commonVaultFilter).forEach(poolName => {
             const arr = myData[poolName];
             if (arr.length == 0) return;
 

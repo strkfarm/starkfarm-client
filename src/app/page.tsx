@@ -15,6 +15,7 @@ import Filters from "@/components/Filters";
 import tg from '@/assets/tg.svg';
 import Pools from "@/components/Pools";
 import Strategies from "@/components/Strategies";
+import mixpanel from "mixpanel-browser";
 
 export default function Home() {
   
@@ -30,8 +31,12 @@ export default function Home() {
         </Box>
         <Tabs position="relative" variant='unstyled' width={'100%'}>
           <TabList>
-            <Tab color='light_grey' _selected={{ color: 'color2' }}>All Pools</Tab >
-            <Tab  color='light_grey' _selected={{ color: 'color2' }}>Strategies</Tab>
+            <Tab color='light_grey' _selected={{ color: 'color2' }} onClick={() => {
+              mixpanel.track('All pools clicked')
+            }}>All Pools</Tab >
+            <Tab  color='light_grey' _selected={{ color: 'color2' }} onClick={() => {
+              mixpanel.track('Strategies opened')
+            }}>Strategies✨</Tab>
           </TabList>
           <TabIndicator
             mt="-1.5px"
