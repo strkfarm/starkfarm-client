@@ -121,7 +121,9 @@ export const StrkDexIncentivesAtom = atomWithQuery((get) => ({
     queryKey: ['strk_dex_incentives'],
     queryFn: async ({ queryKey: [] }) => {
         const res = await fetch(CONSTANTS.DEX_INCENTIVE_URL); // common for all
-        return res.json()
+        let data = await res.text();
+        data = data.replaceAll('NaN', '0');
+        return JSON.parse(data)
     },
 }))
 
@@ -129,7 +131,9 @@ export const StrkLendingIncentivesAtom = atomWithQuery((get) => ({
     queryKey: ['strk_lending_incentives'],
     queryFn: async ({ queryKey: [] }) => {
         const res = await fetch(CONSTANTS.LENDING_INCENTIVES_URL); // common for all
-        return res.json()
+        let data = await res.text();
+        data = data.replaceAll('NaN', '0');
+        return JSON.parse(data)
     },
 }))
 

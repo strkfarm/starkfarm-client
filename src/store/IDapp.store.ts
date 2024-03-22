@@ -56,6 +56,9 @@ export class IDapp<BaseAPYT> {
     }
 
     commonVaultFilter(poolName: string) {
-        return !poolName.includes('DAI') && !poolName.includes('WSTETH') && !poolName.includes('BTC');
+        const supportedPools = ['ETH/USDC', 'STRK/USDC', 'STRK/ETH', 'USDC/USDT', 'USDC', 'USDT', 'ETH', 'STRK']
+        console.log('filter', poolName, supportedPools.includes(poolName))
+        // return !poolName.includes('DAI') && !poolName.includes('WSTETH') && !poolName.includes('BTC');
+        return supportedPools.includes(poolName);
     }
 }
