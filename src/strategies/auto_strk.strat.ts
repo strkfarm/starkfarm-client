@@ -3,6 +3,7 @@ import { IDapp } from "@/store/IDapp.store";
 import { Category, PROTOCOLS, PoolInfo } from "@/store/pools";
 import { IStrategy } from "./IStrategy";
 import { nostraLending } from "@/store/nostralending.store";
+import { zkLend  } from "@/store/zklend.store";
 
 interface Step {
     name: string,
@@ -33,7 +34,7 @@ export class AutoTokenStrategy extends IStrategy {
     }
 
     filterStrk(pools: PoolInfo[], amount: string, prevActions: StrategyAction[]) {
-        return pools.filter(p => p.pool.name == this.token && p.protocol.name == nostraLending.name)
+        return pools.filter(p => p.pool.name == this.token && p.protocol.name == zkLend.name)
     }
 
     optimizer(eligiblePools: PoolInfo[], amount: string, actions: StrategyAction[]): StrategyAction[] {
