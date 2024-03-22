@@ -19,9 +19,23 @@ export default function Navbar() {
         <Center bg='highlight' color='orange' padding={0}>
             <Text fontSize='12px' textAlign={'center'} padding="0px 5px">{""}<b>Alpha version, report bugs in our Telegram group.</b>{""}</Text>
         </Center>
-        <Box width={'100%'} maxWidth='1000px' margin={'0px auto'} padding={'20px 20px 10px'}>
+        <Box width={'100%'} maxWidth='1400px' margin={'0px auto'} padding={'20px 20px 10px'}>
             <Flex width={'100%'}>
                 <Text fontSize={'30px'}  margin='0 auto 0 0' color={'color2'} letterSpacing={'10px'} textAlign={'left'}><b>STRKFarm</b></Text>
+                <Link href={'/claims'} isExternal>
+                    <Button margin='0 0 0 auto' 
+                        borderColor='color2' 
+                        color='color2' variant='ghost' 
+                        marginRight={'30px'}
+                        leftIcon={ <Avatar size='sm' bg='highlight' color='color2' name='T G' src={CONSTANTS.LOGOS.STRK} />}
+                        _hover={{
+                            bg: 'color2_50p'
+                        }}    
+                        display={{base: 'none !important', md: 'flex !important'}}
+                    >
+                        Claims
+                    </Button>
+                </Link>
                 <Link href={CONSTANTS.COMMUNITY_TG} isExternal>
                     <Button margin='0 0 0 auto' 
                         borderColor='color2' 
