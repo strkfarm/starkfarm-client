@@ -33,7 +33,7 @@ const CONSTANTS = {
         AutoStrkFarm: '0x541681b9ad63dff1b35f79c78d8477f64857de29a27902f7298f7b620838ea',
         AutoUsdcFarm: '0x16912b22d5696e95ffde888ede4bd69fbbc60c5f873082857a47c543172694f'
     },
-    MOBILE_MSG: 'Desktop/Table only'
+    MOBILE_MSG: 'Desktop/Tablet only'
 }
 
 export const TOKENS: TokenInfo[] = [{
