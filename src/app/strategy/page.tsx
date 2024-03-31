@@ -25,6 +25,7 @@ import Deposit from "@/components/Deposit";
 import MyNumber from "@/utils/MyNumber";
 import { useERC20Balance } from "@/hooks/useERC20Balance";
 import { useAccount } from "@starknet-react/core";
+import { isMobile } from "react-device-detect";
 
 export default function Strategy() {
   const { address } = useAccount();
@@ -77,7 +78,7 @@ export default function Strategy() {
                   </Box>
                 </Box>
                 <Box padding={'10px'} borderRadius={'10px'} bg={'purple'} marginTop={'20px'}>
-                  <Text><b>Your Holdings: </b>{address ? `${balance.toEtherToFixedDecimals(4)} ${strategy?.holdingTokens[0].name}` : 'Connect wallet'}</Text>
+                  <Text><b>Your Holdings: </b>{address ? `${balance.toEtherToFixedDecimals(4)} ${strategy?.holdingTokens[0].name}` : (isMobile ? CONSTANTS.MOBILE_MSG : 'Connect wallet')}</Text>
                 </Box>
               </Card>
             </GridItem>
