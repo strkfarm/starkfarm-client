@@ -140,7 +140,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
            */}
             <Container  width={'100%'} padding='0px' paddingTop='100px'>
               <Navbar></Navbar>
-              {children}
+              <React.Suspense>{children}</React.Suspense>
             </Container>
           </Flex>
         </ChakraBaseProvider>
