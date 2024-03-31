@@ -98,7 +98,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
     const chains = [sepolia];
     const provider = jsonRpcProvider({
       rpc: (chain) => {
-        let args: RpcProviderOptions = {nodeUrl: 'http://localhost:3000/rpc-api', chainId: constants.StarknetChainId.SN_MAIN };
+        let args: RpcProviderOptions = {nodeUrl: 'https://rpc.nethermind.io/mainnet-juno?apikey=t1HPjhplOyEQpxqVMhpwLGuwmOlbXN0XivWUiPAxIBs0kHVK', chainId: constants.StarknetChainId.SN_MAIN };
         return args;
       }
     });
