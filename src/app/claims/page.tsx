@@ -17,7 +17,7 @@ import Pools from "@/components/Pools";
 import Strategies from "@/components/Strategies";
 import mixpanel from "mixpanel-browser";
 
-export default function Home() {
+export default function Claim() {
   
 
   return (
