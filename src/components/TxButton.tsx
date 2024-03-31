@@ -1,3 +1,4 @@
+import CONSTANTS from "@/constants";
 import { Box, Button, Spinner } from "@chakra-ui/react"
 import { UseContractWriteResult, useAccount, useContractWrite } from "@starknet-react/core"
 import { useEffect, useMemo } from "react";
@@ -31,7 +32,7 @@ export default function TxButton(props: TxButtonProps) {
     }, [status])
 
     const disabledText = useMemo(() => {
-        if(isMobile) return "Desktop/Table only";
+        if(isMobile) return CONSTANTS.MOBILE_MSG;
         if (!address) return "Wallet not connected"
         return ""
     }, [isMobile, address])
