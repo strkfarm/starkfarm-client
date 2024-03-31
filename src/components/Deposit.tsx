@@ -36,8 +36,8 @@ export default function Deposit(props: DepositProps) {
         console.log('hookkkAmount', amount.toEtherStr(), calls)
     }, [amount, calls])
 
-    function getBalanceComponent(token: TokenInfo) {
-        const { balance, isLoading, isError} = useERC20Balance(token); 
+    function BalanceComponent(props: {token: TokenInfo}) {
+        const { balance, isLoading, isError} = useERC20Balance(props.token); 
         return <Box color={'light_grey'} textAlign={'right'}>
             <Text>Available balance: </Text>
             <LoadingWrap isLoading={isLoading} isError={isError} 
@@ -49,7 +49,7 @@ export default function Deposit(props: DepositProps) {
                     boxSize: '15px'
                 }}
             >
-                <b style={{marginLeft: '5px'}}>{balance.toEtherToFixedDecimals(token.displayDecimals)}</b>
+                <b style={{marginLeft: '5px'}}>{balance.toEtherToFixedDecimals(props.token.displayDecimals)}</b>
             </LoadingWrap>
         </Box>
     }
@@ -77,7 +77,7 @@ export default function Deposit(props: DepositProps) {
                 </Menu>
             </GridItem>
             <GridItem colSpan={3}>
-                {getBalanceComponent(selectedMarket)}
+                <BalanceComponent token={selectedMarket}/>
             </GridItem>
         </Grid>
         

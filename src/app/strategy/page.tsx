@@ -43,6 +43,8 @@ export default function Strategy() {
     mixpanel.track('Strategy page open', {name: searchParams.get('name')})
   }, [])
 
+  const colSpan1: any = {base: '5', md: '3'}
+  const colSpan2: any = {base: '5', md: '2'}
   return (
     <Container maxWidth={'1000px'} margin={'0 auto'} padding='30px 10px' fontFamily={"sans-serif"}>
         <Flex marginBottom={'10px'}>
@@ -51,7 +53,7 @@ export default function Strategy() {
         </Flex>
         {strategy && <VStack width={'100%'}>
           <Grid width={'100%'} templateColumns='repeat(5, 1fr)' gap={2}>
-            <GridItem display='flex' colSpan={{base: '5', md: '3'}}>
+            <GridItem display='flex' colSpan={colSpan1}>
               <Card width='100%' padding={'15px'} color='white' bg='highlight'>
                 <Box display={{base: 'block', md: 'flex'}}>
                   <Box width={{base: '100%', md: '70%'}} float={'left'}>
@@ -79,7 +81,7 @@ export default function Strategy() {
                 </Box>
               </Card>
             </GridItem>
-            <GridItem display='flex' colSpan={{base: '5', md: '2'}}>
+            <GridItem display='flex' colSpan={colSpan2}>
               <Card width='100%' padding={'15px'} color='white' bg='highlight'>
               <Tabs position="relative" variant='unstyled' width={'100%'}>
                 <TabList>
