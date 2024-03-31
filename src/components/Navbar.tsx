@@ -1,27 +1,52 @@
 import { Avatar, Badge, Box, Button, Center, Container, Flex, IconButton, Link, Menu, MenuButton, MenuItem, MenuList, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, Portal, Select, Spinner, Text } from "@chakra-ui/react";
-import { useAccount } from "@starknet-react/core";
+import { useAccount, useConnect } from "@starknet-react/core";
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { num } from "starknet";
 import tg from '@/assets/tg.svg';
 import CONSTANTS from "@/constants";
+import { useEffect } from "react";
+import { useAtomValue, useSetAtom } from "jotai";
+import { addressAtom } from "@/store/claims.atoms";
+import { capitalize, shortAddress, MyMenuListProps, MyMenuItemProps } from "@/utils";
 
 
 export default function Navbar() {
-    const { address, chainId, status  }  = useAccount();
-    // const balances = useAtomValue(balancesAtom);
+    const { address, chainId, status, connector } = useAccount();
+    const { connect, connectors } = useConnect();
+    const setAddress = useSetAtom(addressAtom);
 
-    function shortString(_address: string) {
-        let x = num.toHex(num.getDecimalString(_address))
-        return `${x.slice(0, 4)}...${x.slice(x.length - 4, x.length)}`
-    }
+    useEffect(() => {
+        setAddress(address);
+        console.log('yoooo', address, connector)
+    }, [address, connector])
 
     return <Container width={'100%'} padding={'0'} borderBottom={'1px solid var(--chakra-colors-color2)'} position={'fixed'} bg='bg' zIndex={10000} top='0'>
         <Center bg='highlight' color='orange' padding={0}>
-            <Text fontSize='12px' textAlign={'center'} padding="0px 5px">{""}<b>Alpha version, report bugs in our Telegram group.</b>{""}</Text>
+            <Text fontSize='12px' textAlign={'center'} padding="0px 5px">{""}<b>Alpha version, DYOR before you use.</b>{""}</Text>
         </Center>
-        <Box width={'100%'} maxWidth='1000px' margin={'0px auto'} padding={'20px 20px 10px'}>
+        <Box width={'100%'} maxWidth='1400px' margin={'0px auto'} padding={'20px 20px 10px'}>
             <Flex width={'100%'}>
-                <Text fontSize={'30px'}  margin='0 auto 0 0' color={'color2'} letterSpacing={'10px'} textAlign={'left'}><b>STRKFarm</b></Text>
+                <Link href='/' margin='0 auto 0 0'
+                textAlign={'left'}><Text 
+                fontSize={{base: '20px', sm: '25px', md: '30px'}}  
+                 color={'color2'} 
+                letterSpacing={'10px'} 
+                marginTop={{base: '7px', sm: '3px', md: "0"}}
+                ><b>STRKFarm</b></Text></Link>
+                {/* <Link href={'/claims'} isExternal>
+                    <Button margin='0 0 0 auto' 
+                        borderColor='color2' 
+                        color='color2' variant='ghost' 
+                        marginRight={'30px'}
+                        leftIcon={ <Avatar size='sm' bg='highlight' color='color2' name='T G' src={CONSTANTS.LOGOS.STRK} />}
+                        _hover={{
+                            bg: 'color2_50p'
+                        }}    
+                        display={{base: 'none !important', md: 'flex !important'}}
+                    >
+                        Claims
+                    </Button>
+                </Link> */}
                 <Link href={CONSTANTS.COMMUNITY_TG} isExternal>
                     <Button margin='0 0 0 auto' 
                         borderColor='color2' 
@@ -40,25 +65,44 @@ export default function Navbar() {
                         variant={'ghost'}
                         borderColor={'color2'}
                         display={{base: 'block', md: 'none'}}
-                        icon={<Avatar size='md' bg='highlight' className="glow-button" name='T G' color='color2' src={tg.src}
+                        icon={<Avatar size='sm' bg='highlight' className="glow-button" name='T G' color='color2' src={tg.src}
                         _hover={{
                             bg: 'color2_50p'
                         }}  
                     />}
                     />
                 </Link>
-            {/* <Menu>
-                <MenuButton as={Button} rightIcon={<ChevronDownIcon />} bgColor={'highlight'} color='light_grey'>
-                    <Center>
-                        {status == 'connecting' || status == 'reconnecting' ? <Spinner size={'sm'} marginRight={'5px'}/> : <></>} 
-                        {status == 'connected' && address ? shortString(address) : ''}
-                        {status == 'disconnected' ? 'Connect' : ''}
-                    </Center>
-                </MenuButton>
-                <MenuList>
-                    <MenuItem>Disconnect</MenuItem>
-                </MenuList>
-            </Menu> */}
+                <Menu>
+                    <MenuButton as={Button} rightIcon={<ChevronDownIcon />} bgColor={'highlight'} color='light_grey' borderColor={'highlight'} _hover={{
+                        bg: 'bg',
+                        borderColor: 'highlight',
+                        borderWidth: '1px'
+                    }} _active={{
+                        bg: 'highlight',
+                        borderColor: 'highlight',
+                        borderWidth: '1px'
+                    }}
+                    marginLeft={'10px'}
+                    display={{base: 'none', sm: 'flex'}}
+                    >
+                        <Center>
+                            {status == 'connecting' || status == 'reconnecting' ? <Spinner size={'sm'} marginRight={'5px'}/> : <></>} 
+                            {status == 'connected' && address ? shortAddress(address) : ''}
+                            {status == 'disconnected' ? 'Connect' : ''}
+                        </Center>
+                    </MenuButton>
+                    <MenuList {...MyMenuListProps}>
+                        {/* connectors */}
+                        {status != 'connected' && connectors.map(conn => <MenuItem {...MyMenuItemProps} key={conn.name} onClick={() => {
+                            connect({connector: conn})
+                        }}><Avatar src={conn.icon.light} size={'2xs'} marginRight={'5px'}/>{capitalize(conn.name)}</MenuItem>)}  
+
+                        {/* disconnect buttons  */}
+                        {status == 'connected' && address && <MenuItem key='disconnect' {...MyMenuItemProps} onClick={(() => {
+                            connector?.disconnect()
+                        })}>Disconnect</MenuItem>}
+                    </MenuList>
+                </Menu>
             </Flex>
         </Box>
     </Container>

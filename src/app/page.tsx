@@ -19,6 +19,10 @@ import mixpanel from "mixpanel-browser";
 
 export default function Home() {
   
+  useEffect(() => {
+    mixpanel.track('Page open')
+  }, [])
+
 
   return (
     <Container maxWidth={'1000px'} margin={'0 auto'}>

@@ -39,7 +39,6 @@ import mixpanel from 'mixpanel-browser';
 
 // ! make page view more dynamic
 mixpanel.init("118f29da6a372f0ccb6f541079cad56b");
-mixpanel.track('Page open')
 
 const theme = extendTheme({
   colors: {
@@ -52,6 +51,8 @@ const theme = extendTheme({
     color2_50p: 'rgba(104, 51, 205, 0.5)',
     highlight: '#272932', // light grey
     light_grey: '#9d9d9d',
+    disabled_text: '#818181',
+    disabled_bg: '#5f5f5f',
     purple: '#6F4FF2',
     cyan: '#22F3DF',
     bg: '#1A1C26', // dark blue
@@ -85,6 +86,9 @@ const theme = extendTheme({
     heading: `'Courier New', Courier, monospace`,
     body: `'Courier New', Courier, monospace`,
   },
+  MenuItem: {
+    bg: 'highlight'
+  }
 })
 
 // @ts-ignore
@@ -94,7 +98,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
     const chains = [sepolia];
     const provider = jsonRpcProvider({
       rpc: (chain) => {
-        let args: RpcProviderOptions = {nodeUrl: 'http://localhost:3000/rpc-api', chainId: constants.StarknetChainId.SN_SEPOLIA };
+        let args: RpcProviderOptions = {nodeUrl: 'http://localhost:3000/rpc-api', chainId: constants.StarknetChainId.SN_MAIN };
         return args;
       }
     });
@@ -107,7 +111,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
       // Hide recommended connectors if the user has any connector installed.
       includeRecommended: "onlyIfNoConnectors",
       // Randomize the order of the connectors.
-      order: "random"
+      order: "alphabetical"
     });
 
     function getIconNode(icon: typeof import("*.svg"), alt: string) {

@@ -2,24 +2,19 @@ import { SimpleStableStrategy, StrategyAction } from "@/strategies/simple.stable
 import { atom } from "jotai";
 import { allPoolsAtomUnSorted } from "./pools";
 import { AutoTokenStrategy } from "@/strategies/auto_strk.strat";
+import { IStrategy, IStrategyProps, StrategyStatus } from "@/strategies/IStrategy";
+import CONSTANTS from "@/constants";
 
-export interface StrategyInfo {
-    name: string,
-    description: string,
-    actions: StrategyAction[],
-    netYield: number,
-    leverage: number,
-    rewardTokens: {
-        logo: string
-    }[]
+export interface StrategyInfo extends IStrategyProps {
+    name: string
 }
 
 export const strategiesAtom = atom<StrategyInfo[]>((get) => {
     const simpleStableStrat = new SimpleStableStrategy();
-    const autoStrkStrategy = new AutoTokenStrategy('STRK', "Auto collect $STRK biweekly and re-invest");
-    const autoUSDCStrategy = new AutoTokenStrategy('USDC', "Auto collect $STRK biweekly, swap and re-invest");
+    const autoStrkStrategy = new AutoTokenStrategy('STRK', "Auto collect $STRK biweekly and re-invest. You receive frmzSTRK LP token for depositing STRK or zSTRK (zklend STRK). You can withdraw by redeeming your frmzSTRK for zSTRK", 'zSTRK', CONSTANTS.CONTRACTS.AutoStrkFarm);
+    const autoUSDCStrategy = new AutoTokenStrategy('USDC', "Auto collect $STRK biweekly, swap and re-invest. You receive frmzUSDC LP token for depositing USDC or zUSDC (zklend USDC). You can withdraw by redeeming your frmzUSDC for zUSDC", 'zUSDC', CONSTANTS.CONTRACTS.AutoUsdcFarm);
 
-    const allPools = get(allPoolsAtomUnSorted);
+    const allPools = get(allPoolsAtomUnSorted) ;
     const filteredPools = allPools.filter(p => (
         p.protocol.name == 'ZkLend' || p.protocol.name == 'Nostra MM'
     ))
@@ -29,36 +24,18 @@ export const strategiesAtom = atom<StrategyInfo[]>((get) => {
     simpleStableStrat.solve(filteredPools, '1000')
     autoStrkStrategy.solve(filteredPools, '1000')
     autoUSDCStrategy.solve(filteredPools, '1000')
-    if (autoStrkStrategy.solved) {
-        strategies.push({
-            name: "Auto Compounding STRK",
-            description: autoStrkStrategy.description,
-            actions: autoStrkStrategy.actions,
-            netYield: autoStrkStrategy.netYield,
-            leverage: autoStrkStrategy.leverage,
-            rewardTokens: autoStrkStrategy.rewardTokens
-        })
-    }
-    if (autoUSDCStrategy.solved) {
-        strategies.push({
-            name: "Auto Compounding USDC",
-            description: autoUSDCStrategy.description,
-            actions: autoUSDCStrategy.actions,
-            netYield: autoUSDCStrategy.netYield,
-            leverage: autoUSDCStrategy.leverage,
-            rewardTokens: autoUSDCStrategy.rewardTokens
-        })
-    }
-    if (simpleStableStrat.solved) {
-        strategies.push({
-            name: "USDC-USDT Maxi",
-            description: simpleStableStrat.description,
-            actions: simpleStableStrat.actions,
-            netYield: simpleStableStrat.netYield,
-            leverage: simpleStableStrat.leverage,
-            rewardTokens: simpleStableStrat.rewardTokens
-        })
-    }
+    strategies.push({
+        name: "Auto Compounding STRK",
+        ...autoStrkStrategy
+    })
+    strategies.push({
+        name: "Auto Compounding USDC",
+        ...autoUSDCStrategy
+    })
+    // strategies.push({
+    //     name: "USDC-USDT Maxi",
+    //     .
+    // })
     return strategies;
 })
 
