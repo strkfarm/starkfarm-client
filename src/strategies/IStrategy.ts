@@ -58,7 +58,6 @@ export class IStrategyProps {
     risks: string[] = [
         "The strategy encompasses exposure to the protocols and tokens listed above, which inherently entail a spectrum of risks including, but not limited to, hacks and volatility",
         "APYs shown are just indicative and do not promise exact returns",
-        "STRKFarm is a new protocol, DYOR before you use",
     ]
 
     depositMethods = (amount: MyNumber, address: string, provider: ProviderInterface):  IStrategyActionHook[] => {
