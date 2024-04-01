@@ -15,14 +15,9 @@ export default function Navbar() {
     const { connect, connectors } = useConnect();
     const setAddress = useSetAtom(addressAtom);
 
-    useEffect(() => {
-        setAddress(address);
-        console.log('yoooo', address, connector)
-    }, [address, connector])
-
     return <Container width={'100%'} padding={'0'} borderBottom={'1px solid var(--chakra-colors-color2)'} position={'fixed'} bg='bg' zIndex={10000} top='0'>
         <Center bg='highlight' color='orange' padding={0}>
-            <Text fontSize='12px' textAlign={'center'} padding="0px 5px">{""}<b>Alpha version, DYOR before you use.</b>{""}</Text>
+            <Text fontSize='12px' textAlign={'center'} padding="0px 5px">{""}<b>Alpha version, report bugs in our Telegram group.</b>{""}</Text>
         </Center>
         <Box width={'100%'} maxWidth='1400px' margin={'0px auto'} padding={'20px 20px 10px'}>
             <Flex width={'100%'}>
