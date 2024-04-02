@@ -22,6 +22,7 @@ export default function Navbar() {
 
     useEffect(() => {
         getStarknetResult.getLastConnectedWallet().then(res => {
+            console.log('last connected wallet', res, res?.name);
             if (res?.name) {
                 const filConn = connectors.filter(conn => conn.name == res.name);
                 console.log('last', filConn)
