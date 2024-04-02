@@ -8,12 +8,28 @@ import { useEffect } from "react";
 import { useAtomValue, useSetAtom } from "jotai";
 import { addressAtom } from "@/store/claims.atoms";
 import { capitalize, shortAddress, MyMenuListProps, MyMenuItemProps } from "@/utils";
-
+import {
+    getStarknet
+} from "get-starknet-core"
+  
 
 export default function Navbar() {
     const { address, chainId, status, connector } = useAccount();
-    const { connect, connectors } = useConnect();
+    const {connect, connectors} = useConnect();
     const setAddress = useSetAtom(addressAtom);
+    
+    const getStarknetResult = getStarknet();
+
+    useEffect(() => {
+        getStarknetResult.getLastConnectedWallet().then(res => {
+            if (res?.name) {
+                const filConn = connectors.filter(conn => conn.name == res.name);
+                console.log('last', filConn)
+                if (filConn.length == 1) // ideally it should be always
+                    connect({connector: filConn[0]})
+            }
+        })
+    }, [])
 
     return <Container width={'100%'} padding={'0'} borderBottom={'1px solid var(--chakra-colors-color2)'} position={'fixed'} bg='bg' zIndex={10000} top='0'>
         <Center bg='highlight' color='orange' padding={0}>
@@ -68,14 +84,16 @@ export default function Navbar() {
                     />
                 </Link>
                 <Menu>
-                    <MenuButton as={Button} rightIcon={<ChevronDownIcon />} bgColor={'highlight'} color='light_grey' borderColor={'highlight'} _hover={{
+                    <MenuButton as={Button} rightIcon={<ChevronDownIcon />} bgColor={'purple'} color='white' borderColor={'purple'} _hover={{
                         bg: 'bg',
-                        borderColor: 'highlight',
-                        borderWidth: '1px'
+                        borderColor: 'purple',
+                        borderWidth: '1px',
+                        color: 'purple'
                     }} _active={{
-                        bg: 'highlight',
-                        borderColor: 'highlight',
-                        borderWidth: '1px'
+                        bg: 'bg',
+                        borderColor: 'purple',
+                        borderWidth: '1px',
+                        color: 'purple'
                     }}
                     marginLeft={'10px'}
                     display={{base: 'none', sm: 'flex'}}

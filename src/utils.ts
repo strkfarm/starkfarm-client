@@ -34,6 +34,15 @@ export function shortAddress(_address: string) {
     return `${x.slice(0, 4)}...${x.slice(x.length - 4, x.length)}`
 }
 
+export function standariseAddress(address: string | bigint) {
+    let _a = address;
+    if (!address) {
+        _a = "0";
+    }
+    const a = num.getHexString(num.getDecimalString(_a.toString()));
+    return a;
+}
+
 export const MyMenuListProps: MenuListProps = {
     bg:'highlight',
     color: 'white',

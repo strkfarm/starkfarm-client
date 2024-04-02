@@ -113,7 +113,10 @@ export default function Strategies() {
           {strategies.length > 0 && <Stack spacing='4'>
             {strategies.map((strat, index) => (
             <Card key={`${strat.name}`} variant={'filled'} 
-            bg={index % 2 == 0 ? 'color1_50p': 'color2_50p'} color='white'
+                bg={index % 2 == 0 ? 'color1_50p': 'color2_50p'} color='white'
+                _hover={{
+                    bg: index % 2 == 0 ? 'color1_65p': 'color2_65p'
+                }}
             >
                 <CardBody
                     padding={{base: '15px', md: '20px'}}

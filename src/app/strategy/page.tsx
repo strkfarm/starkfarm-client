@@ -26,6 +26,7 @@ import MyNumber from "@/utils/MyNumber";
 import { useERC20Balance } from "@/hooks/useERC20Balance";
 import { useAccount } from "@starknet-react/core";
 import { isMobile } from "react-device-detect";
+import { useERC4626Value } from "@/hooks/useERC4626Value";
 
 export default function Strategy() {
   const { address } = useAccount();
@@ -38,7 +39,7 @@ export default function Strategy() {
     return strategies.find(s => s.name == name);
   }, [searchParams, strategies])
 
-  const {balance, isLoading, isError} = useERC20Balance(strategy?.holdingTokens[0]) // @todo need to add multi token support
+  const {balance, underlyingTokenInfo, isLoading, isError} = useERC4626Value(strategy?.holdingTokens[0]) // @todo need to add multi token support
   
   useEffect(() => {
     mixpanel.track('Strategy page open', {name: searchParams.get('name')})
@@ -57,8 +58,8 @@ export default function Strategy() {
             <GridItem display='flex' colSpan={colSpan1}>
               <Card width='100%' padding={'15px'} color='white' bg='highlight'>
                 <Box display={{base: 'block', md: 'flex'}}>
-                  <Box width={{base: '100%', md: '70%'}} float={'left'}>
-                    <Text><b>Description</b></Text>
+                  <Box width={{base: '100%', md: '80%'}} float={'left'}>
+                    <Text fontSize={'20px'} marginBottom={'0px'} fontWeight={'bold'}>How does it work?</Text>
                     <Text color='light_grey' marginBottom='5px' fontSize={'15px'}>{strategy.description}</Text>
                     <Wrap>
                         {getUniqueById(strategy.actions.map(p => ({id: p.pool.protocol.name, logo: p.pool.protocol.logo}))).map(p => <WrapItem marginRight={'10px'} key={p.id}>
@@ -69,7 +70,7 @@ export default function Strategy() {
                         </WrapItem>)}
                     </Wrap>
                   </Box>
-                  <Box width={{base: '100%', md: '30%'}} float={'left'} marginTop={{base: '10px'}}>
+                  <Box width={{base: '100%', md: '20%'}} float={'left'} marginTop={{base: '10px'}}>
                     <Stat>
                       <StatLabel textAlign={{base: 'left', md: 'right'}}>APY</StatLabel>
                       <StatNumber color='cyan' textAlign={{base: 'left', md: 'right'}}>{(strategy.netYield * 100).toFixed(2)}%</StatNumber>
@@ -78,7 +79,8 @@ export default function Strategy() {
                   </Box>
                 </Box>
                 <Box padding={'10px'} borderRadius={'10px'} bg={'purple'} marginTop={'20px'}>
-                  <Text><b>Your Holdings: </b>{address ? `${balance.toEtherToFixedDecimals(4)} ${strategy?.holdingTokens[0].name}` : (isMobile ? CONSTANTS.MOBILE_MSG : 'Connect wallet')}</Text>
+                  {!isLoading && <Text><b>Your Holdings: </b>{address ? `${balance.toEtherToFixedDecimals(4)} ${underlyingTokenInfo?.name}` : (isMobile ? CONSTANTS.MOBILE_MSG : 'Connect wallet')}</Text>}
+                  {isLoading && <Text><b>Your Holdings: </b>{address ? <Spinner size='sm' marginTop={'5px'}/> : (isMobile ? CONSTANTS.MOBILE_MSG : 'Connect wallet')}</Text>}
                 </Box>
               </Card>
             </GridItem>
