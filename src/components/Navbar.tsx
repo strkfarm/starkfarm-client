@@ -1,36 +1,52 @@
 import { Avatar, Badge, Box, Button, Center, Container, Flex, IconButton, Link, Menu, MenuButton, MenuItem, MenuList, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverFooter, PopoverHeader, PopoverTrigger, Portal, Select, Spinner, Text } from "@chakra-ui/react";
-import { useAccount, useConnect } from "@starknet-react/core";
+import { useAccount, useConnect, useDisconnect } from "@starknet-react/core";
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { num } from "starknet";
 import tg from '@/assets/tg.svg';
 import CONSTANTS from "@/constants";
 import { useEffect } from "react";
-import { useAtomValue, useSetAtom } from "jotai";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
 import { addressAtom } from "@/store/claims.atoms";
 import { capitalize, shortAddress, MyMenuListProps, MyMenuItemProps } from "@/utils";
 import {
     getStarknet
 } from "get-starknet-core"
+import { WalletName, lastWalletAtom } from "@/store/utils.atoms";
   
 
 export default function Navbar() {
     const { address, chainId, status, connector } = useAccount();
     const {connect, connectors} = useConnect();
+    const {disconnect, disconnectAsync} = useDisconnect()
     const setAddress = useSetAtom(addressAtom);
-    
+    const [lastWallet, setLastWallet] = useAtom(lastWalletAtom)
     const getStarknetResult = getStarknet();
 
     useEffect(() => {
-        getStarknetResult.getLastConnectedWallet().then(res => {
-            console.log('last connected wallet', res, res?.name);
-            if (res?.name) {
-                const filConn = connectors.filter(conn => conn.name == res.name);
-                console.log('last', filConn)
-                if (filConn.length == 1) // ideally it should be always
-                    connect({connector: filConn[0]})
+        console.log('lastWallet', lastWallet)
+        if (!address && lastWallet) {
+            const lastConnector = connectors.find(c => c.name == lastWallet);
+            console.log('lastWallet connected', lastConnector)
+            if (!lastConnector) console.error('last connector name found, but no connector')
+            else {
+                connect({connector: lastConnector})
             }
+        }
+    }, [lastWallet])
+
+    useEffect(() => {
+        console.log('lastWallet connector', connector?.name)
+        if(connector) {
+            const name: WalletName = connector.name as WalletName;
+            setLastWallet(name)
+        }
+    }, [connector])
+
+    useEffect(() => {
+        console.log('lastWallet stats', {
+            address, status, connector
         })
-    }, [])
+    }, [ address, status, connector])
 
     return <Container width={'100%'} padding={'0'} borderBottom={'1px solid var(--chakra-colors-color2)'} position={'fixed'} bg='bg' zIndex={10000} top='0'>
         <Center bg='highlight' color='orange' padding={0}>
@@ -113,7 +129,10 @@ export default function Navbar() {
 
                         {/* disconnect buttons  */}
                         {status == 'connected' && address && <MenuItem key='disconnect' {...MyMenuItemProps} onClick={(() => {
-                            connector?.disconnect()
+                            disconnectAsync().then(data => {
+                                console.log('wallet disconnected')
+                                setLastWallet(null)
+                            })
                         })}>Disconnect</MenuItem>}
                     </MenuList>
                 </Menu>

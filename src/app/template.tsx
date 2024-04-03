@@ -70,28 +70,14 @@ const theme = extendTheme({
     prose: '100%'
   },
   components: {
-    Button: {
-      variants: {
-        purple: {
-          bg: 'purple',
-          color: 'white'
-        },
-        _disabled: {
-          color: 'light_grey',
-        },
-        _hover: {
-          bg: 'light_grey', // slightly darket purple
-        }
-      }
+    MenuItem: {
+      bg: 'highlight'
     }
   },
   fonts: {
     heading: `'Courier New', Courier, monospace`,
     body: `'Courier New', Courier, monospace`,
   },
-  MenuItem: {
-    bg: 'highlight'
-  }
 })
 
 // @ts-ignore

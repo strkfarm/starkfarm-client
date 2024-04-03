@@ -1,5 +1,5 @@
 import CONSTANTS from "@/constants";
-import { Box, Button, Spinner } from "@chakra-ui/react"
+import { Box, Button, ButtonProps, Spinner } from "@chakra-ui/react"
 import { UseContractWriteResult, useAccount, useContractWrite } from "@starknet-react/core"
 import { useEffect, useMemo } from "react";
 import { isMobile } from 'react-device-detect';
@@ -7,7 +7,8 @@ import { Call } from "starknet";
 
 interface TxButtonProps {
     text: string,
-    calls: Call[]
+    calls: Call[],
+    buttonProps: ButtonProps
 }
 
 export default function TxButton(props: TxButtonProps) {
@@ -67,6 +68,7 @@ export default function TxButton(props: TxButtonProps) {
                 onClick={() => {
                     writeAsync()
                 }}
+                {...props.buttonProps}
             >
                 {isPending && <Spinner size={'sm'} marginRight={'5px'}/>} {props.text}</Button>
         </Box>

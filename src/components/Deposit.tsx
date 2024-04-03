@@ -4,13 +4,14 @@ import LoadingWrap from "./LoadingWrap";
 import { IStrategyActionHook, TokenInfo } from "@/strategies/IStrategy";
 import { useERC20Balance } from "@/hooks/useERC20Balance";
 import { StrategyInfo } from "@/store/strategies.atoms";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, createRef } from "react";
 import MyNumber from "@/utils/MyNumber";
 import TxButton from "./TxButton";
 import { MyMenuItemProps, MyMenuListProps } from "@/utils";
 import { PrefixPathnameNormalizer } from "next/dist/server/future/normalizers/request/prefix";
 import { useAccount, useProvider } from "@starknet-react/core";
 import { ProviderInterface } from "starknet";
+import { setMaxIdleHTTPParsers } from "http";
 
 interface DepositProps {
     strategy: StrategyInfo,
@@ -21,10 +22,12 @@ interface DepositProps {
 export default function Deposit(props: DepositProps) {
     const { address } = useAccount();
     const { provider } = useProvider();
-    const [amount, setAmount] = useState(MyNumber.fromZero());
+    const [dirty, setDirty] = useState(false);
 
-    const [selectedMarket, setSelectedMarket] = useState(props.callsInfo(amount, address || '0x0', provider)[0].tokenInfo);
-    
+    const [selectedMarket, setSelectedMarket] = useState(props.callsInfo(MyNumber.fromZero(), address || '0x0', provider)[0].tokenInfo);
+    const [amount, setAmount] = useState(MyNumber.fromEther("0", selectedMarket.decimals));
+    const [rawAmount, setRawAmount] = useState("");
+
     const {calls, actions} = useMemo(() => {
         const actions = props.callsInfo(amount, address || '0x0', provider)
         const hook = actions.find(a => a.tokenInfo.name == selectedMarket.name)
@@ -32,14 +35,15 @@ export default function Deposit(props: DepositProps) {
         return {calls: hook.calls, actions}
     }, [selectedMarket, amount, address, provider])
 
-    useEffect(() => {
-        console.log('hookkkAmount', amount.toEtherStr(), calls)
-    }, [amount, calls])
+    const { balance, isLoading, isError} = useERC20Balance(selectedMarket);
+
+    const maxAmount: MyNumber = useMemo(() => {
+        return MyNumber.min(balance, selectedMarket.maxAmount)
+    }, [balance, selectedMarket])
 
     function BalanceComponent(props: {token: TokenInfo}) {
-        const { balance, isLoading, isError} = useERC20Balance(props.token); 
         return <Box color={'light_grey'} textAlign={'right'}>
-            <Text>Available balance: </Text>
+            <Text>Available balance </Text>
             <LoadingWrap isLoading={isLoading} isError={isError} 
                 skeletonProps={{
                     height: '10px', width:'50px', float: 'right', marginTop: '8px', marginLeft: '5px'
@@ -49,7 +53,22 @@ export default function Deposit(props: DepositProps) {
                     boxSize: '15px'
                 }}
             >
-                <b style={{marginLeft: '5px'}}>{balance.toEtherToFixedDecimals(props.token.displayDecimals)}</b>
+                <Tooltip label={balance.toEtherStr()}><b style={{marginLeft: '5px'}}>{balance.toEtherToFixedDecimals(4)}</b></Tooltip>
+                <Button size={'sm'} marginLeft={'5px'} color='purple' bg='highlight' 
+                    padding='0' maxHeight={'25px'}
+                    _hover={{
+                        bg: 'highlight',
+                        color: 'color_50p'
+                    }}
+                    _active={{
+                        bg: 'highlight',
+                        color: 'color_50p'
+                    }}
+                    onClick={() => {
+                        setAmount(maxAmount)
+                        setRawAmount(maxAmount.toEtherStr())
+                    }}
+                >[Max]</Button>
             </LoadingWrap>
         </Box>
     }
@@ -67,6 +86,9 @@ export default function Deposit(props: DepositProps) {
                                 onClick={() => {
                                     if (selectedMarket.name != dep.tokenInfo.name) {
                                         setSelectedMarket(dep.tokenInfo)
+                                        setAmount(new MyNumber("0", dep.tokenInfo.decimals))
+                                        setDirty(false)
+                                        setRawAmount("")
                                     }
                                 }}
                             >
@@ -83,18 +105,24 @@ export default function Deposit(props: DepositProps) {
         
         {/* add min max validations and show err */}
         <NumberInput 
+            
             min={0} 
-            max={parseFloat(selectedMarket.maxAmount.toEtherStr())} 
+            max={parseFloat(maxAmount.toEtherStr())} 
             step={parseFloat(selectedMarket.stepAmount.toEtherStr())} 
             color={"white"} bg={'bg'} borderRadius={'10px'}
             onChange={(value) => {
                 if (value && Number(value) > 0)
                     setAmount(MyNumber.fromEther(value, selectedMarket.decimals));
                 else {
-                    setAmount(MyNumber.fromZero());
+                    setAmount(new MyNumber("0", selectedMarket.decimals));
                 }
+                setRawAmount(value)
+                setDirty(true)
             }}
             marginTop={'10px'}
+            keepWithinRange={false}
+            clampValueOnBlur={false}
+            value={rawAmount}
         >
             <NumberInputField border={'0px'} borderRadius={'10px'} placeholder="Amount"/>
             <NumberInputStepper>
@@ -102,7 +130,16 @@ export default function Deposit(props: DepositProps) {
                 <NumberDecrementStepper color={'white'} border={'0px'}/>
             </NumberInputStepper>
         </NumberInput>
+        {amount.isZero() && dirty && <Text marginTop='2px' marginLeft={'7px'} color='red' fontSize={'13px'}>Require amount {">"} 0</Text>}
+        {amount.compare(maxAmount.toEtherStr(), 'gt') && <Text marginTop='2px' marginLeft={'7px'} color='red' fontSize={'13px'}>Amount to be less than {maxAmount.toEtherToFixedDecimals(2)}</Text>}
 
-        <Center marginTop={'10px'}><TxButton text={`${props.buttonText}: ${amount.toEtherToFixedDecimals(2)} ${selectedMarket.name}`} calls={calls}/></Center>
+        <Center marginTop={'10px'}>
+            <TxButton 
+                text={`${props.buttonText}: ${amount.toEtherToFixedDecimals(2)} ${selectedMarket.name}`} 
+                calls={calls}
+                buttonProps={{
+                    isDisabled: amount.isZero() || amount.compare(maxAmount.toEtherStr(), 'gt')
+                }}
+            /></Center>
     </Box>
 }

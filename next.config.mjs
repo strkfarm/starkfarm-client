@@ -5,7 +5,7 @@ const nextConfig = {
         removeConsole: {
         exclude: ['error'],
       },
-    },
+      },
     // async rewrites() {
     //     return [
     //       {

@@ -27,7 +27,8 @@ export default class MyNumber {
     }
 
     toEtherToFixedDecimals(decimals: number) {
-        return parseFloat(this.toEtherStr()).toFixed(decimals);
+        // rounding down
+        return (Math.floor(parseFloat(this.toEtherStr()) * (10 ** decimals)) / (10 ** decimals)).toFixed(decimals);
     }
 
     isZero() {
@@ -44,5 +45,12 @@ export default class MyNumber {
     compare(amountEther: string, command: 'gte' | 'gt' | 'lt') {
         const fullNum = new BigNumber(ethers.parseUnits(amountEther, this.decimals).toString());
         return this.bigNumber[command](fullNum);
+    }
+
+    static min(a: MyNumber, b: MyNumber) {
+        if (!a.isZero() && !b.isZero())
+            if (a.decimals != b.decimals) throw new Error(`Cannot compare numbers of diff decimals: a:${a.decimals}, b:${b.decimals}`)
+        const bn = BigNumber.min(a.bigNumber, b.bigNumber);
+        return new MyNumber(bn.toString(), a.decimals);
     }
 }

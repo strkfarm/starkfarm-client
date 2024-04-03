@@ -7,7 +7,7 @@ import { useEffect, useMemo } from 'react';
 import { useERC20Balance } from './useERC20Balance';
 import { TOKENS } from '@/constants';
 import { standariseAddress } from '@/utils';
-import { uint256 } from 'starknet';
+import { BlockTag, uint256 } from 'starknet';
 
 export function useERC4626Value(token: TokenInfo | undefined) {
     const { address } = useAccount();
@@ -19,6 +19,7 @@ export function useERC4626Value(token: TokenInfo | undefined) {
         abi: ERC4626Abi,
         address: token?.token || '0x0',
         watch: true,
+        blockIdentifier: BlockTag.pending
     });
 
     const { data: underlyingAsset, isError: isErrorAsset, isLoading: isLoadingAsset, error: errorAsset } = useContractRead({
@@ -26,7 +27,7 @@ export function useERC4626Value(token: TokenInfo | undefined) {
         args: [],
         abi: ERC4626Abi,
         address: token?.token || '0x0',
-        watch: true,
+        watch: false,
     });
 
     const underlyingTokenInfo = useMemo(() => {
