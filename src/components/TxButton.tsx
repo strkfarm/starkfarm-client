@@ -1,6 +1,7 @@
 import CONSTANTS from "@/constants";
 import { Box, Button, ButtonProps, Spinner } from "@chakra-ui/react"
 import { UseContractWriteResult, useAccount, useContractWrite } from "@starknet-react/core"
+import mixpanel from "mixpanel-browser";
 import { useEffect, useMemo } from "react";
 import { isMobile } from 'react-device-detect';
 import { Call } from "starknet";
@@ -66,7 +67,17 @@ export default function TxButton(props: TxButtonProps) {
                     bg: 'var(--chakra-colors-bg)'
                 }}
                 onClick={() => {
-                    writeAsync()
+                    
+                    mixpanel.track('Click strategy button', {
+                        buttonText: props.text,
+                        address
+                    })
+                    writeAsync().then(tx => {
+                        mixpanel.track('Submitted tx', {
+                            txHash: tx.transaction_hash,
+                            address
+                        })
+                    })
                 }}
                 {...props.buttonProps}
             >

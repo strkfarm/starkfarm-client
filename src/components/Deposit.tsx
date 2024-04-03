@@ -12,6 +12,7 @@ import { PrefixPathnameNormalizer } from "next/dist/server/future/normalizers/re
 import { useAccount, useProvider } from "@starknet-react/core";
 import { ProviderInterface } from "starknet";
 import { setMaxIdleHTTPParsers } from "http";
+import mixpanel from "mixpanel-browser";
 
 interface DepositProps {
     strategy: StrategyInfo,
@@ -41,7 +42,8 @@ export default function Deposit(props: DepositProps) {
         return MyNumber.min(balance, selectedMarket.maxAmount)
     }, [balance, selectedMarket])
 
-    function BalanceComponent(props: {token: TokenInfo}) {
+    function BalanceComponent(props: {token: TokenInfo,strategy: StrategyInfo,
+        buttonText: string}) {
         return <Box color={'light_grey'} textAlign={'right'}>
             <Text>Available balance </Text>
             <LoadingWrap isLoading={isLoading} isError={isError} 
@@ -67,6 +69,14 @@ export default function Deposit(props: DepositProps) {
                     onClick={() => {
                         setAmount(maxAmount)
                         setRawAmount(maxAmount.toEtherStr())
+                        mixpanel.track("Chose max amount", {
+                            strategy: props.strategy.name,
+                            buttonText: props.buttonText,
+                            amount: amount.toEtherStr(),
+                            token: selectedMarket.name,
+                            maxAmount: maxAmount.toEtherStr(),
+                            address
+                        })
                     }}
                 >[Max]</Button>
             </LoadingWrap>
@@ -99,7 +109,7 @@ export default function Deposit(props: DepositProps) {
                 </Menu>
             </GridItem>
             <GridItem colSpan={3}>
-                <BalanceComponent token={selectedMarket}/>
+                <BalanceComponent token={selectedMarket} strategy={props.strategy} buttonText={props.buttonText}/>
             </GridItem>
         </Grid>
         
@@ -118,6 +128,14 @@ export default function Deposit(props: DepositProps) {
                 }
                 setRawAmount(value)
                 setDirty(true)
+                mixpanel.track('Enter amount', {
+                    strategy: props.strategy.name,
+                    buttonText: props.buttonText,
+                    amount: amount.toEtherStr(),
+                    token: selectedMarket.name,
+                    maxAmount: maxAmount.toEtherStr(),
+                    address
+                })
             }}
             marginTop={'10px'}
             keepWithinRange={false}

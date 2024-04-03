@@ -16,7 +16,7 @@ export const strategiesAtom = atom<StrategyInfo[]>((get) => {
 
     const allPools = get(allPoolsAtomUnSorted) ;
     const filteredPools = allPools.filter(p => (
-        p.protocol.name == 'ZkLend' || p.protocol.name == 'Nostra MM'
+        p.protocol.name == 'zkLend' || p.protocol.name == 'Nostra MM'
     ))
 
     let strategies: StrategyInfo[] = []
