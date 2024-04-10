@@ -21,6 +21,7 @@
     "@tanstack/query-core": "^5.28.0",
     "@types/mixpanel-browser": "^2.49.0",
     "@types/mustache": "^4.2.5",
+    "@vercel/analytics": "^1.2.2",
     "axios": "^1.6.7",
     "bignumber.js": "^4.0.4",
     "chroma.ts": "^1.0.10",
