@@ -12,8 +12,8 @@ const LOGOS = {
 
 export type TokenName = 'USDT' | 'USDC' | 'ETH' | 'STRK' | 'WBTC' | 'DAI'
 const CONSTANTS = {
-    DEX_INCENTIVE_URL: 'https://kx58j6x5me.execute-api.us-east-1.amazonaws.com/starknet/fetchFile?file=strk_grant.json',
-    LENDING_INCENTIVES_URL: 'https://kx58j6x5me.execute-api.us-east-1.amazonaws.com/starknet/fetchFile?file=prod-api/lending/lending_strk_grant.json',
+    DEX_INCENTIVE_URL: '/strk-incentives/fetchFile?file=strk_grant.json',
+    LENDING_INCENTIVES_URL: '/strk-incentives/fetchFile?file=prod-api/lending/lending_strk_grant.json',
     LOGOS,
     COMMUNITY_TG:'https://t.me/+HQ_eHaXmF-1lZDc1',
     NOSTRA: {

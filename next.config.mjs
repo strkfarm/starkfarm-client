@@ -1,11 +1,19 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-    output: 'export',
-      compiler: {
-        removeConsole: {
+    // output: 'export',
+    compiler: {
+      removeConsole: {
         exclude: ['error'],
       },
-      },
+    },
+    async rewrites() {
+        return [
+            {
+                source: '/strk-incentives/:path*',
+                destination: 'https://kx58j6x5me.execute-api.us-east-1.amazonaws.com/starknet/:path*',
+            },
+        ]
+    },
     // async rewrites() {
     //     return [
     //       {
