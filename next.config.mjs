@@ -9,9 +9,25 @@ const nextConfig = {
     async rewrites() {
         return [
             {
-                source: '/strk-incentives/:path*',
-                destination: 'https://kx58j6x5me.execute-api.us-east-1.amazonaws.com/starknet/:path*',
+              source: '/strk-incentives/:path*',
+              destination: 'https://kx58j6x5me.execute-api.us-east-1.amazonaws.com/starknet/:path*',
             },
+            {
+              source: '/zklend/:path*',
+              destination: 'https://app.zklend.com/:path*'
+            },
+            {
+              source: '/jediswap/:path*',
+              destination: 'https://api.jediswap.xyz/:path*'
+            },
+            {
+              source: '/ekubo/:path*',
+              destination: 'https://mainnet-api.ekubo.org/:path*'
+            },
+            {
+              source: '/nostra/:path*',
+              destination: 'https://us-east-2.aws.data.mongodb-api.com/:path*'
+            }
         ]
     },
     // async rewrites() {
