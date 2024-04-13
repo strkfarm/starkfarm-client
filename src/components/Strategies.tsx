@@ -4,15 +4,17 @@ import { StrategyInfo, strategiesAtom } from "@/store/strategies.atoms";
 import { StrategyAction } from "@/strategies/simple.stable.strat";
 import { getUnique, getUniqueById } from "@/utils";
 import { AddIcon } from "@chakra-ui/icons";
-import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Avatar, AvatarGroup, Box, Button, Card, CardBody, Center, Container, Flex, HStack, Heading, Link, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Skeleton, Stack, Table, TableCaption, TableContainer, Tbody, Td, Text, Th, Thead, Tooltip, Tr, VisuallyHidden, Wrap, WrapItem, useDisclosure } from "@chakra-ui/react";
+import { Accordion, AccordionButton, AccordionIcon, AccordionItem, AccordionPanel, AlertDialog, AlertDialogBody, AlertDialogContent, AlertDialogFooter, AlertDialogHeader, AlertDialogOverlay, Avatar, AvatarGroup, Box, Button, Card, CardBody, Center, Container, Flex, HStack, Heading, Link, LinkBox, LinkOverlay, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Popover, PopoverArrow, PopoverBody, PopoverCloseButton, PopoverContent, PopoverTrigger, Skeleton, Stack, Table, TableCaption, TableContainer, Tbody, Td, Text, Th, Thead, Tooltip, Tr, VisuallyHidden, Wrap, WrapItem, useDisclosure } from "@chakra-ui/react";
 import { useAtomValue } from "jotai";
 import React, { useEffect } from "react";
 import mixpanel from 'mixpanel-browser';
+import { useRouter } from "next/navigation";
 
 
 export default function Strategies() {
     const allPools = useAtomValue(allPoolsAtomUnSorted);
     const strategies = useAtomValue(strategiesAtom);
+    const router = useRouter()
 
     function DepositButton(strat: StrategyInfo) {
         // const { isOpen, onOpen, onClose } = useDisclosure()
@@ -30,7 +32,7 @@ export default function Strategies() {
                                 backgroundColor: 'bg'
                             }}
                             onClick={()=> {
-                                mixpanel.track('Click one click deposit')
+                                mixpanel.track('Click one click deposit', {name: strat.name})
                             }}
                         ><AddIcon/></Button>
                 </PopoverTrigger>
@@ -51,13 +53,16 @@ export default function Strategies() {
 
     function getStratCard(strat: StrategyInfo) {
         return  <Stack direction={{base: 'column', md: 'row'}} width={'100%'}>
-            <Box width={{base: '100%', md: '70%'}} display={{base: 'flex', md: 'flex'}}>
+            <LinkBox  width={{base: '100%', md: '70%'}} display={{base: 'flex', md: 'flex'}} onClick={() => {
+                mixpanel.track('Strategy expanded', {name: strat.name})
+            }}
+            ><Box width={'100%'}>
                 <AvatarGroup size='xs' max={2} marginRight={'5px'}>
                 {getUniqueById(strat.actions.map(p => ({id: p.pool.pool.name, logo: p.pool.pool.logos[0]}))).map((p: any) => <Avatar key={p.id} src={p.logo} />)}
                 </AvatarGroup>
-                <Box>
+                <Box>   
                     <Heading size={{base: 'sm', md: 'md'}} textAlign={'left'} marginBottom={'5px'} fontWeight={'bold'}>
-                        {strat.name}
+                        <LinkOverlay href={`/strategy?name=${strat.name}`}>{strat.name}</LinkOverlay>
                     </Heading>
                     <Heading fontSize={{base: '12px', md: '14px'}}color='color1_light'> 
                         <Wrap>
@@ -70,12 +75,11 @@ export default function Strategies() {
                         </Wrap>
                     </Heading>
                 </Box>
-            </Box>
+            </Box></LinkBox>
             <Box width={{base: '100%', md: '30%'}} marginTop={{base: '10px', md: '0px'}}>
                 <Box width={'100%'} float='left' marginBottom={'5px'}>
                     <Tooltip label="Includes fees & rewards earn from tokens shown. Click to know the investment proceduce.">
                         <Text textAlign={'right'} color='cyan' fontWeight={'bold'} float={{base: 'left', md: 'right'}}>
-                        
                             {(strat.netYield*100).toFixed(2)}%
                         </Text>
                     </Tooltip>
@@ -110,48 +114,18 @@ export default function Strategies() {
             {strategies.map((strat, index) => (
             <Card key={`${strat.name}`} variant={'filled'} 
                 bg={index % 2 == 0 ? 'color1_50p': 'color2_50p'} color='white'
+                _hover={{
+                    bg: index % 2 == 0 ? 'color1_65p': 'color2_65p'
+                }}
             >
                 <CardBody
                     padding={{base: '15px', md: '20px'}}
                 >
-                    <Accordion allowToggle display={{base: 'none', md: 'block'}}>
-                        <AccordionItem border='0px'>
-                            <AccordionButton padding='0' onClick={() => {
-                                mixpanel.track('Strategy expanded', {name: strat.name})
-                            }}>
-                                
-                                <Box width={'100%'} padding={'0px 10px 0 0'}>
-                                    {getStratCard(strat)}
-                                </Box>
-                                <AccordionIcon />
-                            </AccordionButton>
-                            <AccordionPanel pb={4} bg='highlight' borderRadius={'10px'} marginTop={'10px'}>
-                                <Text width={'100%'}>Strategy Steps (Assume $1000 initial fund)</Text>
-                                <Box>
-                                    <Flex color='white' width={'100%'}>
-                                        <Text width={'5%'} className="text-cell">#</Text>
-                                        <Text width={'45%'} className="text-cell">Action</Text>
-                                        <Text width={'15%'} className="text-cell" textAlign={'left'}>Protocol</Text>
-                                        <Text width={'15%'} className="text-cell" textAlign={'left'}>Pool</Text>
-                                        <Text width={'10%'} className="text-cell" textAlign={'right'}>Amount</Text>
-                                        <Text width={'10%'} className="text-cell" textAlign={'right'}>Yield</Text>
-                                    </Flex>
-                                    {strat.actions.map((action, index) => <Flex key={index} width={'100%'} color='light_grey' borderBottom={'1px solid var(--charka-colors-bg)'} fontSize={'14px'}>
-                                        <Text width={'5%'} className="text-cell">{index + 1}</Text>
-                                        <Text width={'45%'} className="text-cell">{action.name}</Text>
-                                        <Text width={'15%'} className="text-cell"><Avatar size='2xs' bg={'black'} src={action.pool.protocol.logo} marginRight={'2px'}/> {action.pool.protocol.name}</Text>
-                                        <Text width={'15%'} className="text-cell" textAlign={'left'}><Avatar size='2xs' bg={'black'} src={action.pool.pool.logos[0]} marginRight={'2px'} /> {action.pool.pool.name}</Text>
-                                        <Text width={'10%'} className="text-cell" textAlign={'right'}>${Number(action.amount).toLocaleString()}</Text>
-                                        <Text width={'10%'} className="text-cell" textAlign={'right'}>{action.isDeposit ? (action.pool.apr * 100).toFixed(2) : -(action.pool.borrow.apr*100).toFixed(2)}%</Text>
-                                    </Flex>)}
-                                </Box>
-                            </AccordionPanel>
-                        </AccordionItem>
-                    </Accordion>
-                    <Box display={{base: 'block', md: 'none'}}>
+                    
+                    <Box width={'100%'} padding={'0px 10px 0 0'}>
                         {getStratCard(strat)}
                     </Box>
-                    {DepositButton(strat)}
+                    {/* {DepositButton(strat)} */}
                 </CardBody>
             </Card>
             ))}

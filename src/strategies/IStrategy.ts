@@ -1,11 +1,25 @@
 import CONSTANTS from "@/constants";
 import { IDapp } from "@/store/IDapp.store";
 import { Category, PROTOCOLS, PoolInfo } from "@/store/pools";
+import MyNumber from "@/utils/MyNumber";
+import { UseContractWriteResult } from "@starknet-react/core";
+import { Call, ProviderInterface } from "starknet";
 
 interface Step {
     name: string,
     optimizer: (pools: PoolInfo[], amount: string, prevActions: StrategyAction[]) => StrategyAction[],
     filter: ((pools: PoolInfo[], amount: string, prevActions: StrategyAction[]) => PoolInfo[])[],
+}
+
+export interface TokenInfo {
+    token: string,
+    decimals: number,
+    displayDecimals: number,
+    name: string,
+    logo: any,
+    minAmount: MyNumber,
+    maxAmount: MyNumber,
+    stepAmount: MyNumber,
 }
 
 export interface StrategyAction {
@@ -15,9 +29,19 @@ export interface StrategyAction {
     name?: string
 }
 
-export class IStrategy {
-    readonly tag: string;
-    description: string;
+export enum StrategyStatus {
+    UNINTIALISED = 0,
+    SOLVING = 1,
+    SOLVED = 2
+}
+
+export interface IStrategyActionHook {
+    tokenInfo: TokenInfo, 
+    calls: Call[]
+}
+
+export class IStrategyProps {
+    readonly description: string;
     exchanges: IDapp<any>[] = [];
 
     steps: Step[] = [];
@@ -25,14 +49,40 @@ export class IStrategy {
     actions: StrategyAction[] = [];
     netYield: number = 0;
     leverage: number = 0;
-    solved = false;
+    status = StrategyStatus.UNINTIALISED;
 
     readonly rewardTokens: {logo: string}[];
+    
+    readonly holdingTokens: TokenInfo[];
 
-    constructor(tag: string, description: string, rewardTokens: {logo: string}[]) {
-        this.tag = tag;
+    risks: string[] = [
+        "The strategy encompasses exposure to the protocols and tokens listed above, which inherently entail a spectrum of risks including, but not limited to, hacks and volatility",
+        "APYs shown are just indicative and do not promise exact returns",
+    ]
+
+    depositMethods = (amount: MyNumber, address: string, provider: ProviderInterface):  IStrategyActionHook[] => {
+        return [];
+    }
+
+    withdrawMethods = (amount: MyNumber, address: string, provider: ProviderInterface):  IStrategyActionHook[] => {
+        return [];
+    }
+
+    constructor(description: string, rewardTokens: {logo: string}[], holdingTokens: TokenInfo[]) {
         this.description = description;
         this.rewardTokens = rewardTokens;
+        this.holdingTokens = holdingTokens;
+    }
+
+    
+}
+
+export class IStrategy extends IStrategyProps {
+    readonly tag: string;
+
+    constructor(tag: string, description: string, rewardTokens: {logo: string}[], holdingTokens: TokenInfo[]) {
+        super(description, rewardTokens, holdingTokens)
+        this.tag = tag;
     }
 
     filterStablesOnly(pools: PoolInfo[], amount: string, prevActions: StrategyAction[]) {
@@ -77,6 +127,7 @@ export class IStrategy {
         this.actions = [];
         let _amount: string = amount;
         let netYield = 0;
+        this.status = StrategyStatus.SOLVING;
         try {
             for(let i=0; i<this.steps.length; ++i) {
                 const step = this.steps[i];
@@ -117,8 +168,16 @@ export class IStrategy {
 
         this.postSolve();
 
-        this.solved = true;
+        this.status = StrategyStatus.SOLVED;
     }
 
     postSolve() {}
+
+    isSolved() {
+        return this.status == StrategyStatus.SOLVED;
+    }
+
+    isSolving() {
+        return this.status == StrategyStatus.SOLVING;
+    }
 }
