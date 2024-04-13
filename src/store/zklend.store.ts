@@ -45,7 +45,7 @@ interface MyBaseAprDoc {
 }
 
 export class ZkLend extends IDapp<MyBaseAprDoc[]> {
-    name = 'ZkLend'
+    name = 'zkLend'
     link = 'https://app.zklend.com/markets'
     logo = 'https://app.zklend.com/favicon.ico'
 

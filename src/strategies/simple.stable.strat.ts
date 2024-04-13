@@ -27,7 +27,7 @@ export class SimpleStableStrategy extends IStrategy {
     
     constructor() {
         const rewardTokens = [{logo: CONSTANTS.LOGOS.STRK}, {logo: CONSTANTS.LOGOS.USDC}, {logo: CONSTANTS.LOGOS.USDT}];
-        super('SSStrt', "Loop stable-coins to maximize yield", rewardTokens);
+        super('SSStrt', "Loop stable-coins to maximize yield", rewardTokens, []);
 
         this.steps = [{
             name: "Deposit to best pool",
