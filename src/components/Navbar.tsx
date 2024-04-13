@@ -61,7 +61,7 @@ export default function Navbar() {
                 letterSpacing={'10px'} 
                 marginTop={{base: '7px', sm: '3px', md: "0"}}
                 ><b>STRKFarm</b></Text></Link>
-                {/* <Link href={'/claims'} isExternal>
+                <Link href={'/claims'} isExternal>
                     <Button margin='0 0 0 auto' 
                         borderColor='color2' 
                         color='color2' variant='ghost' 
@@ -74,7 +74,7 @@ export default function Navbar() {
                     >
                         Claims
                     </Button>
-                </Link> */}
+                </Link>
                 <Link href={CONSTANTS.COMMUNITY_TG} isExternal>
                     <Button margin='0 0 0 auto' 
                         borderColor='color2' 
