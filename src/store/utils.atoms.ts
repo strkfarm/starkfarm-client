@@ -1,6 +1,7 @@
 import CONSTANTS from "@/constants";
 import { atomWithQuery } from "jotai-tanstack-query";
 import { unstable_renderSubtreeIntoContainer } from "react-dom";
+import { atomWithStorage, createJSONStorage } from 'jotai/utils'
 
 export interface BlockInfo {
     "data": {
@@ -88,3 +89,16 @@ export const blockInfoMinus1DAtom = atomWithQuery((get) => ({
         return res.json()
     },
 }))
+
+const ISSERVER = typeof window === "undefined";
+declare let localStorage: any;
+
+export type WalletName = 'Braavos' | 'Argent X'
+export const lastWalletAtom = atomWithStorage<null | WalletName>('lastWallet', null, {                
+    ...createJSONStorage(() => {
+        if(!ISSERVER) return localStorage
+        return null;
+    }),                                            
+  }, {
+    getOnInit: true
+  });

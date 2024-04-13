@@ -39,19 +39,23 @@ import mixpanel from 'mixpanel-browser';
 
 // ! make page view more dynamic
 mixpanel.init("118f29da6a372f0ccb6f541079cad56b");
-mixpanel.track('Page open')
 
 const theme = extendTheme({
   colors: {
     transparent: 'rgba(0, 0, 0, 0)',
     opacity_50p: 'rgba(0, 0, 0, 0.5)',
     color1: 'rgba(86, 118, 254, 1)',
+    color1_65p: 'rgba(86, 118, 254, 0.65)',
     color1_50p: 'rgba(86, 118, 254, 0.5)',
+    color1_35p: 'rgba(86, 118, 254, 0.35)',
     color1_light: '#bcc9ff80',
     color2: 'rgb(127 73 229)',
+    color2_65p: 'rgba(104, 51, 205, 0.65)',
     color2_50p: 'rgba(104, 51, 205, 0.5)',
     highlight: '#272932', // light grey
     light_grey: '#9d9d9d',
+    disabled_text: '#818181',
+    disabled_bg: '#5f5f5f',
     purple: '#6F4FF2',
     cyan: '#22F3DF',
     bg: '#1A1C26', // dark blue
@@ -66,19 +70,8 @@ const theme = extendTheme({
     prose: '100%'
   },
   components: {
-    Button: {
-      variants: {
-        purple: {
-          bg: 'purple',
-          color: 'white'
-        },
-        _disabled: {
-          color: 'light_grey',
-        },
-        _hover: {
-          bg: 'light_grey', // slightly darket purple
-        }
-      }
+    MenuItem: {
+      bg: 'highlight'
     }
   },
   fonts: {
@@ -94,7 +87,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
     const chains = [sepolia];
     const provider = jsonRpcProvider({
       rpc: (chain) => {
-        let args: RpcProviderOptions = {nodeUrl: 'http://localhost:3000/rpc-api', chainId: constants.StarknetChainId.SN_SEPOLIA };
+        let args: RpcProviderOptions = {nodeUrl: 'https://rpc.nethermind.io/mainnet-juno?apikey=t1HPjhplOyEQpxqVMhpwLGuwmOlbXN0XivWUiPAxIBs0kHVK', chainId: constants.StarknetChainId.SN_MAIN };
         return args;
       }
     });
@@ -107,7 +100,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
       // Hide recommended connectors if the user has any connector installed.
       includeRecommended: "onlyIfNoConnectors",
       // Randomize the order of the connectors.
-      order: "random"
+      order: "alphabetical"
     });
 
     function getIconNode(icon: typeof import("*.svg"), alt: string) {
@@ -136,10 +129,10 @@ export default function Template({ children }: { children: React.ReactNode }) {
            */}
             <Container  width={'100%'} padding='0px' paddingTop='100px'>
               <Navbar></Navbar>
-              {children}
+              <React.Suspense>{children}</React.Suspense>
             </Container>
           </Flex>
         </ChakraBaseProvider>
       </StarknetConfig>
-    </JotaiProvider>
+</JotaiProvider>
 }

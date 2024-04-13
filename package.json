@@ -20,17 +20,22 @@
     "@starknet-react/core": "^2.2.5",
     "@tanstack/query-core": "^5.28.0",
     "@types/mixpanel-browser": "^2.49.0",
+    "@types/mustache": "^4.2.5",
+    "@vercel/analytics": "^1.2.2",
     "axios": "^1.6.7",
     "bignumber.js": "^4.0.4",
     "chroma.ts": "^1.0.10",
     "ethers": "^6.11.1",
     "framer-motion": "^11.0.5",
+    "get-starknet": "^3.0.1",
     "get-starknet-core": "^3.2.0",
     "jotai": "^2.6.4",
     "jotai-tanstack-query": "^0.8.5",
     "mixpanel-browser": "^2.49.0",
+    "mustache": "^4.2.0",
     "next": "14.1.0",
     "react": "^18",
+    "react-device-detect": "^2.2.3",
     "react-dom": "^18",
     "react-mixpanel": "^1.0.5",
     "react-pro-sidebar": "^1.1.0",
@@ -53,6 +58,6 @@
     "typescript": "^5"
   },
   "engines": {
-    "node": "18.19"
+    "node": "20.x"
   }
 }
