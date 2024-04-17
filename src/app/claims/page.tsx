@@ -31,7 +31,7 @@ export default function Claim() {
           <Card width='100%' padding={'15px 30px'} color='white' bg='highlight'>
             <Stat>
               <StatLabel>Total Earned</StatLabel>
-              <StatNumber>345,670</StatNumber>
+              <StatNumber>0</StatNumber>
             </Stat>
           </Card>
         </GridItem>
@@ -39,7 +39,7 @@ export default function Claim() {
           <Card width='100%' padding={'15px 30px'} color='white' bg='highlight'>
             <Stat>
               <StatLabel>Total Claimed</StatLabel>
-              <StatNumber>345,670</StatNumber>
+              <StatNumber>0</StatNumber>
             </Stat>
           </Card>
         </GridItem>
@@ -47,9 +47,9 @@ export default function Claim() {
           <Card width='100%' padding={'15px 30px'} color='white' bg='highlight'>
             <Stat>
               <StatLabel>Unclaimed</StatLabel>
-              <StatNumber>345,670</StatNumber>
+              <StatNumber>0</StatNumber>
             </Stat>
-            <Button>Claim</Button>
+            <Button onClick={() => console.log("claim")}>Claim</Button>
           </Card>
         </GridItem>
       </Grid>
