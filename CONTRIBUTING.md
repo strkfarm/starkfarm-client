@@ -6,8 +6,6 @@ Starkfarm Client is a web application built using [Next.js](https://nextjs.org/)
 
 ## Table of Contents
 
-- [Starkfarm Client](#starkfarm-client)
-  - [Table of Contents](#table-of-contents)
   - [Getting Started](#getting-started)
   - [Contributing](#contributing)
   - [All Thanks To Our Contributors](#all-thanks-to-our-contributors)
