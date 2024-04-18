@@ -6,6 +6,8 @@ Starkfarm Client is a web application built using [Next.js](https://nextjs.org/)
 
 ## Table of Contents
 
+- [Starkfarm Client](#starkfarm-client)
+  - [Table of Contents](#table-of-contents)
   - [Getting Started](#getting-started)
   - [Contributing](#contributing)
   - [All Thanks To Our Contributors](#all-thanks-to-our-contributors)
@@ -45,6 +47,14 @@ yarn dev
 # or
 pnpm dev
 ```
+
+5. Make sure to lint and format your code before creating a PR
+
+- `npm run lint:check` to check for lint errors
+- `npm run lint:fix` to fix lint errors
+- `npm run format:check` to format the code
+- `npm run format:fix` to fix the formatting
+- If the code is not formatted properly, the CI will fail
 
 Open [http://localhost:3000](http://localhost:3000) in your browser to see the Starkfarm Client in action.
 
