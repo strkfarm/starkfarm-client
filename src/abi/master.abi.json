@@ -1,235 +1,235 @@
 [
-    {
-      "name": "ExternalImpl",
-      "type": "impl",
-      "interface_name": "strkfarm::strats::master::IMaster"
-    },
-    {
-      "name": "core::integer::u256",
-      "type": "struct",
-      "members": [
-        {
-          "name": "low",
-          "type": "core::integer::u128"
-        },
-        {
-          "name": "high",
-          "type": "core::integer::u128"
-        }
-      ]
-    },
-    {
-      "name": "strkfarm::strats::master::IMaster",
-      "type": "interface",
-      "items": [
-        {
-          "name": "invest_auto_strk",
-          "type": "function",
-          "inputs": [
-            {
-              "name": "strategy",
-              "type": "core::starknet::contract_address::ContractAddress"
-            },
-            {
-              "name": "amount",
-              "type": "core::integer::u256"
-            },
-            {
-              "name": "receiver",
-              "type": "core::starknet::contract_address::ContractAddress"
-            }
-          ],
-          "outputs": [
-            {
-              "type": "core::integer::u256"
-            }
-          ],
-          "state_mutability": "external"
-        },
-        {
-          "name": "upgrade",
-          "type": "function",
-          "inputs": [
-            {
-              "name": "class_hash",
-              "type": "core::starknet::class_hash::ClassHash"
-            }
-          ],
-          "outputs": [],
-          "state_mutability": "external"
-        }
-      ]
-    },
-    {
-      "name": "OwnableTwoStepImpl",
-      "type": "impl",
-      "interface_name": "openzeppelin::access::ownable::interface::IOwnableTwoStep"
-    },
-    {
-      "name": "openzeppelin::access::ownable::interface::IOwnableTwoStep",
-      "type": "interface",
-      "items": [
-        {
-          "name": "owner",
-          "type": "function",
-          "inputs": [],
-          "outputs": [
-            {
-              "type": "core::starknet::contract_address::ContractAddress"
-            }
-          ],
-          "state_mutability": "view"
-        },
-        {
-          "name": "pending_owner",
-          "type": "function",
-          "inputs": [],
-          "outputs": [
-            {
-              "type": "core::starknet::contract_address::ContractAddress"
-            }
-          ],
-          "state_mutability": "view"
-        },
-        {
-          "name": "accept_ownership",
-          "type": "function",
-          "inputs": [],
-          "outputs": [],
-          "state_mutability": "external"
-        },
-        {
-          "name": "transfer_ownership",
-          "type": "function",
-          "inputs": [
-            {
-              "name": "new_owner",
-              "type": "core::starknet::contract_address::ContractAddress"
-            }
-          ],
-          "outputs": [],
-          "state_mutability": "external"
-        },
-        {
-          "name": "renounce_ownership",
-          "type": "function",
-          "inputs": [],
-          "outputs": [],
-          "state_mutability": "external"
-        }
-      ]
-    },
-    {
-      "name": "constructor",
-      "type": "constructor",
-      "inputs": [
-        {
-          "name": "owner",
-          "type": "core::starknet::contract_address::ContractAddress"
-        }
-      ]
-    },
-    {
-      "kind": "enum",
-      "name": "openzeppelin::security::reentrancyguard::ReentrancyGuardComponent::Event",
-      "type": "event",
-      "variants": []
-    },
-    {
-      "kind": "struct",
-      "name": "openzeppelin::access::ownable::ownable::OwnableComponent::OwnershipTransferred",
-      "type": "event",
-      "members": [
-        {
-          "kind": "key",
-          "name": "previous_owner",
-          "type": "core::starknet::contract_address::ContractAddress"
-        },
-        {
-          "kind": "key",
-          "name": "new_owner",
-          "type": "core::starknet::contract_address::ContractAddress"
-        }
-      ]
-    },
-    {
-      "kind": "struct",
-      "name": "openzeppelin::access::ownable::ownable::OwnableComponent::OwnershipTransferStarted",
-      "type": "event",
-      "members": [
-        {
-          "kind": "key",
-          "name": "previous_owner",
-          "type": "core::starknet::contract_address::ContractAddress"
-        },
-        {
-          "kind": "key",
-          "name": "new_owner",
-          "type": "core::starknet::contract_address::ContractAddress"
-        }
-      ]
-    },
-    {
-      "kind": "enum",
-      "name": "openzeppelin::access::ownable::ownable::OwnableComponent::Event",
-      "type": "event",
-      "variants": [
-        {
-          "kind": "nested",
-          "name": "OwnershipTransferred",
-          "type": "openzeppelin::access::ownable::ownable::OwnableComponent::OwnershipTransferred"
-        },
-        {
-          "kind": "nested",
-          "name": "OwnershipTransferStarted",
-          "type": "openzeppelin::access::ownable::ownable::OwnableComponent::OwnershipTransferStarted"
-        }
-      ]
-    },
-    {
-      "kind": "struct",
-      "name": "openzeppelin::upgrades::upgradeable::UpgradeableComponent::Upgraded",
-      "type": "event",
-      "members": [
-        {
-          "kind": "data",
-          "name": "class_hash",
-          "type": "core::starknet::class_hash::ClassHash"
-        }
-      ]
-    },
-    {
-      "kind": "enum",
-      "name": "openzeppelin::upgrades::upgradeable::UpgradeableComponent::Event",
-      "type": "event",
-      "variants": [
-        {
-          "kind": "nested",
-          "name": "Upgraded",
-          "type": "openzeppelin::upgrades::upgradeable::UpgradeableComponent::Upgraded"
-        }
-      ]
-    },
-    {
-      "kind": "enum",
-      "name": "strkfarm::strats::master::Master::Event",
-      "type": "event",
-      "variants": [
-        {
-          "kind": "flat",
-          "name": "ReentrancyGuardEvent",
-          "type": "openzeppelin::security::reentrancyguard::ReentrancyGuardComponent::Event"
-        },
-        {
-          "kind": "flat",
-          "name": "OwnableEvent",
-          "type": "openzeppelin::access::ownable::ownable::OwnableComponent::Event"
-        },
-        {
-          "kind": "flat",
-          "name": "UpgradeableEvent",
-          "type": "openzeppelin::upgrades::upgradeable::UpgradeableComponent::Event"
-        }
-      ]
-    }
-  ]
+  {
+    "name": "ExternalImpl",
+    "type": "impl",
+    "interface_name": "strkfarm::strats::master::IMaster"
+  },
+  {
+    "name": "core::integer::u256",
+    "type": "struct",
+    "members": [
+      {
+        "name": "low",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "high",
+        "type": "core::integer::u128"
+      }
+    ]
+  },
+  {
+    "name": "strkfarm::strats::master::IMaster",
+    "type": "interface",
+    "items": [
+      {
+        "name": "invest_auto_strk",
+        "type": "function",
+        "inputs": [
+          {
+            "name": "strategy",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "amount",
+            "type": "core::integer::u256"
+          },
+          {
+            "name": "receiver",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::integer::u256"
+          }
+        ],
+        "state_mutability": "external"
+      },
+      {
+        "name": "upgrade",
+        "type": "function",
+        "inputs": [
+          {
+            "name": "class_hash",
+            "type": "core::starknet::class_hash::ClassHash"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
+      }
+    ]
+  },
+  {
+    "name": "OwnableTwoStepImpl",
+    "type": "impl",
+    "interface_name": "openzeppelin::access::ownable::interface::IOwnableTwoStep"
+  },
+  {
+    "name": "openzeppelin::access::ownable::interface::IOwnableTwoStep",
+    "type": "interface",
+    "items": [
+      {
+        "name": "owner",
+        "type": "function",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "name": "pending_owner",
+        "type": "function",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "name": "accept_ownership",
+        "type": "function",
+        "inputs": [],
+        "outputs": [],
+        "state_mutability": "external"
+      },
+      {
+        "name": "transfer_ownership",
+        "type": "function",
+        "inputs": [
+          {
+            "name": "new_owner",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [],
+        "state_mutability": "external"
+      },
+      {
+        "name": "renounce_ownership",
+        "type": "function",
+        "inputs": [],
+        "outputs": [],
+        "state_mutability": "external"
+      }
+    ]
+  },
+  {
+    "name": "constructor",
+    "type": "constructor",
+    "inputs": [
+      {
+        "name": "owner",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ]
+  },
+  {
+    "kind": "enum",
+    "name": "openzeppelin::security::reentrancyguard::ReentrancyGuardComponent::Event",
+    "type": "event",
+    "variants": []
+  },
+  {
+    "kind": "struct",
+    "name": "openzeppelin::access::ownable::ownable::OwnableComponent::OwnershipTransferred",
+    "type": "event",
+    "members": [
+      {
+        "kind": "key",
+        "name": "previous_owner",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "kind": "key",
+        "name": "new_owner",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ]
+  },
+  {
+    "kind": "struct",
+    "name": "openzeppelin::access::ownable::ownable::OwnableComponent::OwnershipTransferStarted",
+    "type": "event",
+    "members": [
+      {
+        "kind": "key",
+        "name": "previous_owner",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "kind": "key",
+        "name": "new_owner",
+        "type": "core::starknet::contract_address::ContractAddress"
+      }
+    ]
+  },
+  {
+    "kind": "enum",
+    "name": "openzeppelin::access::ownable::ownable::OwnableComponent::Event",
+    "type": "event",
+    "variants": [
+      {
+        "kind": "nested",
+        "name": "OwnershipTransferred",
+        "type": "openzeppelin::access::ownable::ownable::OwnableComponent::OwnershipTransferred"
+      },
+      {
+        "kind": "nested",
+        "name": "OwnershipTransferStarted",
+        "type": "openzeppelin::access::ownable::ownable::OwnableComponent::OwnershipTransferStarted"
+      }
+    ]
+  },
+  {
+    "kind": "struct",
+    "name": "openzeppelin::upgrades::upgradeable::UpgradeableComponent::Upgraded",
+    "type": "event",
+    "members": [
+      {
+        "kind": "data",
+        "name": "class_hash",
+        "type": "core::starknet::class_hash::ClassHash"
+      }
+    ]
+  },
+  {
+    "kind": "enum",
+    "name": "openzeppelin::upgrades::upgradeable::UpgradeableComponent::Event",
+    "type": "event",
+    "variants": [
+      {
+        "kind": "nested",
+        "name": "Upgraded",
+        "type": "openzeppelin::upgrades::upgradeable::UpgradeableComponent::Upgraded"
+      }
+    ]
+  },
+  {
+    "kind": "enum",
+    "name": "strkfarm::strats::master::Master::Event",
+    "type": "event",
+    "variants": [
+      {
+        "kind": "flat",
+        "name": "ReentrancyGuardEvent",
+        "type": "openzeppelin::security::reentrancyguard::ReentrancyGuardComponent::Event"
+      },
+      {
+        "kind": "flat",
+        "name": "OwnableEvent",
+        "type": "openzeppelin::access::ownable::ownable::OwnableComponent::Event"
+      },
+      {
+        "kind": "flat",
+        "name": "UpgradeableEvent",
+        "type": "openzeppelin::upgrades::upgradeable::UpgradeableComponent::Event"
+      }
+    ]
+  }
+]
