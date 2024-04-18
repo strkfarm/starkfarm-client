@@ -4,10 +4,14 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "build": "node generate-changelog.js && node update-readme.js"
   },
+  "files": [
+    "CHANGELOG.md",
+    "dist"
+  ],
   "dependencies": {
     "@ajna/pagination": "^1.4.19",
     "@chakra-ui/icons": "^2.1.1",
@@ -55,7 +59,9 @@
     "eslint-config-next": "14.1.0",
     "postcss": "^8",
     "tailwindcss": "^3.3.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "conventional-changelog": "^5.1.0",
+    "conventional-commits-parser": "^5.0.0"
   },
   "engines": {
     "node": "20.x"
