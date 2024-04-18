@@ -8,7 +8,7 @@ import { PoolInfo, StrkDexIncentivesAtom, allPoolsAtomUnSorted, filteredPools, s
 import { Avatar, AvatarGroup, Box, Button, Card, CardBody, CardHeader, Center, Container, Flex, Grid, GridItem, HStack, Heading, Image, Input, Link, LinkBox, LinkOverlay, ListItem, Menu, MenuButton, MenuItem, MenuList, NumberInput, OrderedList, Skeleton, Spinner, Stack, Stat, StatHelpText, StatLabel, StatNumber, Tab, TabIndicator, TabList, TabPanel, TabPanels, Tabs, Text, Tooltip, VStack, Wrap, WrapItem } from "@chakra-ui/react";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useMemo, useState } from "react";
-import useSWR from 'swr'
+import useSWR from 'swr';
 import { Pagination, PaginationContainer, usePagination, PaginationNext, PaginationPrevious, PaginationPage, PaginationPageGroup } from '@ajna/pagination';
 import CONSTANTS from "@/constants";
 import Filters from "@/components/Filters";
@@ -16,7 +16,7 @@ import tg from '@/assets/tg.svg';
 import Pools from "@/components/Pools";
 import Strategies from "@/components/Strategies";
 import mixpanel from "mixpanel-browser";
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation';
 import { StrategyInfo, strategiesAtom } from "@/store/strategies.atoms";
 import { getUniqueById } from "@/utils";
 import { ChevronDownIcon } from "@chakra-ui/icons";
@@ -30,23 +30,23 @@ import { useERC4626Value } from "@/hooks/useERC4626Value";
 
 export default function Strategy() {
   const { address } = useAccount();
-  const searchParams = useSearchParams()
+  const searchParams = useSearchParams();
   const strategies = useAtomValue(strategiesAtom);
 
   const strategy: StrategyInfo | undefined = useMemo(() => {
-    const name = searchParams.get('name')
-    console.log('name', name)
+    const name = searchParams.get('name');
+    console.log('name', name);
     return strategies.find(s => s.name == name);
-  }, [searchParams, strategies])
+  }, [searchParams, strategies]);
 
-  const {balance, underlyingTokenInfo, isLoading, isError} = useERC4626Value(strategy?.holdingTokens[0]) // @todo need to add multi token support
+  const {balance, underlyingTokenInfo, isLoading, isError} = useERC4626Value(strategy?.holdingTokens[0]); // @todo need to add multi token support
   
   useEffect(() => {
-    mixpanel.track('Strategy page open', {name: searchParams.get('name')})
-  }, [])
+    mixpanel.track('Strategy page open', {name: searchParams.get('name')});
+  }, []);
 
-  const colSpan1: any = {base: '5', md: '3'}
-  const colSpan2: any = {base: '5', md: '2'}
+  const colSpan1: any = {base: '5', md: '3'};
+  const colSpan2: any = {base: '5', md: '2'};
   return (
     <Container maxWidth={'1000px'} margin={'0 auto'} padding='30px 10px' fontFamily={"sans-serif"}>
         <Flex marginBottom={'10px'}>

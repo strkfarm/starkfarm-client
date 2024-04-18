@@ -8,7 +8,7 @@ import { PoolInfo, StrkDexIncentivesAtom, allPoolsAtomUnSorted, filteredPools, s
 import { Avatar, AvatarGroup, Box, Card, CardBody, CardHeader, Center, Container, Flex, HStack, Heading, Image, Link, LinkBox, LinkOverlay, Skeleton, Spinner, Stack, Tab, TabIndicator, TabList, TabPanel, TabPanels, Tabs, Text, Tooltip } from "@chakra-ui/react";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useMemo, useState } from "react";
-import useSWR from 'swr'
+import useSWR from 'swr';
 import { Pagination, PaginationContainer, usePagination, PaginationNext, PaginationPrevious, PaginationPage, PaginationPageGroup } from '@ajna/pagination';
 import CONSTANTS from "@/constants";
 import Filters from "@/components/Filters";
@@ -18,11 +18,9 @@ import Strategies from "@/components/Strategies";
 import mixpanel from "mixpanel-browser";
 
 export default function Home() {
-  
   useEffect(() => {
-    mixpanel.track('Page open')
-  }, [])
-
+    mixpanel.track('Page open');
+  }, []);
 
   return (
     <Container maxWidth={'1000px'} margin={'0 auto'}>
@@ -36,10 +34,10 @@ export default function Home() {
         <Tabs position="relative" variant='unstyled' width={'100%'}>
           <TabList>
             <Tab color='light_grey' _selected={{ color: 'color2' }} onClick={() => {
-              mixpanel.track('All pools clicked')
+              mixpanel.track('All pools clicked');
             }}>All Pools</Tab >
             <Tab  color='light_grey' _selected={{ color: 'color2' }} onClick={() => {
-              mixpanel.track('Strategies opened')
+              mixpanel.track('Strategies opened');
             }}>Strategies✨</Tab>
           </TabList>
           <TabIndicator

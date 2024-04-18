@@ -8,7 +8,7 @@ import { PoolInfo, StrkDexIncentivesAtom, allPoolsAtomUnSorted, filteredPools, s
 import { Avatar, AvatarGroup, Box, Button, Card, CardBody, CardHeader, Center, Container, Flex, Grid, GridItem, HStack, Heading, Image, Link, LinkBox, LinkOverlay, Skeleton, Spinner, Stack, Stat, StatLabel, StatNumber, Tab, TabIndicator, TabList, TabPanel, TabPanels, Tabs, Text, Tooltip } from "@chakra-ui/react";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useMemo, useState } from "react";
-import useSWR from 'swr'
+import useSWR from 'swr';
 import { Pagination, PaginationContainer, usePagination, PaginationNext, PaginationPrevious, PaginationPage, PaginationPageGroup } from '@ajna/pagination';
 import CONSTANTS from "@/constants";
 import Filters from "@/components/Filters";
@@ -18,8 +18,6 @@ import Strategies from "@/components/Strategies";
 import mixpanel from "mixpanel-browser";
 
 export default function Claim() {
-  
-
   return (
     <Container maxWidth={'1000px'} margin={'0 auto'} padding='30px 10px'>
       <Heading as='h2' color='white' marginBottom={'10px'}>

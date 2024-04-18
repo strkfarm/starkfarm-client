@@ -58,58 +58,56 @@ export class IStrategyProps {
     risks: string[] = [
         "The strategy encompasses exposure to the protocols and tokens listed above, which inherently entail a spectrum of risks including, but not limited to, hacks and volatility",
         "APYs shown are just indicative and do not promise exact returns",
-    ]
+    ];
 
     depositMethods = (amount: MyNumber, address: string, provider: ProviderInterface):  IStrategyActionHook[] => {
         return [];
-    }
+    };
 
     withdrawMethods = (amount: MyNumber, address: string, provider: ProviderInterface):  IStrategyActionHook[] => {
         return [];
-    }
+    };
 
     constructor(description: string, rewardTokens: {logo: string}[], holdingTokens: TokenInfo[]) {
         this.description = description;
         this.rewardTokens = rewardTokens;
         this.holdingTokens = holdingTokens;
     }
-
-    
 }
 
 export class IStrategy extends IStrategyProps {
     readonly tag: string;
 
     constructor(tag: string, description: string, rewardTokens: {logo: string}[], holdingTokens: TokenInfo[]) {
-        super(description, rewardTokens, holdingTokens)
+        super(description, rewardTokens, holdingTokens);
         this.tag = tag;
     }
 
     filterStablesOnly(pools: PoolInfo[], amount: string, prevActions: StrategyAction[]) {
         const eligiblePools = pools.filter(p => p.category == Category.Stable);
-        if (!eligiblePools) throw new Error(`${this.tag}: [F1] no eligible pools`)
+        if (!eligiblePools) throw new Error(`${this.tag}: [F1] no eligible pools`);
         return eligiblePools;
     }
 
     filterSameProtocolNotSameDepositPool(pools: PoolInfo[], amount: string, prevActions: StrategyAction[]) {
-        if (prevActions.length == 0) throw new Error(`${this.tag}: filterSameProtocolNotSameDepositPool - Prev actions zero`)
-        const lastAction = prevActions[prevActions.length - 1]
+        if (prevActions.length == 0) throw new Error(`${this.tag}: filterSameProtocolNotSameDepositPool - Prev actions zero`);
+        const lastAction = prevActions[prevActions.length - 1];
         const eligiblePools = pools.filter(p => p.protocol.name == lastAction.pool.protocol.name).filter(p => {
-            return p.pool.name != lastAction.pool.pool.name
-        })
+            return p.pool.name != lastAction.pool.pool.name;
+        });
 
-        if (!eligiblePools) throw new Error(`${this.tag}: [F2] no eligible pools`)
+        if (!eligiblePools) throw new Error(`${this.tag}: [F2] no eligible pools`);
         return eligiblePools;
     }
 
     filterNotSameProtocolSameDepositPool(pools: PoolInfo[], amount: string, prevActions: StrategyAction[]) {
-        if (prevActions.length == 0) throw new Error(`${this.tag}: filterNotSameProtocolSameDepositPool - Prev actions zero`)
-        const lastAction = prevActions[prevActions.length - 1]
+        if (prevActions.length == 0) throw new Error(`${this.tag}: filterNotSameProtocolSameDepositPool - Prev actions zero`);
+        const lastAction = prevActions[prevActions.length - 1];
         const eligiblePools = pools.filter(p => p.protocol.name != lastAction.pool.protocol.name).filter(p => {
-            return p.pool.name == lastAction.pool.pool.name
-        })
+            return p.pool.name == lastAction.pool.pool.name;
+        });
 
-        if (!eligiblePools) throw new Error(`${this.tag}: [F3] no eligible pools`)
+        if (!eligiblePools) throw new Error(`${this.tag}: [F3] no eligible pools`);
         return eligiblePools;
     }
 
@@ -119,7 +117,7 @@ export class IStrategy extends IStrategyProps {
             if (p.apr > bestPool.apr) {
                 bestPool = p;
             }
-        })
+        });
         return [...actions, {pool: bestPool, amount, isDeposit: true}];
     }
 
@@ -129,42 +127,42 @@ export class IStrategy extends IStrategyProps {
         let netYield = 0;
         this.status = StrategyStatus.SOLVING;
         try {
-            for(let i=0; i<this.steps.length; ++i) {
+            for (let i=0; i<this.steps.length; ++i) {
                 const step = this.steps[i];
                 let _pools = [...pools];
-                for(let j=0; j<step.filter.length; ++j) {
-                    const filter = step.filter[j]
+                for (let j=0; j<step.filter.length; ++j) {
+                    const filter = step.filter[j];
                     _pools = filter.bind(this)(_pools, amount, this.actions);
-                };
+                }
 
-                console.log('solve', i, _pools, pools.length, this.actions, _amount)
+                console.log('solve', i, _pools, pools.length, this.actions, _amount);
 
                 if (_pools.length > 0) {
-                    this.actions = step.optimizer(_pools, _amount, this.actions)
+                    this.actions = step.optimizer(_pools, _amount, this.actions);
                     if (this.actions.length != (i + 1)) {
-                        console.warn(`actions`, this.actions.length, 'i', i)
-                        throw new Error('one new action per step required')
+                        console.warn(`actions`, this.actions.length, 'i', i);
+                        throw new Error('one new action per step required');
                     }
                     this.actions[i].name = step.name;
                     _amount = this.actions[this.actions.length - 1].amount;
                 } else {
-                    throw new Error('no pools to continue computing strategy')
+                    throw new Error('no pools to continue computing strategy');
                 }
-            };
-        } catch(err) {
-            console.warn(`${this.tag} - unsolved`, err)
+            }
+        } catch (err) {
+            console.warn(`${this.tag} - unsolved`, err);
             return;
         }
 
         this.actions.forEach(action => {
-            const sign = action.isDeposit ? 1 : -1
+            const sign = action.isDeposit ? 1 : -1;
             const apr = action.isDeposit ? action.pool.apr : action.pool.borrow.apr;
             netYield += sign * apr * Number(action.amount);
-            console.log('netYield1', sign, apr, action.amount, netYield)
-        })
+            console.log('netYield1', sign, apr, action.amount, netYield);
+        });
         this.netYield = netYield / Number(amount);
-        console.log('netYield', netYield, this.netYield)
-        this.leverage = this.netYield / this.actions[0].pool.apr
+        console.log('netYield', netYield, this.netYield);
+        this.leverage = this.netYield / this.actions[0].pool.apr;
 
         this.postSolve();
 

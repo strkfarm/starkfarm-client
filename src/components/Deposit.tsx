@@ -30,17 +30,17 @@ export default function Deposit(props: DepositProps) {
     const [rawAmount, setRawAmount] = useState("");
 
     const {calls, actions} = useMemo(() => {
-        const actions = props.callsInfo(amount, address || '0x0', provider)
-        const hook = actions.find(a => a.tokenInfo.name == selectedMarket.name)
+        const actions = props.callsInfo(amount, address || '0x0', provider);
+        const hook = actions.find(a => a.tokenInfo.name == selectedMarket.name);
         if (!hook) return {calls: [], actions};
-        return {calls: hook.calls, actions}
-    }, [selectedMarket, amount, address, provider])
+        return {calls: hook.calls, actions};
+    }, [selectedMarket, amount, address, provider]);
 
     const { balance, isLoading, isError} = useERC20Balance(selectedMarket);
 
     const maxAmount: MyNumber = useMemo(() => {
-        return MyNumber.min(balance, selectedMarket.maxAmount)
-    }, [balance, selectedMarket])
+        return MyNumber.min(balance, selectedMarket.maxAmount);
+    }, [balance, selectedMarket]);
 
     function BalanceComponent(props: {token: TokenInfo,strategy: StrategyInfo,
         buttonText: string}) {
@@ -48,7 +48,7 @@ export default function Deposit(props: DepositProps) {
             <Text>Available balance </Text>
             <LoadingWrap isLoading={isLoading} isError={isError} 
                 skeletonProps={{
-                    height: '10px', width:'50px', float: 'right', marginTop: '8px', marginLeft: '5px'
+                    height: '10px', width: '50px', float: 'right', marginTop: '8px', marginLeft: '5px'
                 }}
                 iconProps={{
                     marginLeft: '5px',
@@ -67,8 +67,8 @@ export default function Deposit(props: DepositProps) {
                         color: 'color_50p'
                     }}
                     onClick={() => {
-                        setAmount(maxAmount)
-                        setRawAmount(maxAmount.toEtherStr())
+                        setAmount(maxAmount);
+                        setRawAmount(maxAmount.toEtherStr());
                         mixpanel.track("Chose max amount", {
                             strategy: props.strategy.name,
                             buttonText: props.buttonText,
@@ -76,11 +76,11 @@ export default function Deposit(props: DepositProps) {
                             token: selectedMarket.name,
                             maxAmount: maxAmount.toEtherStr(),
                             address
-                        })
+                        });
                     }}
                 >[Max]</Button>
             </LoadingWrap>
-        </Box>
+        </Box>;
     }
 
     return <Box>
@@ -95,10 +95,10 @@ export default function Deposit(props: DepositProps) {
                             <MenuItem key={dep.tokenInfo.name} {...MyMenuItemProps}
                                 onClick={() => {
                                     if (selectedMarket.name != dep.tokenInfo.name) {
-                                        setSelectedMarket(dep.tokenInfo)
-                                        setAmount(new MyNumber("0", dep.tokenInfo.decimals))
-                                        setDirty(false)
-                                        setRawAmount("")
+                                        setSelectedMarket(dep.tokenInfo);
+                                        setAmount(new MyNumber("0", dep.tokenInfo.decimals));
+                                        setDirty(false);
+                                        setRawAmount("");
                                     }
                                 }}
                             >
@@ -126,8 +126,8 @@ export default function Deposit(props: DepositProps) {
                 else {
                     setAmount(new MyNumber("0", selectedMarket.decimals));
                 }
-                setRawAmount(value)
-                setDirty(true)
+                setRawAmount(value);
+                setDirty(true);
                 mixpanel.track('Enter amount', {
                     strategy: props.strategy.name,
                     buttonText: props.buttonText,
@@ -135,7 +135,7 @@ export default function Deposit(props: DepositProps) {
                     token: selectedMarket.name,
                     maxAmount: maxAmount.toEtherStr(),
                     address
-                })
+                });
             }}
             marginTop={'10px'}
             keepWithinRange={false}
@@ -159,5 +159,5 @@ export default function Deposit(props: DepositProps) {
                     isDisabled: amount.isZero() || amount.compare(maxAmount.toEtherStr(), 'gt')
                 }}
             /></Center>
-    </Box>
+    </Box>;
 }

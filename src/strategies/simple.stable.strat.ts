@@ -17,7 +17,7 @@ export interface StrategyAction {
 }
 
 export class SimpleStableStrategy extends IStrategy {
-    tag = 'SSStrt'
+    tag = 'SSStrt';
     exchanges: IDapp<any>[] = [];
 
     actions: StrategyAction[] = [];
@@ -41,13 +41,13 @@ export class SimpleStableStrategy extends IStrategy {
                     if (p.borrow.apr < bestPool.borrow.apr) {
                         bestPool = p;
                     }
-                })
-                const protocolInfo: any = PROTOCOLS.find(p => p.name == bestPool.protocol.name)
-                if (!protocolInfo) throw new Error(`${this.tag} Protocol info not found`)
-                const protocolClass: IDapp<any> = protocolInfo.class
+                });
+                const protocolInfo: any = PROTOCOLS.find(p => p.name == bestPool.protocol.name);
+                if (!protocolInfo) throw new Error(`${this.tag} Protocol info not found`);
+                const protocolClass: IDapp<any> = protocolInfo.class;
                 const factoredAmount = protocolClass.getMaxFactoredOut(actions, 1.2);
                 const newAmount = factoredAmount * bestPool.borrow.borrowFactor;
-                const newAction: StrategyAction = {pool: bestPool, amount: newAmount.toFixed(0), isDeposit: false}
+                const newAction: StrategyAction = {pool: bestPool, amount: newAmount.toFixed(0), isDeposit: false};
                 return [...actions, newAction];
             },
             filter: [this.filterStablesOnly, this.filterSameProtocolNotSameDepositPool]
@@ -55,6 +55,6 @@ export class SimpleStableStrategy extends IStrategy {
             name: "Deposit borrowed amount to another protocol",
             optimizer: this.optimizerDeposit,
             filter: [this.filterStablesOnly, this.filterNotSameProtocolSameDepositPool]
-        }]
+        }];
     }
 }

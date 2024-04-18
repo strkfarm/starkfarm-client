@@ -1,5 +1,5 @@
 import CONSTANTS, { TokenName } from "@/constants";
-import axios from 'axios'
+import axios from 'axios';
 import { APRSplit, Category, PoolInfo, PoolMetadata, PoolType, ProtocolAtoms, StrkDexIncentivesAtom } from "./pools";
 import { Ekubo } from "./ekobu.store";
 import { atom } from "jotai";
@@ -18,13 +18,13 @@ const PairInfo: any = {
     'STRK/ETH': '0x2ed66297d146ecd91595c3174da61c1397e8b7fcecf25d423b1ba6717b0ece9',
     'ETH/USDC': '0x4d0390b777b424e43839cd1e744799f3de6c176c7e32c1812a41dbd9c19db6a',
     'STRK/USDC': '0x5726725e9507c3586cc0516449e2c74d9b201ab2747752bb0251aaa263c9a26'
-}
+};
 
 export class Jediswap extends IDapp<string> {
-    name = 'Jediswap (v1)'
-    link = 'https://app.jediswap.xyz/#/pool'
-    logo = 'https://app.jediswap.xyz/favicon/favicon-32x32.png'
-    incentiveDataKey = 'Jediswap_v1'
+    name = 'Jediswap (v1)';
+    link = 'https://app.jediswap.xyz/#/pool';
+    logo = 'https://app.jediswap.xyz/favicon/favicon-32x32.png';
+    incentiveDataKey = 'Jediswap_v1';
     _computePoolsInfo(data: any) {
         try {
             const myData = data[this.incentiveDataKey];
@@ -35,7 +35,7 @@ export class Jediswap extends IDapp<string> {
                 let category = Category.Others;
                 
                 if (poolName == 'USDC/USDT') {
-                    category = Category.Stable
+                    category = Category.Stable;
                 } else if (poolName.includes('STRK')) {
                     category = Category.STRK;
                 }
@@ -60,7 +60,7 @@ export class Jediswap extends IDapp<string> {
                         title: 'STRK rewards',
                         description: 'Starknet DeFi Spring incentives',
                     }],
-                    category: category,
+                    category,
                     type: PoolType.DEXV2,
                     lending: {
                         collateralFactor: 0,
@@ -69,47 +69,46 @@ export class Jediswap extends IDapp<string> {
                         borrowFactor: 0,
                         apr: 0
                     }
-                }
+                };
                 pools.push(poolInfo);
-            })
-            console.log('processed pools jedi', pools)
+            });
+            console.log('processed pools jedi', pools);
             return pools;
-        } catch(err) {
-            console.error('Err fetching poools [2]', err)
+        } catch (err) {
+            console.error('Err fetching poools [2]', err);
             throw err;
         }
     }
 
     getBaseAPY(p: PoolInfo, data: AtomWithQueryResult<any, Error>) {
         const aprData: MyBaseAprDoc[] = data.data;
-        let baseAPY: number | 'Err' = 'Err'
+        let baseAPY: number | 'Err' = 'Err';
         let splitApr: APRSplit | null = null;
         const metadata: PoolMetadata | null = null;
         if (data.isSuccess) {
-            const pairId = PairInfo[p.pool.name]
-            const item = aprData.find((doc) => doc.id == pairId)
-            if(item) {
+            const pairId = PairInfo[p.pool.name];
+            const item = aprData.find((doc) => doc.id == pairId);
+            if (item) {
                 baseAPY = item.apr;
                 splitApr = {
                     apr: baseAPY,
                     title: "Base APY",
                     description: ''
-                }
+                };
             }
         }
         return {
             baseAPY, splitApr, metadata
-        }
+        };
     }
 }
-
 
 async function getVolumes(block: number) {
     let supportedPairs = "";
     Object.keys(PairInfo).forEach((pair: any) => {
-        supportedPairs += `"${PairInfo[pair]}",`
-    })
-    supportedPairs = supportedPairs.slice(0, supportedPairs.length - 1)
+        supportedPairs += `"${PairInfo[pair]}",`;
+    });
+    supportedPairs = supportedPairs.slice(0, supportedPairs.length - 1);
     const data = JSON.stringify({
         query: `query pairs {
         pairs(first: 200, where: {idIn: [${supportedPairs}]}, block: {number: ${block}}, orderBy: "tracked_reserve_eth", orderByDirection: "desc") {
@@ -126,12 +125,12 @@ async function getVolumes(block: number) {
     const res = await fetch(CONSTANTS.JEDI.BASE_API, {
         method: 'POST',
         headers: {
-            'Accept': 'application/json',
+            Accept: 'application/json',
             'Content-Type': 'application/json'
         },
         body: data
-    })
-    return res.json()
+    });
+    return res.json();
 }
 
 export const jedi = new Jediswap();
@@ -139,24 +138,24 @@ const JediAtoms: ProtocolAtoms = {
     baseAPRs: atomWithQuery((get) => ({
         queryKey: ['jedi_base_aprs'],
         queryFn: async ({ queryKey: [] }) => {
-            console.log('jedi base')
+            console.log('jedi base');
             const nowSeconds = Math.round((new Date().getTime()) / 1000) - 300; // giving enough time to have data
             const NowMinus1DSeconds = nowSeconds - 86400;
-            const promsies: Promise<BlockInfo>[] = [getBlock(nowSeconds), getBlock(NowMinus1DSeconds)]
+            const promsies: Promise<BlockInfo>[] = [getBlock(nowSeconds), getBlock(NowMinus1DSeconds)];
             const [blockInfoNow, blockInfoMinus1D] = await Promise.all(promsies);
 
-            console.log('jedi base', {blockInfoNow, blockInfoMinus1D})
+            console.log('jedi base', {blockInfoNow, blockInfoMinus1D});
             if (blockInfoNow && blockInfoMinus1D) {
                 const blockNow = blockInfoNow.data.blocks[0]?.number;
                 const blockMinus1D = blockInfoMinus1D.data.blocks[0]?.number;
                 if (blockNow && blockMinus1D) {
-                    console.log('jedi base', 'blocks', blockNow, blockMinus1D)
+                    console.log('jedi base', 'blocks', blockNow, blockMinus1D);
                     const volumeNow = await getVolumes(blockNow);
                     const volumeMinus1D = await getVolumes(blockMinus1D);
 
                     console.log({
                         volumeNow, volumeMinus1D
-                    }, 'jedi base', 'volumes')
+                    }, 'jedi base', 'volumes');
 
                     const aprData: {id: string, apr: number}[] = volumeNow.data.pairs.map((pair: any) => {
                         // ** Example **
@@ -168,7 +167,7 @@ const JediAtoms: ProtocolAtoms = {
 
                         const prevVolume = volumeMinus1D.data.pairs.find((p: any) => p.id == pair.id);
                         if (!prevVolume) {
-                            console.error('prev vol not found', pair, volumeMinus1D)
+                            console.error('prev vol not found', pair, volumeMinus1D);
                             throw new Error('prev vol not found');
                         }
                         const twnty4hrVol = Number(pair.volumeUSD) - Number(prevVolume.volumeUSD);
@@ -176,8 +175,8 @@ const JediAtoms: ProtocolAtoms = {
                         return {
                             id: pair.id,
                             apr: (twnty4hrVol * 365 * 0.003) / Number(pair.reserveUSD)
-                        }
-                    })
+                        };
+                    });
 
                     return aprData;
                 }
@@ -187,7 +186,7 @@ const JediAtoms: ProtocolAtoms = {
         }
     })),
     pools: atom((get) => {
-        const poolsInfo = get(StrkDexIncentivesAtom)
+        const poolsInfo = get(StrkDexIncentivesAtom);
         const empty: PoolInfo[] = [];
         // if (!JediAtoms.baseAPRs) return empty;
         // const baseInfo = get(JediAtoms.baseAPRs)
@@ -196,7 +195,7 @@ const JediAtoms: ProtocolAtoms = {
             // return jedi.addBaseAPYs(pools, baseInfo);
             return pools;
         }
-        else return empty;
+        return empty;
     })
-}
+};
 export default JediAtoms;

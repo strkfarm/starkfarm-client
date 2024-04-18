@@ -8,14 +8,14 @@ const LOGOS = {
     ETH: "/zklend/icons/tokens/eth.svg?w=20",
     STRK: "/zklend/icons/tokens/strk.svg?w=20",
     DAI: "/zklend/icons/tokens/dai.svg?w=20"
-}
+};
 
 export type TokenName = 'USDT' | 'USDC' | 'ETH' | 'STRK' | 'WBTC' | 'DAI'
 const CONSTANTS = {
     DEX_INCENTIVE_URL: '/strk-incentives/fetchFile?file=strk_grant.json',
     LENDING_INCENTIVES_URL: '/strk-incentives/fetchFile?file=prod-api/lending/lending_strk_grant.json',
     LOGOS,
-    COMMUNITY_TG:'https://t.me/+HQ_eHaXmF-1lZDc1',
+    COMMUNITY_TG: 'https://t.me/+HQ_eHaXmF-1lZDc1',
     NOSTRA: {
         LENDING_GRAPH_URL: '/nostra/app/data-yqlpb/endpoint/data/v1/action/find',
     },
@@ -34,7 +34,7 @@ const CONSTANTS = {
         AutoUsdcFarm: '0x16912b22d5696e95ffde888ede4bd69fbbc60c5f873082857a47c543172694f'
     },
     MOBILE_MSG: 'Desktop/Tablet only'
-}
+};
 
 export const TOKENS: TokenInfo[] = [{
     token: '0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
@@ -90,6 +90,6 @@ export const TOKENS: TokenInfo[] = [{
     minAmount: MyNumber.fromEther('10', 6),
     maxAmount: MyNumber.fromEther('10000', 6),
     stepAmount: MyNumber.fromEther('10', 6),
-}]
+}];
 
 export default CONSTANTS;

@@ -1,21 +1,21 @@
 'use client';
 
 import CONSTANTS, { TokenName } from "@/constants";
-import axios from 'axios'
+import axios from 'axios';
 import { Category, PoolInfo, PoolType, ProtocolAtoms, StrkDexIncentivesAtom } from "./pools";
 import { PrimitiveAtom, atom } from "jotai";
 import useSWR from "swr";
 import { atomWithQuery } from "jotai-tanstack-query";
 const fetcher = (...args: any[]) => {
-    return fetch(args[0], args[1]).then(res => res.json())
-}
+    return fetch(args[0], args[1]).then(res => res.json());
+};
 
 export class Ekubo {
-    name = 'Ekubo'
-    link = 'https://app.ekubo.org/positions'
-    logo = 'https://app.ekubo.org/logo.svg'
+    name = 'Ekubo';
+    link = 'https://app.ekubo.org/positions';
+    logo = 'https://app.ekubo.org/logo.svg';
 
-    incentiveDataKey = 'Ekubo'
+    incentiveDataKey = 'Ekubo';
     _computePoolsInfo(data: any) {
         try {
             const myData = data[this.incentiveDataKey];
@@ -25,7 +25,7 @@ export class Ekubo {
                 const arr = myData[poolName];
                 let category = Category.Others;
                 if (poolName == 'USDC/USDT') {
-                    category = Category.Stable
+                    category = Category.Stable;
                 } else if (poolName.includes('STRK')) {
                     category = Category.STRK;
                 }
@@ -54,7 +54,7 @@ export class Ekubo {
                         title: 'STRK rewards',
                         description: 'Starknet DeFi Spring incentives',
                     }],
-                    category: category,
+                    category,
                     type: PoolType.DEXV3,
                     lending: {
                         collateralFactor: 0,
@@ -63,35 +63,33 @@ export class Ekubo {
                         borrowFactor: 0,
                         apr: 0
                     }
-                }
+                };
                 pools.push(poolInfo);
-            })
+            });
             
             return pools;
-        } catch(err) {
-            console.error('Error fetching pools', err)
+        } catch (err) {
+            console.error('Error fetching pools', err);
             throw err;
         }
     }
 
     commonVaultFilter(poolName: string) {
-        const supportedPools = ['ETH/USDC', 'STRK/USDC', 'STRK/ETH', 'USDC/USDT', 'USDC', 'USDT', 'ETH', 'STRK']
-        console.log('filter2', poolName, supportedPools.includes(poolName))
+        const supportedPools = ['ETH/USDC', 'STRK/USDC', 'STRK/ETH', 'USDC/USDT', 'USDC', 'USDT', 'ETH', 'STRK'];
+        console.log('filter2', poolName, supportedPools.includes(poolName));
         // return !poolName.includes('DAI') && !poolName.includes('WSTETH') && !poolName.includes('BTC');
         return supportedPools.includes(poolName);
     }
-
 }
-
 
 export const ekubo = new Ekubo();
 const EkuboAtoms: ProtocolAtoms = {
     pools: atom((get) => {
-        const poolsInfo = get(StrkDexIncentivesAtom)
+        const poolsInfo = get(StrkDexIncentivesAtom);
         const empty: PoolInfo[] = [];
-        console.log('ekubo', poolsInfo)
+        console.log('ekubo', poolsInfo);
         if (poolsInfo.data) return ekubo._computePoolsInfo(poolsInfo.data);
-        else return empty;
+        return empty;
     })
-}
+};
 export default EkuboAtoms;

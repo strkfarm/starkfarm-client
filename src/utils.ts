@@ -4,20 +4,20 @@ import { num } from "starknet";
 export function getUniqueStrings(arr: Array<string>) {
     const _arr: string[] = [];
     arr.forEach(item => {
-        if (!_arr.includes(item)) _arr.push(item)
-    })
+        if (!_arr.includes(item)) _arr.push(item);
+    });
     return _arr;
 }
 
 export function getUnique<T>(arr: Array<T>, uniqueField: string) {
     const _arr: T[] = [];
-    const map: {[key: string]: boolean} = {}
+    const map: {[key: string]: boolean} = {};
     arr.forEach((item: any) => {
         if (!map[item[uniqueField]]) {
-            _arr.push(item)
+            _arr.push(item);
             map[item[uniqueField]] = true;
         }
-    })
+    });
     return _arr;
 }
 
@@ -30,8 +30,8 @@ export function capitalize(str: string) {
 }
 
 export function shortAddress(_address: string) {
-    let x = num.toHex(num.getDecimalString(_address))
-    return `${x.slice(0, 4)}...${x.slice(x.length - 4, x.length)}`
+    const x = num.toHex(num.getDecimalString(_address));
+    return `${x.slice(0, 4)}...${x.slice(x.length - 4, x.length)}`;
 }
 
 export function standariseAddress(address: string | bigint) {
@@ -44,15 +44,15 @@ export function standariseAddress(address: string | bigint) {
 }
 
 export const MyMenuListProps: MenuListProps = {
-    bg:'highlight',
+    bg: 'highlight',
     color: 'white',
     borderColor: 'bg',
     padding: 0,
-}
+};
 
 export const MyMenuItemProps: MenuItemProps = {
     bg: 'highlight', 
     _hover: {
         bg: 'bg'
     }
-}
+};

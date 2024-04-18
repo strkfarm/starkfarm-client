@@ -32,7 +32,7 @@ export default class MyNumber {
     }
 
     isZero() {
-        return this.bigNumber.eq('0')
+        return this.bigNumber.eq('0');
     }
 
     /**
@@ -49,7 +49,7 @@ export default class MyNumber {
 
     static min(a: MyNumber, b: MyNumber) {
         if (!a.isZero() && !b.isZero())
-            if (a.decimals != b.decimals) throw new Error(`Cannot compare numbers of diff decimals: a:${a.decimals}, b:${b.decimals}`)
+            if (a.decimals != b.decimals) throw new Error(`Cannot compare numbers of diff decimals: a:${a.decimals}, b:${b.decimals}`);
         const bn = BigNumber.min(a.bigNumber, b.bigNumber);
         return new MyNumber(bn.toString(), a.decimals);
     }

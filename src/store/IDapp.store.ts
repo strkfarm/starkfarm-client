@@ -8,35 +8,33 @@ export interface APRInfo {
     apr: number
 }
 
-
-
 export class IDapp<BaseAPYT> {
-    name: string = ''
-    link: string = ''
-    logo: string = ''
+    name: string = '';
+    link: string = '';
+    logo: string = '';
 
-    incentiveDataKey: string = ''
+    incentiveDataKey: string = '';
     _computePoolsInfo(data: any): PoolInfo[] {
-        throw new Error('not implemented: _computePoolsInfo')
+        throw new Error('not implemented: _computePoolsInfo');
     }
 
     addBaseAPYs<BaseAPYT>(pools: PoolInfo[], data: AtomWithQueryResult<BaseAPYT, Error>): PoolInfo[] {
         console.log(`lending: ${this.name}`, data);
-        if(data.isError) {
+        if (data.isError) {
             console.error('Error fetching lending base', data.error);
         }
         return pools.map(p => {
             const { baseAPY, splitApr, metadata } = this.getBaseAPY(p, <any>data);
-            let aprSplits = p.aprSplits;
+            const aprSplits = p.aprSplits;
             if (splitApr) p.aprSplits.unshift(splitApr);
             return {
                 ...p,
                 isLoading: data.isLoading,
-                aprSplits: aprSplits,
+                aprSplits,
                 apr: baseAPY != 'Err' ? p.apr + baseAPY : p.apr,
                 ...metadata
-            }
-        })
+            };
+        });
     }
 
     getBaseAPY(p: PoolInfo, data: AtomWithQueryResult<BaseAPYT, Error>) : {
@@ -44,20 +42,20 @@ export class IDapp<BaseAPYT> {
         splitApr: APRSplit | null,
         metadata: PoolMetadata | null
     } {
-        throw new Error('not implemented: getBaseAPY')
+        throw new Error('not implemented: getBaseAPY');
     }
 
     getHF(positions: StrategyAction[]):  { hf: number, isLiquidable: boolean} {
-        throw new Error('not implemented: getHF')
+        throw new Error('not implemented: getHF');
     }
 
     getMaxFactoredOut(positions: StrategyAction[], minHf: number): number {
-        throw new Error('not implemented: getMaxFactoredOut')
+        throw new Error('not implemented: getMaxFactoredOut');
     }
 
     commonVaultFilter(poolName: string) {
-        const supportedPools = ['ETH/USDC', 'STRK/USDC', 'STRK/ETH', 'USDC/USDT', 'USDC', 'USDT', 'ETH', 'STRK']
-        console.log('filter', poolName, supportedPools.includes(poolName))
+        const supportedPools = ['ETH/USDC', 'STRK/USDC', 'STRK/ETH', 'USDC/USDT', 'USDC', 'USDT', 'ETH', 'STRK'];
+        console.log('filter', poolName, supportedPools.includes(poolName));
         // return !poolName.includes('DAI') && !poolName.includes('WSTETH') && !poolName.includes('BTC');
         return supportedPools.includes(poolName);
     }

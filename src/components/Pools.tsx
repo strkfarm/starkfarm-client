@@ -8,14 +8,13 @@ import { PoolInfo, StrkDexIncentivesAtom, allPoolsAtomUnSorted, filteredPools, s
 import { Avatar, AvatarGroup, Box, Card, CardBody, CardHeader, Center, Container, Flex, HStack, Heading, Image, Link, LinkBox, LinkOverlay, Skeleton, Spinner, Stack, Text, Tooltip } from "@chakra-ui/react";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { useEffect, useMemo, useState } from "react";
-import useSWR from 'swr'
+import useSWR from 'swr';
 import { Pagination, PaginationContainer, usePagination, PaginationNext, PaginationPrevious, PaginationPage, PaginationPageGroup } from '@ajna/pagination';
 import CONSTANTS from "@/constants";
 import Filters from "@/components/Filters";
 import tg from '@/assets/tg.svg';
 
 export default function Pools() {
-
     const allPools = useAtomValue(allPoolsAtomUnSorted);
   const _filteredPools = useAtomValue(filteredPools);
   const ITEMS_PER_PAGE = 15;
@@ -30,37 +29,37 @@ export default function Pools() {
   });
 
   const pools = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
-    return _filteredPools.slice(startIndex, startIndex + ITEMS_PER_PAGE)
-  }, [_filteredPools, currentPage])
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return _filteredPools.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [_filteredPools, currentPage]);
 
-  const sortedPools = useAtomValue(sortPoolsAtom)
+  const sortedPools = useAtomValue(sortPoolsAtom);
 
   useEffect(() => {
-    console.log('sortedPools', sortedPools)
-  }, [sortedPools])
+    console.log('sortedPools', sortedPools);
+  }, [sortedPools]);
   useEffect(() => {
     console.log('pages', currentPage,
     setCurrentPage,
     pagesCount,
-    pages)
+    pages);
   }, [currentPage,
     setCurrentPage,
     pagesCount,
-    pages])
+    pages]);
 
   function getAPRWithToolTip(pool: PoolInfo) {
     const tip = <Box width={'300px'}>
       {pool.aprSplits.map(split => {
         if (split.apr == 0) {
-          return <Text key={split.title}>{split.title}: {split.description}</Text>
+          return <Text key={split.title}>{split.title}: {split.description}</Text>;
         }
         return <Flex width={'100%'} key={split.title}>
             <Text key='1' width={'70%'}>{split.title}:</Text>
             <Text width={'30%'} textAlign={'right'}  key='2'>{split.apr == 'Err' ? split.apr : (split.apr * 100).toFixed(2)}%</Text>
-          </Flex>
+          </Flex>;
       })}
-    </Box>
+    </Box>;
     return <Tooltip hasArrow label={tip} bg="gray.300" color="black">
       <Center width={{base: 'auto', md: '50%'}}
         marginRight={'0px'}
@@ -73,7 +72,7 @@ export default function Pools() {
           <Text  textAlign={{base: 'right', md: 'center'}} color='cyan' fontSize={'20px'}><b>{(pool.apr * 100).toFixed(2)}%</b></Text>
         </>}
       </Center>
-    </Tooltip>
+    </Tooltip>;
 }
 
     return <Box float='left' width={'100%'}>
@@ -84,7 +83,7 @@ export default function Pools() {
             currentPage={currentPage}
             isDisabled={false}
             onPageChange={(page) => {
-              setCurrentPage(page)
+              setCurrentPage(page);
             }}
           >
             <PaginationContainer
@@ -171,5 +170,5 @@ export default function Pools() {
             <Skeleton height='70px' />
           </Stack>}
         </Container>
-    </Box>
+    </Box>;
 }

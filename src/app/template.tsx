@@ -1,4 +1,4 @@
-'use client'
+'use client';
 
 import * as React from 'react';
 
@@ -26,7 +26,7 @@ import {
   Center,
   Box,
   Container,
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
 import { Provider as JotaiProvider } from 'jotai';
 import { Sidebar, Menu, MenuItem, SubMenu } from 'react-pro-sidebar';
 import * as LogoSvg from '@public/logo.svg';
@@ -78,16 +78,16 @@ const theme = extendTheme({
     heading: `'Courier New', Courier, monospace`,
     body: `'Courier New', Courier, monospace`,
   },
-})
+});
 
 // @ts-ignore
-BigInt.prototype.toJSON = function() { return this.toString() }
+BigInt.prototype.toJSON = function() { return this.toString(); };
 
 export default function Template({ children }: { children: React.ReactNode }) {
     const chains = [sepolia];
     const provider = jsonRpcProvider({
       rpc: (chain) => {
-        let args: RpcProviderOptions = {nodeUrl: 'https://rpc.nethermind.io/mainnet-juno?apikey=t1HPjhplOyEQpxqVMhpwLGuwmOlbXN0XivWUiPAxIBs0kHVK', chainId: constants.StarknetChainId.SN_MAIN };
+        const args: RpcProviderOptions = {nodeUrl: 'https://rpc.nethermind.io/mainnet-juno?apikey=t1HPjhplOyEQpxqVMhpwLGuwmOlbXN0XivWUiPAxIBs0kHVK', chainId: constants.StarknetChainId.SN_MAIN };
         return args;
       }
     });
@@ -104,7 +104,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
     });
 
     function getIconNode(icon: typeof import("*.svg"), alt: string) {
-      return <Center className='my-menu-button' width='100%' marginLeft={'-20px'}><Image src={icon} alt={alt}/></Center>
+      return <Center className='my-menu-button' width='100%' marginLeft={'-20px'}><Image src={icon} alt={alt}/></Center>;
     }
 
     return <JotaiProvider>
@@ -134,5 +134,5 @@ export default function Template({ children }: { children: React.ReactNode }) {
           </Flex>
         </ChakraBaseProvider>
       </StarknetConfig>
-</JotaiProvider>
+</JotaiProvider>;
 }

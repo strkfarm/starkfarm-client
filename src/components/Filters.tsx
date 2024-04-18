@@ -44,31 +44,31 @@ const colourStyles: StylesConfig<Option, true> = {
         return {
             ...styles,
             width: '100%'
-        }
+        };
     },
     dropdownIndicator: (styles, {  }) => {
         return {
             ...styles,
             color: 'var(--chakra-colors-color2)'
-        }
+        };
     },
     clearIndicator: (styles, {  }) => {
         return {
             ...styles,
             color: 'var(--chakra-colors-color2)'
-        }
+        };
     },
     indicatorSeparator: (styles, {  }) => {
         return {
             ...styles,
             backgroundColor: 'var(--chakra-colors-color2)'
-        }
+        };
     },
     menu: (styles, {  }) => {
         return {
             ...styles,
             backgroundColor: 'var(--chakra-colors-highlight)'
-        }
+        };
     },
     multiValue: (styles, { data }) => {
       const color = chroma.color(data.color);
@@ -99,20 +99,20 @@ export default function Filters() {
     // const colors: readonly string[] = ['#00B8D9', '#407cd5', '#7967e5', '#FF5630', 
     // '#FF8B00','#FFC400', '#36B37E', '#00875A', '#253858', '#666666']
 
-    const colors = ['rgba(86, 118, 254, 1)', 'rgb(127 73 229)']
-    const updateFilters = useSetAtom(updateFiltersAtom)
+    const colors = ['rgba(86, 118, 254, 1)', 'rgb(127 73 229)'];
+    const updateFilters = useSetAtom(updateFiltersAtom);
     
     const protocolOptions: readonly Option[] = filters.protocols.map((p, index) => {
-        return {value: p, label: p, color: colors[index % colors.length]}
-    })
+        return {value: p, label: p, color: colors[index % colors.length]};
+    });
 
     const categories: readonly Option[] = filters.categories.map((p, index) => {
-        return {value: p, label: p, color: colors[index % colors.length]}
-    })
+        return {value: p, label: p, color: colors[index % colors.length]};
+    });
 
     const poolTypes: readonly Option[] = filters.types.map((p, index) => {
-        return {value: p, label: p, color: colors[index % colors.length]}
-    })
+        return {value: p, label: p, color: colors[index % colors.length]};
+    });
   return <Accordion allowToggle>
           <AccordionItem borderTop='0px' borderBottom='1px' borderColor={'bg'}>
             <h2>
@@ -133,11 +133,11 @@ export default function Filters() {
               options={protocolOptions}
               styles={colourStyles}
               onChange={(x, b) => {
-                  console.log(x, Array.isArray(x), b)
+                  console.log(x, Array.isArray(x), b);
                   if (filters.protocols.length == x.length) {
-                      updateFilters('protocols', [ALL_FILTER])
+                      updateFilters('protocols', [ALL_FILTER]);
                   } else {
-                      updateFilters('protocols', x.map(p => p.value))
+                      updateFilters('protocols', x.map(p => p.value));
                   }
               }}
           />
@@ -153,8 +153,8 @@ export default function Filters() {
                   options={categories}
                   styles={colourStyles}
                   onChange={(x, b) => {
-                      console.log(x, Array.isArray(x), b)
-                      updateFilters('categories', x.map(p => p.value))
+                      console.log(x, Array.isArray(x), b);
+                      updateFilters('categories', x.map(p => p.value));
                   }}/>
               </Box>
               <Box width={{base: '100%', md: '50%'}}>
@@ -167,11 +167,11 @@ export default function Filters() {
                   options={poolTypes}
                   styles={colourStyles}
                   onChange={(x, b) => {
-                      updateFilters('poolTypes', x.map(p => p.value))
+                      updateFilters('poolTypes', x.map(p => p.value));
                   }}/>
               </Box>
           </Stack>
         </AccordionPanel>
       </AccordionItem>
-    </Accordion>
-};
+    </Accordion>;
+}

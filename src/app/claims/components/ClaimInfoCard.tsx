@@ -7,5 +7,5 @@ export interface ClaimInfoCardProps {
 export default function ClaimInfoCard() {
     return <Card>
 
-    </Card>
+    </Card>;
 }

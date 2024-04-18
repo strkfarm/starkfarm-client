@@ -32,19 +32,19 @@ export function useERC4626Value(token: TokenInfo | undefined) {
 
     const underlyingTokenInfo = useMemo(() => {
         if (!underlyingAsset) return undefined;
-        return TOKENS.find(t => standariseAddress(t.token) == standariseAddress(<bigint>underlyingAsset))
-    }, [underlyingAsset])
+        return TOKENS.find(t => standariseAddress(t.token) == standariseAddress(<bigint>underlyingAsset));
+    }, [underlyingAsset]);
 
     const convertedBal = useMemo(() => {
         console.log('4626balance', {address, balance: balance.toString(), underlyingBal, 
             underlyingAsset, isLoadingBal, isLoadingAsset, isLoadingConvert, 
             isErrorAsset, isErrorBal, isErrorConvert, underlyingTokenInfo,
-            errorBal, errorAsset})
+            errorBal, errorAsset});
         if (!address || !token) return {
             balance: MyNumber.fromZero(),
             isLoading: false,
             isError: false
-        }
+        };
         let convertedBal = MyNumber.fromZero();
         if (underlyingTokenInfo && underlyingBal) {
             convertedBal = new MyNumber(underlyingBal.toString(), token.decimals);
@@ -53,14 +53,14 @@ export function useERC4626Value(token: TokenInfo | undefined) {
             balance: convertedBal,
             isLoading: isLoadingAsset || isLoadingBal || isLoadingConvert,
             isError: isErrorAsset || isErrorBal || isErrorConvert,
-        }
-    }, [address, underlyingBal, underlyingAsset, isLoadingBal, isLoadingAsset, isLoadingConvert, isErrorAsset, isErrorBal, isErrorConvert])
+        };
+    }, [address, underlyingBal, underlyingAsset, isLoadingBal, isLoadingAsset, isLoadingConvert, isErrorAsset, isErrorBal, isErrorConvert]);
 
     useEffect(() => {
-        console.log('4626balance2', {finalBal: convertedBal.balance.toEtherStr()})
-    }, [convertedBal])
+        console.log('4626balance2', {finalBal: convertedBal.balance.toEtherStr()});
+    }, [convertedBal]);
     return {
         ...convertedBal,
         underlyingTokenInfo
-    }
+    };
 }

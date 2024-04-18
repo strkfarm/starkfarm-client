@@ -10,11 +10,10 @@ import React, { useEffect } from "react";
 import mixpanel from 'mixpanel-browser';
 import { useRouter } from "next/navigation";
 
-
 export default function Strategies() {
     const allPools = useAtomValue(allPoolsAtomUnSorted);
     const strategies = useAtomValue(strategiesAtom);
-    const router = useRouter()
+    const router = useRouter();
 
     function DepositButton(strat: StrategyInfo) {
         // const { isOpen, onOpen, onClose } = useDisclosure()
@@ -31,8 +30,8 @@ export default function Strategies() {
                             _hover={{
                                 backgroundColor: 'bg'
                             }}
-                            onClick={()=> {
-                                mixpanel.track('Click one click deposit', {name: strat.name})
+                            onClick={() => {
+                                mixpanel.track('Click one click deposit', {name: strat.name});
                             }}
                         ><AddIcon/></Button>
                 </PopoverTrigger>
@@ -48,13 +47,13 @@ export default function Strategies() {
                     </PopoverBody>
                 </PopoverContent>
             </Popover>
-      </Box>
+      </Box>;
     }
 
     function getStratCard(strat: StrategyInfo) {
         return  <Stack direction={{base: 'column', md: 'row'}} width={'100%'}>
             <LinkBox  width={{base: '100%', md: '70%'}} display={{base: 'flex', md: 'flex'}} onClick={() => {
-                mixpanel.track('Strategy expanded', {name: strat.name})
+                mixpanel.track('Strategy expanded', {name: strat.name});
             }}
             ><Box width={'100%'}>
                 <AvatarGroup size='xs' max={2} marginRight={'5px'}>
@@ -95,7 +94,7 @@ export default function Strategies() {
             {getAPRWithToolTip(pool)}
             <Text width={{base: '100%', md: '50%'}} textAlign={'right'}>${Math.round(pool.tvl).toLocaleString()}</Text>
             </Stack> */}
-        </Stack>
+        </Stack>;
     }
     return <Container width='100%' float={'left'} padding={'0px'} marginTop={'10px'}>
             <Text color='light_grey' fontSize={'13px'} marginBottom={'10px'} fontFamily={'arial'}>Strategies are combination of deposit & borrow actions that combine various pools and risk combinations to maximize yield. 
@@ -136,5 +135,5 @@ export default function Strategies() {
           {allPools.length == 0 && <Stack>
             <Skeleton height='70px' />
           </Stack>}
-        </Container>
+        </Container>;
 }
