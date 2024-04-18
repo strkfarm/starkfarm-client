@@ -1,33 +1,34 @@
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
 <div align="center" style="margin-top:50px">
-  <img src="https://avatars.githubusercontent.com/u/165751591?s=200&v=4" height="300">
+  <img src="https://avatars.githubusercontent.com/u/165751591?s=200&v=4" height="150">
 </div>
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
 
-
 # STRKFarm
 
-STRKFarm is a tool that allows users to find best yield generating pools on Starknet.
+STRKFarm is a platform that allows users to better navigate DeFi on Starknet. It has the following features:  
+1. Show top yield generating pools sorted by Protocols and various Categories. 10+ Protocols are integrated. ✅
+2. Customized strategies, providing one-click investment with automated risk-management ✅ (Adding more)
+3. Concentrated Liquidity Impermanent calculator 🚧
+4. One click $STRK claim for DeFi spring users 🚧
 
-[![Pull Requests welcome](https://img.shields.io/badge/PRs-welcome-ff69b4.svg?style=flat-square)](https://github.com/strkfarm/starkfarm-client/issues)
-
-## About
-
-STRKFarm is a tool that allows users to find best yield generating pools on Starknet. 
-
-### Terms to help you get familiar with codebase - 
-
-* 
-
-#### Achievements
-
-* We have integrated 10+ DeFi protocols so far and we aim to add more features to allow users to design strategies, compute estimated yields, etc. to allow them to generate returns that match their interest while educating them of the risks.
-
-
+## Project structure
+The project is build using NextJS and Typescript. Below is the broad project structure:  
+1. Re-usable project wide components go into `src/components`. Page specific components go into their respective folder. (e.g. `src/app/claims/components`)
+2. We use [Jotai](https://jotai.org/) for state management. Atoms are written in `src/store`. E.g. `src/store/strategies.atoms.ts`.
+   Most re-usable data is written into atoms, outside components so that data is eaily accessible across components without dumping custom logic into components.
+   Its suggested to keep view components low on business logic code.
+3. All protocols have a class object (e.g. `src/store/ekubo.store.ts`). Where protocol specific custom logic is written, so that its get written to respective Atoms.
+4. You can use `src/store/IDapp.store.ts` to define abstract class or type definitions that can be used within protocol class objects.
+5. Custom re-usable hooks are written to `src/hooks`.
 
 ## How to get started
+
+[![Pull Requests welcome](https://img.shields.io/badge/PRs-welcome-ff69b4.svg?style=flat-square)](https://github.com/strkfarm/starkfarm-client/issues)
+Requirements:
+1. Node 18+
 
 Clone the repository
 ```bash
@@ -58,17 +59,16 @@ You should see something like this:
 
 ## 🤝 Contribute
 
-We're always looking for for stallions with great NextJS & Typescript skills to further this tool, to join our community and contribute to STRKFarm. Check out our [contributing guide](./docs/CONTRIBUTING.md)
+We're always looking for for stallions with great NextJS & Typescript skills to further this tool, to join our community and contribute to STRKFarm. Check out our [contributing guide](./CONTRIBUTING.md)
 for more information on how to get started.
 
-To connect with us regarding any queries about contributing to the repo, feel free to join our telegram group [here](https://t.me/+HQ_eHaXmF-1lZDc1)
+To connect with us regarding any queries about contributing to the repo, feel free to join our telegram group [here](https://t.me/+HQ_eHaXmF-1lZDc1). Head to `dev` topic.
 
 ## References
 
 - [Telegram](https://t.me/+HQ_eHaXmF-1lZDc1)
 - [OnlyDust](https://app.onlydust.com/p/strkfarm)
 - [Website](https://www.strkfarm.xyz/)
-
 
 ## Contributors ✨
 
