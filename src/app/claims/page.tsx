@@ -21,8 +21,7 @@ import CONSTANTS from "@/constants";
 import useClaimReward from "@/hooks/useClaimReward";
 
 export default function Claim() {
-
-  const {} = useClaimReward();
+	const { handleClaimReward } = useClaimReward();
 
 	return (
 		<Container maxWidth={"1000px"} margin={"0 auto"} padding="30px 10px">
@@ -30,7 +29,7 @@ export default function Claim() {
 				<Avatar marginRight={"5px"} src={CONSTANTS.LOGOS.STRK} />
 				Claim $STRK Tokens
 			</Heading>
-      
+
 			<Grid templateColumns="repeat(3, 1fr)" gap="6">
 				<GridItem display="flex">
 					<Card width="100%" padding={"15px 30px"} color="white" bg="highlight">
@@ -54,7 +53,7 @@ export default function Claim() {
 							<StatLabel>Unclaimed</StatLabel>
 							<StatNumber>0</StatNumber>
 						</Stat>
-						<Button onClick={() => console.log("claim")}>Claim</Button>
+						<Button onClick={handleClaimReward}>Claim</Button>
 					</Card>
 				</GridItem>
 			</Grid>

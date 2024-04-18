@@ -1,10 +1,7 @@
 import { getZklendRewards } from "@/services/apiService";
-import { atomWithQuery } from "jotai-tanstack-query";
-import { addressAtom } from "./claims.atoms";
+import { atomWithMutation } from "jotai-tanstack-query";
 
-export const zklendAtom = atomWithQuery((get) => {
-	return {
-		queryKey: ["zklend", get(addressAtom)],
-		queryFn: getZklendRewards,
-	};
-});
+export const zklendAtom = atomWithMutation(() => ({
+	mutationKey: ["posts"],
+	mutationFn: getZklendRewards,
+}));
