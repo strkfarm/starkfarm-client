@@ -1,6 +1,6 @@
 # Starkfarm Client
 
-![image](https://github.com/priyankeshh/review-app/assets/102135464/ce5d8d2b-c130-4a31-b6c1-200d6a6d862e)
+![image](https://avatars.githubusercontent.com/u/165751591?s=200&v=4)
 
 Starkfarm Client is a web application built using [Next.js](https://nextjs.org/), bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
@@ -48,9 +48,9 @@ yarn dev
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser to see the Starkfarm Client in action. You can start customizing and integrating it into your website by modifying `app/page.tsx`.
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the Starkfarm Client in action.
 
-For more details on API routes, check out [the API documentation](https://nextjs.org/docs/api-routes/introduction) and edit the routes in `app/api`.
+For more details on API routes, check out [the API documentation](https://nextjs.org/docs/api-routes/introduction) and edit the routes in `src/app/api`.
 
 <!-- ## Key Features -->
 
