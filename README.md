@@ -38,8 +38,9 @@ git clone https://github.com/strkfarm/starkfarm-client.git
 Install dependencies and run the development build
 
 ```bash
-npm i
-npm run dev
+yarn
+
+yarn run dev
 ```
 
 You should see something like this:
