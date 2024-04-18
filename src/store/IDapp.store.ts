@@ -4,59 +4,74 @@ import { TokenName } from "@/constants";
 import { StrategyAction } from "@/strategies/simple.stable.strat";
 
 export interface APRInfo {
-    asset: TokenName,
-    apr: number
+  asset: TokenName;
+  apr: number;
 }
 
 export class IDapp<BaseAPYT> {
-    name: string = '';
-    link: string = '';
-    logo: string = '';
+  name: string = "";
+  link: string = "";
+  logo: string = "";
 
-    incentiveDataKey: string = '';
-    _computePoolsInfo(data: any): PoolInfo[] {
-        throw new Error('not implemented: _computePoolsInfo');
-    }
+  incentiveDataKey: string = "";
+  _computePoolsInfo(data: any): PoolInfo[] {
+    throw new Error("not implemented: _computePoolsInfo");
+  }
 
-    addBaseAPYs<BaseAPYT>(pools: PoolInfo[], data: AtomWithQueryResult<BaseAPYT, Error>): PoolInfo[] {
-        console.log(`lending: ${this.name}`, data);
-        if (data.isError) {
-            console.error('Error fetching lending base', data.error);
-        }
-        return pools.map(p => {
-            const { baseAPY, splitApr, metadata } = this.getBaseAPY(p, <any>data);
-            const aprSplits = p.aprSplits;
-            if (splitApr) p.aprSplits.unshift(splitApr);
-            return {
-                ...p,
-                isLoading: data.isLoading,
-                aprSplits,
-                apr: baseAPY != 'Err' ? p.apr + baseAPY : p.apr,
-                ...metadata
-            };
-        });
+  addBaseAPYs<BaseAPYT>(
+    pools: PoolInfo[],
+    data: AtomWithQueryResult<BaseAPYT, Error>,
+  ): PoolInfo[] {
+    console.log(`lending: ${this.name}`, data);
+    if (data.isError) {
+      console.error("Error fetching lending base", data.error);
     }
+    return pools.map((p) => {
+      const { baseAPY, splitApr, metadata } = this.getBaseAPY(p, <any>data);
+      const aprSplits = p.aprSplits;
+      if (splitApr) p.aprSplits.unshift(splitApr);
+      return {
+        ...p,
+        isLoading: data.isLoading,
+        aprSplits,
+        apr: baseAPY != "Err" ? p.apr + baseAPY : p.apr,
+        ...metadata,
+      };
+    });
+  }
 
-    getBaseAPY(p: PoolInfo, data: AtomWithQueryResult<BaseAPYT, Error>) : {
-        baseAPY: number | 'Err',
-        splitApr: APRSplit | null,
-        metadata: PoolMetadata | null
-    } {
-        throw new Error('not implemented: getBaseAPY');
-    }
+  getBaseAPY(
+    p: PoolInfo,
+    data: AtomWithQueryResult<BaseAPYT, Error>,
+  ): {
+    baseAPY: number | "Err";
+    splitApr: APRSplit | null;
+    metadata: PoolMetadata | null;
+  } {
+    throw new Error("not implemented: getBaseAPY");
+  }
 
-    getHF(positions: StrategyAction[]):  { hf: number, isLiquidable: boolean} {
-        throw new Error('not implemented: getHF');
-    }
+  getHF(positions: StrategyAction[]): { hf: number; isLiquidable: boolean } {
+    throw new Error("not implemented: getHF");
+  }
 
-    getMaxFactoredOut(positions: StrategyAction[], minHf: number): number {
-        throw new Error('not implemented: getMaxFactoredOut');
-    }
+  getMaxFactoredOut(positions: StrategyAction[], minHf: number): number {
+    throw new Error("not implemented: getMaxFactoredOut");
+  }
 
-    commonVaultFilter(poolName: string) {
-        const supportedPools = ['ETH/USDC', 'STRK/USDC', 'STRK/ETH', 'USDC/USDT', 'USDC', 'USDT', 'ETH', 'STRK'];
-        console.log('filter', poolName, supportedPools.includes(poolName));
-        // return !poolName.includes('DAI') && !poolName.includes('WSTETH') && !poolName.includes('BTC');
-        return supportedPools.includes(poolName);
-    }
+  commonVaultFilter(poolName: string) {
+    const supportedPools = [
+      "ETH/USDC",
+      "STRK/USDC",
+      "STRK/ETH",
+      "USDC/USDT",
+      "USDC",
+      "USDT",
+      "ETH",
+      "STRK",
+    ];
+    console.log("filter", poolName, supportedPools.includes(poolName));
+    // return !poolName.includes('DAI') && !poolName.includes('WSTETH') && !poolName.includes('BTC');
+    return supportedPools.includes(poolName);
+  }
 }
