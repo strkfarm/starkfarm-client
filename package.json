@@ -30,6 +30,7 @@
     "get-starknet": "^3.0.1",
     "get-starknet-core": "^3.2.0",
     "jotai": "^2.6.4",
+    "jotai-cache": "^0.4.1",
     "jotai-tanstack-query": "^0.8.5",
     "mixpanel-browser": "^2.49.0",
     "mustache": "^4.2.0",
