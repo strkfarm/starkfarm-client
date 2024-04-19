@@ -31,11 +31,11 @@ cd starkfarm-client
 3. Install dependencies:
 
 ```bash
-npm install
+npm install --force
 # or
-yarn install
+yarn install --force
 # or
-pnpm install
+pnpm install --force
 ```
 
 4. Start the development server:
