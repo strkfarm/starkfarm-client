@@ -72,7 +72,7 @@ To connect with us regarding any queries about contributing to the repo, feel fr
 
 ## Contributors ✨
 
-Thanks goes to these wonderful people. Follow the [contributors guide]() if you'd like to take part.
+Thanks goes to these wonderful people.
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
