@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Analytics } from "@vercel/analytics/react"
+import { Analytics } from "@vercel/analytics/react";
 // import { Inter, Courier_Prime } from "next/font/google";
 import "./globals.css";
-import { GoogleAnalytics } from '@next/third-parties/google'
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 // const courier = Courier_Prime({
 //   weight: '400',
@@ -12,7 +12,7 @@ import { GoogleAnalytics } from '@next/third-parties/google'
 export const metadata: Metadata = {
   title: "STRKFarm | Earn $STRK Tokens",
   description: "Farm on the best pools of Starknet",
-}; 
+};
 
 export default function RootLayout({
   children,
@@ -29,6 +29,6 @@ export default function RootLayout({
         <Analytics />
       </body>
       <GoogleAnalytics gaId="G-K05JV94KM9" />
-  </html>
+    </html>
   );
 }

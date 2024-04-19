@@ -1,12 +1,16 @@
 {
-  "name": "zk-farmers-client",
+  "name": "strkfarm-client",
   "version": "0.1.0",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "start": "next start",
     "lint": "next lint",
-    "build": "node generate-changelog.js && node update-readme.js"
+    "build": "next build && node generate-changelog.js && node update-readme.js"
+    "lint:check": "eslint --max-warnings 0 --config .eslintrc .",
+    "lint:fix": "eslint --max-warnings 0 --config .eslintrc . --fix",
+    "format:check": "prettier --check \"**/*.{ts,tsx,json}\"",
+    "format:fix": "prettier --write \"**/*.{ts,tsx,json}\""
   },
   "files": [
     "CHANGELOG.md",
@@ -54,10 +58,13 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@typescript-eslint/eslint-plugin": "^7.7.0",
+    "@typescript-eslint/parser": "^7.7.0",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
     "postcss": "^8",
+    "prettier": "^3.2.5",
     "tailwindcss": "^3.3.0",
     "typescript": "^5",
     "conventional-changelog": "^5.1.0",
