@@ -5,36 +5,22 @@ import * as React from "react";
 import { sepolia } from "@starknet-react/chains";
 import {
   StarknetConfig,
-  publicProvider,
   argent,
   braavos,
   useInjectedConnectors,
-  useNetwork,
-  useAccount,
-  useConnect,
-  nethermindProvider,
   jsonRpcProvider,
 } from "@starknet-react/core";
 import {
   ChakraBaseProvider,
-  extendBaseTheme,
-  theme as chakraTheme,
   extendTheme,
   Flex,
-  Icon,
-  HStack,
   Center,
-  Box,
   Container,
 } from "@chakra-ui/react";
 import { Provider as JotaiProvider } from "jotai";
-import { Sidebar, Menu, MenuItem, SubMenu } from "react-pro-sidebar";
-import * as LogoSvg from "@public/logo.svg";
-import * as HomeSvg from "@public/home.svg";
-import * as PlaySvg from "@public/play.svg";
 import Image from "next/image";
 import Navbar from "@/components/Navbar";
-import { RpcProvider, RpcProviderOptions, constants } from "starknet";
+import { RpcProviderOptions, constants } from "starknet";
 import mixpanel from "mixpanel-browser";
 
 // ! make page view more dynamic

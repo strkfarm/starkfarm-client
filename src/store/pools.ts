@@ -1,37 +1,35 @@
-import CONSTANTS from "@/constants";
-import BigNumber from "bignumber.js";
-import { Atom, PrimitiveAtom, atom } from "jotai";
-import { AtomWithQueryResult, atomWithQuery } from "jotai-tanstack-query";
-import EkuboAtoms, { ekubo } from "./ekobu.store";
-import JediAtoms, { jedi } from "./jedi.store";
-import MySwapAtoms, { mySwap } from "./myswap.store";
-import TenkSwapAtoms, { TenkSwap, tenkswap } from "./tenkswap.store";
-import HaikoAtoms, { haiko } from "./haiko.store";
-import StarkDefiAtoms, { starkDefi } from "./starkdefi.store";
-import NostraDexAtoms, { nostraDex } from "./nostradex.store";
-import SithswapAtoms, { sithswap } from "./sithswap.store";
-import ZkLendAtoms, { zkLend } from "./zklend.store";
+import CONSTANTS from '@/constants';
+import { Atom, atom } from 'jotai';
+import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
+import EkuboAtoms, { ekubo } from './ekobu.store';
+import HaikoAtoms, { haiko } from './haiko.store';
+import HashstackAtoms, { hashstack } from './hashstack.store';
+import JediAtoms, { jedi } from './jedi.store';
+import MySwapAtoms, { mySwap } from './myswap.store';
+import NimboraAtoms, { nimbora } from './nimbora.store';
+import NostraDexAtoms, { nostraDex } from './nostradex.store';
 import NostraLendingAtoms, {
-  NostraLending,
   nostraLending,
-} from "./nostralending.store";
-import HashstackAtoms, { hashstack } from "./hashstack.store";
-import NimboraAtoms, { nimbora } from "./nimbora.store";
+} from './nostralending.store';
+import SithswapAtoms, { sithswap } from './sithswap.store';
+import StarkDefiAtoms, { starkDefi } from './starkdefi.store';
+import TenkSwapAtoms, { tenkswap } from './tenkswap.store';
+import ZkLendAtoms, { zkLend } from './zklend.store';
 
 export enum Category {
-  Stable = "Stable Pools",
-  STRK = "STRK Pools",
-  Others = "Others",
+  Stable = 'Stable Pools',
+  STRK = 'STRK Pools',
+  Others = 'Others',
 }
 
 export enum PoolType {
-  DEXV2 = "V2 LP DEX",
-  DEXV3 = "Concentrated LP DEX",
-  Lending = "Lending",
+  DEXV2 = 'V2 LP DEX',
+  DEXV3 = 'Concentrated LP DEX',
+  Lending = 'Lending',
 }
 
 export interface APRSplit {
-  apr: number | "Err";
+  apr: number | 'Err';
   title: string;
   description: string;
 }
@@ -133,26 +131,26 @@ export const PROTOCOLS = [
 ];
 
 export const StrkDexIncentivesAtom = atomWithQuery((get) => ({
-  queryKey: ["strk_dex_incentives"],
-  queryFn: async ({ queryKey: [] }) => {
+  queryKey: ['strk_dex_incentives'],
+  queryFn: async ({ queryKey }) => {
     const res = await fetch(CONSTANTS.DEX_INCENTIVE_URL); // common for all
     let data = await res.text();
-    data = data.replaceAll("NaN", "0");
+    data = data.replaceAll('NaN', '0');
     return JSON.parse(data);
   },
 }));
 
 export const StrkLendingIncentivesAtom = atomWithQuery((get) => ({
-  queryKey: ["strk_lending_incentives"],
-  queryFn: async ({ queryKey: [] }) => {
+  queryKey: ['strk_lending_incentives'],
+  queryFn: async ({ queryKey }) => {
     const res = await fetch(CONSTANTS.LENDING_INCENTIVES_URL); // common for all
     let data = await res.text();
-    data = data.replaceAll("NaN", "0");
+    data = data.replaceAll('NaN', '0');
     return JSON.parse(data);
   },
 }));
 
-export const ALL_FILTER = "All";
+export const ALL_FILTER = 'All';
 export const filters = {
   categories: [...Object.values(Category)],
   types: [...Object.values(PoolType)],
@@ -170,14 +168,14 @@ export const updateFiltersAtom = atom(
   (
     get,
     set,
-    type: "categories" | "poolTypes" | "protocols",
+    type: 'categories' | 'poolTypes' | 'protocols',
     newOptions: string[],
   ) => {
-    if (type == "categories") {
+    if (type === 'categories') {
       set(filterAtoms.categoriesAtom, newOptions);
-    } else if (type == "poolTypes") {
+    } else if (type === 'poolTypes') {
       set(filterAtoms.typesAtom, newOptions);
-    } else if (type == "protocols") {
+    } else if (type === 'protocols') {
       set(filterAtoms.protocolsAtom, newOptions);
     }
   },
@@ -193,16 +191,16 @@ export const allPoolsAtomUnSorted = atom((get) => {
 
 // const allPoolsAtom = atom<PoolInfo[]>([]);
 
-const SORT_OPTIONS = ["APR", "TVL"];
+const SORT_OPTIONS = ['APR', 'TVL'];
 
 export const sortAtom = atom(SORT_OPTIONS[0]);
 
 export const sortPoolsAtom = atom((get) => {
   const pools = get(allPoolsAtomUnSorted);
-  console.log("pre sort", pools);
+  console.log('pre sort', pools);
   const sortOption = get(sortAtom);
   pools.sort((a, b) => {
-    if (sortOption == SORT_OPTIONS[1]) {
+    if (sortOption === SORT_OPTIONS[1]) {
       return b.tvl - a.tvl;
     }
     return b.apr - a.apr;

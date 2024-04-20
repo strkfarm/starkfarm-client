@@ -1,9 +1,7 @@
-import CONSTANTS from "@/constants";
-import { IDapp } from "@/store/IDapp.store";
-import { Category, PROTOCOLS, PoolInfo } from "@/store/pools";
-import MyNumber from "@/utils/MyNumber";
-import { UseContractWriteResult } from "@starknet-react/core";
-import { Call, ProviderInterface } from "starknet";
+import { IDapp } from '@/store/IDapp.store';
+import { Category, PoolInfo } from '@/store/pools';
+import MyNumber from '@/utils/MyNumber';
+import { Call, ProviderInterface } from 'starknet';
 
 interface Step {
   name: string;
@@ -64,8 +62,8 @@ export class IStrategyProps {
   readonly holdingTokens: TokenInfo[];
 
   risks: string[] = [
-    "The strategy encompasses exposure to the protocols and tokens listed above, which inherently entail a spectrum of risks including, but not limited to, hacks and volatility",
-    "APYs shown are just indicative and do not promise exact returns",
+    'The strategy encompasses exposure to the protocols and tokens listed above, which inherently entail a spectrum of risks including, but not limited to, hacks and volatility',
+    'APYs shown are just indicative and do not promise exact returns',
   ];
 
   depositMethods = (
@@ -113,7 +111,7 @@ export class IStrategy extends IStrategyProps {
     amount: string,
     prevActions: StrategyAction[],
   ) {
-    const eligiblePools = pools.filter((p) => p.category == Category.Stable);
+    const eligiblePools = pools.filter((p) => p.category === Category.Stable);
     if (!eligiblePools) throw new Error(`${this.tag}: [F1] no eligible pools`);
     return eligiblePools;
   }
@@ -123,15 +121,15 @@ export class IStrategy extends IStrategyProps {
     amount: string,
     prevActions: StrategyAction[],
   ) {
-    if (prevActions.length == 0)
+    if (prevActions.length === 0)
       throw new Error(
         `${this.tag}: filterSameProtocolNotSameDepositPool - Prev actions zero`,
       );
     const lastAction = prevActions[prevActions.length - 1];
     const eligiblePools = pools
-      .filter((p) => p.protocol.name == lastAction.pool.protocol.name)
+      .filter((p) => p.protocol.name === lastAction.pool.protocol.name)
       .filter((p) => {
-        return p.pool.name != lastAction.pool.pool.name;
+        return p.pool.name !== lastAction.pool.pool.name;
       });
 
     if (!eligiblePools) throw new Error(`${this.tag}: [F2] no eligible pools`);
@@ -143,15 +141,15 @@ export class IStrategy extends IStrategyProps {
     amount: string,
     prevActions: StrategyAction[],
   ) {
-    if (prevActions.length == 0)
+    if (prevActions.length === 0)
       throw new Error(
         `${this.tag}: filterNotSameProtocolSameDepositPool - Prev actions zero`,
       );
     const lastAction = prevActions[prevActions.length - 1];
     const eligiblePools = pools
-      .filter((p) => p.protocol.name != lastAction.pool.protocol.name)
+      .filter((p) => p.protocol.name !== lastAction.pool.protocol.name)
       .filter((p) => {
-        return p.pool.name == lastAction.pool.pool.name;
+        return p.pool.name === lastAction.pool.pool.name;
       });
 
     if (!eligiblePools) throw new Error(`${this.tag}: [F3] no eligible pools`);
@@ -186,18 +184,18 @@ export class IStrategy extends IStrategyProps {
           _pools = filter.bind(this)(_pools, amount, this.actions);
         }
 
-        console.log("solve", i, _pools, pools.length, this.actions, _amount);
+        console.log('solve', i, _pools, pools.length, this.actions, _amount);
 
         if (_pools.length > 0) {
           this.actions = step.optimizer(_pools, _amount, this.actions);
-          if (this.actions.length != i + 1) {
-            console.warn(`actions`, this.actions.length, "i", i);
-            throw new Error("one new action per step required");
+          if (this.actions.length !== i + 1) {
+            console.warn(`actions`, this.actions.length, 'i', i);
+            throw new Error('one new action per step required');
           }
           this.actions[i].name = step.name;
           _amount = this.actions[this.actions.length - 1].amount;
         } else {
-          throw new Error("no pools to continue computing strategy");
+          throw new Error('no pools to continue computing strategy');
         }
       }
     } catch (err) {
@@ -209,10 +207,10 @@ export class IStrategy extends IStrategyProps {
       const sign = action.isDeposit ? 1 : -1;
       const apr = action.isDeposit ? action.pool.apr : action.pool.borrow.apr;
       netYield += sign * apr * Number(action.amount);
-      console.log("netYield1", sign, apr, action.amount, netYield);
+      console.log('netYield1', sign, apr, action.amount, netYield);
     });
     this.netYield = netYield / Number(amount);
-    console.log("netYield", netYield, this.netYield);
+    console.log('netYield', netYield, this.netYield);
     this.leverage = this.netYield / this.actions[0].pool.apr;
 
     this.postSolve();
@@ -223,10 +221,10 @@ export class IStrategy extends IStrategyProps {
   postSolve() {}
 
   isSolved() {
-    return this.status == StrategyStatus.SOLVED;
+    return this.status === StrategyStatus.SOLVED;
   }
 
   isSolving() {
-    return this.status == StrategyStatus.SOLVING;
+    return this.status === StrategyStatus.SOLVING;
   }
 }

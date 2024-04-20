@@ -1,7 +1,6 @@
-"use client";
+'use client';
 
-import CONSTANTS, { TokenName } from "@/constants";
-import axios from "axios";
+import CONSTANTS, { TokenName } from '@/constants';
 import {
   APRSplit,
   Category,
@@ -9,14 +8,12 @@ import {
   PoolMetadata,
   PoolType,
   ProtocolAtoms,
-  StrkDexIncentivesAtom,
   StrkLendingIncentivesAtom,
-} from "./pools";
-import { PrimitiveAtom, atom } from "jotai";
-import useSWR from "swr";
-import { AtomWithQueryResult, atomWithQuery } from "jotai-tanstack-query";
-import { IDapp } from "./IDapp.store";
-import { StrategyAction } from "@/strategies/simple.stable.strat";
+} from './pools';
+import { atom } from 'jotai';
+import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
+import { IDapp } from './IDapp.store';
+import { StrategyAction } from '@/strategies/simple.stable.strat';
 const fetcher = (...args: any[]) => {
   return fetch(args[0], args[1]).then((res) => res.json());
 };
@@ -54,11 +51,11 @@ interface MyBaseAprDoc {
 }
 
 export class ZkLend extends IDapp<MyBaseAprDoc[]> {
-  name = "zkLend";
-  link = "https://app.zklend.com/markets";
-  logo = "https://app.zklend.com/favicon.ico";
+  name = 'zkLend';
+  link = 'https://app.zklend.com/markets';
+  logo = 'https://app.zklend.com/favicon.ico';
 
-  incentiveDataKey = "zkLend";
+  incentiveDataKey = 'zkLend';
   LIQUIDATION_THRESHOLD = 1;
   _computePoolsInfo(data: any) {
     const myData = data[this.incentiveDataKey];
@@ -68,12 +65,12 @@ export class ZkLend extends IDapp<MyBaseAprDoc[]> {
       .filter(this.commonVaultFilter)
       .forEach((poolName) => {
         const arr = myData[poolName];
-        if (arr.length == 0) return;
+        if (arr.length === 0) return;
 
         let category = Category.Others;
-        if (["USDC", "USDT"].includes(poolName)) {
+        if (['USDC', 'USDT'].includes(poolName)) {
           category = Category.Stable;
-        } else if (poolName.includes("STRK")) {
+        } else if (poolName.includes('STRK')) {
           category = Category.STRK;
         }
 
@@ -94,8 +91,8 @@ export class ZkLend extends IDapp<MyBaseAprDoc[]> {
           aprSplits: [
             {
               apr: arr[arr.length - 1].strk_grant_apr_nrs,
-              title: "STRK rewards",
-              description: "Starknet DeFi Spring incentives",
+              title: 'STRK rewards',
+              description: 'Starknet DeFi Spring incentives',
             },
           ],
           category,
@@ -115,28 +112,28 @@ export class ZkLend extends IDapp<MyBaseAprDoc[]> {
   }
 
   getBaseAPY(p: PoolInfo, data: AtomWithQueryResult<MyBaseAprDoc[], Error>) {
-    let baseAPY: number | "Err" = "Err";
+    let baseAPY: number | 'Err' = 'Err';
     let splitApr: APRSplit | null = null;
     let metadata: PoolMetadata | null = null;
     if (data.isSuccess) {
-      const item = data.data.find((doc) => doc.token.symbol == p.pool.name);
+      const item = data.data.find((doc) => doc.token.symbol === p.pool.name);
       if (item) {
         baseAPY = item.lending_apy.raw_apy;
         splitApr = {
           apr: baseAPY,
-          title: "Base APY",
-          description: "",
+          title: 'Base APY',
+          description: '',
         };
         metadata = {
           borrow: {
             apr: item.borrowing_apy.net_apy,
             borrowFactor:
-              parseInt(item.borrow_factor.value) /
+              parseInt(item.borrow_factor.value, 10) /
               10 ** item.borrow_factor.decimals,
           },
           lending: {
             collateralFactor:
-              parseInt(item.collateral_factor.value) /
+              parseInt(item.collateral_factor.value, 10) /
               10 ** item.collateral_factor.decimals,
           },
         };
@@ -165,7 +162,7 @@ export class ZkLend extends IDapp<MyBaseAprDoc[]> {
     });
 
     let hf = Number.MAX_SAFE_INTEGER; // if not debt, i.e. denominator 0;
-    if (denominator != 0) {
+    if (denominator !== 0) {
       hf = numerator / denominator;
     }
 
@@ -197,8 +194,8 @@ export class ZkLend extends IDapp<MyBaseAprDoc[]> {
 export const zkLend = new ZkLend();
 const ZkLendAtoms: ProtocolAtoms = {
   baseAPRs: atomWithQuery((get) => ({
-    queryKey: ["zklend_lending_base_aprs"],
-    queryFn: async ({ queryKey: [] }) => {
+    queryKey: ['zklend_lending_base_aprs'],
+    queryFn: async ({ queryKey }) => {
       const res = await fetch(CONSTANTS.ZKLEND.BASE_APR_API);
       return res.json();
     },
