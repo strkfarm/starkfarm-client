@@ -1,17 +1,13 @@
-import {
-  PoolInfo,
-  ProtocolAtoms,
-  StrkDexIncentivesAtom,
-} from "./pools";
-import { atom } from "jotai";
-import { Jediswap } from "./jedi.store";
+import { PoolInfo, ProtocolAtoms, StrkDexIncentivesAtom } from './pools';
+import { atom } from 'jotai';
+import { Jediswap } from './jedi.store';
 
 export class NostraDex extends Jediswap {
-  name = "Nostra DEX";
-  link = "https://app.nostra.finance/pools";
-  logo = "https://app.nostra.finance/favicon.svg";
+  name = 'Nostra DEX';
+  link = 'https://app.nostra.finance/pools';
+  logo = 'https://app.nostra.finance/favicon.svg';
 
-  incentiveDataKey = "Nostra";
+  incentiveDataKey = 'Nostra';
 }
 
 export const nostraDex = new NostraDex();

@@ -1,10 +1,6 @@
 import React from 'react';
 import Select, { StylesConfig } from 'react-select';
-import {
-  ALL_FILTER,
-  filters,
-  updateFiltersAtom,
-} from '@/store/pools';
+import { ALL_FILTER, filters, updateFiltersAtom } from '@/store/pools';
 import * as chroma from 'chroma.ts';
 import { useSetAtom } from 'jotai';
 import {

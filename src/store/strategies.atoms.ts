@@ -1,12 +1,8 @@
-import {
-  SimpleStableStrategy,
-} from '@/strategies/simple.stable.strat';
+import { SimpleStableStrategy } from '@/strategies/simple.stable.strat';
 import { atom } from 'jotai';
 import { allPoolsAtomUnSorted } from './pools';
 import { AutoTokenStrategy } from '@/strategies/auto_strk.strat';
-import {
-  IStrategyProps,
-} from '@/strategies/IStrategy';
+import { IStrategyProps } from '@/strategies/IStrategy';
 import CONSTANTS from '@/constants';
 
 export interface StrategyInfo extends IStrategyProps {

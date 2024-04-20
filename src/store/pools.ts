@@ -8,9 +8,7 @@ import JediAtoms, { jedi } from './jedi.store';
 import MySwapAtoms, { mySwap } from './myswap.store';
 import NimboraAtoms, { nimbora } from './nimbora.store';
 import NostraDexAtoms, { nostraDex } from './nostradex.store';
-import NostraLendingAtoms, {
-  nostraLending,
-} from './nostralending.store';
+import NostraLendingAtoms, { nostraLending } from './nostralending.store';
 import SithswapAtoms, { sithswap } from './sithswap.store';
 import StarkDefiAtoms, { starkDefi } from './starkdefi.store';
 import TenkSwapAtoms, { tenkswap } from './tenkswap.store';
