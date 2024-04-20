@@ -1,16 +1,11 @@
 "use client";
 
-import CONSTANTS from "@/constants";
-import axios from "axios";
 import {
-  Category,
   PoolInfo,
-  PoolType,
   ProtocolAtoms,
   StrkDexIncentivesAtom,
 } from "./pools";
-import { PrimitiveAtom, atom } from "jotai";
-import useSWR from "swr";
+import { atom } from "jotai";
 import { Ekubo } from "./ekobu.store";
 const fetcher = (...args: any[]) => {
   return fetch(args[0], args[1]).then((res) => res.json());

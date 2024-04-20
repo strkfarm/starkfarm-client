@@ -1,5 +1,5 @@
-import BigNumber from "bignumber.js";
-import { ethers } from "ethers";
+import BigNumber from 'bignumber.js';
+import { ethers } from 'ethers';
 
 export default class MyNumber {
   bigNumber: BigNumber;
@@ -15,7 +15,7 @@ export default class MyNumber {
   }
 
   static fromZero() {
-    return new MyNumber("0", 0);
+    return new MyNumber('0', 0);
   }
 
   toString() {
@@ -35,7 +35,7 @@ export default class MyNumber {
   }
 
   isZero() {
-    return this.bigNumber.eq("0");
+    return this.bigNumber.eq('0');
   }
 
   /**
@@ -45,7 +45,7 @@ export default class MyNumber {
    * @returns
    * @dev Add more commands as needed
    */
-  compare(amountEther: string, command: "gte" | "gt" | "lt") {
+  compare(amountEther: string, command: 'gte' | 'gt' | 'lt') {
     const fullNum = new BigNumber(
       ethers.parseUnits(amountEther, this.decimals).toString(),
     );
@@ -54,7 +54,7 @@ export default class MyNumber {
 
   static min(a: MyNumber, b: MyNumber) {
     if (!a.isZero() && !b.isZero())
-      if (a.decimals != b.decimals)
+      if (a.decimals !== b.decimals)
         throw new Error(
           `Cannot compare numbers of diff decimals: a:${a.decimals}, b:${b.decimals}`,
         );

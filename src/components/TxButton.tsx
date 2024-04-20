@@ -1,7 +1,6 @@
 import CONSTANTS from "@/constants";
 import { Box, Button, ButtonProps, Spinner } from "@chakra-ui/react";
 import {
-  UseContractWriteResult,
   useAccount,
   useContractWrite,
 } from "@starknet-react/core";

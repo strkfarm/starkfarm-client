@@ -1,68 +1,19 @@
 "use client";
 
-import Navbar from "@/components/Navbar";
-import EkuboAtoms from "@/store/ekobu.store";
-import Ekubo from "@/store/ekobu.store";
-import Jediswap from "@/store/jedi.store";
-import {
-  PoolInfo,
-  StrkDexIncentivesAtom,
-  allPoolsAtomUnSorted,
-  filteredPools,
-  sortPoolsAtom,
-} from "@/store/pools";
 import {
   Avatar,
-  AvatarGroup,
-  Box,
   Button,
   Card,
-  CardBody,
-  CardHeader,
-  Center,
   Container,
-  Flex,
   Grid,
   GridItem,
-  HStack,
   Heading,
-  Image,
-  Link,
-  LinkBox,
-  LinkOverlay,
-  Skeleton,
-  Spinner,
-  Stack,
   Stat,
   StatLabel,
   StatNumber,
-  Tab,
-  TabIndicator,
-  TabList,
-  TabPanel,
-  TabPanels,
-  Tabs,
-  Text,
-  Tooltip,
 } from "@chakra-ui/react";
-import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
-import { useEffect, useMemo, useState } from "react";
-import useSWR from "swr";
-import {
-  Pagination,
-  PaginationContainer,
-  usePagination,
-  PaginationNext,
-  PaginationPrevious,
-  PaginationPage,
-  PaginationPageGroup,
-} from "@ajna/pagination";
+
 import CONSTANTS from "@/constants";
-import Filters from "@/components/Filters";
-import tg from "@/assets/tg.svg";
-import Pools from "@/components/Pools";
-import Strategies from "@/components/Strategies";
-import mixpanel from "mixpanel-browser";
 
 export default function Claim() {
   return (

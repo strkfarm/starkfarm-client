@@ -1,16 +1,9 @@
-import CONSTANTS, { TokenName } from "@/constants";
-import axios from "axios";
 import {
-  Category,
   PoolInfo,
-  PoolType,
   ProtocolAtoms,
-  StrkDexIncentivesAtom,
   StrkLendingIncentivesAtom,
 } from "./pools";
-import { Ekubo } from "./ekobu.store";
 import { atom } from "jotai";
-import { Jediswap } from "./jedi.store";
 import { ZkLend } from "./zklend.store";
 
 export class Nimbora extends ZkLend {

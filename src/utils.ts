@@ -1,4 +1,4 @@
-import { MenuItemProps, MenuListProps, MenuProps } from "@chakra-ui/react";
+import { MenuItemProps, MenuListProps } from "@chakra-ui/react";
 import { num } from "starknet";
 
 export function getUniqueStrings(arr: Array<string>) {

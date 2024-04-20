@@ -1,27 +1,24 @@
-"use client";
+'use client';
 
-import CONSTANTS, { TokenName } from "@/constants";
-import axios from "axios";
+import CONSTANTS, { TokenName } from '@/constants';
 import {
   Category,
   PoolInfo,
   PoolType,
   ProtocolAtoms,
   StrkDexIncentivesAtom,
-} from "./pools";
-import { PrimitiveAtom, atom } from "jotai";
-import useSWR from "swr";
-import { atomWithQuery } from "jotai-tanstack-query";
+} from './pools';
+import { atom } from 'jotai';
 const fetcher = (...args: any[]) => {
   return fetch(args[0], args[1]).then((res) => res.json());
 };
 
 export class Ekubo {
-  name = "Ekubo";
-  link = "https://app.ekubo.org/positions";
-  logo = "https://app.ekubo.org/logo.svg";
+  name = 'Ekubo';
+  link = 'https://app.ekubo.org/positions';
+  logo = 'https://app.ekubo.org/logo.svg';
 
-  incentiveDataKey = "Ekubo";
+  incentiveDataKey = 'Ekubo';
   _computePoolsInfo(data: any) {
     try {
       const myData = data[this.incentiveDataKey];
@@ -32,13 +29,13 @@ export class Ekubo {
         .forEach((poolName) => {
           const arr = myData[poolName];
           let category = Category.Others;
-          if (poolName == "USDC/USDT") {
+          if (poolName === 'USDC/USDT') {
             category = Category.Stable;
-          } else if (poolName.includes("STRK")) {
+          } else if (poolName.includes('STRK')) {
             category = Category.STRK;
           }
 
-          const tokens: TokenName[] = <TokenName[]>poolName.split("/");
+          const tokens: TokenName[] = <TokenName[]>poolName.split('/');
           const logo1 = CONSTANTS.LOGOS[tokens[0]];
           const logo2 = CONSTANTS.LOGOS[tokens[1]];
 
@@ -57,13 +54,13 @@ export class Ekubo {
             aprSplits: [
               {
                 apr: 0,
-                title: "Base APR",
-                description: "Subject to position range",
+                title: 'Base APR',
+                description: 'Subject to position range',
               },
               {
                 apr: arr[arr.length - 1].apr,
-                title: "STRK rewards",
-                description: "Starknet DeFi Spring incentives",
+                title: 'STRK rewards',
+                description: 'Starknet DeFi Spring incentives',
               },
             ],
             category,
@@ -81,23 +78,23 @@ export class Ekubo {
 
       return pools;
     } catch (err) {
-      console.error("Error fetching pools", err);
+      console.error('Error fetching pools', err);
       throw err;
     }
   }
 
   commonVaultFilter(poolName: string) {
     const supportedPools = [
-      "ETH/USDC",
-      "STRK/USDC",
-      "STRK/ETH",
-      "USDC/USDT",
-      "USDC",
-      "USDT",
-      "ETH",
-      "STRK",
+      'ETH/USDC',
+      'STRK/USDC',
+      'STRK/ETH',
+      'USDC/USDT',
+      'USDC',
+      'USDT',
+      'ETH',
+      'STRK',
     ];
-    console.log("filter2", poolName, supportedPools.includes(poolName));
+    console.log('filter2', poolName, supportedPools.includes(poolName));
     // return !poolName.includes('DAI') && !poolName.includes('WSTETH') && !poolName.includes('BTC');
     return supportedPools.includes(poolName);
   }
@@ -108,7 +105,7 @@ const EkuboAtoms: ProtocolAtoms = {
   pools: atom((get) => {
     const poolsInfo = get(StrkDexIncentivesAtom);
     const empty: PoolInfo[] = [];
-    console.log("ekubo", poolsInfo);
+    console.log('ekubo', poolsInfo);
     if (poolsInfo.data) return ekubo._computePoolsInfo(poolsInfo.data);
     return empty;
   }),
