@@ -1,17 +1,13 @@
-import {
-  PoolInfo,
-  ProtocolAtoms,
-  StrkDexIncentivesAtom,
-} from "./pools";
-import { atom } from "jotai";
-import { Jediswap } from "./jedi.store";
+import { PoolInfo, ProtocolAtoms, StrkDexIncentivesAtom } from './pools';
+import { atom } from 'jotai';
+import { Jediswap } from './jedi.store';
 
 export class Sithswap extends Jediswap {
-  name = "SithSwap";
-  link = "https://app.sithswap.com/spring/";
-  logo = "https://app.sithswap.com/favicon.png";
+  name = 'SithSwap';
+  link = 'https://app.sithswap.com/spring/';
+  logo = 'https://app.sithswap.com/favicon.png';
 
-  incentiveDataKey = "Sithswap";
+  incentiveDataKey = 'Sithswap';
 }
 
 export const sithswap = new Sithswap();

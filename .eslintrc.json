@@ -72,7 +72,14 @@
     "wrap-iife": [2, "outside"],
     "no-shadow": 0,
     "no-path-concat": 2,
-    "valid-jsdoc": [0, { "requireReturn": false, "requireParamDescription": false, "requireReturnDescription": false }],
+    "valid-jsdoc": [
+      0,
+      {
+        "requireReturn": false,
+        "requireParamDescription": false,
+        "requireReturnDescription": false
+      }
+    ],
 
     // stylistic errors
     "no-spaced-func": 2,

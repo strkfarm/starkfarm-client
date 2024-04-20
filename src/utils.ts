@@ -1,5 +1,5 @@
-import { MenuItemProps, MenuListProps } from "@chakra-ui/react";
-import { num } from "starknet";
+import { MenuItemProps, MenuListProps } from '@chakra-ui/react';
+import { num } from 'starknet';
 
 export function getUniqueStrings(arr: Array<string>) {
   const _arr: string[] = [];
@@ -22,7 +22,7 @@ export function getUnique<T>(arr: Array<T>, uniqueField: string) {
 }
 
 export function getUniqueById<T>(arr: Array<T>) {
-  return getUnique(arr, "id");
+  return getUnique(arr, 'id');
 }
 
 export function capitalize(str: string) {
@@ -37,22 +37,22 @@ export function shortAddress(_address: string) {
 export function standariseAddress(address: string | bigint) {
   let _a = address;
   if (!address) {
-    _a = "0";
+    _a = '0';
   }
   const a = num.getHexString(num.getDecimalString(_a.toString()));
   return a;
 }
 
 export const MyMenuListProps: MenuListProps = {
-  bg: "highlight",
-  color: "white",
-  borderColor: "bg",
+  bg: 'highlight',
+  color: 'white',
+  borderColor: 'bg',
   padding: 0,
 };
 
 export const MyMenuItemProps: MenuItemProps = {
-  bg: "highlight",
+  bg: 'highlight',
   _hover: {
-    bg: "bg",
+    bg: 'bg',
   },
 };

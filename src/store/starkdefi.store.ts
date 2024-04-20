@@ -1,17 +1,13 @@
-import {
-  PoolInfo,
-  ProtocolAtoms,
-  StrkDexIncentivesAtom,
-} from "./pools";
-import { atom } from "jotai";
-import { Jediswap } from "./jedi.store";
+import { PoolInfo, ProtocolAtoms, StrkDexIncentivesAtom } from './pools';
+import { atom } from 'jotai';
+import { Jediswap } from './jedi.store';
 
 export class StarkDefi extends Jediswap {
-  name = "StarkDefi";
-  link = "https://app.starkdefi.com/#/pool";
-  logo = "https://app.starkdefi.com/favicon.png";
+  name = 'StarkDefi';
+  link = 'https://app.starkdefi.com/#/pool';
+  logo = 'https://app.starkdefi.com/favicon.png';
 
-  incentiveDataKey = "StarkDefi";
+  incentiveDataKey = 'StarkDefi';
 }
 
 export const starkDefi = new StarkDefi();

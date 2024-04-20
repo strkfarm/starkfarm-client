@@ -1,13 +1,10 @@
-import CONSTANTS from "@/constants";
-import { Box, Button, ButtonProps, Spinner } from "@chakra-ui/react";
-import {
-  useAccount,
-  useContractWrite,
-} from "@starknet-react/core";
-import mixpanel from "mixpanel-browser";
-import { useEffect, useMemo } from "react";
-import { isMobile } from "react-device-detect";
-import { Call } from "starknet";
+import CONSTANTS from '@/constants';
+import { Box, Button, ButtonProps, Spinner } from '@chakra-ui/react';
+import { useAccount, useContractWrite } from '@starknet-react/core';
+import mixpanel from 'mixpanel-browser';
+import { useEffect, useMemo } from 'react';
+import { isMobile } from 'react-device-detect';
+import { Call } from 'starknet';
 
 interface TxButtonProps {
   text: string;
@@ -18,10 +15,10 @@ interface TxButtonProps {
 export default function TxButton(props: TxButtonProps) {
   const { address } = useAccount();
   const disabledStyle = {
-    bg: "var(--chakra-colors-disabled_bg)",
-    color: "var(--chakra-colors-disabled_text)",
-    borderColor: "var(--chakra-colors-disabled_bg)",
-    borderWidth: "1px",
+    bg: 'var(--chakra-colors-disabled_bg)',
+    color: 'var(--chakra-colors-disabled_text)',
+    borderColor: 'var(--chakra-colors-disabled_bg)',
+    borderWidth: '1px',
   };
 
   const { writeAsync, data, status, isSuccess, isPending } = useContractWrite({
@@ -29,13 +26,13 @@ export default function TxButton(props: TxButtonProps) {
   });
 
   useEffect(() => {
-    console.log("status", isPending, status, isSuccess);
+    console.log('status', isPending, status, isSuccess);
   }, [status]);
 
   const disabledText = useMemo(() => {
     if (isMobile) return CONSTANTS.MOBILE_MSG;
-    if (!address) return "Wallet not connected";
-    return "";
+    if (!address) return 'Wallet not connected';
+    return '';
   }, [isMobile, address]);
 
   if (disabledText) {
@@ -51,7 +48,7 @@ export default function TxButton(props: TxButtonProps) {
           ...disabledStyle,
         }}
         isDisabled={true}
-        width={"100%"}
+        width={'100%'}
       >
         {disabledText}
       </Button>
@@ -59,25 +56,25 @@ export default function TxButton(props: TxButtonProps) {
   }
 
   return (
-    <Box width={"100%"}>
+    <Box width={'100%'}>
       <Button
-        color={"purple"}
+        color={'purple'}
         bg="highlight"
-        variant={"ghost"}
-        width={"100%"}
+        variant={'ghost'}
+        width={'100%'}
         _active={{
-          bg: "var(--chakra-colors-bg)",
+          bg: 'var(--chakra-colors-bg)',
         }}
         _hover={{
-          bg: "var(--chakra-colors-bg)",
+          bg: 'var(--chakra-colors-bg)',
         }}
         onClick={() => {
-          mixpanel.track("Click strategy button", {
+          mixpanel.track('Click strategy button', {
             buttonText: props.text,
             address,
           });
           writeAsync().then((tx) => {
-            mixpanel.track("Submitted tx", {
+            mixpanel.track('Submitted tx', {
               txHash: tx.transaction_hash,
               address,
             });
@@ -85,7 +82,7 @@ export default function TxButton(props: TxButtonProps) {
         }}
         {...props.buttonProps}
       >
-        {isPending && <Spinner size={"sm"} marginRight={"5px"} />} {props.text}
+        {isPending && <Spinner size={'sm'} marginRight={'5px'} />} {props.text}
       </Button>
     </Box>
   );

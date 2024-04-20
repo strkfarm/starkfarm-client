@@ -1,3 +1,3 @@
-import { atom } from "jotai";
+import { atom } from 'jotai';
 
-export const addressAtom = atom<string | undefined>("");
+export const addressAtom = atom<string | undefined>('');
