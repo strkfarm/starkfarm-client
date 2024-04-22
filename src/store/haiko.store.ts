@@ -1,23 +1,14 @@
-"use client";
+'use client';
 
-import CONSTANTS from "@/constants";
-import axios from "axios";
-import {
-  Category,
-  PoolInfo,
-  PoolType,
-  ProtocolAtoms,
-  StrkDexIncentivesAtom,
-} from "./pools";
-import { PrimitiveAtom, atom } from "jotai";
-import useSWR from "swr";
-import { Ekubo } from "./ekobu.store";
+import { PoolInfo, ProtocolAtoms, StrkDexIncentivesAtom } from './pools';
+import { atom } from 'jotai';
+import { Ekubo } from './ekobu.store';
 
 export class Haiko extends Ekubo {
-  name = "Haiko";
-  link = "https://app.haiko.xyz/positions";
-  logo = "https://app.haiko.xyz/favicon.ico";
-  incentiveDataKey: string = "Haiko";
+  name = 'Haiko';
+  link = 'https://app.haiko.xyz/positions';
+  logo = 'https://app.haiko.xyz/favicon.ico';
+  incentiveDataKey: string = 'Haiko';
 }
 
 export const haiko = new Haiko();

@@ -1,24 +1,18 @@
-import React from "react";
-import Select, { StylesConfig } from "react-select";
-import {
-  ALL_FILTER,
-  filterAtoms,
-  filters,
-  updateFiltersAtom,
-} from "@/store/pools";
-import * as chroma from "chroma.ts";
-import { useAtom, useSetAtom } from "jotai";
+import React from 'react';
+import Select, { StylesConfig } from 'react-select';
+import { ALL_FILTER, filters, updateFiltersAtom } from '@/store/pools';
+import * as chroma from 'chroma.ts';
+import { useSetAtom } from 'jotai';
 import {
   Accordion,
   AccordionButton,
   AccordionItem,
   AccordionPanel,
   Box,
-  Container,
   Stack,
   Text,
-} from "@chakra-ui/react";
-import { HamburgerIcon } from "@chakra-ui/icons";
+} from '@chakra-ui/react';
+import { HamburgerIcon } from '@chakra-ui/icons';
 
 export interface Option {
   readonly value: string;
@@ -31,26 +25,26 @@ export interface Option {
 const colourStyles: StylesConfig<Option, true> = {
   control: (styles) => ({
     ...styles,
-    padding: "10px 0",
-    backgroundColor: "var(--chakra-colors-bg)",
-    borderColor: "var(--chakra-colors-bg)",
+    padding: '10px 0',
+    backgroundColor: 'var(--chakra-colors-bg)',
+    borderColor: 'var(--chakra-colors-bg)',
   }),
   option: (styles, { data, isDisabled, isFocused, isSelected }) => {
     const color = chroma.color(data.color);
     return {
       ...styles,
-      backgroundColor: "var(--chakra-colors-bg)",
+      backgroundColor: 'var(--chakra-colors-bg)',
       color: isDisabled
-        ? "#ccc"
+        ? '#ccc'
         : isSelected
-          ? chroma.contrast(color, "white") > 2
-            ? "white"
-            : "black"
+          ? chroma.contrast(color, 'white') > 2
+            ? 'white'
+            : 'black'
           : data.color,
-      cursor: isDisabled ? "not-allowed" : "default",
+      cursor: isDisabled ? 'not-allowed' : 'default',
 
-      ":active": {
-        ...styles[":active"],
+      ':active': {
+        ...styles[':active'],
         backgroundColor: !isDisabled
           ? isSelected
             ? data.color
@@ -59,45 +53,45 @@ const colourStyles: StylesConfig<Option, true> = {
       },
     };
   },
-  container: (styles, {}) => {
+  container: (styles) => {
     return {
       ...styles,
-      width: "100%",
+      width: '100%',
     };
   },
-  dropdownIndicator: (styles, {}) => {
+  dropdownIndicator: (styles) => {
     return {
       ...styles,
-      color: "var(--chakra-colors-color2)",
+      color: 'var(--chakra-colors-color2)',
     };
   },
-  clearIndicator: (styles, {}) => {
+  clearIndicator: (styles) => {
     return {
       ...styles,
-      color: "var(--chakra-colors-color2)",
+      color: 'var(--chakra-colors-color2)',
     };
   },
-  indicatorSeparator: (styles, {}) => {
+  indicatorSeparator: (styles) => {
     return {
       ...styles,
-      backgroundColor: "var(--chakra-colors-color2)",
+      backgroundColor: 'var(--chakra-colors-color2)',
     };
   },
-  menu: (styles, {}) => {
+  menu: (styles) => {
     return {
       ...styles,
-      backgroundColor: "var(--chakra-colors-highlight)",
+      backgroundColor: 'var(--chakra-colors-highlight)',
     };
   },
   multiValue: (styles, { data }) => {
     const color = chroma.color(data.color);
     return {
       ...styles,
-      fontWeight: "bold",
-      backgroundColor: "none",
+      fontWeight: 'bold',
+      backgroundColor: 'none',
       borderColor: color.alpha(0.7).css(),
-      borderWidth: "1px",
-      borderRadius: "5px",
+      borderWidth: '1px',
+      borderRadius: '5px',
     };
   },
   multiValueLabel: (styles, { data }) => ({
@@ -107,9 +101,9 @@ const colourStyles: StylesConfig<Option, true> = {
   multiValueRemove: (styles, { data }) => ({
     ...styles,
     color: data.color,
-    ":hover": {
+    ':hover': {
       backgroundColor: data.color,
-      color: "white",
+      color: 'white',
     },
   }),
 };
@@ -118,7 +112,7 @@ export default function Filters() {
   // const colors: readonly string[] = ['#00B8D9', '#407cd5', '#7967e5', '#FF5630',
   // '#FF8B00','#FFC400', '#36B37E', '#00875A', '#253858', '#666666']
 
-  const colors = ["rgba(86, 118, 254, 1)", "rgb(127 73 229)"];
+  const colors = ['rgba(86, 118, 254, 1)', 'rgb(127 73 229)'];
   const updateFilters = useSetAtom(updateFiltersAtom);
 
   const protocolOptions: readonly Option[] = filters.protocols.map(
@@ -136,7 +130,7 @@ export default function Filters() {
   });
   return (
     <Accordion allowToggle>
-      <AccordionItem borderTop="0px" borderBottom="1px" borderColor={"bg"}>
+      <AccordionItem borderTop="0px" borderBottom="1px" borderColor={'bg'}>
         <h2>
           <AccordionButton>
             <Box
@@ -151,8 +145,8 @@ export default function Filters() {
             <HamburgerIcon color="color2" />
           </AccordionButton>
         </h2>
-        <AccordionPanel pb={4} bg="highlight" overflow={"visible"}>
-          <Text color="light_grey" fontSize={"14px"} width="100%">
+        <AccordionPanel pb={4} bg="highlight" overflow={'visible'}>
+          <Text color="light_grey" fontSize={'14px'} width="100%">
             Protocols:
           </Text>
           <Select
@@ -164,20 +158,20 @@ export default function Filters() {
             styles={colourStyles}
             onChange={(x, b) => {
               console.log(x, Array.isArray(x), b);
-              if (filters.protocols.length == x.length) {
-                updateFilters("protocols", [ALL_FILTER]);
+              if (filters.protocols.length === x.length) {
+                updateFilters('protocols', [ALL_FILTER]);
               } else {
                 updateFilters(
-                  "protocols",
+                  'protocols',
                   x.map((p) => p.value),
                 );
               }
             }}
           />
 
-          <Stack marginTop={"5px"} direction={{ base: "column", md: "row" }}>
-            <Box width={{ base: "100%", md: "50%" }}>
-              <Text color="light_grey" fontSize={"14px"} width="100%">
+          <Stack marginTop={'5px'} direction={{ base: 'column', md: 'row' }}>
+            <Box width={{ base: '100%', md: '50%' }}>
+              <Text color="light_grey" fontSize={'14px'} width="100%">
                 Categories:
               </Text>
               <Select
@@ -190,14 +184,14 @@ export default function Filters() {
                 onChange={(x, b) => {
                   console.log(x, Array.isArray(x), b);
                   updateFilters(
-                    "categories",
+                    'categories',
                     x.map((p) => p.value),
                   );
                 }}
               />
             </Box>
-            <Box width={{ base: "100%", md: "50%" }}>
-              <Text color="light_grey" fontSize={"14px"} width="100%">
+            <Box width={{ base: '100%', md: '50%' }}>
+              <Text color="light_grey" fontSize={'14px'} width="100%">
                 Protocol types:
               </Text>
               <Select
@@ -209,7 +203,7 @@ export default function Filters() {
                 styles={colourStyles}
                 onChange={(x, b) => {
                   updateFilters(
-                    "poolTypes",
+                    'poolTypes',
                     x.map((p) => p.value),
                   );
                 }}

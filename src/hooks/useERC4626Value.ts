@@ -1,13 +1,12 @@
-import ERC20Abi from "@/abi/erc20.abi.json";
-import ERC4626Abi from "@/abi/erc4626.abi.json";
-import { TokenInfo } from "@/strategies/IStrategy";
-import MyNumber from "@/utils/MyNumber";
-import { useAccount, useContractRead } from "@starknet-react/core";
-import { useEffect, useMemo } from "react";
-import { useERC20Balance } from "./useERC20Balance";
-import { TOKENS } from "@/constants";
-import { standariseAddress } from "@/utils";
-import { BlockTag, uint256 } from "starknet";
+import ERC4626Abi from '@/abi/erc4626.abi.json';
+import { TokenInfo } from '@/strategies/IStrategy';
+import MyNumber from '@/utils/MyNumber';
+import { useAccount, useContractRead } from '@starknet-react/core';
+import { useEffect, useMemo } from 'react';
+import { useERC20Balance } from './useERC20Balance';
+import { TOKENS } from '@/constants';
+import { standariseAddress } from '@/utils';
+import { BlockTag, uint256 } from 'starknet';
 
 export function useERC4626Value(token: TokenInfo | undefined) {
   const { address } = useAccount();
@@ -23,10 +22,10 @@ export function useERC4626Value(token: TokenInfo | undefined) {
     isLoading: isLoadingConvert,
     error: errorBal,
   } = useContractRead({
-    functionName: "convert_to_assets",
+    functionName: 'convert_to_assets',
     args: [uint256.bnToUint256(balance.toString())],
     abi: ERC4626Abi,
-    address: token?.token || "0x0",
+    address: token?.token || '0x0',
     watch: true,
     blockIdentifier: BlockTag.pending,
   });
@@ -37,10 +36,10 @@ export function useERC4626Value(token: TokenInfo | undefined) {
     isLoading: isLoadingAsset,
     error: errorAsset,
   } = useContractRead({
-    functionName: "asset",
+    functionName: 'asset',
     args: [],
     abi: ERC4626Abi,
-    address: token?.token || "0x0",
+    address: token?.token || '0x0',
     watch: false,
   });
 
@@ -48,13 +47,13 @@ export function useERC4626Value(token: TokenInfo | undefined) {
     if (!underlyingAsset) return undefined;
     return TOKENS.find(
       (t) =>
-        standariseAddress(t.token) ==
+        standariseAddress(t.token) ===
         standariseAddress(<bigint>underlyingAsset),
     );
   }, [underlyingAsset]);
 
   const convertedBal = useMemo(() => {
-    console.log("4626balance", {
+    console.log('4626balance', {
       address,
       balance: balance.toString(),
       underlyingBal,
@@ -97,7 +96,7 @@ export function useERC4626Value(token: TokenInfo | undefined) {
   ]);
 
   useEffect(() => {
-    console.log("4626balance2", {
+    console.log('4626balance2', {
       finalBal: convertedBal.balance.toEtherStr(),
     });
   }, [convertedBal]);

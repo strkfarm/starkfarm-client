@@ -1,7 +1,7 @@
-import CONSTANTS from "@/constants";
-import { IDapp } from "@/store/IDapp.store";
-import { Category, PROTOCOLS, PoolInfo } from "@/store/pools";
-import { IStrategy } from "./IStrategy";
+import CONSTANTS from '@/constants';
+import { IDapp } from '@/store/IDapp.store';
+import { PROTOCOLS, PoolInfo } from '@/store/pools';
+import { IStrategy } from './IStrategy';
 
 interface Step {
   name: string;
@@ -25,7 +25,7 @@ export interface StrategyAction {
 }
 
 export class SimpleStableStrategy extends IStrategy {
-  tag = "SSStrt";
+  tag = 'SSStrt';
   exchanges: IDapp<any>[] = [];
 
   actions: StrategyAction[] = [];
@@ -39,16 +39,16 @@ export class SimpleStableStrategy extends IStrategy {
       { logo: CONSTANTS.LOGOS.USDC },
       { logo: CONSTANTS.LOGOS.USDT },
     ];
-    super("SSStrt", "Loop stable-coins to maximize yield", rewardTokens, []);
+    super('SSStrt', 'Loop stable-coins to maximize yield', rewardTokens, []);
 
     this.steps = [
       {
-        name: "Deposit to best pool",
+        name: 'Deposit to best pool',
         optimizer: this.optimizerDeposit,
         filter: [this.filterStablesOnly],
       },
       {
-        name: "Borrow from same protocol keeping HF > 1.2",
+        name: 'Borrow from same protocol keeping HF > 1.2',
         optimizer: (pools, amount, actions) => {
           let bestPool: PoolInfo = pools[0];
           pools.forEach((p) => {
@@ -57,7 +57,7 @@ export class SimpleStableStrategy extends IStrategy {
             }
           });
           const protocolInfo: any = PROTOCOLS.find(
-            (p) => p.name == bestPool.protocol.name,
+            (p) => p.name === bestPool.protocol.name,
           );
           if (!protocolInfo)
             throw new Error(`${this.tag} Protocol info not found`);
@@ -77,7 +77,7 @@ export class SimpleStableStrategy extends IStrategy {
         ],
       },
       {
-        name: "Deposit borrowed amount to another protocol",
+        name: 'Deposit borrowed amount to another protocol',
         optimizer: this.optimizerDeposit,
         filter: [
           this.filterStablesOnly,

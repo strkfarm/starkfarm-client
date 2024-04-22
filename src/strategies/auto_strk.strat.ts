@@ -1,21 +1,13 @@
-import CONSTANTS, { TOKENS, TokenName } from "@/constants";
-import { IDapp } from "@/store/IDapp.store";
-import { Category, PROTOCOLS, PoolInfo } from "@/store/pools";
-import { IStrategy, TokenInfo } from "./IStrategy";
-import { nostraLending } from "@/store/nostralending.store";
-import { zkLend } from "@/store/zklend.store";
-import assert from "assert";
-import {
-  useAccount,
-  useContract,
-  useContractWrite,
-} from "@starknet-react/core";
-import { useEffect, useMemo } from "react";
-import ERC20Abi from "@/abi/erc20.abi.json";
-import AutoStrkAbi from "@/abi/autoStrk.abi.json";
-import MasterAbi from "@/abi/master.abi.json";
-import MyNumber from "@/utils/MyNumber";
-import { Contract, ProviderInterface, uint256 } from "starknet";
+import CONSTANTS, { TOKENS, TokenName } from '@/constants';
+import { PoolInfo } from '@/store/pools';
+import { IStrategy, TokenInfo } from './IStrategy';
+import { zkLend } from '@/store/zklend.store';
+
+import ERC20Abi from '@/abi/erc20.abi.json';
+import AutoStrkAbi from '@/abi/autoStrk.abi.json';
+import MasterAbi from '@/abi/master.abi.json';
+import MyNumber from '@/utils/MyNumber';
+import { Contract, ProviderInterface, uint256 } from 'starknet';
 
 interface Step {
   name: string;
@@ -50,10 +42,10 @@ export class AutoTokenStrategy extends IStrategy {
     strategyAddress: string,
   ) {
     const rewardTokens = [{ logo: CONSTANTS.LOGOS.STRK }];
-    const frmToken = TOKENS.find((t) => t.token == strategyAddress);
-    if (!frmToken) throw new Error("frmToken undefined");
+    const frmToken = TOKENS.find((t) => t.token === strategyAddress);
+    if (!frmToken) throw new Error('frmToken undefined');
     const holdingTokens = [frmToken];
-    super("AutoSTRK", description, rewardTokens, holdingTokens);
+    super('AutoSTRK', description, rewardTokens, holdingTokens);
     this.token = token;
 
     this.steps = [
@@ -79,7 +71,7 @@ export class AutoTokenStrategy extends IStrategy {
 
   filterStrk(pools: PoolInfo[], amount: string, prevActions: StrategyAction[]) {
     return pools.filter(
-      (p) => p.pool.name == this.token && p.protocol.name == zkLend.name,
+      (p) => p.pool.name === this.token && p.protocol.name === zkLend.name,
     );
   }
 
@@ -120,13 +112,13 @@ export class AutoTokenStrategy extends IStrategy {
     provider: ProviderInterface,
   ) => {
     const baseTokenInfo: TokenInfo = TOKENS.find(
-      (t) => t.name == this.token,
+      (t) => t.name === this.token,
     ) as TokenInfo; //
     const zTokenInfo: TokenInfo = TOKENS.find(
-      (t) => t.name == this.lpTokenName,
+      (t) => t.name === this.lpTokenName,
     ) as TokenInfo;
 
-    if (!address || address == "0x0") {
+    if (!address || address === '0x0') {
       return [
         {
           tokenInfo: baseTokenInfo,
@@ -157,22 +149,22 @@ export class AutoTokenStrategy extends IStrategy {
     );
 
     // base token
-    const call11 = baseTokenContract.populate("approve", [
+    const call11 = baseTokenContract.populate('approve', [
       masterContract.address,
       uint256.bnToUint256(amount.toString()),
     ]);
-    const call12 = masterContract.populate("invest_auto_strk", [
+    const call12 = masterContract.populate('invest_auto_strk', [
       this.strategyAddress,
       uint256.bnToUint256(amount.toString()),
       address,
     ]);
 
     // zToken
-    const call21 = zTokenContract.populate("approve", [
+    const call21 = zTokenContract.populate('approve', [
       this.strategyAddress,
       uint256.bnToUint256(amount.toString()),
     ]);
-    const call22 = strategyContract.populate("deposit", [
+    const call22 = strategyContract.populate('deposit', [
       uint256.bnToUint256(amount.toString()),
       address,
     ]);
@@ -198,10 +190,10 @@ export class AutoTokenStrategy extends IStrategy {
     provider: ProviderInterface,
   ) => {
     const frmToken: TokenInfo = TOKENS.find(
-      (t) => t.token == this.strategyAddress,
+      (t) => t.token === this.strategyAddress,
     ) as TokenInfo;
 
-    if (!address || address == "0x0") {
+    if (!address || address === '0x0') {
       return [
         {
           tokenInfo: frmToken,
@@ -224,11 +216,11 @@ export class AutoTokenStrategy extends IStrategy {
     // const call12 = masterContract.populate("invest_auto_strk", [this.strategyAddress, uint256.bnToUint256(amount.toString()), address])
 
     // zToken
-    const call1 = frmTokenContract.populate("approve", [
+    const call1 = frmTokenContract.populate('approve', [
       this.strategyAddress,
       uint256.bnToUint256(amount.toString()),
     ]);
-    const call2 = strategyContract.populate("redeem", [
+    const call2 = strategyContract.populate('redeem', [
       uint256.bnToUint256(amount.toString()),
       address,
       address,

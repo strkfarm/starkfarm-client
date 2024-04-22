@@ -1,24 +1,20 @@
-import CONSTANTS, { TokenName } from "@/constants";
-import axios from "axios";
+import CONSTANTS, { TokenName } from '@/constants';
 import {
   Category,
   PoolInfo,
   PoolType,
   ProtocolAtoms,
-  StrkDexIncentivesAtom,
   StrkLendingIncentivesAtom,
-} from "./pools";
-import { Ekubo } from "./ekobu.store";
-import { atom } from "jotai";
-import { Jediswap } from "./jedi.store";
-import { ZkLend } from "./zklend.store";
+} from './pools';
+import { atom } from 'jotai';
+import { ZkLend } from './zklend.store';
 
 export class Hashstack extends ZkLend {
-  name = "Hashstack";
-  link = "https://app.hashstack.finance/";
-  logo = "https://app.hashstack.finance/favicon-32x32.png";
+  name = 'Hashstack';
+  link = 'https://app.hashstack.finance/';
+  logo = 'https://app.hashstack.finance/favicon-32x32.png';
 
-  incentiveDataKey = "Hashstack";
+  incentiveDataKey = 'Hashstack';
   SUPPLY_FACTOR = 0.7;
   _computePoolsInfo(data: any) {
     const myData = data[this.incentiveDataKey];
@@ -28,12 +24,12 @@ export class Hashstack extends ZkLend {
       .filter(this.commonVaultFilter)
       .forEach((poolName) => {
         const arr = myData[poolName];
-        if (arr.length == 0) return;
+        if (arr.length === 0) return;
 
         let category = Category.Others;
-        if (["USDC", "USDT"].includes(poolName)) {
+        if (['USDC', 'USDT'].includes(poolName)) {
           category = Category.Stable;
-        } else if (poolName.includes("STRK")) {
+        } else if (poolName.includes('STRK')) {
           category = Category.STRK;
         }
 
@@ -54,13 +50,13 @@ export class Hashstack extends ZkLend {
           aprSplits: [
             {
               apr: 0,
-              title: "Base APR",
-              description: "Shown soon",
+              title: 'Base APR',
+              description: 'Shown soon',
             },
             {
               apr: arr[arr.length - 1].strk_grant_apr_nrs * this.SUPPLY_FACTOR,
-              title: "STRK rewards",
-              description: "Starknet DeFi Spring incentives",
+              title: 'STRK rewards',
+              description: 'Starknet DeFi Spring incentives',
             },
           ],
           category,
