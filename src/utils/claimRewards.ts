@@ -1,40 +1,53 @@
-import { ProviderInterface } from "starknet";
+import {
+	Account,
+	CallData,
+	Contract,
+	Provider,
+	ProviderInterface,
+	constants,
+} from "starknet";
 
 interface ContractABIInterface {
+	contractAddress: string;
 	provider: ProviderInterface;
-	address: string;
 }
 
-export const getContractABI = async ({ provider, address }: ContractABIInterface) => {
+export const getContractABI = async ({
+	contractAddress,
+	provider,
+}: ContractABIInterface) => {
 	try {
-		const compressedContract = await provider.getClassAt(address);
+		const compressedContract = await provider.getClassAt(contractAddress);
 		return compressedContract.abi;
 	} catch (error) {
 		console.error("Error fetching data:", error);
 	}
 };
 
-
-interface ProtocolInfo {
-	claim_id: string;
-	recipient: string;
-	amount: {
-			value: number;
-	};
-	proof: any; 
+interface ClaimRewardsProps {
+	contracts: any[];
+	provider: ProviderInterface;
 }
 
-interface Contract {
-	populateTransaction: {
-			claim: (args: any, proof: any) => any; // Adjust the type of 'args' based on your contract's claim function signature
-	};
-}
+export const claimRewards = ({
+	contracts,
+	provider,
+}: ClaimRewardsProps) => {
 
-interface RewardsObject {
-	[claim_id: string]: any; // Adjust the type based on what the rewards data looks like
-}
+	const claimContracts = contracts.map((contract) => {
+		const { abi, claim_contract, claim_id, recipient, amount, proof } = contract;
+		const claimContract = new Contract(abi, claim_contract, provider);
+		const call = claimContract.populateTransaction["claim"]!(
+			{
+				id: claim_id,
+				claimee: recipient,
+				amount: amount?.value,
+			},
+			proof
+		);
 
+		return call;
+	});
 
-
-
-
+	return [claimContracts];
+};

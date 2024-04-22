@@ -1,49 +1,49 @@
-import { allProtocolInfosAtom, zklendAtom } from "@/store/protocolAtomClaim";
+import {
+	allProtocolInfosAtom,
+	claimedRewardsAtom,
+	zklendAtom,
+} from "@/store/protocolAtomClaim";
 import {
 	useAccount,
-	useContract,
 	useContractWrite,
+	useWaitForTransaction,
 } from "@starknet-react/core";
-import { useAtom } from "jotai";
-import { useEffect, useMemo } from "react";
+import { useAtom, useSetAtom } from "jotai";
+import { useEffect, useState } from "react";
 import { useProvider } from "@starknet-react/core";
-import { getContractABI } from "@/utils/claimRewards";
-import TestAbi from "@/abi/abi.json";
+import { claimRewards, getContractABI } from "@/utils/claimRewards";
+import { ethers } from "ethers";
+import mixpanel from "mixpanel-browser";
 
 export default function useClaimReward() {
 	const { address } = useAccount();
 	const [allProtocolInfo, setAllProtocolABIsAtom] =
 		useAtom(allProtocolInfosAtom);
+	const setClaimedReward = useSetAtom(claimedRewardsAtom);
 	const [{ mutate, status, data }] = useAtom(zklendAtom);
 	const { provider } = useProvider();
+	const [calls, setCalls] = useState<any>([]);
 
 	useEffect(() => {
 		if (data && status) {
 			if (data.length > 0) {
-				const fetchData = async () => {
+				const getABIAndFormatResult = async () => {
 					try {
 						const contractInfo = await Promise.all(
 							data.map(async (info: any) => {
 								try {
-									// Fetch contract ABIs for all contracts in data
 									let abi = await getContractABI({
+										contractAddress: info.claim_contract,
 										provider: provider,
-										address: info.claim_contract,
 									});
 
-									let contractInfo = {
-										abi,
-										...info,
-									};
-
-									return contractInfo;
+									return { abi, ...info };
 								} catch (error) {
 									console.error(
 										"Error fetching ABI for contract address:",
-
 										error
 									);
-									return null; // Return null for failed fetches
+									return null;
 								}
 							})
 						);
@@ -52,7 +52,7 @@ export default function useClaimReward() {
 						console.error("Error:", error);
 					}
 				};
-				fetchData();
+				getABIAndFormatResult();
 			}
 		}
 	}, [data, status]);
@@ -61,44 +61,45 @@ export default function useClaimReward() {
 		mutate({ address });
 	};
 
-	const claimAmount = BigInt("1000000000000");
-	const { contract } = useContract({
-		abi: allProtocolInfo[0]?.abi,
-		address: allProtocolInfo[0]?.claim_contract,
-	});
-
-	const calls = useMemo(() => {
-		if (!address || !contract || allProtocolInfo == null) return [];
-		const { claim_id, recipient, amount, proof } = allProtocolInfo[0];
-		console.log(claim_id, recipient, amount, proof);
-		return contract.populateTransaction["claim"]!(
-			{
-				id: claim_id,
-				claimee: address,
-				amount: claimAmount,
-			},
-			proof
-		);
-	}, [contract, address, allProtocolInfo]);
-
-	const {
-		writeAsync,
-		data: rewards,
-		isSuccess,
-		error,
-	} = useContractWrite({
-		calls,
-	});
-
 	useEffect(() => {
 		if (allProtocolInfo.length > 0) {
-			writeAsync();
+			let calls = claimRewards({
+				contracts: allProtocolInfo,
+				provider: provider,
+			});
+
+			setCalls(calls);
 		}
 	}, [allProtocolInfo]);
 
-	console.log(allProtocolInfo, "data");
+	const { writeAsync, data: tx } = useContractWrite({ calls: calls[0] });
+
+	useEffect(() => {
+		if (calls.length > 0) {
+			writeAsync();
+		}
+	}, [calls]);
+
+	const { data: rewards, isLoading } = useWaitForTransaction({
+		hash: tx?.transaction_hash,
+		watch: true,
+		enabled: tx != null,
+	});
+
+	useEffect(() => {
+		if (rewards) {
+			mixpanel.track('Rewards claimed successfully')
+			let value = parseInt(rewards.actual_fee.amount);
+			setClaimedReward(value);
+		}
+	}, [rewards]);
+
+
+
 
 	return {
 		handleClaimReward,
+		address,
+		isLoading,
 	};
 }

@@ -14,9 +14,13 @@ import {
 } from "@chakra-ui/react";
 import CONSTANTS from "@/constants";
 import useClaimReward from "@/hooks/useClaimReward";
+import { useAtomValue } from "jotai";
+import { claimedRewardsAtom } from "@/store/protocolAtomClaim";
+
 export default function Claim() {
-	const { handleClaimReward } = useClaimReward();
-  
+	const { handleClaimReward, address } = useClaimReward();
+
+	const claimedReward = useAtomValue(claimedRewardsAtom);
 
 	return (
 		<Container maxWidth={"1000px"} margin={"0 auto"} padding="30px 10px">
@@ -38,7 +42,7 @@ export default function Claim() {
 					<Card width="100%" padding={"15px 30px"} color="white" bg="highlight">
 						<Stat>
 							<StatLabel>Total Claimed</StatLabel>
-							<StatNumber>0</StatNumber>
+							<StatNumber>{claimedReward}</StatNumber>
 						</Stat>
 					</Card>
 				</GridItem>
@@ -48,9 +52,7 @@ export default function Claim() {
 							<StatLabel>Unclaimed</StatLabel>
 							<StatNumber>0</StatNumber>
 						</Stat>
-						<Button onClick={handleClaimReward}>Claim</Button>
-
-            {/* <Button onClick={() => writeAsync()}>Read</Button> */}
+						{address && <Button onClick={handleClaimReward}>Claim</Button>}
 					</Card>
 				</GridItem>
 			</Grid>
