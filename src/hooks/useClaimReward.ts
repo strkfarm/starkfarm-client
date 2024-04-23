@@ -1,105 +1,149 @@
 import {
-  allProtocolInfosAtom,
-  claimedRewardsAtom,
-  zklendAtom,
+	claimRewardsLoadinAtom,
+	claimedRewardsAtom,
+	ekuboAtom,
+	getProtocolClaimedContracts,
+	protocolsContractsAtom,
+	protocolsInfoAtom,
+	totalContractsAtom,
+	zklendAtom,
 } from "@/store/protocolAtomClaim";
 import {
-  useAccount,
-  useContractWrite,
-  useWaitForTransaction,
+	useAccount,
+	useContractWrite,
+	useWaitForTransaction,
 } from "@starknet-react/core";
-import { useAtom, useSetAtom } from "jotai";
-import { useEffect, useState } from "react";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useEffect, useMemo } from "react";
 import { useProvider } from "@starknet-react/core";
-import { claimRewards, getContractABI } from "@/utils/claimRewards";
-import { ethers } from "ethers";
-import mixpanel from "mixpanel-browser";
+import {
+	claimRewards,
+	getContractABI,
+	getProtocolContractCount,
+} from "@/utils/claimRewards";
+import { toastMessage } from "@/utils/toastMessage";
 
 export default function useClaimReward() {
-  const { address } = useAccount();
-  const [allProtocolInfo, setAllProtocolABIsAtom] =
-    useAtom(allProtocolInfosAtom);
-  const setClaimedReward = useSetAtom(claimedRewardsAtom);
-  const [{ mutate, status, data }] = useAtom(zklendAtom);
-  const { provider } = useProvider();
-  const [calls, setCalls] = useState<any>([]);
+	const { address } = useAccount();
+	const setProtocolsInfo = useSetAtom(protocolsInfoAtom);
+	const setTotalContracts = useSetAtom(totalContractsAtom);
+	const setClaimedReward = useSetAtom(claimedRewardsAtom);
+	const [protocolContracts, setProtocolContracts] = useAtom(
+		protocolsContractsAtom
+	);
+	const protocolClaimedContracts = useAtomValue(getProtocolClaimedContracts);
+	const [isLoading, setIsLoading] = useAtom(claimRewardsLoadinAtom);
+	const [{ mutate: zklendMutate, data: zklendData }] = useAtom(zklendAtom);
+	const [{ mutate: ekuboMutation, data: ekuboData }] = useAtom(ekuboAtom);
+	const { provider } = useProvider();
 
-  useEffect(() => {
-    if (data && status) {
-      if (data.length > 0) {
-        const getABIAndFormatResult = async () => {
-          try {
-            const contractInfo = await Promise.all(
-              data.map(async (info: any) => {
-                try {
-                  let abi = await getContractABI({
-                    contractAddress: info.claim_contract,
-                    provider: provider,
-                  });
+	useEffect(() => {
+		if (protocolClaimedContracts) {
+			if (protocolClaimedContracts.length > 0) {
+				const getABIAndFormatResult = async () => {
+					try {
+						const contractInfo = await Promise.all(
+							protocolClaimedContracts.map(async (info: any) => {
+								try {
+									let abi = await getContractABI({
+										contractAddress: info.claim_contract,
+										provider: provider,
+									});
 
-                  return { abi, ...info };
-                } catch (error) {
-                  console.error(
-                    "Error fetching ABI for contract address:",
-                    error
-                  );
-                  return null;
-                }
-              })
-            );
-            setAllProtocolABIsAtom(contractInfo);
-          } catch (error) {
-            console.error("Error:", error);
-          }
-        };
-        getABIAndFormatResult();
-      }
-    }
-  }, [data, status]);
+									return { abi, ...info };
+								} catch (error) {
+									setIsLoading(false);
+									toastMessage({
+										status: "error",
+										description: "Unable to get contracts ABI",
+									});
+								}
+							})
+						);
+						setProtocolContracts(contractInfo);
+					} catch (error) {
+						setIsLoading(false);
+						toastMessage({
+							status: "error",
+							description: "Unable to get contracts ABI",
+						});
+					}
+				};
+				getABIAndFormatResult();
+			}
+		}
+	}, [protocolClaimedContracts]);
 
-  const handleClaimReward = () => {
-    mutate({ address });
-  };
+	const calls = useMemo(
+		() =>
+			protocolContracts.length > 0
+				? claimRewards({ contracts: protocolContracts, provider })
+				: [],
+		[protocolContracts]
+	);
 
-  useEffect(() => {
-    if (allProtocolInfo.length > 0) {
-      let calls = claimRewards({
-        contracts: allProtocolInfo,
-        provider: provider,
-      });
+	const {
+		writeAsync,
+		data: tx,
+		isError,
+		isSuccess,
+	} = useContractWrite({ calls: calls });
 
-      setCalls(calls);
-    }
-  }, [allProtocolInfo]);
+	useEffect(() => {
+		if (Array.isArray(calls) && calls.length > 0) {
+			// writeAsync();
+		}
+	}, [calls]);
 
-  const { writeAsync, data: tx } = useContractWrite({ calls: calls[0] });
+	const { data: rewards, isLoading: transactionLoading } =
+		useWaitForTransaction({
+			hash: tx?.transaction_hash,
+			watch: true,
+			enabled: tx != null && isSuccess && !isError,
+		});
 
-  useEffect(() => {
-    if (calls.length > 0) {
-      writeAsync();
-    }
-  }, [calls]);
+	useEffect(() => {
+		if (ekuboData && zklendData) {
+			const apiProtocols = [
+				{ name: "ekubo", data: ekuboData ?? null },
+				{ name: "zklend", data: zklendData ?? null },
+			];
+			setTotalContracts(getProtocolContractCount(apiProtocols));
+			setProtocolsInfo(apiProtocols);
+		}
+	}, [ekuboData, zklendData]);
 
-  const { data: rewards, isLoading } = useWaitForTransaction({
-    hash: tx?.transaction_hash,
-    watch: true,
-    enabled: tx != null,
-  });
+	const handleClaimReward = () => {
+		setIsLoading(true);
+		zklendMutate({ address });
+		ekuboMutation({ address });
+	};
 
-  useEffect(() => {
-    if (rewards) {
-      mixpanel.track('Rewards claimed successfully')
-      let value = parseInt(rewards.actual_fee.amount);
-      setClaimedReward(value);
-    }
-  }, [rewards]);
+	 useEffect(() => {
+		if (!transactionLoading && rewards) {
+			setIsLoading(false);
+			console.log(rewards.messages_sent, rewards.actual_fee.amount, "claimReward");
+			// setClaimedReward(parseInt(rewards.messages_sent.))
+			toastMessage({
+				status: "success",
+				description: "Rewards claimed successfully",
+			});
+		}
+		if (!transactionLoading && isError) {
+			setIsLoading(false);
+			toastMessage({
+				status: "error",
+				description: "Unable to claim rewaards. Please try again",
+			});
+		}
+	}, [rewards, transactionLoading, isError]);
 
 
+	
 
-
-  return {
-    handleClaimReward,
-    address,
-    isLoading,
-  };
+	return {
+		handleClaimReward,
+		address,
+		isLoading,
+	};
 }
