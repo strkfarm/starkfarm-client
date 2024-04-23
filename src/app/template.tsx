@@ -111,6 +111,8 @@ export default function Template({ children }: { children: React.ReactNode }) {
     }
 
     return <JotaiProvider>
+                    <ToastContainer />
+
       <StarknetConfig chains={chains} provider={provider} connectors={connectors}>
         <ChakraBaseProvider theme={theme}>
           <Flex minHeight={'100vh'} bgColor={'bg'}>
@@ -135,8 +137,10 @@ export default function Template({ children }: { children: React.ReactNode }) {
               <React.Suspense>{children}</React.Suspense>
             </Container>
           </Flex>
+          
         </ChakraBaseProvider>
-        <ToastContainer />
+
       </StarknetConfig>
+
 </JotaiProvider>
 }
