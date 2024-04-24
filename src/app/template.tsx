@@ -36,7 +36,10 @@ import Image from 'next/image';
 import Navbar from '@/components/Navbar';
 import { RpcProvider, RpcProviderOptions, constants } from 'starknet';
 import mixpanel from 'mixpanel-browser';
+import * as ReactDOM from 'react-dom/client'
+import { createStandaloneToast } from '@chakra-ui/react'
 
+const { ToastContainer,  } = createStandaloneToast()
 // ! make page view more dynamic
 mixpanel.init("118f29da6a372f0ccb6f541079cad56b");
 
@@ -108,6 +111,8 @@ export default function Template({ children }: { children: React.ReactNode }) {
     }
 
     return <JotaiProvider>
+                    <ToastContainer />
+
       <StarknetConfig chains={chains} provider={provider} connectors={connectors}>
         <ChakraBaseProvider theme={theme}>
           <Flex minHeight={'100vh'} bgColor={'bg'}>
@@ -132,7 +137,10 @@ export default function Template({ children }: { children: React.ReactNode }) {
               <React.Suspense>{children}</React.Suspense>
             </Container>
           </Flex>
+          
         </ChakraBaseProvider>
+
       </StarknetConfig>
+
 </JotaiProvider>
 }
