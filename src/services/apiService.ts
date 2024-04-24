@@ -14,7 +14,7 @@ export const getNostraRewards = async (addr: any) => {
 
 export const getZklendRewards = async ({ address }: any) => {
   const { data } = await axios.get(
-    `https://app.zklend.com/api/reward/all/${CONSTANTS.ZKLEND.TEST_ADDRESS}`
+    `/zklend/api/reward/all/${CONSTANTS.ZKLEND.TEST_ADDRESS}`
   );
   return data.filter((item: any) => item.type === "defispring");
 };
