@@ -1,71 +1,71 @@
-import { getEkuboRewards, getZklendRewards } from "@/services/apiService";
-import { atomWithMutation } from "jotai-tanstack-query";
-import { atomWithCache } from "jotai-cache";
+import { getEkubo, getZklend } from "@/services/apiService";
+import { atomWithMutation, atomWithQuery } from "jotai-tanstack-query";
 import { atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
+import { addressAtom } from "./claims.atoms";
+import { Call } from "starknet";
 
-interface ClaimContractProps {
-  claim_contract: string;
-  recipient: string;
-  claim_id: number;
-  amount: number;
-  proof: any[];
-  token?: string;
+interface Protocol {
+	totalEarned: number;
+	totalClaimed: number;
+	totalUnclaimed: number;
+	calls: Call[]; 
 }
 
-export const zklendAtom = atomWithMutation(() => ({
-  mutationKey: ["zklendRewards"],
-  mutationFn: getZklendRewards,
+export const zklendQueryAtom = atomWithQuery((get) => ({
+	queryKey: [get(addressAtom)],
+	queryFn: getZklend,
+  retry: true,
 }));
 
-export const ekuboAtom = atomWithMutation(() => ({
-  mutationKey: ["ekuboRewards"],
-  mutationFn: getEkuboRewards,
+export const ekuboQueryAtom = atomWithQuery((get) => ({
+	queryKey: [get(addressAtom)],
+	queryFn: getEkubo,
+  retry: true,
 }));
 
-export const protocolsInfoAtom = atom<any[]>([]);
-export const totalContractsAtom = atom<number>(0);
-export const claimRewardsLoadinAtom = atom<boolean>(false);
-export const protocolsContractsAtom = atom<any[]>([]);
-export const claimedRewardsAtom = atomWithStorage("claimedRewards", 0);
+export const protocolsDataAtom = atom((get) => {
+	const queryAtoms = [ekuboQueryAtom, zklendQueryAtom];
 
+	return queryAtoms.reduce(
+		(
+			acc: {
+				calls: Call[];
+				totalClaimed: number;
+				totalEarned: number;
+				totalUnclaimed: number;
+			},
+			queryAtom
+		) => {
+			const {
+				calls = [],
+				totalClaimed = 0,
+				totalEarned = 0,
+				totalUnclaimed = 0,
+			} = (get(queryAtom)?.data as Protocol) ?? {};
 
-export const getProtocolClaimedContracts = atom(async (get) => {
-  let protocols = get(protocolsInfoAtom);
-  let totalContracts = get(totalContractsAtom);
-  let protocolsContracts: ClaimContractProps[] = [];
-  protocols.map(async (protocol) => {
-    const { name, data } = protocol;
-    if (data) {
-      if (name === "ekubo") {
-        data.forEach((contract: any) => {
-          const formattedContract = {
-            claim_contract: contract?.contract_address,
-            claim_id: contract?.claim?.id,
-            amount: contract?.claim?.amount,
-            recipient: contract?.claim?.claimee,
-            proof: contract?.proof,
-          };
-          protocolsContracts.push(formattedContract);
-        });
-      }
-      if (name === "zklend") {
-        data.forEach((contract: any) => {
-          const formattedContract = {
-            claim_contract: contract?.claim_contract,
-            claim_id: contract?.claim_id,
-            amount: contract?.amount?.value,
-            recipient: contract?.recipient,
-            proof: contract?.proof,
-          };
-          protocolsContracts.push(formattedContract);
-        });
-      }
-    }
-  });
+			return {
+				calls: [...acc.calls, ...calls],
+				totalClaimed: acc.totalClaimed + totalClaimed,
+				totalEarned: acc.totalEarned + totalEarned,
+				totalUnclaimed: acc.totalUnclaimed + totalUnclaimed,
+			};
+		},
+		{ calls: [], totalClaimed: 0, totalEarned: 0, totalUnclaimed: 0 } as {
+			calls: Call[];
+			totalClaimed: number;
+			totalEarned: number;
+			totalUnclaimed: number;
+		}
+	);
+});
 
-  if (protocolsContracts.length == totalContracts) {
-    return protocolsContracts;
-  }
-  return [];
+export const callsAtom = atom((get) => {
+	const { calls } = get(protocolsDataAtom);
+	return calls;
+});
+
+export const rewardsAtom = atom((get) => {
+	const { totalEarned, totalClaimed, totalUnclaimed } = get(protocolsDataAtom);
+	return { totalEarned, totalClaimed, totalUnclaimed };
 });
