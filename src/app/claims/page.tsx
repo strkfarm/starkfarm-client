@@ -12,8 +12,6 @@ import {
   Stat,
   StatLabel,
   StatNumber,
-  Text,
-  useQuery,
 } from "@chakra-ui/react";
 import CONSTANTS from "@/constants";
 import { useAccount, useContractWrite } from "@starknet-react/core";
@@ -25,7 +23,6 @@ import { useEffect } from "react";
 
 export default function Claim() {
   const { address } = useAccount();
-
   const calls: Call[] = useAtomValue(callsAtom);
   const {
     totalEarned,
@@ -40,9 +37,9 @@ export default function Claim() {
     });
 
   const handleClaimReward = () => {
-    // if (!isError && calls.length > 0 && totalUnclaimed > 0) {
-    writeAsync();
-    // }
+    if (!isError && calls.length > 0 && totalUnclaimed > 0) {
+      writeAsync();
+    }
   };
 
   useEffect(() => {
@@ -58,7 +55,6 @@ export default function Claim() {
     }
   }, [isError, isSuccess, error, data]);
 
-  console.log(data, isSuccess);
   return (
     <Container maxWidth={"1000px"} margin={"0 auto"} padding="30px 10px">
       <Heading as="h2" color="white" marginBottom={"10px"}>
@@ -106,18 +102,15 @@ export default function Claim() {
                 <StatNumber>{totalUnclaimed.toFixed(2)}</StatNumber>
               </Stat>
 
-              <Button onClick={handleClaimReward}>
-                {isPending ? <Spinner color="black" /> : "Claim"}
-              </Button>
+              {totalUnclaimed > 0 && (
+                <Button onClick={handleClaimReward}>
+                  {isPending ? <Spinner color="black" /> : "Claim"}
+                </Button>
+              )}
             </Card>
           </GridItem>
         </Grid>
       )}
-      {/* { address && calls.length == 0 && totalClaimed == 0 && (
-        <Flex flex="" alignItems="center" justifyContent="center">
-          <Text color="white">YOU DO NOT HAVE ANYTHING TO CLAIM. CHECK BACK LATER.</Text>
-        </Flex>
-      )} */}
     </Container>
   );
 }

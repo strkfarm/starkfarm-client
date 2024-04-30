@@ -1,10 +1,10 @@
 import CONSTANTS from "@/constants";
 import {
-  calTotalEarned,
-  calzklendRewards,
-  getCallsData,
+  getCallData,
   getABI,
-  isEkuboRewardClaimed,
+  isRewardClaimed,
+  calcZklendRewards,
+  calcEkuboRewards,
 } from "@/utils/claimRewards";
 import axios from "axios";
 import { ClaimRewardsProps } from "./types";
@@ -35,13 +35,12 @@ export const getZklend = async ({ queryKey }: any) => {
     `/zklend/api/reward/all/${CONSTANTS.ZKLEND.TEST_ADDRESS}`
   );
   if (data.length > 0) {
-    const defiSpring: ZklendReward[] = data.filter(
-      (item: any) => item.type === "defispring"
+    const unclaimedRewards: ZklendReward[] = data.filter(
+      (item: any) => item.type === "defispring" && item.claimed != true
     );
     const contracts: ClaimRewardsProps[] = await Promise.all(
-      defiSpring.map(async (contract: ZklendReward) => {
-        const { claim_contract, claim_id, amount, claimed, proof, recipient } =
-          contract;
+      unclaimedRewards.map(async (contract: ZklendReward) => {
+        const { claim_contract, claim_id, amount, proof, recipient } = contract;
         const contractWithABI = await getABI(contract.claim_contract);
         return {
           abi: contractWithABI,
@@ -49,15 +48,14 @@ export const getZklend = async ({ queryKey }: any) => {
           proof,
           claim_id,
           claimee: recipient,
-          claimed,
           amount: amount.value,
         };
       })
     );
 
     const { totalEarned, totalClaimed, totalUnclaimed } =
-      calzklendRewards(data);
-    let calls = contracts.length > 0 ? getCallsData(contracts) : [];
+      calcZklendRewards(data);
+    let calls = contracts.length > 0 ? getCallData(contracts) : [];
     return { totalEarned, totalClaimed, totalUnclaimed, calls };
   }
   return [];
@@ -71,30 +69,30 @@ export const getEkubo = async ({ queryKey }: any) => {
     const contracts: ClaimRewardsProps[] = await Promise.all(
       data.map(async (contract: EkuboReward) => {
         const { contract_address, claim, proof } = contract;
-        const contractWithABI = await getABI(contract_address);
-
-        // isEkuboRewardClaimed({
-        // 	contract: contract_address,
-        // 	id: claim.id,
-        // 	address: "",
-        // 	abi: contractWithABI,
-        // });
+        const abi = await getABI(contract_address);
+        let claimed = await isRewardClaimed({
+          claim_id: claim.id,
+          abi: abi,
+          contract_claim: contract_address,
+        });
 
         return {
-          abi: contractWithABI,
+          abi: abi,
           claim_contract: contract_address,
-          proof,
           claim_id: claim.id,
           claimee: claim.claimee,
           amount: claim.amount,
+          claimed: claimed,
+          proof,
         };
       })
     );
-    const totalEarned = calTotalEarned(data);
-    const totalClaimed = 0;
-    const totalUnclaimed = 0;
-    console.log(totalEarned.toFixed(2), "total earned", data);
-    let calls = contracts.length > 0 ? getCallsData(contracts) : [];
+
+    const { totalEarned, totalClaimed, totalUnclaimed } =
+      calcEkuboRewards(contracts);
+
+    let unclaimedContracts = contracts.filter((contract) => contract.claimed != true);
+    let calls = unclaimedContracts.length > 0 ? getCallData(unclaimedContracts) : [];
     return { totalEarned, totalClaimed, totalUnclaimed, calls };
   }
   return [];

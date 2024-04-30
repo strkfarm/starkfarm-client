@@ -44,6 +44,7 @@ export const protocolsDataAtom = atom((get) => {
         totalUnclaimed = 0,
       } = (get(queryAtom)?.data as Protocol) ?? {};
 
+
       return {
         calls: [...acc.calls, ...calls],
         totalClaimed: acc.totalClaimed + totalClaimed,
