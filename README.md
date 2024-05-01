@@ -82,6 +82,7 @@ Thanks goes to these wonderful people.
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/akiraonstarknet"><img src="https://avatars.githubusercontent.com/u/156126180?v=4?s=100" width="100px;" alt="Akira "/><br /><sub><b>Akira </b></sub></a><br /><a href="#ideas-akiraonstarknet" title="Ideas, Planning, & Feedback">🤔</a> <a href="#code-akiraonstarknet" title="Code">💻</a> <a href="#infra-akiraonstarknet" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://hemant.lol"><img src="https://avatars.githubusercontent.com/u/85151171?v=4?s=100" width="100px;" alt="Hemant"/><br /><sub><b>Hemant</b></sub></a><br /><a href="#infra-hemantwasthere" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/raizo07"><img src="https://avatars.githubusercontent.com/u/81079370?v=4?s=100" width="100px;" alt="Wolf"/><br /><sub><b>Wolf</b></sub></a><br /><a href="#infra-raizo07" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
     </tr>
   </tbody>
 </table>
