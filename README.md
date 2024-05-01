@@ -28,13 +28,12 @@ The project is build using NextJS and Typescript. Below is the broad project str
 
 [![Pull Requests welcome](https://img.shields.io/badge/PRs-welcome-ff69b4.svg?style=flat-square)](https://github.com/strkfarm/starkfarm-client/issues)
 Requirements:
-1. Node 18+
+1. Node 20+
 
 Clone the repository
 ```bash
 git clone https://github.com/strkfarm/starkfarm-client.git
 ```
-
 
 Install dependencies and run the development build
 
@@ -59,10 +58,12 @@ You should see something like this:
 
 ## 🤝 Contribute
 
+
 We're always looking for for stallions with great NextJS & Typescript skills to further this tool, to join our community and contribute to STRKFarm. Check out our [contributing guide](./CONTRIBUTING.md)
 for more information on how to get started.
 
 To connect with us regarding any queries about contributing to the repo, feel free to join our telegram group [here](https://t.me/+HQ_eHaXmF-1lZDc1). Head to `dev` topic.
+
 
 ## References
 
@@ -70,7 +71,8 @@ To connect with us regarding any queries about contributing to the repo, feel fr
 - [OnlyDust](https://app.onlydust.com/p/strkfarm)
 - [Website](https://www.strkfarm.xyz/)
 
-## Contributors
+## Contributors ✨
+Thanks goes to these wonderful people.
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
@@ -81,5 +83,5 @@ To connect with us regarding any queries about contributing to the repo, feel fr
 
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
-
 [![All Contributors](https://img.shields.io/github/all-contributors/akiraonstarknet/starkfarm-client?color=ee8449&style=flat-square)](#contributors)
+
