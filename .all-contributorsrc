@@ -1,4 +1,23 @@
 {
   "projectName": "starkfarm-client",
-  "projectOwner": "akiraonstarknet"
+  "projectOwner": "strkfarm",
+  "files": [
+    "README.md"
+  ],
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributorsPerLine": 7,
+  "contributors": [
+    {
+      "login": "akiraonstarknet",
+      "name": "Akira ",
+      "avatar_url": "https://avatars.githubusercontent.com/u/156126180?v=4",
+      "profile": "https://github.com/akiraonstarknet",
+      "contributions": [
+        "ideas",
+        "code",
+        "infra"
+      ]
+    }
+  ]
 }
