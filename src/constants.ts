@@ -29,8 +29,8 @@ const CONSTANTS = {
   EKUBO: {
     CLAIMS_URL:
       '/ekubo/airdrops/{{address}}?token=0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
-    BASE_APR_API: 'https://mainnet-api.ekubo.org/pair',
-    BASE_PRICE_API: 'https://mainnet-api.ekubo.org/price',
+    BASE_APR_API: '/ekubo/pair',
+    BASE_PRICE_API: '/ekubo/price',
   },
   CONTRACTS: {
     Master: '0x50314707690c31597849ed66a494fb4279dc060f8805f21593f52906846e28e',
