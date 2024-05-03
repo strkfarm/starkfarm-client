@@ -151,29 +151,33 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
       const poolName = p.pool.name;
       const pools: Pool[] = data.data[poolName];
 
-      const baseAPRs: number[] = pools.map((pool) => {
-        const fees0 =
-          (parseInt(pool.fees0_24h, 10) * parseFloat(pool.price0)) /
-          10 ** pool.decimals0;
-        const fees1 =
-          (parseInt(pool.fees1_24h, 10) * parseFloat(pool.price1)) /
-          10 ** pool.decimals1;
-        const tvl0 =
-          (parseInt(pool.tvl0_total, 10) * parseFloat(pool.price0)) /
-          10 ** pool.decimals0;
-        const tvl1 =
-          (parseInt(pool.tvl1_total, 10) * parseFloat(pool.price1)) /
-          10 ** pool.decimals1;
+      if (pools.length) {
+        const baseAPRs: number[] = pools.map((pool) => {
+          const fees0 =
+            (parseInt(pool.fees0_24h, 10) * parseFloat(pool.price0)) /
+            10 ** pool.decimals0;
+          const fees1 =
+            (parseInt(pool.fees1_24h, 10) * parseFloat(pool.price1)) /
+            10 ** pool.decimals1;
+          const tvl0 =
+            (parseInt(pool.tvl0_total, 10) * parseFloat(pool.price0)) /
+            10 ** pool.decimals0;
+          const tvl1 =
+            (parseInt(pool.tvl1_total, 10) * parseFloat(pool.price1)) /
+            10 ** pool.decimals1;
 
-        return 365 * ((fees0 + fees1) / (tvl0 + tvl1));
-      });
+          return 365 * ((fees0 + fees1) / (tvl0 + tvl1));
+        });
 
-      baseAPY = Math.max(...baseAPRs);
+        baseAPY = Math.max(...baseAPRs);
+      } else {
+        baseAPY = 0;
+      }
 
       splitApr = {
         apr: baseAPY,
         title: 'Base APR',
-        description: 'Subject to position change',
+        description: 'Subject to position range',
       };
     }
 
