@@ -240,7 +240,13 @@ const EkuboAtoms: ProtocolAtoms = {
         (poolName, poolsData: PoolsData) => {
           const [token0Name, token1Name] = poolName.split('/');
           const filterResponseData = poolsData.topPools
-            .filter((pool) => !Object.values(pool).includes('0'))
+            .filter(
+              (pool) =>
+                pool.fees0_24h !== '0' &&
+                pool.fees1_24h !== '0' &&
+                pool.tvl0_total !== '0' &&
+                pool.tvl1_total !== '0',
+            )
             .map((pool) => ({
               ...pool,
               price0: indexedTokenPrices[token0Name].price,
