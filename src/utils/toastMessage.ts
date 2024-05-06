@@ -1,18 +1,14 @@
-import { createStandaloneToast } from "@chakra-ui/react";
-const {  toast } = createStandaloneToast();
+import { toast } from "react-toastify";
 interface ToastProps {
   status?: "error" | "success";
   title?: string;
   description?: string;
   stay?: number;
 }
-export const toastMessage = ({ status, title, description, stay }: ToastProps) => {
-  toast({
-    status: status || "error",
-    title: title || (status === "error" ? "Error" : "Success"),
-    description: description,
-    duration: stay ? null : 4000,
-    position: "top-right",
-    // variant: "top-accent",
-  });
+export const toastError = ({ status, title, description, stay }: ToastProps) => {
+  toast.error(description);
+};
+
+export const toastSuccess = ({ status, title, description, stay }: ToastProps) => {
+  toast.success(description);
 };

@@ -43,6 +43,7 @@
     "react-responsive-carousel": "^3.2.23",
     "react-select": "^5.8.0",
     "react-share": "^5.1.0",
+    "react-toastify": "^10.0.5",
     "starknet": "^6.4.1",
     "swr": "^2.2.5",
     "wonka": "^6.3.4"
