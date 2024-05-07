@@ -1,3 +1,14 @@
+import tg from '@/assets/tg.svg';
+import CONSTANTS from '@/constants';
+import { addressAtom } from '@/store/claims.atoms';
+import { WalletName, lastWalletAtom } from '@/store/utils.atoms';
+import {
+  MyMenuItemProps,
+  MyMenuListProps,
+  capitalize,
+  shortAddress,
+} from '@/utils';
+import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
   Avatar,
   Box,
@@ -15,20 +26,9 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useAccount, useConnect, useDisconnect } from '@starknet-react/core';
-import { ChevronDownIcon } from '@chakra-ui/icons';
-import tg from '@/assets/tg.svg';
-import CONSTANTS from '@/constants';
-import { useEffect } from 'react';
-import { useAtom, useSetAtom } from 'jotai';
-import { addressAtom } from '@/store/claims.atoms';
-import {
-  capitalize,
-  shortAddress,
-  MyMenuListProps,
-  MyMenuItemProps,
-} from '@/utils';
 import { getStarknet } from 'get-starknet-core';
-import { WalletName, lastWalletAtom } from '@/store/utils.atoms';
+import { useAtom, useSetAtom } from 'jotai';
+import { useEffect } from 'react';
 
 export default function Navbar() {
   const { address, chainId, status, connector } = useAccount();
@@ -175,6 +175,7 @@ export default function Navbar() {
               bgColor={'purple'}
               color="white"
               borderColor={'purple'}
+              borderWidth="1px"
               _hover={{
                 bg: 'bg',
                 borderColor: 'purple',
@@ -184,7 +185,6 @@ export default function Navbar() {
               _active={{
                 bg: 'bg',
                 borderColor: 'purple',
-                borderWidth: '1px',
                 color: 'purple',
               }}
               marginLeft={'10px'}
