@@ -65,7 +65,7 @@ export default function Strategies() {
           width={{ base: 'calc(100% - 40px)', md: 'calc(100% - 80px)' }}
           opacity={'0.5'}
           fontSize={'15px'}
-          fontFamily={'arial'}
+          fontFamily={`"Poppins", 'Trebuchet MS', sans-serif`}
         >
           {strat.description}
         </Box>
@@ -223,7 +223,7 @@ export default function Strategies() {
         color="light_grey"
         fontSize={'13px'}
         marginBottom={'10px'}
-        fontFamily={'arial'}
+        fontFamily={`"Poppins", 'Trebuchet MS', sans-serif`}
       >
         Strategies are combination of deposit & borrow actions that combine
         various pools and risk combinations to maximize yield. We currently have

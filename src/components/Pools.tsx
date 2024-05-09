@@ -165,7 +165,7 @@ export default function Pools() {
         <Card variant={'filled'} bg="opacity_50p" color={'purple'}>
           <CardBody paddingTop={'5px'} paddingBottom={'5px'}>
             <HStack width={'100%'}>
-              <Heading width={{ base: '50%', md: '33%' }} size="md">
+              <Heading width={{ base: '50%', md: '33%' }} size="sm">
                 Pool
               </Heading>
               <Stack
@@ -174,7 +174,7 @@ export default function Pools() {
               >
                 <Heading
                   width={{ base: '100%', md: '50%' }}
-                  size="md"
+                  size="sm"
                   textAlign={{ base: 'right', md: 'center' }}
                 >
                   STRK APY(%)
