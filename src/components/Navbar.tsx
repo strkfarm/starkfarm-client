@@ -172,6 +172,7 @@ export default function Navbar() {
             <MenuButton
               as={Button}
               rightIcon={<ChevronDownIcon />}
+              iconSpacing={{ base: '1px', sm: '5px' }}
               bgColor={'purple'}
               color="white"
               borderColor={'purple'}
@@ -188,7 +189,11 @@ export default function Navbar() {
                 color: 'purple',
               }}
               marginLeft={'10px'}
-              display={{ base: 'none', sm: 'flex' }}
+              display={{ base: 'flex' }}
+              height={{ base: '2rem', sm: '2.5rem' }}
+              my={{ base: 'auto', sm: 'initial' }}
+              paddingX={{ base: '0.5rem', sm: '1rem' }}
+              fontSize={{ base: '0.9rem', sm: '1rem' }}
             >
               <Center>
                 {status === 'connecting' || status === 'reconnecting' ? (
@@ -203,20 +208,23 @@ export default function Navbar() {
             <MenuList {...MyMenuListProps}>
               {/* connectors */}
               {status !== 'connected' &&
-                connectors.map((conn) => (
+                connectors.map((connector) => (
                   <MenuItem
                     {...MyMenuItemProps}
-                    key={conn.name}
+                    key={connector.id}
                     onClick={() => {
-                      connect({ connector: conn });
+                      connect({ connector });
                     }}
                   >
-                    <Avatar
-                      src={conn.icon.light}
-                      size={'2xs'}
-                      marginRight={'5px'}
-                    />
-                    {capitalize(conn.name)}
+                    {(connector.id === 'braavos' ||
+                      connector.id === 'argentX') && (
+                      <Avatar
+                        src={connector?.icon?.light}
+                        size={'2xs'}
+                        marginRight={'8px'}
+                      />
+                    )}
+                    {capitalize(connector.id)}
                   </MenuItem>
                 ))}
 

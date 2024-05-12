@@ -1,27 +1,24 @@
 'use client';
 
-import * as React from 'react';
-
-import { sepolia } from '@starknet-react/chains';
 import {
-  StarknetConfig,
-  argent,
-  braavos,
-  useInjectedConnectors,
-  jsonRpcProvider,
-} from '@starknet-react/core';
-import {
-  ChakraBaseProvider,
-  extendTheme,
-  Flex,
   Center,
+  ChakraBaseProvider,
   Container,
+  Flex,
+  extendTheme,
 } from '@chakra-ui/react';
+import { sepolia } from '@starknet-react/chains';
+import { StarknetConfig, jsonRpcProvider } from '@starknet-react/core';
 import { Provider as JotaiProvider } from 'jotai';
-import Image from 'next/image';
-import Navbar from '@/components/Navbar';
-import { RpcProviderOptions, constants } from 'starknet';
 import mixpanel from 'mixpanel-browser';
+import Image from 'next/image';
+import * as React from 'react';
+import { RpcProviderOptions, constants } from 'starknet';
+import { ArgentMobileConnector } from 'starknetkit/argentMobile';
+import { InjectedConnector } from 'starknetkit/injected';
+import { WebWalletConnector } from 'starknetkit/webwallet';
+
+import Navbar from '@/components/Navbar';
 
 // ! make page view more dynamic
 mixpanel.init('118f29da6a372f0ccb6f541079cad56b');
@@ -83,14 +80,22 @@ export default function Template({ children }: { children: React.ReactNode }) {
       return args;
     },
   });
-  const { connectors } = useInjectedConnectors({
-    // Show these connectors if the user has no connector installed.
-    recommended: [braavos(), argent()],
-    // Hide recommended connectors if the user has any connector installed.
-    includeRecommended: 'onlyIfNoConnectors',
-    // Randomize the order of the connectors.
-    order: 'alphabetical',
-  });
+
+  // const { connectors } = useInjectedConnectors({
+  //   // Show these connectors if the user has no connector installed.
+  //   recommended: [braavos(), argent()],
+  //   // Hide recommended connectors if the user has any connector installed.
+  //   includeRecommended: 'onlyIfNoConnectors',
+  //   // Randomize the order of the connectors.
+  //   order: 'alphabetical',
+  // });
+
+  const connectors = [
+    new InjectedConnector({ options: { id: 'braavos', name: 'Braavos' } }),
+    new InjectedConnector({ options: { id: 'argentX', name: 'Argent X' } }),
+    new WebWalletConnector({ url: 'https://web.argent.xyz' }),
+    new ArgentMobileConnector(),
+  ];
 
   function getIconNode(icon: typeof import('*.svg'), alt: string) {
     return (
@@ -126,7 +131,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
             </Sidebar>
            */}
             <Container width={'100%'} padding="0px" paddingTop="100px">
-              <Navbar></Navbar>
+              <Navbar />
               <React.Suspense>{children}</React.Suspense>
             </Container>
           </Flex>
