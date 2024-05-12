@@ -41,10 +41,10 @@ export default function Navbar() {
   useEffect(() => {
     console.log('lastWallet', lastWallet);
     if (!address && lastWallet) {
-      const lastConnector = connectors.find((c) => c.name === lastWallet);
+      const lastConnector = connectors.find((c) => c.id === lastWallet);
       console.log('lastWallet connected', lastConnector);
       if (!lastConnector)
-        console.error('last connector name found, but no connector');
+        console.error('last connector id found, but no connector');
       else {
         connect({ connector: lastConnector });
       }
@@ -52,10 +52,10 @@ export default function Navbar() {
   }, [lastWallet]);
 
   useEffect(() => {
-    console.log('lastWallet connector', connector?.name);
+    console.log('lastWallet connector', connector?.id);
     if (connector) {
-      const name: WalletName = connector.name as WalletName;
-      setLastWallet(name);
+      const id: WalletName = connector.id as WalletName;
+      setLastWallet(id);
     }
   }, [connector]);
 
