@@ -1,7 +1,6 @@
 import { getEkubo, getZklend } from "@/services/apiService";
-import { atomWithMutation, atomWithQuery } from "jotai-tanstack-query";
+import {  atomWithQuery } from "jotai-tanstack-query";
 import { atom } from "jotai";
-import { atomWithStorage } from "jotai/utils";
 import { addressAtom } from "./claims.atoms";
 import { Call } from "starknet";
 
