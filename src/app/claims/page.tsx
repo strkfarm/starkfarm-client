@@ -1,6 +1,7 @@
 "use client";
 import {
   Avatar,
+  Box,
   Button,
   Card,
   Container,
@@ -20,6 +21,7 @@ import { useAtomValue } from "jotai";
 import { Call } from "starknet";
 import { toastError, toastSuccess } from "@/utils/toastMessage";
 import { useEffect } from "react";
+import CustomTable from "@/components/Table";
 
 export default function Claim() {
   const { address } = useAccount();
@@ -54,6 +56,22 @@ export default function Claim() {
       });
     }
   }, [isError, isSuccess, error, data]);
+
+
+
+  const columns = [
+    { label: 'Protocol', field: 'col1' },
+    { label: 'Earned', field: 'col2' },
+    { label: 'Claimed', field: 'col3' },
+    { label: 'Unclaimed', field: 'col4' },
+  ];
+  
+  const datas = [
+    { col1: 'Data 1', col2: 'Data 2', col3: 'Data 3', col4: 'Data 4', },
+    // ... add more data objects as needed
+  ];
+  
+
 
   return (
     <Container maxWidth={"1000px"} margin={"0 auto"} padding="30px 10px">
@@ -111,6 +129,14 @@ export default function Claim() {
           </GridItem>
         </Grid>
       )}
+
+
+
+    <Box marginTop="40px" >
+    <CustomTable columns={columns} data={datas} />
+    </Box>
+
+
     </Container>
   );
 }
