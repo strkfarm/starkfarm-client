@@ -16,7 +16,11 @@ import {
 } from "@chakra-ui/react";
 import CONSTANTS from "@/constants";
 import { useAccount, useContractWrite } from "@starknet-react/core";
-import { callsAtom, rewardsAtom } from "@/store/protocolAtomClaim";
+import {
+  callsAtom,
+  protocolsResult,
+  rewardsAtom,
+} from "@/store/protocolAtomClaim";
 import { useAtomValue } from "jotai";
 import { Call } from "starknet";
 import { toastError, toastSuccess } from "@/utils/toastMessage";
@@ -33,6 +37,7 @@ export default function Claim() {
   }: { totalEarned: number; totalClaimed: number; totalUnclaimed: number } =
     useAtomValue(rewardsAtom);
 
+  const protocolsData = useAtomValue(protocolsResult);
   const { writeAsync, data, isPending, isError, error, isSuccess } =
     useContractWrite({
       calls: calls,
@@ -57,21 +62,12 @@ export default function Claim() {
     }
   }, [isError, isSuccess, error, data]);
 
-
-
   const columns = [
-    { label: 'Protocol', field: 'col1' },
-    { label: 'Earned', field: 'col2' },
-    { label: 'Claimed', field: 'col3' },
-    { label: 'Unclaimed', field: 'col4' },
+    { label: "Protocol", field: "name" },
+    { label: "Earned", field: "earned" },
+    { label: "Claimed", field: "claimed" },
+    { label: "Unclaimed", field: "unclaimed" },
   ];
-  
-  const datas = [
-    { col1: 'Data 1', col2: 'Data 2', col3: 'Data 3', col4: 'Data 4', },
-    // ... add more data objects as needed
-  ];
-  
-
 
   return (
     <Container maxWidth={"1000px"} margin={"0 auto"} padding="30px 10px">
@@ -130,13 +126,9 @@ export default function Claim() {
         </Grid>
       )}
 
-
-
-    <Box marginTop="40px" >
-    <CustomTable columns={columns} data={datas} />
-    </Box>
-
-
+      <Box marginTop="40px">
+ <CustomTable  columns={columns} data={protocolsData} />
+      </Box>
     </Container>
   );
 }

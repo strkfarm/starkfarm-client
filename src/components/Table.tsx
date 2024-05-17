@@ -1,8 +1,8 @@
-import { Table, Thead, Tbody, Tr, Th, Td } from '@chakra-ui/react';
+import { Table, Thead, Tbody, Tr, Th, Td, Spinner } from '@chakra-ui/react';
 
 interface CustomTableProps  {
   columns: any[],
-  data: any[]
+  data: any[],
 }
 
 const CustomTable = ({ columns, data }: CustomTableProps) => {
@@ -19,7 +19,7 @@ const CustomTable = ({ columns, data }: CustomTableProps) => {
         {data.map((row, rowIndex) => (
           <Tr  key={rowIndex}>
             {columns.map((column, columnIndex) => (
-              <Td borderBottom="0.1px solid #fff" color="#fff" key={columnIndex}>{row[column.field]}</Td>
+              <Td fontSize="14px" fontWeight="700" borderBottom="0.1px solid #fff" color="#fff" key={columnIndex}>{row[column.field]}</Td>
             ))}
           </Tr>
         ))}
