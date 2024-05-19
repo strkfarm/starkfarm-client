@@ -1,4 +1,15 @@
 /* eslint-disable @next/next/no-img-element */
+import tg from '@/assets/tg.svg';
+import CONSTANTS from '@/constants';
+import { addressAtom } from '@/store/claims.atoms';
+import { WalletName, lastWalletAtom } from '@/store/utils.atoms';
+import {
+  MyMenuItemProps,
+  MyMenuListProps,
+  capitalize,
+  shortAddress,
+} from '@/utils';
+import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
   Avatar,
   Box,
@@ -27,7 +38,8 @@ import {
   MyMenuItemProps,
 } from '@/utils';
 import { getStarknet } from 'get-starknet-core';
-import { WalletName, lastWalletAtom } from '@/store/utils.atoms';
+import { useAtom, useSetAtom } from 'jotai';
+import { useEffect } from 'react';
 
 export default function Navbar() {
   const { address, chainId, status, connector } = useAccount();
@@ -156,6 +168,7 @@ export default function Navbar() {
               color="white"
               fontSize={{ base: 'small' }}
               borderColor={'purple'}
+              borderWidth="1px"
               _hover={{
                 bg: 'bg',
                 borderColor: 'purple',
@@ -165,7 +178,6 @@ export default function Navbar() {
               _active={{
                 bg: 'bg',
                 borderColor: 'purple',
-                borderWidth: '1px',
                 color: 'purple',
               }}
               marginLeft={'10px'}
