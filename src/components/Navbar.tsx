@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import tg from '@/assets/tg.svg';
 import CONSTANTS from '@/constants';
 import { addressAtom } from '@/store/claims.atoms';
@@ -16,7 +17,6 @@ import {
   Center,
   Container,
   Flex,
-  IconButton,
   Link,
   Menu,
   MenuButton,
@@ -26,6 +26,17 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useAccount, useConnect, useDisconnect } from '@starknet-react/core';
+import { ChevronDownIcon } from '@chakra-ui/icons';
+import CONSTANTS from '@/constants';
+import { useEffect } from 'react';
+import { useAtom, useSetAtom } from 'jotai';
+import { addressAtom } from '@/store/claims.atoms';
+import {
+  capitalize,
+  shortAddress,
+  MyMenuListProps,
+  MyMenuItemProps,
+} from '@/utils';
 import { getStarknet } from 'get-starknet-core';
 import { useAtom, useSetAtom } from 'jotai';
 import { useEffect } from 'react';
@@ -71,9 +82,9 @@ export default function Navbar() {
     <Container
       width={'100%'}
       padding={'0'}
-      borderBottom={'1px solid var(--chakra-colors-color2)'}
+      borderBottom={'1px solid #272932'}
       position={'fixed'}
-      bg="bg"
+      bg="#020612"
       zIndex={10000}
       top="0"
     >
@@ -88,20 +99,28 @@ export default function Navbar() {
         width={'100%'}
         maxWidth="1400px"
         margin={'0px auto'}
-        padding={'20px 20px 10px'}
+        padding={'20px 20px 20px'}
       >
-        <Flex width={'100%'}>
+        <Flex display={'flex'} alignItems={'center'} width={'100%'}>
           <Link href="/" margin="0 auto 0 0" textAlign={'left'}>
-            <Text
-              fontSize={{ base: '20px', sm: '25px', md: '30px' }}
-              color={'color2'}
-              letterSpacing={'10px'}
-              marginTop={{ base: '7px', sm: '3px', md: '0' }}
-            >
-              <b>STRKFarm</b>
-            </Text>
+            <Box marginTop={{ base: '7px', sm: '3px', md: '0' }}>
+              <Flex alignItems={'center'} gap={2}>
+                <img
+                  src={'/favicon.png'}
+                  width={'30px'}
+                  height={'30px'}
+                  alt={'Logo'}
+                />
+                <img
+                  src={'/strk-text-logo.png'}
+                  width={'120px'}
+                  height={'120px'}
+                  alt={'Logo'}
+                />
+              </Flex>
+            </Box>
           </Link>
-          <Link href={'/claims'} isExternal>
+          {/* <Link href={'/claims'} isExternal>
             <Button
               margin="0 0 0 auto"
               borderColor="color2"
@@ -124,49 +143,22 @@ export default function Navbar() {
             >
               Claims
             </Button>
-          </Link>
+          </Link> */}
           <Link href={CONSTANTS.COMMUNITY_TG} isExternal>
             <Button
-              margin="0 0 0 auto"
-              borderColor="color2"
-              color="color2"
-              variant="outline"
-              rightIcon={
-                <Avatar
-                  size="sm"
-                  bg="highlight"
-                  color="color2"
-                  name="T G"
-                  src={tg.src}
-                />
-              }
-              _hover={{
-                bg: 'color2_50p',
-              }}
-              display={{ base: 'none !important', md: 'flex !important' }}
-              className="glow-button"
+              display={'flex'}
+              justifyContent={'center'}
+              alignItems={'center'}
+              color={'white'}
+              borderRadius={'10px'}
+              bg={'#272932'}
+              _hover={'none'}
+              fontSize={{ base: 'small' }}
+              _activeLink={'none'}
+              _active={'none'}
             >
               Join Telegram
             </Button>
-            <IconButton
-              aria-label="tg"
-              variant={'ghost'}
-              borderColor={'color2'}
-              display={{ base: 'block', md: 'none' }}
-              icon={
-                <Avatar
-                  size="sm"
-                  bg="highlight"
-                  className="glow-button"
-                  name="T G"
-                  color="color2"
-                  src={tg.src}
-                  _hover={{
-                    bg: 'color2_50p',
-                  }}
-                />
-              }
-            />
           </Link>
           <Menu>
             <MenuButton
@@ -174,6 +166,7 @@ export default function Navbar() {
               rightIcon={<ChevronDownIcon />}
               bgColor={'purple'}
               color="white"
+              fontSize={{ base: 'small' }}
               borderColor={'purple'}
               borderWidth="1px"
               _hover={{

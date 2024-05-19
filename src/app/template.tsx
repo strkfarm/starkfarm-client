@@ -61,8 +61,8 @@ const theme = extendTheme({
     },
   },
   fonts: {
-    heading: `'Courier New', Courier, monospace`,
-    body: `'Courier New', Courier, monospace`,
+    heading: `Poppins", 'Trebuchet MS', sans-serif`,
+    body: `Poppins", 'Trebuchet MS', sans-serif`,
   },
 });
 
@@ -108,7 +108,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
         connectors={connectors}
       >
         <ChakraBaseProvider theme={theme}>
-          <Flex minHeight={'100vh'} bgColor={'bg'}>
+          <Flex minHeight={'100vh'} bgColor={'#020612'}>
             {/* <Sidebar collapsed={true} backgroundColor='var(--chakra-colors-highlight)' style={{"border": '0px'}} collapsedWidth={'150px'}>
               <Center width='100%' marginTop='20px'><Image src={LogoSvg} alt='Logo' height={'50px'}/></Center>
               <Menu style={{"marginTop": '100px', "backgroundColor": '#eecef9'}}
@@ -125,8 +125,13 @@ export default function Template({ children }: { children: React.ReactNode }) {
               </Menu>
             </Sidebar>
            */}
-            <Container width={'100%'} padding="0px" paddingTop="100px">
-              <Navbar></Navbar>
+            <Container
+              fontFamily={`"Poppins", 'Trebuchet MS', sans-serif`}
+              width={'100%'}
+              padding="0px"
+              paddingTop="100px"
+            >
+              <Navbar />
               <React.Suspense>{children}</React.Suspense>
             </Container>
           </Flex>
