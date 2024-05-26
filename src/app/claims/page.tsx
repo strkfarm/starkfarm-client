@@ -1,6 +1,7 @@
 "use client";
 import {
   Avatar,
+  Box,
   Button,
   Card,
   Container,
@@ -15,11 +16,16 @@ import {
 } from "@chakra-ui/react";
 import CONSTANTS from "@/constants";
 import { useAccount, useContractWrite } from "@starknet-react/core";
-import { callsAtom, rewardsAtom } from "@/store/protocolAtomClaim";
+import {
+  callsAtom,
+  protocolsResult,
+  rewardsAtom,
+} from "@/store/protocolAtomClaim";
 import { useAtomValue } from "jotai";
 import { Call } from "starknet";
 import { toastError, toastSuccess } from "@/utils/toastMessage";
 import { useEffect } from "react";
+import CustomTable from "@/components/Table";
 
 export default function Claim() {
   const { address } = useAccount();
@@ -31,6 +37,7 @@ export default function Claim() {
   }: { totalEarned: number; totalClaimed: number; totalUnclaimed: number } =
     useAtomValue(rewardsAtom);
 
+  const protocolsData = useAtomValue(protocolsResult);
   const { writeAsync, data, isPending, isError, error, isSuccess } =
     useContractWrite({
       calls: calls,
@@ -54,6 +61,13 @@ export default function Claim() {
       });
     }
   }, [isError, isSuccess, error, data]);
+
+  const columns = [
+    { label: "Protocol", field: "name" },
+    { label: "Earned", field: "earned" },
+    { label: "Claimed", field: "claimed" },
+    { label: "Unclaimed", field: "unclaimed" },
+  ];
 
   return (
     <Container maxWidth={"1000px"} margin={"0 auto"} padding="30px 10px">
@@ -111,6 +125,10 @@ export default function Claim() {
           </GridItem>
         </Grid>
       )}
+
+      <Box marginTop="40px">
+ <CustomTable  columns={columns} data={protocolsData} />
+      </Box>
     </Container>
   );
 }

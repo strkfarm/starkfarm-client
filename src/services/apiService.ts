@@ -31,8 +31,9 @@ interface EkuboReward {
 }
 
 export const getZklend = async ({ queryKey }: any) => {
+  const [address, _] = queryKey;
   const { data }: { data: ZklendReward[] } = await axios.get(
-    `/zklend/api/reward/all/${CONSTANTS.ZKLEND.TEST_ADDRESS}`
+    `/zklend/api/reward/all/${address}`
   );
   if (data.length > 0) {
     const unclaimedRewards: ZklendReward[] = data.filter(
@@ -56,14 +57,15 @@ export const getZklend = async ({ queryKey }: any) => {
     const { totalEarned, totalClaimed, totalUnclaimed } =
       calcZklendRewards(data);
     let calls = contracts.length > 0 ? getCallData(contracts) : [];
-    return { totalEarned, totalClaimed, totalUnclaimed, calls };
+    return { totalEarned, totalClaimed, totalUnclaimed, calls, name: "Zklend" };
   }
-  return [];
+  return { totalEarned: 0, totalClaimed: 0, totalUnclaimed: 0, calls: [],  name: "Zklend" };
 };
 
 export const getEkubo = async ({ queryKey }: any) => {
+  const [address, _] = queryKey;
   const { data }: { data: EkuboReward[] } = await axios.get(
-    `/ekubo/airdrops/${CONSTANTS.EKUBO.TEST_ADDRESS}?token=0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d`
+    `/ekubo/airdrops/${address}?token=0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d`
   );
   if (data.length > 0) {
     const contracts: ClaimRewardsProps[] = await Promise.all(
@@ -91,9 +93,12 @@ export const getEkubo = async ({ queryKey }: any) => {
     const { totalEarned, totalClaimed, totalUnclaimed } =
       calcEkuboRewards(contracts);
 
-    let unclaimedContracts = contracts.filter((contract) => contract.claimed != true);
-    let calls = unclaimedContracts.length > 0 ? getCallData(unclaimedContracts) : [];
-    return { totalEarned, totalClaimed, totalUnclaimed, calls };
+    let unclaimedContracts = contracts.filter(
+      (contract) => contract.claimed != true
+    );
+    let calls =
+      unclaimedContracts.length > 0 ? getCallData(unclaimedContracts) : [];
+    return { totalEarned, totalClaimed, totalUnclaimed, calls,  name: "Ekubo" };
   }
-  return [];
+  return { totalEarned: 0, totalClaimed: 0, totalUnclaimed: 0, calls: [],  name: "Ekubo" };
 };

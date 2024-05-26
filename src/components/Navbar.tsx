@@ -68,7 +68,7 @@ export default function Navbar() {
     if (connector) {
       const name: WalletName = connector.name as WalletName;
       setLastWallet(name);
-      setAddress(address);
+      setAddress("0x052a2dffcfa271420af69ae50b13345ccaa38fc04b09f350f33c8d0e3850a232");
     }
   }, [connector]);
 
