@@ -14,7 +14,7 @@ Before starting, ensure you have the following:
 
 1. Define the Protocol Class
 
-Create a new file for your protocol, e.g., `myprotocol.store.ts`. Import necessary modules and extend the IDapp class.
+Create a new file for your protocol, e.g., `myprotocol.store.ts` in `src/store`. Import necessary modules and extend the IDapp class.
 
 ```TypeScript
 'use client';
@@ -311,4 +311,23 @@ const MyProtocolAtoms: ProtocolAtoms = {
 };
 
 export default MyProtocolAtoms;
+```
+
+6. Import Protocol in `src/store/pools.ts`
+
+```TypeScript
+import MyProtocolAtoms, { myProtocol } from './myprotocol.store';
+```
+
+7. Add Protocol to PROTOCOLS array `src/store/pools.ts`
+
+```TypeScript
+export const PROTOCOLS = [
+    // other protocols...
+    {
+        name: myprotocol.name,
+        class: myprotocol,
+        atoms: MyProtocolAtoms,
+    }
+]
 ```
