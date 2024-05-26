@@ -319,7 +319,7 @@ export default MyProtocolAtoms;
 import MyProtocolAtoms, { myProtocol } from './myprotocol.store';
 ```
 
-7. Add Protocol to PROTOCOLS array `src/store/pools.ts`
+7. Add Protocol to `PROTOCOLS` array `src/store/pools.ts`
 
 ```TypeScript
 export const PROTOCOLS = [
