@@ -27,7 +27,7 @@ export default function Navbar() {
   const address = useAtom(addressAtom)[0];
 
   const connectWallet = async () => {
-    const { wallet } = await connect();
+    const { wallet } = await connect({ dappName: 'STRKFarm' });
 
     if (wallet && wallet.isConnected) {
       setAddress(wallet.selectedAddress);
