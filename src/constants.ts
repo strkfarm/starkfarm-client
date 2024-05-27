@@ -32,6 +32,8 @@ const CONSTANTS = {
   EKUBO: {
     CLAIMS_URL:
       '/ekubo/airdrops/{{address}}?token=0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
+    BASE_APR_API: '/ekubo/pair',
+    BASE_PRICE_API: '/ekubo/price',
   },
   CONTRACTS: {
     Master: '0x50314707690c31597849ed66a494fb4279dc060f8805f21593f52906846e28e',
@@ -44,6 +46,16 @@ const CONSTANTS = {
 };
 
 export const TOKENS: TokenInfo[] = [
+  {
+    token: '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
+    name: 'ETH',
+    decimals: 18,
+    displayDecimals: 2,
+    logo: CONSTANTS.LOGOS.ETH,
+    minAmount: MyNumber.fromEther('10', 18),
+    maxAmount: MyNumber.fromEther('10000', 18),
+    stepAmount: MyNumber.fromEther('10', 18),
+  },
   {
     token: '0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
     name: 'STRK',
@@ -80,6 +92,16 @@ export const TOKENS: TokenInfo[] = [
     decimals: 6,
     displayDecimals: 2,
     logo: CONSTANTS.LOGOS.USDC,
+    minAmount: MyNumber.fromEther('10', 6),
+    maxAmount: MyNumber.fromEther('10000', 6),
+    stepAmount: MyNumber.fromEther('10', 6),
+  },
+  {
+    token: '0x068f5c6a61780768455de69077e07e89787839bf8166decfbf92b645209c0fb8',
+    name: 'USDT',
+    decimals: 6,
+    displayDecimals: 2,
+    logo: CONSTANTS.LOGOS.USDT,
     minAmount: MyNumber.fromEther('10', 6),
     maxAmount: MyNumber.fromEther('10000', 6),
     stepAmount: MyNumber.fromEther('10', 6),
