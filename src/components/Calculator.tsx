@@ -35,6 +35,35 @@ interface RefinedBadgeProps {
   children: React.ReactNode;
 }
 
+interface CustomTickProps {
+  x?: number;
+  y?: number;
+  payload?: {
+    value: any;
+    index: number;
+  };
+}
+
+const CustomXAxisTick: React.FC<CustomTickProps> = ({
+  x,
+  y,
+  payload = { value: 0, index: 0 },
+}) => {
+  const shouldDisplayTick = payload.index % 3 === 0;
+
+  if (!shouldDisplayTick) {
+    return <></>;
+  }
+
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={0} dy={16} textAnchor="end" fill="#666">
+        {payload.value}
+      </text>
+    </g>
+  );
+};
+
 const tokenList = [
   {
     name: 'STRK',
@@ -116,24 +145,6 @@ function RefinedBadge({
   );
 }
 
-const CustomXAxisTick = (props: any) => {
-  const { x, y, payload } = props;
-  const shouldDisplayTick = payload.index % 3 === 0; // Display every third tick
-
-  return shouldDisplayTick ? (
-    <g transform={`translate(${x},${y})`}>
-      <text
-        x={0}
-        y={0}
-        dy={16}
-        textAnchor="end"
-        fill="#666"
-      >
-        {payload.value}
-      </text>
-    </g>
-  ) : null;
-};
 export const Calculator: React.FC = () => {
   const [isInvert, setIsInvert] = useState(false);
   const [chartPeriod, setChartPeriod] = useState({
@@ -271,8 +282,8 @@ export const Calculator: React.FC = () => {
   }, [pair1, pair2]);
 
   useEffect(() => {
-      setPair1(pair2);
-      setPair2(pair1);
+    setPair1(pair2);
+    setPair2(pair1);
   }, [isInvert]);
 
   useEffect(() => {
@@ -752,7 +763,7 @@ export const Calculator: React.FC = () => {
             <XAxis
               dataKey={'price'}
               tickFormatter={(value) => value}
-              tick={CustomXAxisTick}
+              tick={<CustomXAxisTick />}
               tickLine={{ stroke: '#334E68' }}
             />
             <YAxis tickLine={{ stroke: '#5843D7' }} />

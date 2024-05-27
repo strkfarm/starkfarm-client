@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-import tg from '@/assets/tg.svg';
 import CONSTANTS from '@/constants';
 import { addressAtom } from '@/store/claims.atoms';
 import { WalletName, lastWalletAtom } from '@/store/utils.atoms';
@@ -26,19 +25,8 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useAccount, useConnect, useDisconnect } from '@starknet-react/core';
-import { ChevronDownIcon } from '@chakra-ui/icons';
-import CONSTANTS from '@/constants';
-import { useEffect } from 'react';
-import { useAtom, useSetAtom } from 'jotai';
-import { addressAtom } from '@/store/claims.atoms';
-import {
-  capitalize,
-  shortAddress,
-  MyMenuListProps,
-  MyMenuItemProps,
-} from '@/utils';
 import { getStarknet } from 'get-starknet-core';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai/react';
 import { useEffect } from 'react';
 
 export default function Navbar() {
