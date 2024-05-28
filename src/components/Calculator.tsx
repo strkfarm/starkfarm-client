@@ -1,7 +1,8 @@
 'use client';
 /* eslint-disable padded-blocks */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { SettingsIcon } from '@chakra-ui/icons';
+import { QuestionIcon, SettingsIcon } from '@chakra-ui/icons';
+import { Tooltip as Tippy } from '@chakra-ui/react';
 import {
   Box,
   InputGroup,
@@ -33,6 +34,58 @@ interface RefinedBadgeProps {
   onClick: () => void;
   children: React.ReactNode;
 }
+
+interface CustomTickProps {
+  x?: number;
+  y?: number;
+  payload?: {
+    value: any;
+    index: number;
+  };
+}
+
+const CustomXAxisTick: React.FC<CustomTickProps> = ({
+  x,
+  y,
+  payload = { value: 0, index: 0 },
+}) => {
+  const shouldDisplayTick = payload.index % 3 === 0;
+
+  if (!shouldDisplayTick) {
+    return <></>;
+  }
+
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <text x={0} y={0} dy={16} textAnchor="end" fill="#666">
+        {payload.value}
+      </text>
+    </g>
+  );
+};
+
+const tokenList = [
+  {
+    name: 'STRK',
+    img: 'https://cryptologos.cc/logos/starknet-token-strk-logo.svg?v=032',
+  },
+  {
+    name: 'ETH',
+    img: 'https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=032',
+  },
+  {
+    name: 'DAI',
+    img: 'https://cryptologos.cc/logos/multi-collateral-dai-dai-logo.svg?v=032',
+  },
+  {
+    name: 'USDC',
+    img: 'https://cryptologos.cc/logos/usd-coin-usdc-logo.svg?v=032',
+  },
+  {
+    name: 'USDT',
+    img: 'https://cryptologos.cc/logos/tether-usdt-logo.svg?v=032',
+  },
+];
 
 function getYFromX(x: number, sa: number, sb: number, sp: number): number {
   return (x * (sp - sa) * sp * sb) / (sb - sp);
@@ -93,7 +146,7 @@ function RefinedBadge({
 }
 
 export const Calculator: React.FC = () => {
-  const [isStrk, setIsStrk] = useState(false);
+  const [isInvert, setIsInvert] = useState(false);
   const [chartPeriod, setChartPeriod] = useState({
     twoWeek: false,
     oneMonth: true,
@@ -111,10 +164,7 @@ export const Calculator: React.FC = () => {
     twoYear: false,
   };
 
-  const [tokenUSD, setTokenUSD] = useState({
-    bitcoin: {
-      usd: 61381,
-    },
+  const [tokenUSD, setTokenUSD] = useState<any>({
     dai: {
       usd: 0.999849,
     },
@@ -135,21 +185,36 @@ export const Calculator: React.FC = () => {
   const xDecimals = 18;
   const yDecimals = 18;
 
+  const [imgToken, setImgToken] = useState(
+    'https://cryptologos.cc/logos/starknet-token-strk-logo.svg?v=032',
+  );
   const [simulationPeriod, setSimulationPeriod] = useState(14);
   const [expectedYieldPercent, setExpectedYieldPeriod] = useState(100);
 
-  const [Pa, setPa] = useState(1500);
-  const [Pb, setPb] = useState(1700);
-  const [P, setP] = useState(1600);
+  const [pair1, setPair1] = useState('STRK');
+  const [pair2, setPair2] = useState('ETH');
+
+  const [Pa, setPa] = useState('1500');
+  const [Pb, setPb] = useState('1700');
+  const [P, setP] = useState('1600');
   const [yPrice, setYPrice] = useState(2.0);
   const x = Math.pow(10, 18); // initial ETH investment
-  const y = getYFromX(x, Math.sqrt(Pa), Math.sqrt(Pb), Math.sqrt(P));
+  const y = getYFromX(
+    x,
+    Math.sqrt(Number(Pa)),
+    Math.sqrt(Number(Pb)),
+    Math.sqrt(Number(P)),
+  );
 
-  const Pdiff = Pb - Pa;
+  const [Pdiff, setPdiff] = useState<any>(Number(Pb) - Number(Pa));
   const step = (Pdiff * 2) / 100;
 
   const dataRows: any[] = [];
-  for (let Pnow = Pa - Pdiff / 2; Pnow <= Pb + Pdiff / 2; Pnow += step) {
+  for (
+    let Pnow = Number(Pa) - Pdiff / 2;
+    Pnow <= Number(Pb) + Pdiff / 2;
+    Pnow += step
+  ) {
     const xPrice = yPrice * (Pnow * Math.pow(10, xDecimals - yDecimals));
     const hdl = get_hodlings_usd(
       x / Math.pow(10, xDecimals),
@@ -157,23 +222,23 @@ export const Calculator: React.FC = () => {
       y / Math.pow(10, yDecimals),
       yPrice,
     );
-    const il = get_il(Pnow, P, Pa, Pb);
+    const il = get_il(Pnow, Number(P), Number(Pa), Number(Pb));
     const valueWithIL = hdl * (1 + il);
     const expectedYield =
       (hdl * (expectedYieldPercent / 100) * simulationPeriod) / 365;
     const netValue = valueWithIL + expectedYield;
     dataRows.push({
-      price: Pnow,
-      hodl: hdl,
-      ILValue: valueWithIL,
-      netValue,
+      price: Pnow.toFixed(2),
+      hodl: hdl.toFixed(2),
+      ILValue: valueWithIL.toFixed(2),
+      netValue: netValue.toFixed(2),
     });
   }
 
   const fetchInitialPrices = useCallback(async () => {
     try {
       const response = await fetch(
-        `https://api.coingecko.com/api/v3/simple/price?ids=ethereum,starknet,tether,usd-coin,dai,bitcoin&vs_currencies=usd`,
+        `https://api.coingecko.com/api/v3/simple/price?ids=ethereum,starknet,tether,usd-coin,dai&vs_currencies=usd`,
       );
 
       if (!response.ok) {
@@ -196,11 +261,30 @@ export const Calculator: React.FC = () => {
 
   useEffect(() => {
     fetchInitialPrices();
+    setP(String((tokenUSD.starknet.usd / tokenUSD.ethereum.usd).toFixed(7)));
   }, []);
 
   useEffect(() => {
     setYPrice(tokenUSD.starknet.usd);
   }, [tokenUSD]);
+
+  useEffect(() => {
+    const pair: any = {
+      USDT: 'tether',
+      ETH: 'ethereum',
+      DAI: 'dai',
+      STRK: 'starknet',
+      USDC: 'usd-coin',
+    };
+    const key1 = pair[pair1];
+    const key2 = pair[pair2];
+    setP(String((tokenUSD[key1].usd / tokenUSD[key2].usd).toFixed(7)));
+  }, [pair1, pair2]);
+
+  useEffect(() => {
+    setPair1(pair2);
+    setPair2(pair1);
+  }, [isInvert]);
 
   useEffect(() => {
     const period = chartPeriod.twoWeek
@@ -218,8 +302,6 @@ export const Calculator: React.FC = () => {
                 : 90;
     setSimulationPeriod(period);
   }, [chartPeriod]);
-
-  console.log(dataRows);
 
   return (
     <Box
@@ -287,21 +369,39 @@ export const Calculator: React.FC = () => {
               border={'#414B73 solid 2px'}
               borderRadius={'10px'}
             >
-              <Img
-                src="https://cryptologos.cc/logos/starknet-token-strk-logo.svg?v=032"
-                width={5}
-              />
+              <Img src={imgToken} width={5} />
               <Select
                 fontSize={isMobile ? 'small' : 'normal'}
                 border={'none'}
+                onChange={(e) => {
+                  try {
+                    const choosen = tokenList.filter(
+                      (item) => item.name === e.target.value,
+                    );
+                    setImgToken(choosen[0].img);
+                    setPair1(e.target.value);
+                  } catch {
+                    setImgToken(
+                      'https://cryptologos.cc/logos/starknet-token-strk-logo.svg?v=032',
+                    );
+                    setPair1('STRK');
+                  }
+                }}
                 _focus={{
                   outline: 'none',
                   boxShadow: 'none',
                   border: 'none',
                 }}
-                placeholder="STRK"
               >
-                <option value="STRK">STRK</option>
+                {tokenList.map((data, index) => (
+                  <option
+                    key={index}
+                    value={data.name}
+                    style={{ background: '#414B73', display: 'inline-block' }}
+                  >
+                    {data.name}
+                  </option>
+                ))}
               </Select>
             </InputGroup>
           </Box>
@@ -320,20 +420,24 @@ export const Calculator: React.FC = () => {
                   boxShadow: 'none',
                   border: 'none',
                 }}
-                placeholder="Select a token"
+                value={'ETH'}
+                onChange={(e) => {
+                  if (e.target.value === '') {
+                    setPair2('ETH');
+                  } else {
+                    setPair2(e.target.value);
+                  }
+                }}
               >
-                <option color="black" value="ETH">
-                  ETH
-                </option>
-                <option color="black" value="USDC">
-                  USDC
-                </option>
-                <option color="black" value="USDT">
-                  USDT
-                </option>
-                <option color="black" value="DAI">
-                  DAI
-                </option>
+                {tokenList.map((data, index) => (
+                  <option
+                    key={index}
+                    value={data.name}
+                    style={{ background: '#414B73', display: 'inline-block' }}
+                  >
+                    {data.name}
+                  </option>
+                ))}
               </Select>
             </InputGroup>
           </Box>
@@ -352,15 +456,15 @@ export const Calculator: React.FC = () => {
             Liquidity range
           </Text>
           <Text fontSize={'small'} fontWeight={600} color={'#B5B5B5'}>
-            STRK for ETH
+            {pair1} for {pair2}
           </Text>
         </Box>
         <Flex mb={'5'} gap={'2px'} justifyContent={'end'}>
-          <RefinedBadge onClick={() => setIsStrk(true)} switch={isStrk}>
-            STRK
+          <RefinedBadge onClick={() => setIsInvert(false)} switch={!isInvert}>
+            {isInvert ? pair2 : pair1}
           </RefinedBadge>
-          <RefinedBadge onClick={() => setIsStrk(false)} switch={!isStrk}>
-            ETH
+          <RefinedBadge onClick={() => setIsInvert(true)} switch={isInvert}>
+            {!isInvert ? pair2 : pair1}
           </RefinedBadge>
         </Flex>
         <Flex gap={isMobile ? '1' : '5'} justifyContent={'space-between'}>
@@ -370,14 +474,23 @@ export const Calculator: React.FC = () => {
               mb={'2'}
               color={'#B5B5B5'}
             >
-              Current price
+              Current price{' '}
+              <Tippy
+                hasArrow
+                label="Current price of the token pair"
+                bg="gray.300"
+                color="black"
+                placement="right"
+              >
+                <QuestionIcon />
+              </Tippy>
             </Text>
             <InputGroup color={'#B5B5B5'} size={'md'}>
               <Input
                 border={'solid 1px #3F4971'}
                 p="2"
                 onChange={(e) => {
-                  setP(Number(e.target.value));
+                  setP(e.target.value);
                 }}
                 fontSize={isMobile ? '10px' : 'normal'}
                 type={'number'}
@@ -387,7 +500,7 @@ export const Calculator: React.FC = () => {
               />
               <InputRightElement p="2" width="fit-content">
                 <Text fontSize={isMobile ? '10px' : 'normal'} color={'#3F4971'}>
-                  USDT
+                  {`${pair1}/${pair2}`}
                 </Text>
               </InputRightElement>
             </InputGroup>
@@ -402,11 +515,11 @@ export const Calculator: React.FC = () => {
             </Text>
             <InputGroup color={'#B5B5B5'} size={'md'}>
               <Input
-                border={'solid 1px #3F4971'}
+                border={`solid 1px #3F4971`}
                 p="2"
                 type={'number'}
                 onChange={(e) => {
-                  setPa(Number(e.target.value));
+                  setPa(e.target.value);
                 }}
                 value={Pa}
                 fontSize={isMobile ? '10px' : 'normal'}
@@ -415,10 +528,15 @@ export const Calculator: React.FC = () => {
               />
               <InputRightElement p="2" width="fit-content">
                 <Text fontSize={isMobile ? '10px' : 'normal'} color={'#3F4971'}>
-                  USDT
+                  {`${pair1}/${pair2}`}
                 </Text>
               </InputRightElement>
             </InputGroup>
+            {!(Pa <= P) && (
+              <Text color="red.500" fontSize={'8px'} mt="2">
+                Can&apos;t be higher than current price
+              </Text>
+            )}
           </Box>
           <Box>
             <Text
@@ -434,7 +552,7 @@ export const Calculator: React.FC = () => {
                 border={'solid 1px #3F4971'}
                 p="2"
                 onChange={(e) => {
-                  setPb(Number(e.target.value));
+                  setPb(e.target.value);
                 }}
                 value={Pb}
                 type={'number'}
@@ -443,10 +561,15 @@ export const Calculator: React.FC = () => {
               />
               <InputRightElement p="2" width="fit-content">
                 <Text fontSize={isMobile ? '10px' : 'normal'} color={'#3F4971'}>
-                  USDT
+                  {`${pair1}/${pair2}`}
                 </Text>
               </InputRightElement>
             </InputGroup>
+            {!(Pb >= P) && (
+              <Text color="red.500" fontSize={'8px'} mt="2">
+                Can&apos;t be lesser than current price
+              </Text>
+            )}
           </Box>
         </Flex>
       </Box>
@@ -475,7 +598,16 @@ export const Calculator: React.FC = () => {
                 mb={'2'}
                 color={'#B5B5B5'}
               >
-                Amount (STRK)
+                Amount ({pair1}){' '}
+                <Tippy
+                  hasArrow
+                  label={`Amount of ${pair1}`}
+                  bg="gray.300"
+                  color="black"
+                  placement="right"
+                >
+                  <QuestionIcon />
+                </Tippy>
               </Text>
               <InputGroup width={'100%'} color={'#B5B5B5'} size="md">
                 <Input
@@ -484,9 +616,11 @@ export const Calculator: React.FC = () => {
                   fontSize={isMobile ? '12px' : 'normal'}
                   type="text"
                   borderRadius={'6px'}
-                  readOnly
                   color={'#ffff'}
                   fontWeight={'bold'}
+                  onChange={(e) => {
+                    setPdiff(Number(e.target.value));
+                  }}
                   value={Pdiff.toLocaleString()}
                   _placeholder={{ color: '#3F4971' }}
                 />
@@ -498,7 +632,16 @@ export const Calculator: React.FC = () => {
                 mb={'2'}
                 color={'#B5B5B5'}
               >
-                Estimated yield %
+                Estimated yield %{' '}
+                <Tippy
+                  hasArrow
+                  label="Estimate your yield in percentages %"
+                  bg="gray.300"
+                  color="black"
+                  placement="right"
+                >
+                  <QuestionIcon />
+                </Tippy>
               </Text>
               <InputGroup width={'100%'} color={'#B5B5B5'}>
                 <Input
@@ -525,7 +668,16 @@ export const Calculator: React.FC = () => {
               color={'#B5B5B5'}
               mb={'2'}
             >
-              Simulation period
+              Simulation period{' '}
+              <Tippy
+                hasArrow
+                label="Project into days"
+                bg="gray.300"
+                color="black"
+                placement="right"
+              >
+                <QuestionIcon />
+              </Tippy>
             </Text>
             <Flex height={'fit-content'} gap={'2px'}>
               <RefinedBadge
@@ -584,8 +736,6 @@ export const Calculator: React.FC = () => {
           my={'9px'}
           color={'#19E3F0'}
         >
-          {/* Simulation period<span style={{ fontFamily: 'Verdana' }}>(i)</span>: 25
-          days */}
           Simulation period: {simulationPeriod} days
         </Text>
         <Text
@@ -594,7 +744,7 @@ export const Calculator: React.FC = () => {
           fontSize={isMobile ? 'normal' : '20px'}
           fontWeight={'bold'}
         >
-          Position value vs price in STRK per ETH
+          Position value vs price in {pair1} per {pair2}
         </Text>
         <Box width={'100%'} overflowX={'auto'}>
           <LineChart width={750} height={250} data={dataRows}>
@@ -612,12 +762,8 @@ export const Calculator: React.FC = () => {
             <CartesianGrid stroke="#334E68" />
             <XAxis
               dataKey={'price'}
-              label={
-                <Text color={'white'} fontSize={'medium'}>
-                  Price
-                </Text>
-              }
               tickFormatter={(value) => value}
+              tick={<CustomXAxisTick />}
               tickLine={{ stroke: '#334E68' }}
             />
             <YAxis tickLine={{ stroke: '#5843D7' }} />

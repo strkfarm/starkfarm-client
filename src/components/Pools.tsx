@@ -75,7 +75,8 @@ export default function Pools() {
           return (
             <Flex width={'100%'} key={split.title}>
               <Text key="1" width={'70%'}>
-                {split.title} {split.description ? `(${split.description})` : ''}
+                {split.title}{' '}
+                {split.description ? `(${split.description})` : ''}
               </Text>
               <Text width={'30%'} textAlign={'right'} key="2">
                 {split.apr === 'Err' ? split.apr : (split.apr * 100).toFixed(2)}

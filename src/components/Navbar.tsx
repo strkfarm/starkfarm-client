@@ -26,7 +26,7 @@ import {
   MyMenuItemProps,
 } from '@/utils';
 import { getStarknet } from 'get-starknet-core';
-import { useAtom, useSetAtom } from 'jotai';
+import { useAtom, useSetAtom } from 'jotai/react';
 import { useEffect } from 'react';
 
 export default function Navbar() {
