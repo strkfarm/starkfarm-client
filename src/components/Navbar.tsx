@@ -1,13 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import CONSTANTS from '@/constants';
-import { addressAtom } from '@/store/claims.atoms';
 import { WalletName, lastWalletAtom } from '@/store/utils.atoms';
-import {
-  MyMenuItemProps,
-  MyMenuListProps,
-  capitalize,
-  shortAddress,
-} from '@/utils';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
   Avatar,
@@ -25,6 +17,14 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useAccount, useConnect, useDisconnect } from '@starknet-react/core';
+import CONSTANTS from '@/constants';
+import { addressAtom } from '@/store/claims.atoms';
+import {
+  capitalize,
+  shortAddress,
+  MyMenuListProps,
+  MyMenuItemProps,
+} from '@/utils';
 import { getStarknet } from 'get-starknet-core';
 import { useAtom, useSetAtom } from 'jotai/react';
 import { useEffect } from 'react';
