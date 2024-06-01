@@ -86,6 +86,7 @@ Thanks goes to these wonderful people.
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/jedstroke"><img src="https://avatars.githubusercontent.com/u/86930056?v=4?s=100" width="100px;" alt="Jed"/><br /><sub><b>Jed</b></sub></a><br /><a href="#code-jedstroke" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/EjembiEmmanuel"><img src="https://avatars.githubusercontent.com/u/83036156?v=4?s=100" width="100px;" alt="Emmaunuel Ejembi"/><br /><sub><b>Emmaunuel Ejembi</b></sub></a><br /><a href="#code-EjembiEmmanuel" title="Code">💻</a> <a href="#doc-EjembiEmmanuel" title="Documentation">📖</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/kateberryd"><img src="https://avatars.githubusercontent.com/u/35270183?v=4?s=100" width="100px;" alt="Catherine Jonathan"/><br /><sub><b>Catherine Jonathan</b></sub></a><br /><a href="#code-kateberryd" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/NeelkanthTandel"><img src="https://avatars.githubusercontent.com/u/68822066?v=4?s=100" width="100px;" alt="Neelkanth Tandel"/><br /><sub><b>Neelkanth Tandel</b></sub></a><br /><a href="#review-NeelkanthTandel" title="Reviewed Pull Requests">👀</a></td>
     </tr>
   </tbody>
 </table>
