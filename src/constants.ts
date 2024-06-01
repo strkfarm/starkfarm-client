@@ -17,6 +17,9 @@ const CONSTANTS = {
     '/strk-incentives/fetchFile?file=prod-api/lending/lending_strk_grant.json',
   LOGOS,
   COMMUNITY_TG: 'https://t.me/+HQ_eHaXmF-1lZDc1',
+  COMMUNITY_DISCORD: 'https://discord.com',
+  COMMUNITY_MEDIUM: 'https://meduim.com',
+  COMMUNITY_X: 'https://twitter.com/starknet',
   NOSTRA: {
     LENDING_GRAPH_URL: '/nostra/app/data-yqlpb/endpoint/data/v1/action/find',
   },

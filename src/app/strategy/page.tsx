@@ -67,7 +67,7 @@ export default function Strategy() {
       maxWidth={'1000px'}
       margin={'0 auto'}
       padding="30px 10px"
-      fontFamily={'sans-serif'}
+      fontFamily={`"Poppins", 'Trebuchet MS', sans-serif`}
     >
       <Flex marginBottom={'10px'}>
         <Avatar marginRight={'5px'} src={strategy?.holdingTokens[0].logo} />

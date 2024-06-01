@@ -42,14 +42,18 @@
     "mixpanel-browser": "^2.49.0",
     "mustache": "^4.2.0",
     "next": "14.1.0",
+    "pandas-js": "^0.2.4",
     "react": "^18",
     "react-device-detect": "^2.2.3",
     "react-dom": "^18",
+    "react-easy-emoji": "^1.8.1",
     "react-mixpanel": "^1.0.5",
     "react-pro-sidebar": "^1.1.0",
+    "react-responsive": "^10.0.0",
     "react-responsive-carousel": "^3.2.23",
     "react-select": "^5.8.0",
     "react-share": "^5.1.0",
+    "recharts": "^2.12.7",
     "starknet": "^6.4.1",
     "swr": "^2.2.5",
     "wonka": "^6.3.4"
@@ -61,15 +65,15 @@
     "@typescript-eslint/eslint-plugin": "^7.7.0",
     "@typescript-eslint/parser": "^7.7.0",
     "autoprefixer": "^10.0.1",
+    "conventional-changelog": "^5.1.0",
+    "conventional-commits-parser": "^5.0.0",
     "eslint": "^8",
     "eslint-config-next": "14.1.0",
     "eslint-plugin-unused-imports": "^3.1.0",
     "postcss": "^8",
     "prettier": "^3.2.5",
     "tailwindcss": "^3.3.0",
-    "typescript": "^5",
-    "conventional-changelog": "^5.1.0",
-    "conventional-commits-parser": "^5.0.0"
+    "typescript": "^5"
   },
   "engines": {
     "node": "20.x"
