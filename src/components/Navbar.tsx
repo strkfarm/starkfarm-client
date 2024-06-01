@@ -1,13 +1,3 @@
-import tg from '@/assets/tg.svg';
-import CONSTANTS from '@/constants';
-import { addressAtom } from '@/store/claims.atoms';
-import { WalletName, lastWalletAtom } from '@/store/utils.atoms';
-import {
-  MyMenuItemProps,
-  MyMenuListProps,
-  capitalize,
-  shortAddress,
-} from '@/utils';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
   Avatar,
@@ -22,50 +12,51 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Spinner,
   Text,
 } from '@chakra-ui/react';
-import { useAccount, useConnect, useDisconnect } from '@starknet-react/core';
-import { getStarknet } from 'get-starknet-core';
 import { useAtom, useSetAtom } from 'jotai';
-import { useEffect } from 'react';
+import { connect, disconnect } from 'starknetkit';
+
+import tg from '@/assets/tg.svg';
+import CONSTANTS from '@/constants';
+import { addressAtom } from '@/store/claims.atoms';
+import { MyMenuItemProps, MyMenuListProps, shortAddress } from '@/utils';
 
 export default function Navbar() {
-  const { address, chainId, status, connector } = useAccount();
-  const { connect, connectors } = useConnect();
-  const { disconnect, disconnectAsync } = useDisconnect();
   const setAddress = useSetAtom(addressAtom);
-  const [lastWallet, setLastWallet] = useAtom(lastWalletAtom);
-  const getStarknetResult = getStarknet();
+  const address = useAtom(addressAtom)[0];
 
-  useEffect(() => {
-    console.log('lastWallet', lastWallet);
-    if (!address && lastWallet) {
-      const lastConnector = connectors.find((c) => c.name === lastWallet);
-      console.log('lastWallet connected', lastConnector);
-      if (!lastConnector)
-        console.error('last connector name found, but no connector');
-      else {
-        connect({ connector: lastConnector });
-      }
+  const connectWallet = async () => {
+    const { wallet } = await connect({ dappName: 'STRKFarm' });
+
+    if (wallet && wallet.isConnected) {
+      setAddress(wallet.selectedAddress);
     }
-  }, [lastWallet]);
+  };
 
-  useEffect(() => {
-    console.log('lastWallet connector', connector?.name);
-    if (connector) {
-      const name: WalletName = connector.name as WalletName;
-      setLastWallet(name);
-    }
-  }, [connector]);
+  const disconnectWallet = async () => {
+    await disconnect();
+    setAddress('');
+  };
 
-  useEffect(() => {
-    console.log('lastWallet stats', {
-      address,
-      status,
-      connector,
-    });
-  }, [address, status, connector]);
+  // useEffect(() => {
+  //   if (!address && lastWallet) {
+  //     const lastConnector = connectors.find((c) => c.id === lastWallet);
+  //     console.log('lastWallet connected', lastConnector);
+  //     if (!lastConnector)
+  //       console.error('last connector id found, but no connector');
+  //     else {
+  //       connect({ connector: lastConnector });
+  //     }
+  //   }
+  // }, [lastWallet]);
+
+  // useEffect(() => {
+  //   if (connector) {
+  //     const id: WalletName = connector.id as WalletName;
+  //     setLastWallet(id);
+  //   }
+  // }, [connector]);
 
   return (
     <Container
@@ -171,7 +162,8 @@ export default function Navbar() {
           <Menu>
             <MenuButton
               as={Button}
-              rightIcon={<ChevronDownIcon />}
+              rightIcon={address ? <ChevronDownIcon /> : <></>}
+              iconSpacing={{ base: '1px', sm: '5px' }}
               bgColor={'purple'}
               color="white"
               borderColor={'purple'}
@@ -188,50 +180,18 @@ export default function Navbar() {
                 color: 'purple',
               }}
               marginLeft={'10px'}
-              display={{ base: 'none', sm: 'flex' }}
+              display={{ base: 'flex' }}
+              height={{ base: '2rem', sm: '2.5rem' }}
+              my={{ base: 'auto', sm: 'initial' }}
+              paddingX={{ base: '0.5rem', sm: '1rem' }}
+              fontSize={{ base: '0.9rem', sm: '1rem' }}
+              onClick={address ? undefined : connectWallet}
             >
-              <Center>
-                {status === 'connecting' || status === 'reconnecting' ? (
-                  <Spinner size={'sm'} marginRight={'5px'} />
-                ) : (
-                  <></>
-                )}
-                {status === 'connected' && address ? shortAddress(address) : ''}
-                {status === 'disconnected' ? 'Connect' : ''}
-              </Center>
+              <Center>{address ? shortAddress(address) : 'Connect'}</Center>
             </MenuButton>
             <MenuList {...MyMenuListProps}>
-              {/* connectors */}
-              {status !== 'connected' &&
-                connectors.map((conn) => (
-                  <MenuItem
-                    {...MyMenuItemProps}
-                    key={conn.name}
-                    onClick={() => {
-                      connect({ connector: conn });
-                    }}
-                  >
-                    <Avatar
-                      src={conn.icon.light}
-                      size={'2xs'}
-                      marginRight={'5px'}
-                    />
-                    {capitalize(conn.name)}
-                  </MenuItem>
-                ))}
-
-              {/* disconnect buttons  */}
-              {status === 'connected' && address && (
-                <MenuItem
-                  key="disconnect"
-                  {...MyMenuItemProps}
-                  onClick={() => {
-                    disconnectAsync().then((data) => {
-                      console.log('wallet disconnected');
-                      setLastWallet(null);
-                    });
-                  }}
-                >
+              {address && (
+                <MenuItem {...MyMenuItemProps} onClick={disconnectWallet}>
                   Disconnect
                 </MenuItem>
               )}
