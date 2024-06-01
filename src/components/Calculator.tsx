@@ -185,15 +185,17 @@ export const Calculator: React.FC = () => {
   const xDecimals = 18;
   const yDecimals = 18;
 
-  const [imgToken, setImgToken] = useState(
+  const [imgToken1, setImgToken1] = useState(
     'https://cryptologos.cc/logos/starknet-token-strk-logo.svg?v=032',
+  );
+  const [imgToken2, setImgToken2] = useState(
+    'https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=032',
   );
   const [simulationPeriod, setSimulationPeriod] = useState(14);
   const [expectedYieldPercent, setExpectedYieldPeriod] = useState(100);
 
   const [pair1, setPair1] = useState('STRK');
   const [pair2, setPair2] = useState('ETH');
-
   const [Pa, setPa] = useState('1500');
   const [Pb, setPb] = useState('1700');
   const [P, setP] = useState('1600');
@@ -279,11 +281,58 @@ export const Calculator: React.FC = () => {
     const key1 = pair[pair1];
     const key2 = pair[pair2];
     setP(String((tokenUSD[key1].usd / tokenUSD[key2].usd).toFixed(7)));
+    setPa(
+      String(
+        (
+          tokenUSD[key1].usd / tokenUSD[key2].usd -
+          (tokenUSD[key1].usd / tokenUSD[key2].usd) * 0.1
+        ).toFixed(7),
+      ),
+    );
+    setPb(
+      String(
+        (
+          tokenUSD[key1].usd / tokenUSD[key2].usd +
+          (tokenUSD[key1].usd / tokenUSD[key2].usd) * 0.1
+        ).toFixed(7),
+      ),
+    );
   }, [pair1, pair2]);
 
   useEffect(() => {
-    setPair1(pair2);
-    setPair2(pair1);
+    const pair: any = {
+      USDT: 'tether',
+      ETH: 'ethereum',
+      DAI: 'dai',
+      STRK: 'starknet',
+      USDC: 'usd-coin',
+    };
+    if (isInvert) {
+      setPair1(pair2);
+      setPair2(pair1);
+    } else {
+      setPair1(pair1);
+      setPair2(pair2);
+    }
+    const key1 = pair[pair1];
+    const key2 = pair[pair2];
+    setP(String((tokenUSD[key1].usd / tokenUSD[key2].usd).toFixed(7)));
+    setPa(
+      String(
+        (
+          tokenUSD[key1].usd / tokenUSD[key2].usd -
+          (tokenUSD[key1].usd / tokenUSD[key2].usd) * 0.1
+        ).toFixed(7),
+      ),
+    );
+    setPb(
+      String(
+        (
+          tokenUSD[key1].usd / tokenUSD[key2].usd +
+          (tokenUSD[key1].usd / tokenUSD[key2].usd) * 0.1
+        ).toFixed(7),
+      ),
+    );
   }, [isInvert]);
 
   useEffect(() => {
@@ -369,19 +418,22 @@ export const Calculator: React.FC = () => {
               border={'#414B73 solid 2px'}
               borderRadius={'10px'}
             >
-              <Img src={imgToken} width={5} />
+              <Img src={imgToken1} width={5} />
               <Select
                 fontSize={isMobile ? 'small' : 'normal'}
                 border={'none'}
                 onChange={(e) => {
+                  if (pair2 === e.target.value) {
+                    return;
+                  }
                   try {
                     const choosen = tokenList.filter(
                       (item) => item.name === e.target.value,
                     );
-                    setImgToken(choosen[0].img);
+                    setImgToken1(choosen[0].img);
                     setPair1(e.target.value);
                   } catch {
-                    setImgToken(
+                    setImgToken1(
                       'https://cryptologos.cc/logos/starknet-token-strk-logo.svg?v=032',
                     );
                     setPair1('STRK');
@@ -392,6 +444,7 @@ export const Calculator: React.FC = () => {
                   boxShadow: 'none',
                   border: 'none',
                 }}
+                placeholder={"STRK"}
               >
                 {tokenList.map((data, index) => (
                   <option
@@ -409,9 +462,11 @@ export const Calculator: React.FC = () => {
             <InputGroup
               bg={'#292C38'}
               display={'flex'}
+              paddingLeft={'13px'}
               border={'#414B73 solid 2px'}
               borderRadius={'10px'}
             >
+              <Img src={imgToken2} width={5} />
               <Select
                 fontSize={isMobile ? 'small' : 'normal'}
                 border={'none'}
@@ -420,14 +475,24 @@ export const Calculator: React.FC = () => {
                   boxShadow: 'none',
                   border: 'none',
                 }}
-                value={'ETH'}
                 onChange={(e) => {
-                  if (e.target.value === '') {
-                    setPair2('ETH');
-                  } else {
+                  if (pair1 === e.target.value) {
+                    return;
+                  }
+                  try {
+                    const choosen = tokenList.filter(
+                      (item) => item.name === e.target.value,
+                    );
+                    setImgToken2(choosen[0].img);
                     setPair2(e.target.value);
+                  } catch {
+                    setImgToken2(
+                      'https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=032',
+                    );
+                    setPair2('ETH');
                   }
                 }}
+                placeholder={"ETH"}
               >
                 {tokenList.map((data, index) => (
                   <option
