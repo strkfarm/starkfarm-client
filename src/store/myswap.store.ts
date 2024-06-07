@@ -1,23 +1,15 @@
 'use client';
 
 import CONSTANTS, { TOKENS, TokenName } from '@/constants';
-import {APRSplit, Category, PoolInfo, PoolMetadata, PoolType, ProtocolAtoms, StrkDexIncentivesAtom,} from './pools';
+import { APRSplit, Category, PoolInfo, PoolMetadata, PoolType, ProtocolAtoms, StrkDexIncentivesAtom } from './pools';
 import { atom } from 'jotai';
-type Ekubo = import('./ekobu.store').Ekubo;
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { TokenInfo } from '@/strategies/IStrategy';
 import { IDapp } from './IDapp.store';
-const fetcher = (...args: any[]) => {
-  return fetch(args[0], args[1]).then((res) => res.json());
-};
+import { tokenPricesAtom } from './tokenPrices.store';
 
 interface MySwapBaseAprDoc {
   [key: string]: Pool[];
-}
-
-interface TokenPrice {
-  timestamp: string;
-  price: string;
 }
 
 interface Pool {
@@ -42,81 +34,15 @@ interface PoolsData {
   topPools: Pool[];
 }
 
-type IndexedTokenPrices = Record<string, TokenPrice>;
 type IndexedPools = Record<string, Pool[]>;
 
 const POOL_NAMES: string[] = ['STRK/USDC', 'STRK/ETH', 'ETH/USDC', 'USDC/USDT'];
-const PRICE_PAIRS: string[] = [
-  'STRK/USDC',
-  'ETH/USDC',
-  'USDC/USDC',
-  'USDT/USDC',
-];
 
 export class MySwap extends IDapp<MySwapBaseAprDoc> {
   name = 'MySwap (v2)';
   link = 'https://app.myswap.xyz/#/pools';
   logo = 'https://app.myswap.xyz/favicon.ico';
   incentiveDataKey: string = 'MySwap';
-  _computePoolsInfo(data: any) {
-    try {
-      const myData = data[this.incentiveDataKey];
-      if (!myData) return [];
-      const pools: PoolInfo[] = [];
-
-      Object.keys(myData)
-        .filter(this.commonVaultFilter)
-        .forEach((poolName) => {
-          const arr = myData[poolName];
-          let category = Category.Others;
-          if (poolName === 'USDC/USDT') {
-            category = Category.Stable;
-          } else if (poolName.includes('STRK')) {
-            category = Category.STRK;
-          }
-
-          const tokens: TokenName[] = <TokenName[]>poolName.split('/');
-          const logo1 = CONSTANTS.LOGOS[tokens[0]];
-          const logo2 = CONSTANTS.LOGOS[tokens[1]];
-
-          const poolInfo: PoolInfo = {
-            pool: {
-              name: poolName,
-              logos: [logo1, logo2],
-            },
-            protocol: {
-              name: this.name,
-              link: this.link,
-              logo: this.logo,
-            },
-            apr: arr[arr.length - 1].apr,
-            tvl: arr[arr.length - 1].tvl_usd,
-            aprSplits: [
-              {
-                apr: arr[arr.length - 1].apr,
-                title: 'STRK rewards',
-                description: 'Starknet DeFi Spring incentives',
-              },
-            ],
-            category,
-            type: PoolType.DEXV3,
-            lending: {
-              collateralFactor: 0,
-            },
-            borrow: {
-              borrowFactor: 0,
-              apr: 0,
-            },
-          };
-          pools.push(poolInfo);
-        });
-
-      return pools;
-    } catch (err) {
-      console.error('Error fetching pools', err);
-      throw err;
-    }
-  }
 
   commonVaultFilter(poolName: string) {
     const supportedPools = [
@@ -130,7 +56,6 @@ export class MySwap extends IDapp<MySwapBaseAprDoc> {
       'STRK',
     ];
     console.log('filter2', poolName, supportedPools.includes(poolName));
-    // return !poolName.includes('DAI') && !poolName.includes('WSTETH') && !poolName.includes('BTC');
     return supportedPools.includes(poolName);
   }
 
@@ -197,7 +122,7 @@ const fetchData = async <T>(
       const token1 = tokensMetadata[token1Name];
 
       const response = await fetch(
-        `${CONSTANTS.EKUBO[apiPath]}/${token0.token}/${token1.token}`,
+        `${CONSTANTS.MYSWAP[apiPath]}/${token0.token}/${token1.token}`,
       );
       const data = await response.json();
 
@@ -217,18 +142,18 @@ const MySwapAtoms: ProtocolAtoms = {
         TOKENS.map((token) => [token.name, token]),
       );
 
-      const indexedTokenPrices: IndexedTokenPrices = await fetchData(
-        PRICE_PAIRS,
-        'BASE_PRICE_API',
-        tokensMetadata,
-        (pair, priceData) => [pair.split('/')[0], priceData],
-      );
-
       const indexedPools: IndexedPools = await fetchData(
         POOL_NAMES,
         'BASE_APR_API',
         tokensMetadata,
         (poolName, poolsData: PoolsData) => {
+          const tokenPrices = get(tokenPricesAtom);
+          const indexedTokenPrices = tokenPrices?.data;
+
+          if (!indexedTokenPrices) {
+            throw new Error('Token prices are not available');
+          }
+
           const [token0Name, token1Name] = poolName.split('/');
           const filterResponseData = poolsData.topPools
             .filter(
@@ -265,4 +190,5 @@ const MySwapAtoms: ProtocolAtoms = {
     return empty;
   }),
 };
+
 export default MySwapAtoms;
