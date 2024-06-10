@@ -34,7 +34,7 @@ const CONSTANTS = {
   },
 
   MYSWAP: {
-    BASE_APR_API: '/#/positions',
+    BASE_APR_API: '/#/pools',
     BASE_PRICE_API: '/#/price',
     
   },
