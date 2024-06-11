@@ -11,7 +11,6 @@ import { tokenPricesAtom } from './tokenPrices.store';
 interface MySwapBaseAprDoc {
   [key: string]: Pool[];
 }
-
 interface Pool {
   fee: string;
   tick_spacing: number;
