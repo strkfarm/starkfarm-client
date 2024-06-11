@@ -41,7 +41,68 @@ export class MySwap extends IDapp<MySwapBaseAprDoc> {
   name = 'MySwap (v2)';
   link = 'https://app.myswap.xyz/#/pools';
   logo = 'https://app.myswap.xyz/favicon.ico';
-  incentiveDataKey: string = 'MySwap';
+  
+  incentiveDataKey = 'MySwap';
+
+  _computePoolsInfo(data: any) {
+    try {
+      const myData = data[this.incentiveDataKey];
+      if (!myData) return [];
+      const pools: PoolInfo[] = [];
+
+      Object.keys(myData)
+        .filter(this.commonVaultFilter)
+        .forEach((poolName) => {
+          const arr = myData[poolName];
+          let category = Category.Others;
+          if (poolName === 'USDC/USDT') {
+            category = Category.Stable;
+          } else if (poolName.includes('STRK')) {
+            category = Category.STRK;
+          }
+          const tokens: TokenName[] = <TokenName[]>poolName.split('/');
+          const logo1 = CONSTANTS.LOGOS[tokens[0]];
+          const logo2 = CONSTANTS.LOGOS[tokens[1]];
+
+          const poolInfo: PoolInfo = {
+            pool: {
+              name: poolName,
+              logos: [logo1, logo2],
+            },
+            protocol: {
+              name: this.name,
+              link: this.link,
+              logo: this.logo,
+            },
+            apr: arr[arr.length - 1].apr,
+            tvl: arr[arr.length - 1].tvl_usd,
+            aprSplits
+            : [
+              {
+                apr: arr[arr.length - 1].apr,
+                title: 'STRK rewards',
+                description: 'Starknet DeFi Spring incentives',
+              },
+            ],
+            category,
+            type: PoolType.DEXV3,
+            lending: {
+              collateralFactor: 0,
+            },
+            borrow: {
+              borrowFactor: 0,
+              apr: 0,
+            },
+          };
+          pools.push(poolInfo);
+        });
+
+      return pools;
+    } catch (err) {
+      console.error('Error fetching pools', err);
+      throw err;
+    }
+  }
 
   commonVaultFilter(poolName: string) {
     const supportedPools = [
@@ -57,6 +118,7 @@ export class MySwap extends IDapp<MySwapBaseAprDoc> {
     console.log('filter2', poolName, supportedPools.includes(poolName));
     return supportedPools.includes(poolName);
   }
+
 
   getBaseAPY(p: PoolInfo, data: AtomWithQueryResult<MySwapBaseAprDoc, Error>) {
     let baseAPY: number | 'Err' = 'Err';
