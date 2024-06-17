@@ -148,7 +148,7 @@ export const StrkDexIncentivesAtom = atomWithQuery((get) => ({
 export const StrkDegenIncentivesAtom = atomWithQuery((get) => ({
   queryKey: ['isNostraDegen'],
   queryFn: async ({ queryKey }) => {
-    const res = await fetch(CONSTANTS.NOSTRA_DEGEN_INCENTIVE_URL); // common for all
+    const res = await fetch(CONSTANTS.NOSTRA_DEGEN_INCENTIVE_URL); // specific to Nostra Degen
     let data = await res.text();
     data = data.replaceAll('NaN', '0');
     return JSON.parse(data);
