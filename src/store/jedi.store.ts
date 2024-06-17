@@ -34,7 +34,7 @@ export class Jediswap extends IDapp<string> {
   link = 'https://app.jediswap.xyz/#/pool';
   logo = 'https://app.jediswap.xyz/favicon/favicon-32x32.png';
   incentiveDataKey = 'Jediswap_v1';
-  _computePoolsInfo(data: any) {
+   _computePoolsInfo(data: any) {
     try {
       const myData = data[this.incentiveDataKey];
       if (!myData) return [];
@@ -49,6 +49,8 @@ export class Jediswap extends IDapp<string> {
             category = Category.Stable;
           } else if (poolName.includes('STRK')) {
             category = Category.STRK;
+          } else if (poolName.includes('DEGEN')){
+            category = Category.Degen;
           }
 
           const tokens: TokenName[] = <TokenName[]>poolName.split('/');
@@ -72,6 +74,7 @@ export class Jediswap extends IDapp<string> {
                 title: 'STRK rewards',
                 description: 'Starknet DeFi Spring incentives',
               },
+              
             ],
             category,
             type: PoolType.DEXV2,

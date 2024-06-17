@@ -13,6 +13,7 @@ const LOGOS = {
 export type TokenName = 'USDT' | 'USDC' | 'ETH' | 'STRK' | 'WBTC' | 'DAI';
 const CONSTANTS = {
   DEX_INCENTIVE_URL: '/strk-incentives/fetchFile?file=strk_grant.json',
+  DEGEN_INCENTIVE_URL: 'https://api.nostra.finance/query/pool_aprs',
   LENDING_INCENTIVES_URL:
     '/strk-incentives/fetchFile?file=prod-api/lending/lending_strk_grant.json',
   LOGOS,
