@@ -6,7 +6,7 @@
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
 
-# STRKFarm
+# STRKFarm.xyz
 
 STRKFarm is a platform that allows users to better navigate DeFi on Starknet. It has the following features:  
 1. Show top yield generating pools sorted by Protocols and various Categories. 10+ Protocols are integrated. ✅
