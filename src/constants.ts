@@ -33,7 +33,7 @@ const CONSTANTS = {
     BASE_PRICE_API: '/ekubo/price',
   },
   MYSWAP: {
-    BASE_APR_API: '/#/pools',
+    BASE_APR_API: '/#/position?',
     BASE_PRICE_API: '/#/price',
   },
   HAIKO: {
