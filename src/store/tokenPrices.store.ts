@@ -4,6 +4,7 @@ import { TokenInfo } from '@/strategies/IStrategy';
 
 interface TokenPrice {
   timestamp: string;
+
   price: string;
 }
 

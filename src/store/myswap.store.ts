@@ -7,6 +7,7 @@ import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { TokenInfo } from '@/strategies/IStrategy';
 import { IDapp } from './IDapp.store';
 import { tokenPricesAtom } from './tokenPrices.store';
+import { Ekubo } from './ekobu.store'
 
 interface MySwapBaseAprDoc {
   [key: string]: Pool[];
@@ -37,7 +38,7 @@ type IndexedPools = Record<string, Pool[]>;
 
 const POOL_NAMES: string[] = ['STRK/USDC', 'STRK/ETH', 'ETH/USDC', 'USDC/USDT'];
 
-export class MySwap extends IDapp<MySwapBaseAprDoc> {
+export class MySwap extends Ekubo {
   name = 'MySwap (v2)';
   link = 'https://app.myswap.xyz/#/pools';
   logo = 'https://app.myswap.xyz/favicon.ico';
