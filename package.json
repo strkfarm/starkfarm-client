@@ -6,7 +6,7 @@
     "dev": "next dev",
     "start": "next start",
     "lint": "next lint",
-    "build": "next build && node generate-changelog.js && node update-readme.js",
+    "build": "next build",
     "lint:check": "eslint --config .eslintrc.json .",
     "lint:fix": "eslint --config .eslintrc.json . --fix",
     "format:check": "prettier --check \"**/*.{ts,tsx,json}\"",
