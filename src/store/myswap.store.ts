@@ -1,13 +1,12 @@
 'use client';
 
-import CONSTANTS, { TOKENS, TokenName } from '@/constants';
-import { APRSplit, Category, PoolInfo, PoolMetadata, PoolType, ProtocolAtoms, StrkDexIncentivesAtom } from './pools';
+import CONSTANTS, { TOKENS } from '@/constants';
+import { APRSplit, PoolInfo, PoolMetadata, ProtocolAtoms, StrkDexIncentivesAtom } from './pools';
 import { atom } from 'jotai';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { TokenInfo } from '@/strategies/IStrategy';
-import { IDapp } from './IDapp.store';
 import { tokenPricesAtom } from './tokenPrices.store';
-import { Ekubo } from './ekobu.store'
+import { Ekubo } from './ekobu.store';
 
 interface MySwapBaseAprDoc {
   [key: string]: Pool[];
@@ -58,7 +57,6 @@ export class MySwap extends Ekubo {
     console.log('filter2', poolName, supportedPools.includes(poolName));
     return supportedPools.includes(poolName);
   }
-
 
   getBaseAPY(p: PoolInfo, data: AtomWithQueryResult<MySwapBaseAprDoc, Error>) {
     let baseAPY: number | 'Err' = 'Err';

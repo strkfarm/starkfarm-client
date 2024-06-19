@@ -1,10 +1,9 @@
 import { atomWithQuery } from 'jotai-tanstack-query';
-import CONSTANTS, { TOKENS, TokenName } from '@/constants';
+import CONSTANTS, { TOKENS } from '@/constants';
 import { TokenInfo } from '@/strategies/IStrategy';
 
 interface TokenPrice {
   timestamp: string;
-
   price: string;
 }
 

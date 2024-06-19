@@ -97,8 +97,7 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
             },
             apr: arr[arr.length - 1].apr,
             tvl: arr[arr.length - 1].tvl_usd,
-            aprSplits
-            : [
+            aprSplits: [
               {
                 apr: arr[arr.length - 1].apr,
                 title: 'STRK rewards',
