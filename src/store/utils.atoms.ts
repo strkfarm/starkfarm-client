@@ -1,6 +1,8 @@
 import CONSTANTS from '@/constants';
+import axios from 'axios';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import { atomWithStorage, createJSONStorage } from 'jotai/utils';
+import { addressAtom } from './claims.atoms';
 
 export interface BlockInfo {
   data: {
@@ -53,7 +55,7 @@ export async function getBlock(
 
 export const blockInfoNowAtom = atomWithQuery((get) => ({
   queryKey: ['block_now'],
-  queryFn: async ({ queryKey }): Promise<BlockInfo> => {
+  queryFn: async (): Promise<BlockInfo> => {
     console.log('jedi base', 'block now');
     const nowSeconds = Math.round(new Date().getTime() / 1000);
     const res = await getBlock(nowSeconds);
@@ -61,6 +63,81 @@ export const blockInfoNowAtom = atomWithQuery((get) => ({
     return res;
   },
 }));
+
+interface DAppStats {
+  tvl: number;
+}
+
+export const dAppStatsAtom = atomWithQuery((get) => ({
+  queryKey: ['stats'],
+  queryFn: async (): Promise<DAppStats> => {
+    const res = await axios.get('/api/stats');
+    return res.data;
+  },
+}));
+
+interface UserStats {
+  holdingsUSD: number;
+}
+
+export const userStatsAtom = atomWithQuery((get) => ({
+  queryKey: ['user_stats', get(addressAtom)],
+  queryFn: async ({ queryKey }: any): Promise<UserStats | null> => {
+    console.log('queryKey', queryKey);
+    const [_, addr] = queryKey;
+    if (!addr) {
+      return null;
+    }
+    const res = await axios.get(`/api/stats/${addr}`);
+    return res.data;
+  },
+}));
+
+interface Price {
+  tokenName: string;
+  timestamp: string;
+  price: string;
+}
+
+// export const pricesAtom = atomWithQuery((get) => ({
+//     queryKey: ['prices'],
+//     queryFn: async ({ queryKey: [] }): Promise<Price[]> => {
+//         let tokenInfos = [
+//             TOKENS.find(t => t.name == 'zSTRK'),
+//             TOKENS.find(t => t.name == 'zUSDC')
+//         ]
+
+//         let promises = tokenInfos.map(async (tokenInfo) => {
+//             if (tokenInfo) {
+//                 const res = await axios.get(`/price/${tokenInfo.ekuboPriceKey}`)
+//                 return {
+//                     tokenName: tokenInfo.name,
+//                     timestamp: res.data.timestamp,
+//                     price: res.data.price
+//                 }
+//             }
+//             return {
+//                 tokenName: '',
+//                 timestamp: '',
+//                 price: ''
+
+//             };
+//         })
+//         return Promise.all(promises);
+//     },
+// }))
+
+// export const strategyTVLAtom = atom((get) => {
+//     const prices = get(pricesAtom);
+//     const tvl = prices.reduce((acc, price) => {
+//         let tokenInfo = TOKENS.find(t => t.name == price.tokenName)
+//         if (tokenInfo) {
+//             return acc + (parseFloat(price.price) * tokenInfo.totalSupply)
+//         }
+//         return acc;
+//     }, 0)
+//     return tvl;
+// })
 
 export const blockInfoMinus1DAtom = atomWithQuery((get) => ({
   queryKey: ['block_minus_1d'],
@@ -96,17 +173,18 @@ export const blockInfoMinus1DAtom = atomWithQuery((get) => ({
 const ISSERVER = typeof window === 'undefined';
 declare let localStorage: any;
 
-export type WalletName = 'Braavos' | 'Argent X';
-export const lastWalletAtom = atomWithStorage<null | WalletName>(
-  'lastWallet',
-  null,
-  {
-    ...createJSONStorage(() => {
-      if (!ISSERVER) return localStorage;
-      return null;
-    }),
-  },
+export const lastWalletAtom = createAtomWithStorage<null | string>('lastWallet', null);
+
+export function createAtomWithStorage<T>(key: string, defaultValue: T, getter?: (key: string, initialValue: T) => PromiseLike<T>) {
+  let storageConfig = createJSONStorage<T>(() => {
+    if (!ISSERVER) return localStorage;
+    return null;
+  })
+  if (getter) {
+    storageConfig = {...storageConfig, getItem: getter};
+  }
+  return atomWithStorage<T>(key, defaultValue, storageConfig,
   {
     getOnInit: true,
-  },
-);
+  });
+}

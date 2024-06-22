@@ -12,51 +12,87 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
+  Spinner,
   Text,
 } from '@chakra-ui/react';
 import { useAtom, useSetAtom } from 'jotai';
-import { connect, disconnect } from 'starknetkit';
+import { useStarknetkitConnectModal } from 'starknetkit';
 
 import tg from '@/assets/tg.svg';
 import CONSTANTS from '@/constants';
 import { addressAtom } from '@/store/claims.atoms';
 import { MyMenuItemProps, MyMenuListProps, shortAddress } from '@/utils';
+import { useEffect, useState } from 'react';
+import { lastWalletAtom } from '@/store/utils.atoms';
+import { getStarknet } from 'get-starknet-core';
+import { useAccount, useConnect, useDisconnect } from "@starknet-react/core"
+import { MYCONNECTORS } from '@/app/template';
 
 export default function Navbar() {
-  const setAddress = useSetAtom(addressAtom);
-  const address = useAtom(addressAtom)[0];
+  const { address, connector } = useAccount();
+    const {connect, connectors} = useConnect();
+    const { disconnectAsync} = useDisconnect()
+    const setAddress = useSetAtom(addressAtom);
+    const [lastWallet, setLastWallet] = useAtom(lastWalletAtom)
+    const { starknetkitConnectModal: starknetkitConnectModal1 } = useStarknetkitConnectModal({
+      modalMode: 'canAsk',
+      modalTheme: 'dark',
+    });
 
-  const connectWallet = async () => {
-    const { wallet } = await connect({ dappName: 'STRKFarm' });
+    // backup 
+    const { starknetkitConnectModal: starknetkitConnectModal2 } = useStarknetkitConnectModal({
+      modalMode: 'alwaysAsk',
+      modalTheme: 'dark',
+    });
 
-    if (wallet && wallet.isConnected) {
-      setAddress(wallet.selectedAddress);
+    // Connect wallet using starknetkit
+    const connectWallet = async() => {
+      try {
+        const result = await starknetkitConnectModal1()
+        await connect({ connector: result.connector })
+      } catch (error) {
+        try {
+          const result = await starknetkitConnectModal2()
+          await connect({ connector: result.connector })
+        } catch (error) {
+          console.error('connectWallet error', error)
+          alert('Error connecting wallet');
+        }
+      }
     }
-  };
 
-  const disconnectWallet = async () => {
-    await disconnect();
-    setAddress('');
-  };
+    // Auto-connects to last wallet
+    useEffect(() => {
+        console.log('lastWallet', lastWallet, connectors)
+        try {
+          if (!address && lastWallet) {
+              const lastConnector = connectors.find(c => c.name == lastWallet);
+              console.log('lastWallet connected', lastConnector)
+              if (!lastConnector) {
+                console.error('last connector name found, but no connector')
+                setLastWallet(null)
+              } else {
+                connectWallet();
+              }
+          }
+        } catch (error) {
+          console.error('lastWallet error', error)
+        }
+    }, [lastWallet, connectors])
 
-  // useEffect(() => {
-  //   if (!address && lastWallet) {
-  //     const lastConnector = connectors.find((c) => c.id === lastWallet);
-  //     console.log('lastWallet connected', lastConnector);
-  //     if (!lastConnector)
-  //       console.error('last connector id found, but no connector');
-  //     else {
-  //       connect({ connector: lastConnector });
-  //     }
-  //   }
-  // }, [lastWallet]);
+    // Set last wallet when a new wallet is connected
+    useEffect(() => {
+        console.log('lastWallet connector', connector?.name)
+        if(connector) {
+            const name: string = connector.name;
+            setLastWallet(name)
+        }
+    }, [connector])
 
-  // useEffect(() => {
-  //   if (connector) {
-  //     const id: WalletName = connector.id as WalletName;
-  //     setLastWallet(id);
-  //   }
-  // }, [connector]);
+    // set address atom
+    useEffect(() => {
+        setAddress(address)
+    }, [address])
 
   return (
     <Container
@@ -92,7 +128,7 @@ export default function Navbar() {
               <b>STRKFarm</b>
             </Text>
           </Link>
-          <Link href={'/claims'} isExternal>
+          {/* <Link href={'/claims'} isExternal>
             <Button
               margin="0 0 0 auto"
               borderColor="color2"
@@ -115,7 +151,7 @@ export default function Navbar() {
             >
               Claims
             </Button>
-          </Link>
+          </Link> */}
           <Link href={CONSTANTS.COMMUNITY_TG} isExternal>
             <Button
               margin="0 0 0 auto"
@@ -191,7 +227,12 @@ export default function Navbar() {
             </MenuButton>
             <MenuList {...MyMenuListProps}>
               {address && (
-                <MenuItem {...MyMenuItemProps} onClick={disconnectWallet}>
+                <MenuItem {...MyMenuItemProps} onClick={() => {
+                  disconnectAsync().then(data => {
+                    console.log('wallet disconnected')
+                    setLastWallet(null)
+                  })
+                }}>
                   Disconnect
                 </MenuItem>
               )}

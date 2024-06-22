@@ -2,7 +2,6 @@ import CONSTANTS, { TOKENS, TokenName } from '@/constants';
 import { PoolInfo } from '@/store/pools';
 import { IStrategy, TokenInfo } from './IStrategy';
 import { zkLend } from '@/store/zklend.store';
-
 import ERC20Abi from '@/abi/erc20.abi.json';
 import AutoStrkAbi from '@/abi/autoStrk.abi.json';
 import MasterAbi from '@/abi/master.abi.json';
@@ -42,26 +41,28 @@ export class AutoTokenStrategy extends IStrategy {
     strategyAddress: string,
   ) {
     const rewardTokens = [{ logo: CONSTANTS.LOGOS.STRK }];
-    const frmToken = TOKENS.find((t) => t.token === strategyAddress);
+    const frmToken = TOKENS.find((t) => t.token == strategyAddress);
     if (!frmToken) throw new Error('frmToken undefined');
     const holdingTokens = [frmToken];
-    super('AutoSTRK', description, rewardTokens, holdingTokens);
+    super(`auto_token_${token}`, 'AutoSTRK', description, rewardTokens, holdingTokens);
     this.token = token;
 
     this.steps = [
       {
-        name: `Deposit ${token}`,
+        name: `Supplies your ${token} to zkLend`,
         optimizer: this.optimizer,
         filter: [this.filterStrk],
       },
       {
-        name: `Auto-invest Bi-Weekly STRK Rewards`,
+        name: `Re-invest your STRK Rewards every 14 days`,
         optimizer: this.compounder,
         filter: [this.filterStrk],
       },
     ];
     const _risks = [...this.risks];
     this.risks = [
+      `Safety score: 4.5/5`,
+      `Your original investment is safe. If you deposit 100 tokens, you will always get at least 100 tokens back, unless due to below reasons.`,
       `Transfering excess ${lpTokenName} may take your borrows in zkLend near liquidaton. It's safer to deposit ${token} directly.`,
       ..._risks,
     ];
@@ -71,7 +72,7 @@ export class AutoTokenStrategy extends IStrategy {
 
   filterStrk(pools: PoolInfo[], amount: string, prevActions: StrategyAction[]) {
     return pools.filter(
-      (p) => p.pool.name === this.token && p.protocol.name === zkLend.name,
+      (p) => p.pool.name == this.token && p.protocol.name == zkLend.name,
     );
   }
 
@@ -112,13 +113,13 @@ export class AutoTokenStrategy extends IStrategy {
     provider: ProviderInterface,
   ) => {
     const baseTokenInfo: TokenInfo = TOKENS.find(
-      (t) => t.name === this.token,
+      (t) => t.name == this.token,
     ) as TokenInfo; //
     const zTokenInfo: TokenInfo = TOKENS.find(
-      (t) => t.name === this.lpTokenName,
+      (t) => t.name == this.lpTokenName,
     ) as TokenInfo;
 
-    if (!address || address === '0x0') {
+    if (!address || address == '0x0') {
       return [
         {
           tokenInfo: baseTokenInfo,
@@ -190,10 +191,10 @@ export class AutoTokenStrategy extends IStrategy {
     provider: ProviderInterface,
   ) => {
     const frmToken: TokenInfo = TOKENS.find(
-      (t) => t.token === this.strategyAddress,
+      (t) => t.token == this.strategyAddress,
     ) as TokenInfo;
 
-    if (!address || address === '0x0') {
+    if (!address || address == '0x0') {
       return [
         {
           tokenInfo: frmToken,

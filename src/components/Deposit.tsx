@@ -29,10 +29,13 @@ import { MyMenuItemProps, MyMenuListProps } from '@/utils';
 import { useAccount, useProvider } from '@starknet-react/core';
 import { ProviderInterface } from 'starknet';
 import mixpanel from 'mixpanel-browser';
+import { StrategyTxProps } from '@/store/transactions.atom';
 
 interface DepositProps {
   strategy: StrategyInfo;
-  buttonText: string;
+  // ? If you want to add more button text, you can add here
+  // ? @dev ensure below actionType is updated accordingly
+  buttonText: 'Deposit' | 'Redeem'; 
   callsInfo: (
     amount: MyNumber,
     address: string,
@@ -45,15 +48,31 @@ export default function Deposit(props: DepositProps) {
   const { provider } = useProvider();
   const [dirty, setDirty] = useState(false);
 
+  // This is the selected market token
   const [selectedMarket, setSelectedMarket] = useState(
     props.callsInfo(MyNumber.fromZero(), address || '0x0', provider)[0]
       .tokenInfo,
   );
+
+  // This is processed amount stored in MyNumber format and meant for sending tx
   const [amount, setAmount] = useState(
     MyNumber.fromEther('0', selectedMarket.decimals),
   );
-  const [rawAmount, setRawAmount] = useState('');
 
+  // This is used to store the raw amount entered by the user
+  const [rawAmount, setRawAmount] = useState('');
+  
+  // use to maintain tx history and show toasts
+  const txInfo: StrategyTxProps = useMemo(() => {
+    return {
+      strategyId: props.strategy.id,
+      actionType: props.buttonText == 'Deposit' ? 'deposit' : 'withdraw',
+      amount: amount,
+      tokenAddr: selectedMarket.token,
+    }
+  }, [amount, props]);
+
+  // constructs tx calls
   const { calls, actions } = useMemo(() => {
     const actions = props.callsInfo(amount, address || '0x0', provider);
     const hook = actions.find((a) => a.tokenInfo.name === selectedMarket.name);
@@ -142,15 +161,13 @@ export default function Deposit(props: DepositProps) {
               bgColor={'highlight'}
               borderColor={'bg'}
               borderWidth={'1px'}
-              color="purple"
+              color="color2Text"
+              _hover={{
+                bg: 'bg',
+              }}
             >
               <Center>
-                <ImageC
-                  src={selectedMarket.logo.src}
-                  alt=""
-                  width={'20px'}
-                  marginRight="5px"
-                />{' '}
+                {/* <ImageC src={selectedMarket.logo.src} alt='' width={'20px'} marginRight='5px'/> */}
                 {selectedMarket.name}
               </Center>
             </MenuButton>
@@ -160,7 +177,7 @@ export default function Deposit(props: DepositProps) {
                   key={dep.tokenInfo.name}
                   {...MyMenuItemProps}
                   onClick={() => {
-                    if (selectedMarket.name !== dep.tokenInfo.name) {
+                    if (selectedMarket.name != dep.tokenInfo.name) {
                       setSelectedMarket(dep.tokenInfo);
                       setAmount(new MyNumber('0', dep.tokenInfo.decimals));
                       setDirty(false);
@@ -244,6 +261,7 @@ export default function Deposit(props: DepositProps) {
 
       <Center marginTop={'10px'}>
         <TxButton
+          txInfo={txInfo}
           text={`${props.buttonText}: ${amount.toEtherToFixedDecimals(2)} ${selectedMarket.name}`}
           calls={calls}
           buttonProps={{
@@ -252,6 +270,15 @@ export default function Deposit(props: DepositProps) {
           }}
         />
       </Center>
+
+      <Text
+        textAlign="center"
+        color="disabled_bg"
+        fontSize="12px"
+        marginTop="20px"
+      >
+        No additional fees by STRKFarm
+      </Text>
     </Box>
   );
 }

@@ -1,5 +1,6 @@
 import { MenuItemProps, MenuListProps } from '@chakra-ui/react';
 import { num } from 'starknet';
+import { TOKENS } from './constants';
 
 export function getUniqueStrings(arr: Array<string>) {
   const _arr: string[] = [];
@@ -56,3 +57,11 @@ export const MyMenuItemProps: MenuItemProps = {
     bg: 'bg',
   },
 };
+
+export function getTokenInfoFromAddr(tokenAddr: string) {
+  const info = TOKENS.find((t) => standariseAddress(t.token) === standariseAddress(tokenAddr));
+  if (!info) {
+    throw new Error('Token not found');
+  }
+  return info;
+}

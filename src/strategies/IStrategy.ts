@@ -26,6 +26,7 @@ export interface TokenInfo {
   minAmount: MyNumber;
   maxAmount: MyNumber;
   stepAmount: MyNumber;
+  ekuboPriceKey?: string;
 }
 
 export interface StrategyAction {
@@ -47,6 +48,7 @@ export interface IStrategyActionHook {
 }
 
 export class IStrategyProps {
+  readonly id: string;
   readonly description: string;
   exchanges: IDapp<any>[] = [];
 
@@ -62,7 +64,7 @@ export class IStrategyProps {
   readonly holdingTokens: TokenInfo[];
 
   risks: string[] = [
-    'The strategy encompasses exposure to the protocols and tokens listed above, which inherently entail a spectrum of risks including, but not limited to, hacks and volatility',
+    'The strategy involves exposure to smart contracts, which inherently carry risks like hacks, albeit relatively low',
     'APYs shown are just indicative and do not promise exact returns',
   ];
 
@@ -83,10 +85,12 @@ export class IStrategyProps {
   };
 
   constructor(
+    id: string,
     description: string,
     rewardTokens: { logo: string }[],
     holdingTokens: TokenInfo[],
   ) {
+    this.id = id;
     this.description = description;
     this.rewardTokens = rewardTokens;
     this.holdingTokens = holdingTokens;
@@ -97,12 +101,13 @@ export class IStrategy extends IStrategyProps {
   readonly tag: string;
 
   constructor(
+    id: string,
     tag: string,
     description: string,
     rewardTokens: { logo: string }[],
     holdingTokens: TokenInfo[],
   ) {
-    super(description, rewardTokens, holdingTokens);
+    super(id, description, rewardTokens, holdingTokens);
     this.tag = tag;
   }
 
@@ -111,7 +116,7 @@ export class IStrategy extends IStrategyProps {
     amount: string,
     prevActions: StrategyAction[],
   ) {
-    const eligiblePools = pools.filter((p) => p.category === Category.Stable);
+    const eligiblePools = pools.filter((p) => p.category == Category.Stable);
     if (!eligiblePools) throw new Error(`${this.tag}: [F1] no eligible pools`);
     return eligiblePools;
   }
@@ -121,15 +126,15 @@ export class IStrategy extends IStrategyProps {
     amount: string,
     prevActions: StrategyAction[],
   ) {
-    if (prevActions.length === 0)
+    if (prevActions.length == 0)
       throw new Error(
         `${this.tag}: filterSameProtocolNotSameDepositPool - Prev actions zero`,
       );
     const lastAction = prevActions[prevActions.length - 1];
     const eligiblePools = pools
-      .filter((p) => p.protocol.name === lastAction.pool.protocol.name)
+      .filter((p) => p.protocol.name == lastAction.pool.protocol.name)
       .filter((p) => {
-        return p.pool.name !== lastAction.pool.pool.name;
+        return p.pool.name != lastAction.pool.pool.name;
       });
 
     if (!eligiblePools) throw new Error(`${this.tag}: [F2] no eligible pools`);
@@ -141,15 +146,15 @@ export class IStrategy extends IStrategyProps {
     amount: string,
     prevActions: StrategyAction[],
   ) {
-    if (prevActions.length === 0)
+    if (prevActions.length == 0)
       throw new Error(
         `${this.tag}: filterNotSameProtocolSameDepositPool - Prev actions zero`,
       );
     const lastAction = prevActions[prevActions.length - 1];
     const eligiblePools = pools
-      .filter((p) => p.protocol.name !== lastAction.pool.protocol.name)
+      .filter((p) => p.protocol.name != lastAction.pool.protocol.name)
       .filter((p) => {
-        return p.pool.name === lastAction.pool.pool.name;
+        return p.pool.name == lastAction.pool.pool.name;
       });
 
     if (!eligiblePools) throw new Error(`${this.tag}: [F3] no eligible pools`);
@@ -188,7 +193,7 @@ export class IStrategy extends IStrategyProps {
 
         if (_pools.length > 0) {
           this.actions = step.optimizer(_pools, _amount, this.actions);
-          if (this.actions.length !== i + 1) {
+          if (this.actions.length != i + 1) {
             console.warn(`actions`, this.actions.length, 'i', i);
             throw new Error('one new action per step required');
           }
