@@ -155,13 +155,7 @@ export default function Pools() {
           </Pagination>
         </Container>
       }
-      {
-        <Box padding="0px 0" width={'100%'} float={'left'}>
-          <Text color="light_grey" textAlign={'right'} fontSize={'12px'}>
-            Max {ITEMS_PER_PAGE} per page, total {_filteredPools.length}
-          </Text>
-        </Box>
-      }
+
       <Container width="100%" float={'left'} padding={'0px'} marginTop={'10px'}>
         <Card variant={'filled'} bg="opacity_50p" color={'purple'}>
           <CardBody paddingTop={'5px'} paddingBottom={'5px'}>

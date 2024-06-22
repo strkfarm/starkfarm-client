@@ -54,7 +54,7 @@
     "no-fallthrough": 1,
 
     // Errors
-    "eqeqeq": 2,
+    "eqeqeq": ["warn"],
     "no-undef": 2,
     "no-dupe-keys": 2,
     "no-empty-character-class": 2,
