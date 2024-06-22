@@ -27,6 +27,7 @@ export interface TransactionInfo {
 
 // in local storage, objects like Date, MyNumber are stored as strings
 // this function deserialises them back to their original types
+declare let localStorage: any;
 async function deserialiseTxInfo(key: string, initialValue: TransactionInfo[]) {
   const storedValue = localStorage.getItem(key);
   const txs: TransactionInfo[] = storedValue
