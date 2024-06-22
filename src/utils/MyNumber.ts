@@ -64,6 +64,6 @@ export default class MyNumber {
   }
 
   [customInspectSymbol](depth: any, inspectOptions: any, inspect: any) {
-    return JSON.stringify({raw: this.toString(), decimals: this.decimals});
+    return JSON.stringify({ raw: this.toString(), decimals: this.decimals });
   }
 }

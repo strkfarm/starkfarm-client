@@ -60,7 +60,7 @@ export default function Home() {
     <Container maxWidth={'1000px'} margin={'0 auto'}>
       <Box padding={'15px 30px'} borderRadius="10px" margin="20px 0px">
         <Text fontSize={'35px'} color={'cyan'} textAlign={'center'}>
-          <b>Starknet's Yield Powerhouse🚀</b>
+          <b>{"Starknet's"} Yield Powerhouse🚀</b>
         </Text>
         <Text
           color="color2"
@@ -68,7 +68,8 @@ export default function Home() {
           fontSize={'18px'}
           marginBottom={'0px'}
         >
-          Identify & Invest in the best $STRK rewarding pools and maximize your rewards
+          Identify & Invest in the best $STRK rewarding pools and maximize your
+          rewards
         </Text>
       </Box>
       <Tabs

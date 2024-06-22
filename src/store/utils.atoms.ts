@@ -173,18 +173,24 @@ export const blockInfoMinus1DAtom = atomWithQuery((get) => ({
 const ISSERVER = typeof window === 'undefined';
 declare let localStorage: any;
 
-export const lastWalletAtom = createAtomWithStorage<null | string>('lastWallet', null);
+export const lastWalletAtom = createAtomWithStorage<null | string>(
+  'lastWallet',
+  null,
+);
 
-export function createAtomWithStorage<T>(key: string, defaultValue: T, getter?: (key: string, initialValue: T) => PromiseLike<T>) {
+export function createAtomWithStorage<T>(
+  key: string,
+  defaultValue: T,
+  getter?: (key: string, initialValue: T) => PromiseLike<T>,
+) {
   let storageConfig = createJSONStorage<T>(() => {
     if (!ISSERVER) return localStorage;
     return null;
-  })
+  });
   if (getter) {
-    storageConfig = {...storageConfig, getItem: getter};
+    storageConfig = { ...storageConfig, getItem: getter };
   }
-  return atomWithStorage<T>(key, defaultValue, storageConfig,
-  {
+  return atomWithStorage<T>(key, defaultValue, storageConfig, {
     getOnInit: true,
   });
 }

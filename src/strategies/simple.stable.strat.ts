@@ -39,7 +39,13 @@ export class SimpleStableStrategy extends IStrategy {
       { logo: CONSTANTS.LOGOS.USDC },
       { logo: CONSTANTS.LOGOS.USDT },
     ];
-    super(`SSStrt_mm_usdc_usdt`, 'SSStrt', 'Loop stable-coins to maximize yield', rewardTokens, []);
+    super(
+      `SSStrt_mm_usdc_usdt`,
+      'SSStrt',
+      'Loop stable-coins to maximize yield',
+      rewardTokens,
+      [],
+    );
 
     this.steps = [
       {

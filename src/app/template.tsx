@@ -7,7 +7,7 @@ import {
   Flex,
   extendTheme,
 } from '@chakra-ui/react';
-import { mainnet, sepolia } from '@starknet-react/chains';
+import { mainnet } from '@starknet-react/chains';
 import { StarknetConfig, jsonRpcProvider } from '@starknet-react/core';
 import { Provider as JotaiProvider } from 'jotai';
 import mixpanel from 'mixpanel-browser';
@@ -46,18 +46,18 @@ const theme = extendTheme({
     bg: '#1A1C26', // dark blue
   },
   fontSizes: {
-    large: '50px'
+    large: '50px',
   },
   space: {
-    large: '50px'
+    large: '50px',
   },
   sizes: {
-    prose: '100%'
+    prose: '100%',
   },
   components: {
     MenuItem: {
-      bg: 'highlight'
-    }
+      bg: 'highlight',
+    },
   },
   fonts: {
     heading: `'Courier New', Courier, monospace`,

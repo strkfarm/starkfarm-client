@@ -5,8 +5,11 @@ import CONSTANTS from '@/constants';
 import { useERC4626Value } from '@/hooks/useERC4626Value';
 
 import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
-import { StrategyTxPropsToMessageWithStrategies, transactionsAtom } from '@/store/transactions.atom';
-import { capitalize, getTokenInfoFromAddr, getUniqueById, shortAddress } from '@/utils';
+import {
+  StrategyTxPropsToMessageWithStrategies,
+  transactionsAtom,
+} from '@/store/transactions.atom';
+import { getUniqueById, shortAddress } from '@/utils';
 
 import {
   Avatar,
@@ -37,7 +40,7 @@ import {
   WrapItem,
 } from '@chakra-ui/react';
 import { useAccount } from '@starknet-react/core';
-import { useAtom, useAtomValue } from 'jotai';
+import { useAtomValue } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
@@ -50,8 +53,8 @@ export default function Strategy() {
   const transactions = useAtomValue(transactionsAtom);
 
   useEffect(() => {
-    console.log('txs', transactions)
-  }, [transactions])
+    console.log('txs', transactions);
+  }, [transactions]);
   const strategy: StrategyInfo | undefined = useMemo(() => {
     const name = searchParams.get('name');
     console.log('name', name);
@@ -358,13 +361,22 @@ export default function Strategy() {
             </Text>
 
             {/* If more than 1 filtered tx */}
-            {
-              transactions.filter(tx => tx.info.strategyId == strategy.id).length > 0 && (<>
-                <Text fontSize={'14px'} marginBottom={'10px'} color="light_grey">
-                Note: This feature saves and shows transactions made on this device since it was added. Clearing your browser cache will remove this data.
+            {transactions.filter((tx) => tx.info.strategyId == strategy.id)
+              .length > 0 && (
+              <>
+                <Text
+                  fontSize={'14px'}
+                  marginBottom={'10px'}
+                  color="light_grey"
+                >
+                  Note: This feature saves and shows transactions made on this
+                  device since it was added. Clearing your browser cache will
+                  remove this data.
                 </Text>
-                
-                {transactions.filter(tx => tx.info.strategyId == strategy.id).map((tx, index) => {
+
+                {transactions
+                  .filter((tx) => tx.info.strategyId == strategy.id)
+                  .map((tx, index) => {
                     return (
                       <Box
                         className="text-cell"
@@ -373,27 +385,42 @@ export default function Strategy() {
                         color="light_grey"
                         fontSize={'14px'}
                       >
-                        <Text width={'100%'} color='white' padding={'5px 10px'}>
+                        <Text width={'100%'} color="white" padding={'5px 10px'}>
                           {/* The default msg contains strategy name, since this for a specific strategy, replace it */}
-                          {index + 1}) {StrategyTxPropsToMessageWithStrategies(tx.info, strategies).replace(` in ${strategy.name}`, '')}
+                          {index + 1}){' '}
+                          {StrategyTxPropsToMessageWithStrategies(
+                            tx.info,
+                            strategies,
+                          ).replace(` in ${strategy.name}`, '')}
                         </Text>
                         <Text width={'100%'} padding={'5px 10px'}>
                           {/* The default msg contains strategy name, since this for a specific strategy, replace it */}
-                          Transacted on {tx.createdAt.toLocaleDateString()} [<Link textDecoration={'underline'} href={`https://starkscan.co/tx/${tx.txHash}`} target='_blank'>{shortAddress(tx.txHash)}</Link>]
+                          Transacted on {tx.createdAt.toLocaleDateString()} [
+                          <Link
+                            textDecoration={'underline'}
+                            href={`https://starkscan.co/tx/${tx.txHash}`}
+                            target="_blank"
+                          >
+                            {shortAddress(tx.txHash)}
+                          </Link>
+                          ]
                         </Text>
                       </Box>
                     );
-                })}
-              </>)
-            }
+                  })}
+              </>
+            )}
 
             {/* If no filtered tx */}
-            {
-              transactions.filter(tx => tx.info.strategyId == strategy.id).length == 0 && (
-                <Text fontSize={'14px'} textAlign={'center'} color="light_grey">
-                No transactions recorded since this feature was added. We use your browser's storage to save your transaction history. Make a deposit or withdrawal to see your transactions here. Clearning browser cache will remove this data.
-              </Text>)
-            }
+            {transactions.filter((tx) => tx.info.strategyId == strategy.id)
+              .length == 0 && (
+              <Text fontSize={'14px'} textAlign={'center'} color="light_grey">
+                No transactions recorded since this feature was added. We use
+                your {"browser's"} storage to save your transaction history.
+                Make a deposit or withdrawal to see your transactions here.
+                Clearning browser cache will remove this data.
+              </Text>
+            )}
           </Card>
         </VStack>
       )}

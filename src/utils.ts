@@ -59,7 +59,9 @@ export const MyMenuItemProps: MenuItemProps = {
 };
 
 export function getTokenInfoFromAddr(tokenAddr: string) {
-  const info = TOKENS.find((t) => standariseAddress(t.token) === standariseAddress(tokenAddr));
+  const info = TOKENS.find(
+    (t) => standariseAddress(t.token) === standariseAddress(tokenAddr),
+  );
   if (!info) {
     throw new Error('Token not found');
   }

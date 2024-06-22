@@ -35,7 +35,7 @@ interface DepositProps {
   strategy: StrategyInfo;
   // ? If you want to add more button text, you can add here
   // ? @dev ensure below actionType is updated accordingly
-  buttonText: 'Deposit' | 'Redeem'; 
+  buttonText: 'Deposit' | 'Redeem';
   callsInfo: (
     amount: MyNumber,
     address: string,
@@ -61,15 +61,15 @@ export default function Deposit(props: DepositProps) {
 
   // This is used to store the raw amount entered by the user
   const [rawAmount, setRawAmount] = useState('');
-  
+
   // use to maintain tx history and show toasts
   const txInfo: StrategyTxProps = useMemo(() => {
     return {
       strategyId: props.strategy.id,
       actionType: props.buttonText == 'Deposit' ? 'deposit' : 'withdraw',
-      amount: amount,
+      amount,
       tokenAddr: selectedMarket.token,
-    }
+    };
   }, [amount, props]);
 
   // constructs tx calls

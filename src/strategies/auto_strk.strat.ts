@@ -44,7 +44,13 @@ export class AutoTokenStrategy extends IStrategy {
     const frmToken = TOKENS.find((t) => t.token == strategyAddress);
     if (!frmToken) throw new Error('frmToken undefined');
     const holdingTokens = [frmToken];
-    super(`auto_token_${token}`, 'AutoSTRK', description, rewardTokens, holdingTokens);
+    super(
+      `auto_token_${token}`,
+      'AutoSTRK',
+      description,
+      rewardTokens,
+      holdingTokens,
+    );
     this.token = token;
 
     this.steps = [
