@@ -32,12 +32,12 @@ const CONSTANTS = {
     BASE_APR_API: '/ekubo/pair',
     BASE_PRICE_API: '/ekubo/price',
   },
-  MYSWAP: {
-    BASE_APR_API: '/#/position',
-    BASE_PRICE_API: '/#/price',
-  },
   HAIKO: {
     BASE_APR_API: 'haiko/markets?network=mainnet',
+  },
+  MY_SWAP: {
+    POOLS_API: '/myswap/data/pools/all.json',
+    BASE_APR_API: '/myswap/data/pools',
   },
   CONTRACTS: {
     Master: '0x50314707690c31597849ed66a494fb4279dc060f8805f21593f52906846e28e',

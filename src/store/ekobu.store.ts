@@ -1,3 +1,4 @@
+
 'use client';
 
 import CONSTANTS, { TOKENS, TokenName } from '@/constants';
@@ -14,7 +15,9 @@ import { atom } from 'jotai';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { TokenInfo } from '@/strategies/IStrategy';
 import { IDapp } from './IDapp.store';
-import { tokenPricesAtom } from './tokenPrices.store';
+const fetcher = (...args: any[]) => {
+  return fetch(args[0], args[1]).then((res) => res.json());
+};
 
 interface EkuboBaseAprDoc {
   [key: string]: Pool[];
@@ -47,6 +50,7 @@ interface PoolsData {
   topPools: Pool[];
 }
 
+type IndexedTokenPrices = Record<string, TokenPrice>;
 type IndexedPools = Record<string, Pool[]>;
 
 const POOL_NAMES: string[] = ['STRK/USDC', 'STRK/ETH', 'ETH/USDC', 'USDC/USDT'];
@@ -136,6 +140,7 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
       'STRK',
     ];
     console.log('filter2', poolName, supportedPools.includes(poolName));
+    // return !poolName.includes('DAI') && !poolName.includes('WSTETH') && !poolName.includes('BTC');
     return supportedPools.includes(poolName);
   }
 
@@ -222,18 +227,18 @@ const EkuboAtoms: ProtocolAtoms = {
         TOKENS.map((token) => [token.name, token]),
       );
 
+      const indexedTokenPrices: IndexedTokenPrices = await fetchData(
+        PRICE_PAIRS,
+        'BASE_PRICE_API',
+        tokensMetadata,
+        (pair, priceData) => [pair.split('/')[0], priceData],
+      );
+
       const indexedPools: IndexedPools = await fetchData(
         POOL_NAMES,
         'BASE_APR_API',
         tokensMetadata,
         (poolName, poolsData: PoolsData) => {
-          const tokenPrices = get(tokenPricesAtom);
-          const indexedTokenPrices = tokenPrices?.data;
-
-          if (!indexedTokenPrices) {
-            throw new Error('Token prices are not available');
-          }
-
           const [token0Name, token1Name] = poolName.split('/');
           const filterResponseData = poolsData.topPools
             .filter(
@@ -270,5 +275,4 @@ const EkuboAtoms: ProtocolAtoms = {
     return empty;
   }),
 };
-
 export default EkuboAtoms;
