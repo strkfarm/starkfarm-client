@@ -35,14 +35,6 @@ const nextConfig = {
       },
     ];
   },
-  // async rewrites() {
-  //     return [
-  //       {
-  //         source: '/rpc-api',
-  //         destination: 'https://rpc.nethermind.io/mainnet-juno?apikey=t1HPjhplOyEQpxqVMhpwLGuwmOlbXN0XivWUiPAxIBs0kHVK',
-  //       },
-  //     ]
-  // },
 };
 
 export default nextConfig;
