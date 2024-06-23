@@ -177,7 +177,8 @@ export default function Strategy() {
                   {!balData.isLoading &&
                     !balData.isError &&
                     !balData.isPending &&
-                    balData.data && (
+                    balData.data &&
+                    balData.data.tokenInfo && (
                       <Text>
                         <b>Your Holdings: </b>
                         {address
@@ -338,7 +339,6 @@ export default function Strategy() {
                 <Text
                   display={{ base: 'none', md: 'block' }}
                   width={{ base: '100%', md: '10%' }}
-                  className="text-cell"
                   textAlign={'right'}
                   padding={'5px 10px'}
                 >
@@ -347,7 +347,6 @@ export default function Strategy() {
                 <Text
                   display={{ base: 'none', md: 'block' }}
                   width={{ base: '100%', md: '10%' }}
-                  className="text-cell"
                   textAlign={'right'}
                   padding={'5px 10px'}
                 >
