@@ -30,6 +30,8 @@ import { useAccount, useProvider } from '@starknet-react/core';
 import { ProviderInterface } from 'starknet';
 import mixpanel from 'mixpanel-browser';
 import { StrategyTxProps } from '@/store/transactions.atom';
+import { useAtomValue } from 'jotai';
+import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
 
 interface DepositProps {
   strategy: StrategyInfo;
@@ -80,7 +82,11 @@ export default function Deposit(props: DepositProps) {
     return { calls: hook.calls, actions };
   }, [selectedMarket, amount, address, provider]);
 
-  const { balance, isLoading, isError } = useERC20Balance(selectedMarket);
+  const balData = useAtomValue(actions.find((a) => a.tokenInfo.name === selectedMarket.name)?.balanceAtom || DUMMY_BAL_ATOM);
+  const balance = useMemo(() => {
+    return balData.data?.amount || MyNumber.fromZero();
+  }, [balData])
+  // const { balance, isLoading, isError } = useERC20Balance(selectedMarket);
 
   const maxAmount: MyNumber = useMemo(() => {
     return MyNumber.min(balance, selectedMarket.maxAmount);
@@ -95,8 +101,8 @@ export default function Deposit(props: DepositProps) {
       <Box color={'light_grey'} textAlign={'right'}>
         <Text>Available balance </Text>
         <LoadingWrap
-          isLoading={isLoading}
-          isError={isError}
+          isLoading={balData.isLoading || balData.isPending}
+          isError={balData.isError}
           skeletonProps={{
             height: '10px',
             width: '50px',

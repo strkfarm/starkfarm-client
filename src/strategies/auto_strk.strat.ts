@@ -7,6 +7,9 @@ import AutoStrkAbi from '@/abi/autoStrk.abi.json';
 import MasterAbi from '@/abi/master.abi.json';
 import MyNumber from '@/utils/MyNumber';
 import { Contract, ProviderInterface, uint256 } from 'starknet';
+import { atom } from 'jotai';
+import { BalanceResult, DUMMY_BAL_ATOM, getBalanceAtom } from '@/store/balance.atoms';
+import { AtomWithQueryResult } from 'jotai-tanstack-query';
 
 interface Step {
   name: string;
@@ -44,6 +47,7 @@ export class AutoTokenStrategy extends IStrategy {
     const frmToken = TOKENS.find((t) => t.token == strategyAddress);
     if (!frmToken) throw new Error('frmToken undefined');
     const holdingTokens = [frmToken];
+
     super(
       `auto_token_${token}`,
       'AutoSTRK',
@@ -57,12 +61,12 @@ export class AutoTokenStrategy extends IStrategy {
       {
         name: `Supplies your ${token} to zkLend`,
         optimizer: this.optimizer,
-        filter: [this.filterStrk],
+        filter: [this.filterStrkzkLend],
       },
       {
         name: `Re-invest your STRK Rewards every 14 days`,
         optimizer: this.compounder,
-        filter: [this.filterStrk],
+        filter: [this.filterStrkzkLend],
       },
     ];
     const _risks = [...this.risks];
@@ -76,11 +80,6 @@ export class AutoTokenStrategy extends IStrategy {
     this.strategyAddress = strategyAddress;
   }
 
-  filterStrk(pools: PoolInfo[], amount: string, prevActions: StrategyAction[]) {
-    return pools.filter(
-      (p) => p.pool.name == this.token && p.protocol.name == zkLend.name,
-    );
-  }
 
   optimizer(
     eligiblePools: PoolInfo[],
@@ -130,10 +129,12 @@ export class AutoTokenStrategy extends IStrategy {
         {
           tokenInfo: baseTokenInfo,
           calls: [],
+          balanceAtom: DUMMY_BAL_ATOM
         },
         {
           tokenInfo: zTokenInfo,
           calls: [],
+          balanceAtom: DUMMY_BAL_ATOM
         },
       ];
     }
@@ -183,10 +184,12 @@ export class AutoTokenStrategy extends IStrategy {
       {
         tokenInfo: baseTokenInfo,
         calls: calls1,
+        balanceAtom: getBalanceAtom(baseTokenInfo, atom(true))
       },
       {
         tokenInfo: zTokenInfo,
         calls: calls2,
+        balanceAtom: getBalanceAtom(zTokenInfo, atom(true))
       },
     ];
   };
@@ -205,6 +208,7 @@ export class AutoTokenStrategy extends IStrategy {
         {
           tokenInfo: frmToken,
           calls: [],
+          balanceAtom: DUMMY_BAL_ATOM
         },
       ];
     }
@@ -239,6 +243,7 @@ export class AutoTokenStrategy extends IStrategy {
       {
         tokenInfo: frmToken,
         calls,
+        balanceAtom: getBalanceAtom(frmToken, atom(true))
       },
     ];
   };

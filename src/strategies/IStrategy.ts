@@ -1,6 +1,10 @@
 import { IDapp } from '@/store/IDapp.store';
+import { BalanceResult, getBalanceAtom } from '@/store/balance.atoms';
 import { Category, PoolInfo } from '@/store/pools';
+import { zkLend } from '@/store/zklend.store';
 import MyNumber from '@/utils/MyNumber';
+import { Atom, atom } from 'jotai';
+import { AtomWithQueryResult } from 'jotai-tanstack-query';
 import { Call, ProviderInterface } from 'starknet';
 
 interface Step {
@@ -27,6 +31,16 @@ export interface TokenInfo {
   maxAmount: MyNumber;
   stepAmount: MyNumber;
   ekuboPriceKey?: string;
+  isERC4626: boolean;
+}
+
+export interface NFTInfo {
+  name: string,
+  address: string,
+  logo: any,
+  config: {
+    mainTokenName: string
+  }
 }
 
 export interface StrategyAction {
@@ -45,6 +59,7 @@ export enum StrategyStatus {
 export interface IStrategyActionHook {
   tokenInfo: TokenInfo;
   calls: Call[];
+  balanceAtom: Atom<AtomWithQueryResult<BalanceResult, Error>>;
 }
 
 export class IStrategyProps {
@@ -60,8 +75,10 @@ export class IStrategyProps {
   status = StrategyStatus.UNINTIALISED;
 
   readonly rewardTokens: { logo: string }[];
-
-  readonly holdingTokens: TokenInfo[];
+  readonly holdingTokens: (TokenInfo | NFTInfo)[];
+  
+  balEnabled = atom(false);
+  readonly balanceAtom: Atom<AtomWithQueryResult<BalanceResult, Error>>;
 
   risks: string[] = [
     'The strategy involves exposure to smart contracts, which inherently carry risks like hacks, albeit relatively low',
@@ -88,12 +105,13 @@ export class IStrategyProps {
     id: string,
     description: string,
     rewardTokens: { logo: string }[],
-    holdingTokens: TokenInfo[],
+    holdingTokens: (TokenInfo | NFTInfo)[],
   ) {
     this.id = id;
     this.description = description;
     this.rewardTokens = rewardTokens;
     this.holdingTokens = holdingTokens;
+    this.balanceAtom = getBalanceAtom(holdingTokens[0], this.balEnabled);
   }
 }
 
@@ -105,7 +123,7 @@ export class IStrategy extends IStrategyProps {
     tag: string,
     description: string,
     rewardTokens: { logo: string }[],
-    holdingTokens: TokenInfo[],
+    holdingTokens: (TokenInfo | NFTInfo)[],
   ) {
     super(id, description, rewardTokens, holdingTokens);
     this.tag = tag;
@@ -161,6 +179,12 @@ export class IStrategy extends IStrategyProps {
     return eligiblePools;
   }
 
+  filterStrkzkLend(pools: PoolInfo[], amount: string, prevActions: StrategyAction[]) {
+    return pools.filter(
+      (p) => p.pool.name == 'STRK' && p.protocol.name == zkLend.name,
+    );
+  }
+
   optimizerDeposit(
     eligiblePools: PoolInfo[],
     amount: string,
@@ -192,7 +216,7 @@ export class IStrategy extends IStrategyProps {
         console.log('solve', i, _pools, pools.length, this.actions, _amount);
 
         if (_pools.length > 0) {
-          this.actions = step.optimizer(_pools, _amount, this.actions);
+          this.actions = step.optimizer.bind(this)(_pools, _amount, this.actions);
           if (this.actions.length != i + 1) {
             console.warn(`actions`, this.actions.length, 'i', i);
             throw new Error('one new action per step required');
