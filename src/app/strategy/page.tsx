@@ -2,10 +2,14 @@
 
 import Deposit from '@/components/Deposit';
 import CONSTANTS from '@/constants';
-import { useERC4626Value } from '@/hooks/useERC4626Value';
+import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
 
 import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
-import { getUniqueById } from '@/utils';
+import {
+  StrategyTxPropsToMessageWithStrategies,
+  transactionsAtom,
+} from '@/store/transactions.atom';
+import { getUniqueById, shortAddress } from '@/utils';
 
 import {
   Avatar,
@@ -16,6 +20,7 @@ import {
   Flex,
   Grid,
   GridItem,
+  Link,
   ListItem,
   OrderedList,
   Spinner,
@@ -35,7 +40,7 @@ import {
   WrapItem,
 } from '@chakra-ui/react';
 import { useAccount } from '@starknet-react/core';
-import { useAtomValue } from 'jotai';
+import { atom, useAtomValue, useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
@@ -45,16 +50,35 @@ export default function Strategy() {
   const { address } = useAccount();
   const searchParams = useSearchParams();
   const strategies = useAtomValue(strategiesAtom);
+  const transactions = useAtomValue(transactionsAtom);
 
+  useEffect(() => {
+    console.log('txs', transactions);
+  }, [transactions]);
   const strategy: StrategyInfo | undefined = useMemo(() => {
     const name = searchParams.get('name');
     console.log('name', name);
     return strategies.find((s) => s.name === name);
   }, [searchParams, strategies]);
 
-  const { balance, underlyingTokenInfo, isLoading, isError } = useERC4626Value(
-    strategy?.holdingTokens[0],
-  ); // @todo need to add multi token support
+  const setBalQueryEnable = useSetAtom(strategy?.balEnabled || atom(false));
+  useEffect(() => {
+    setBalQueryEnable(true);
+  }, []);
+
+  // const balAtom = getBalanceAtom(strategy?.holdingTokens[0]);
+  const balData = useAtomValue(strategy?.balanceAtom || DUMMY_BAL_ATOM);
+  // cons{ balance, underlyingTokenInfo, isLoading, isError }
+  useEffect(() => {
+    console.log(
+      'balData',
+      balData.isError,
+      balData.isLoading,
+      balData.isPending,
+      balData.data,
+      balData.error,
+    );
+  }, [balData]);
 
   useEffect(() => {
     mixpanel.track('Strategy page open', { name: searchParams.get('name') });
@@ -146,20 +170,26 @@ export default function Strategy() {
                 <Box
                   padding={'10px'}
                   borderRadius={'10px'}
-                  bg={'purple'}
+                  bg={'bg'}
+                  color="cyan"
                   marginTop={'20px'}
                 >
-                  {!isLoading && (
-                    <Text>
-                      <b>Your Holdings: </b>
-                      {address
-                        ? `${balance.toEtherToFixedDecimals(4)} ${underlyingTokenInfo?.name}`
-                        : isMobile
-                          ? CONSTANTS.MOBILE_MSG
-                          : 'Connect wallet'}
-                    </Text>
-                  )}
-                  {isLoading && (
+                  {!balData.isLoading &&
+                    !balData.isError &&
+                    !balData.isPending &&
+                    balData.data && (
+                      <Text>
+                        <b>Your Holdings: </b>
+                        {address
+                          ? `${balData.data.amount.toEtherToFixedDecimals(4)} ${balData.data.tokenInfo?.name}`
+                          : isMobile
+                            ? CONSTANTS.MOBILE_MSG
+                            : 'Connect wallet'}
+                      </Text>
+                    )}
+                  {(balData.isLoading ||
+                    balData.isPending ||
+                    !balData.data?.tokenInfo) && (
                     <Text>
                       <b>Your Holdings: </b>
                       {address ? (
@@ -171,6 +201,11 @@ export default function Strategy() {
                       )}
                     </Text>
                   )}
+                  {balData.isError && (
+                    <Text>
+                      <b>Your Holdings: Error</b>
+                    </Text>
+                  )}
                 </Box>
               </Card>
             </GridItem>
@@ -180,7 +215,7 @@ export default function Strategy() {
                   <TabList>
                     <Tab
                       color="light_grey"
-                      _selected={{ color: 'color2' }}
+                      _selected={{ color: 'color2Text' }}
                       onClick={() => {
                         // mixpanel.track('All pools clicked')
                       }}
@@ -189,7 +224,7 @@ export default function Strategy() {
                     </Tab>
                     <Tab
                       color="light_grey"
-                      _selected={{ color: 'color2' }}
+                      _selected={{ color: 'color2Text' }}
                       onClick={() => {
                         // mixpanel.track('Strategies opened')
                       }}
@@ -200,7 +235,7 @@ export default function Strategy() {
                   <TabIndicator
                     mt="-1.5px"
                     height="2px"
-                    bg="color2"
+                    bg="color2Text"
                     color="color1"
                     borderRadius="1px"
                   />
@@ -225,7 +260,7 @@ export default function Strategy() {
                     >
                       <Deposit
                         strategy={strategy}
-                        buttonText="Withdraw"
+                        buttonText="Redeem"
                         callsInfo={strategy.withdrawMethods}
                       />
                     </TabPanel>
@@ -239,7 +274,7 @@ export default function Strategy() {
               Behind the scenes
             </Text>
             <Text fontSize={'15px'} marginBottom={'10px'}>
-              Assuming a capital of $1000, below are all the actions executed
+              This is what happens when you invest $1000 in this strategy:
             </Text>
             <Flex
               color="white"
@@ -270,7 +305,7 @@ export default function Strategy() {
                 fontSize={'14px'}
               >
                 <Text width={{ base: '100%', md: '50%' }} padding={'5px 10px'}>
-                  {index + 1}) {action.name}
+                  {index + 1} {action.name}
                 </Text>
                 <Text width={{ base: '100%', md: '30%' }} padding={'5px 10px'}>
                   <Avatar
@@ -324,6 +359,8 @@ export default function Strategy() {
               </Box>
             ))}
           </Card>
+
+          {/* Risks card */}
           <Card width={'100%'} color="white" bg="highlight" padding={'15px'}>
             <Text fontSize={'20px'} marginBottom={'10px'} fontWeight={'bold'}>
               Risks
@@ -340,6 +377,75 @@ export default function Strategy() {
                 </ListItem>
               ))}
             </OrderedList>
+          </Card>
+
+          {/* Transaction history card */}
+          <Card width={'100%'} color="white" bg="highlight" padding={'15px'}>
+            <Text fontSize={'20px'} marginBottom={'10px'} fontWeight={'bold'}>
+              Transaction history
+            </Text>
+
+            {/* If more than 1 filtered tx */}
+            {transactions.filter((tx) => tx.info.strategyId == strategy.id)
+              .length > 0 && (
+              <>
+                <Text
+                  fontSize={'14px'}
+                  marginBottom={'10px'}
+                  color="light_grey"
+                >
+                  Note: This feature saves and shows transactions made on this
+                  device since it was added. Clearing your browser cache will
+                  remove this data.
+                </Text>
+
+                {transactions
+                  .filter((tx) => tx.info.strategyId == strategy.id)
+                  .map((tx, index) => {
+                    return (
+                      <Box
+                        className="text-cell"
+                        key={index}
+                        width={'100%'}
+                        color="light_grey"
+                        fontSize={'14px'}
+                      >
+                        <Text width={'100%'} color="white" padding={'5px 10px'}>
+                          {/* The default msg contains strategy name, since this for a specific strategy, replace it */}
+                          {index + 1}){' '}
+                          {StrategyTxPropsToMessageWithStrategies(
+                            tx.info,
+                            strategies,
+                          ).replace(` in ${strategy.name}`, '')}
+                        </Text>
+                        <Text width={'100%'} padding={'5px 10px'}>
+                          {/* The default msg contains strategy name, since this for a specific strategy, replace it */}
+                          Transacted on {tx.createdAt.toLocaleDateString()} [
+                          <Link
+                            textDecoration={'underline'}
+                            href={`https://starkscan.co/tx/${tx.txHash}`}
+                            target="_blank"
+                          >
+                            {shortAddress(tx.txHash)}
+                          </Link>
+                          ]
+                        </Text>
+                      </Box>
+                    );
+                  })}
+              </>
+            )}
+
+            {/* If no filtered tx */}
+            {transactions.filter((tx) => tx.info.strategyId == strategy.id)
+              .length == 0 && (
+              <Text fontSize={'14px'} textAlign={'center'} color="light_grey">
+                No transactions recorded since this feature was added. We use
+                your {"browser's"} storage to save your transaction history.
+                Make a deposit or withdrawal to see your transactions here.
+                Clearning browser cache will remove this data.
+              </Text>
+            )}
           </Card>
         </VStack>
       )}

@@ -1,6 +1,10 @@
 import { IDapp } from '@/store/IDapp.store';
+import { BalanceResult, getBalanceAtom } from '@/store/balance.atoms';
 import { Category, PoolInfo } from '@/store/pools';
+import { zkLend } from '@/store/zklend.store';
 import MyNumber from '@/utils/MyNumber';
+import { Atom, atom } from 'jotai';
+import { AtomWithQueryResult } from 'jotai-tanstack-query';
 import { Call, ProviderInterface } from 'starknet';
 
 interface Step {
@@ -26,6 +30,17 @@ export interface TokenInfo {
   minAmount: MyNumber;
   maxAmount: MyNumber;
   stepAmount: MyNumber;
+  ekuboPriceKey?: string;
+  isERC4626: boolean;
+}
+
+export interface NFTInfo {
+  name: string;
+  address: string;
+  logo: any;
+  config: {
+    mainTokenName: string;
+  };
 }
 
 export interface StrategyAction {
@@ -44,9 +59,11 @@ export enum StrategyStatus {
 export interface IStrategyActionHook {
   tokenInfo: TokenInfo;
   calls: Call[];
+  balanceAtom: Atom<AtomWithQueryResult<BalanceResult, Error>>;
 }
 
 export class IStrategyProps {
+  readonly id: string;
   readonly description: string;
   exchanges: IDapp<any>[] = [];
 
@@ -58,11 +75,13 @@ export class IStrategyProps {
   status = StrategyStatus.UNINTIALISED;
 
   readonly rewardTokens: { logo: string }[];
+  readonly holdingTokens: (TokenInfo | NFTInfo)[];
 
-  readonly holdingTokens: TokenInfo[];
+  balEnabled = atom(false);
+  readonly balanceAtom: Atom<AtomWithQueryResult<BalanceResult, Error>>;
 
   risks: string[] = [
-    'The strategy encompasses exposure to the protocols and tokens listed above, which inherently entail a spectrum of risks including, but not limited to, hacks and volatility',
+    'The strategy involves exposure to smart contracts, which inherently carry risks like hacks, albeit relatively low',
     'APYs shown are just indicative and do not promise exact returns',
   ];
 
@@ -83,13 +102,16 @@ export class IStrategyProps {
   };
 
   constructor(
+    id: string,
     description: string,
     rewardTokens: { logo: string }[],
-    holdingTokens: TokenInfo[],
+    holdingTokens: (TokenInfo | NFTInfo)[],
   ) {
+    this.id = id;
     this.description = description;
     this.rewardTokens = rewardTokens;
     this.holdingTokens = holdingTokens;
+    this.balanceAtom = getBalanceAtom(holdingTokens[0], this.balEnabled);
   }
 }
 
@@ -97,12 +119,13 @@ export class IStrategy extends IStrategyProps {
   readonly tag: string;
 
   constructor(
+    id: string,
     tag: string,
     description: string,
     rewardTokens: { logo: string }[],
-    holdingTokens: TokenInfo[],
+    holdingTokens: (TokenInfo | NFTInfo)[],
   ) {
-    super(description, rewardTokens, holdingTokens);
+    super(id, description, rewardTokens, holdingTokens);
     this.tag = tag;
   }
 
@@ -111,7 +134,7 @@ export class IStrategy extends IStrategyProps {
     amount: string,
     prevActions: StrategyAction[],
   ) {
-    const eligiblePools = pools.filter((p) => p.category === Category.Stable);
+    const eligiblePools = pools.filter((p) => p.category == Category.Stable);
     if (!eligiblePools) throw new Error(`${this.tag}: [F1] no eligible pools`);
     return eligiblePools;
   }
@@ -121,15 +144,15 @@ export class IStrategy extends IStrategyProps {
     amount: string,
     prevActions: StrategyAction[],
   ) {
-    if (prevActions.length === 0)
+    if (prevActions.length == 0)
       throw new Error(
         `${this.tag}: filterSameProtocolNotSameDepositPool - Prev actions zero`,
       );
     const lastAction = prevActions[prevActions.length - 1];
     const eligiblePools = pools
-      .filter((p) => p.protocol.name === lastAction.pool.protocol.name)
+      .filter((p) => p.protocol.name == lastAction.pool.protocol.name)
       .filter((p) => {
-        return p.pool.name !== lastAction.pool.pool.name;
+        return p.pool.name != lastAction.pool.pool.name;
       });
 
     if (!eligiblePools) throw new Error(`${this.tag}: [F2] no eligible pools`);
@@ -141,19 +164,29 @@ export class IStrategy extends IStrategyProps {
     amount: string,
     prevActions: StrategyAction[],
   ) {
-    if (prevActions.length === 0)
+    if (prevActions.length == 0)
       throw new Error(
         `${this.tag}: filterNotSameProtocolSameDepositPool - Prev actions zero`,
       );
     const lastAction = prevActions[prevActions.length - 1];
     const eligiblePools = pools
-      .filter((p) => p.protocol.name !== lastAction.pool.protocol.name)
+      .filter((p) => p.protocol.name != lastAction.pool.protocol.name)
       .filter((p) => {
-        return p.pool.name === lastAction.pool.pool.name;
+        return p.pool.name == lastAction.pool.pool.name;
       });
 
     if (!eligiblePools) throw new Error(`${this.tag}: [F3] no eligible pools`);
     return eligiblePools;
+  }
+
+  filterStrkzkLend(
+    pools: PoolInfo[],
+    amount: string,
+    prevActions: StrategyAction[],
+  ) {
+    return pools.filter(
+      (p) => p.pool.name == 'STRK' && p.protocol.name == zkLend.name,
+    );
   }
 
   optimizerDeposit(
@@ -187,8 +220,12 @@ export class IStrategy extends IStrategyProps {
         console.log('solve', i, _pools, pools.length, this.actions, _amount);
 
         if (_pools.length > 0) {
-          this.actions = step.optimizer(_pools, _amount, this.actions);
-          if (this.actions.length !== i + 1) {
+          this.actions = step.optimizer.bind(this)(
+            _pools,
+            _amount,
+            this.actions,
+          );
+          if (this.actions.length != i + 1) {
             console.warn(`actions`, this.actions.length, 'i', i);
             throw new Error('one new action per step required');
           }

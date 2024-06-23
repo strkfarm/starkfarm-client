@@ -7,6 +7,7 @@ import {
   Container,
   Flex,
   IconButton,
+  Image,
   Link,
   Menu,
   MenuButton,
@@ -15,48 +16,86 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useAtom, useSetAtom } from 'jotai';
-import { connect, disconnect } from 'starknetkit';
+import { useStarknetkitConnectModal } from 'starknetkit';
 
 import tg from '@/assets/tg.svg';
+import fulllogo from '@public/fulllogo.png';
 import CONSTANTS from '@/constants';
 import { addressAtom } from '@/store/claims.atoms';
 import { MyMenuItemProps, MyMenuListProps, shortAddress } from '@/utils';
+import { useEffect } from 'react';
+import { lastWalletAtom } from '@/store/utils.atoms';
+import { useAccount, useConnect, useDisconnect } from '@starknet-react/core';
 
 export default function Navbar() {
+  const { address, connector } = useAccount();
+  const { connect, connectors } = useConnect();
+  const { disconnectAsync } = useDisconnect();
   const setAddress = useSetAtom(addressAtom);
-  const address = useAtom(addressAtom)[0];
+  const [lastWallet, setLastWallet] = useAtom(lastWalletAtom);
+  const { starknetkitConnectModal: starknetkitConnectModal1 } =
+    useStarknetkitConnectModal({
+      modalMode: 'canAsk',
+      modalTheme: 'dark',
+    });
 
+  // backup
+  const { starknetkitConnectModal: starknetkitConnectModal2 } =
+    useStarknetkitConnectModal({
+      modalMode: 'alwaysAsk',
+      modalTheme: 'dark',
+    });
+
+  // Connect wallet using starknetkit
   const connectWallet = async () => {
-    const { wallet } = await connect({ dappName: 'STRKFarm' });
-
-    if (wallet && wallet.isConnected) {
-      setAddress(wallet.selectedAddress);
+    try {
+      const result = await starknetkitConnectModal1();
+      await connect({ connector: result.connector });
+    } catch (error) {
+      console.warn('connectWallet error', error);
+      try {
+        const result = await starknetkitConnectModal2();
+        await connect({ connector: result.connector });
+      } catch (error) {
+        console.error('connectWallet error', error);
+        alert('Error connecting wallet');
+      }
     }
   };
 
-  const disconnectWallet = async () => {
-    await disconnect();
-    setAddress('');
-  };
+  function autoConnect(retry = 0) {
+    console.log('lastWallet', lastWallet, connectors);
+    try {
+      if (!address && lastWallet) {
+        connectWallet();
+      }
+    } catch (error) {
+      console.error('lastWallet error', error);
+      if (retry < 10) {
+        setTimeout(() => {
+          autoConnect(retry + 1);
+        }, 1000);
+      }
+    }
+  }
+  // Auto-connects to last wallet
+  useEffect(() => {
+    autoConnect();
+  }, [lastWallet]);
 
-  // useEffect(() => {
-  //   if (!address && lastWallet) {
-  //     const lastConnector = connectors.find((c) => c.id === lastWallet);
-  //     console.log('lastWallet connected', lastConnector);
-  //     if (!lastConnector)
-  //       console.error('last connector id found, but no connector');
-  //     else {
-  //       connect({ connector: lastConnector });
-  //     }
-  //   }
-  // }, [lastWallet]);
+  // Set last wallet when a new wallet is connected
+  useEffect(() => {
+    console.log('lastWallet connector', connector?.name);
+    if (connector) {
+      const name: string = connector.name;
+      setLastWallet(name);
+    }
+  }, [connector]);
 
-  // useEffect(() => {
-  //   if (connector) {
-  //     const id: WalletName = connector.id as WalletName;
-  //     setLastWallet(id);
-  //   }
-  // }, [connector]);
+  // set address atom
+  useEffect(() => {
+    setAddress(address);
+  }, [address]);
 
   return (
     <Container
@@ -71,7 +110,7 @@ export default function Navbar() {
       <Center bg="highlight" color="orange" padding={0}>
         <Text fontSize="12px" textAlign={'center'} padding="0px 5px">
           {''}
-          <b>Alpha version, report bugs in our Telegram group.</b>
+          <b>Report bugs & share feedback in our Telegram group.</b>
           {''}
         </Text>
       </Center>
@@ -83,16 +122,13 @@ export default function Navbar() {
       >
         <Flex width={'100%'}>
           <Link href="/" margin="0 auto 0 0" textAlign={'left'}>
-            <Text
-              fontSize={{ base: '20px', sm: '25px', md: '30px' }}
-              color={'color2'}
-              letterSpacing={'10px'}
-              marginTop={{ base: '7px', sm: '3px', md: '0' }}
-            >
-              <b>STRKFarm</b>
-            </Text>
+            <Image
+              src={fulllogo.src}
+              alt="logo"
+              height={{ base: '40px', md: '50px' }}
+            />
           </Link>
-          <Link href={'/claims'} isExternal>
+          {/* <Link href={'/claims'} isExternal>
             <Button
               margin="0 0 0 auto"
               borderColor="color2"
@@ -115,7 +151,7 @@ export default function Navbar() {
             >
               Claims
             </Button>
-          </Link>
+          </Link> */}
           <Link href={CONSTANTS.COMMUNITY_TG} isExternal>
             <Button
               margin="0 0 0 auto"
@@ -184,14 +220,23 @@ export default function Navbar() {
               height={{ base: '2rem', sm: '2.5rem' }}
               my={{ base: 'auto', sm: 'initial' }}
               paddingX={{ base: '0.5rem', sm: '1rem' }}
-              fontSize={{ base: '0.9rem', sm: '1rem' }}
+              fontSize={{ base: '0.8rem', sm: '1rem' }}
               onClick={address ? undefined : connectWallet}
+              size="xs"
             >
               <Center>{address ? shortAddress(address) : 'Connect'}</Center>
             </MenuButton>
             <MenuList {...MyMenuListProps}>
               {address && (
-                <MenuItem {...MyMenuItemProps} onClick={disconnectWallet}>
+                <MenuItem
+                  {...MyMenuItemProps}
+                  onClick={() => {
+                    disconnectAsync().then((data) => {
+                      console.log('wallet disconnected');
+                      setLastWallet(null);
+                    });
+                  }}
+                >
                   Disconnect
                 </MenuItem>
               )}
