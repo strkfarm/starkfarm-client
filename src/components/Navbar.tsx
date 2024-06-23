@@ -26,6 +26,7 @@ import { MyMenuItemProps, MyMenuListProps, shortAddress } from '@/utils';
 import { useEffect } from 'react';
 import { lastWalletAtom } from '@/store/utils.atoms';
 import { useAccount, useConnect, useDisconnect } from '@starknet-react/core';
+import { CONNECTOR_NAMES, MYCONNECTORS } from '@/app/template';
 
 export default function Navbar() {
   const { address, connector } = useAccount();
@@ -37,6 +38,7 @@ export default function Navbar() {
     useStarknetkitConnectModal({
       modalMode: 'canAsk',
       modalTheme: 'dark',
+      connectors: MYCONNECTORS,
     });
 
   // backup
@@ -44,6 +46,7 @@ export default function Navbar() {
     useStarknetkitConnectModal({
       modalMode: 'alwaysAsk',
       modalTheme: 'dark',
+      connectors: MYCONNECTORS,
     });
 
   // Connect wallet using starknetkit
@@ -67,7 +70,12 @@ export default function Navbar() {
     console.log('lastWallet', lastWallet, connectors);
     try {
       if (!address && lastWallet) {
-        connectWallet();
+        const connectorIndex = CONNECTOR_NAMES.findIndex(
+          (name) => name === lastWallet,
+        );
+        if (connectorIndex >= 0) {
+          connect({ connector: MYCONNECTORS[connectorIndex] });
+        }
       }
     } catch (error) {
       console.error('lastWallet error', error);
