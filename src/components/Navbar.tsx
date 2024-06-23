@@ -122,7 +122,11 @@ export default function Navbar() {
       >
         <Flex width={'100%'}>
           <Link href="/" margin="0 auto 0 0" textAlign={'left'}>
-            <Image src={fulllogo.src} alt='logo' height={{base: '40px', md: '50px'}}/>
+            <Image
+              src={fulllogo.src}
+              alt="logo"
+              height={{ base: '40px', md: '50px' }}
+            />
           </Link>
           {/* <Link href={'/claims'} isExternal>
             <Button
@@ -218,7 +222,7 @@ export default function Navbar() {
               paddingX={{ base: '0.5rem', sm: '1rem' }}
               fontSize={{ base: '0.8rem', sm: '1rem' }}
               onClick={address ? undefined : connectWallet}
-              size='xs'
+              size="xs"
             >
               <Center>{address ? shortAddress(address) : 'Connect'}</Center>
             </MenuButton>

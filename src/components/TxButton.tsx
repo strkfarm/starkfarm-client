@@ -25,12 +25,21 @@ export default function TxButton(props: TxButtonProps) {
     borderWidth: '1px',
   };
 
-  const { writeAsync, data, status, isSuccess, isPending, error, isError } = useContractWrite({
-    calls: props.calls,
-  });
+  const { writeAsync, data, status, isSuccess, isPending, error, isError } =
+    useContractWrite({
+      calls: props.calls,
+    });
 
   useEffect(() => {
-    console.log('TxButton status', isPending, status, isSuccess, data, error, isError);
+    console.log(
+      'TxButton status',
+      isPending,
+      status,
+      isSuccess,
+      data,
+      error,
+      isError,
+    );
     if (data && data.transaction_hash) {
       console.log('TxButton txHash', data.transaction_hash);
       // initiates a toast and adds the tx to tx history if successful

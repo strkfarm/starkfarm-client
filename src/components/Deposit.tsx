@@ -20,7 +20,6 @@ import {
 } from '@chakra-ui/react';
 import LoadingWrap from './LoadingWrap';
 import { IStrategyActionHook, TokenInfo } from '@/strategies/IStrategy';
-import { useERC20Balance } from '@/hooks/useERC20Balance';
 import { StrategyInfo } from '@/store/strategies.atoms';
 import { useMemo, useState } from 'react';
 import MyNumber from '@/utils/MyNumber';
@@ -82,10 +81,13 @@ export default function Deposit(props: DepositProps) {
     return { calls: hook.calls, actions };
   }, [selectedMarket, amount, address, provider]);
 
-  const balData = useAtomValue(actions.find((a) => a.tokenInfo.name === selectedMarket.name)?.balanceAtom || DUMMY_BAL_ATOM);
+  const balData = useAtomValue(
+    actions.find((a) => a.tokenInfo.name === selectedMarket.name)
+      ?.balanceAtom || DUMMY_BAL_ATOM,
+  );
   const balance = useMemo(() => {
     return balData.data?.amount || MyNumber.fromZero();
-  }, [balData])
+  }, [balData]);
   // const { balance, isLoading, isError } = useERC20Balance(selectedMarket);
 
   const maxAmount: MyNumber = useMemo(() => {

@@ -26,14 +26,14 @@ export const strategiesAtom = atom<StrategyInfo[]>((get) => {
     CONSTANTS.CONTRACTS.AutoUsdcFarm,
   );
 
-  const DNMMDescription = `Deposit your {{token1}} to automatically loop your funds between zkLend and Nostra to create a delta neutral position. This strategy is designed to maximize your yield on {{token1}}. Your position is automatically adjusted periodically to maintain a healthy health factor. Your receive a NFT as representation for your stake on STRKFarm. You can withdraw anytime by redeeming your NFT for {{token1}}.`
+  const DNMMDescription = `Deposit your {{token1}} to automatically loop your funds between zkLend and Nostra to create a delta neutral position. This strategy is designed to maximize your yield on {{token1}}. Your position is automatically adjusted periodically to maintain a healthy health factor. Your receive a NFT as representation for your stake on STRKFarm. You can withdraw anytime by redeeming your NFT for {{token1}}.`;
   const deltaNeutralMMUSDCETH = new DeltaNeutralMM(
     'USDC',
     Mustache.render(DNMMDescription, { token1: 'USDC', token2: 'ETH' }),
     'ETH',
     CONSTANTS.CONTRACTS.DeltaNeutralMMUSDCETH,
-    [1.52, 0.618, 1, 0.553, 1.923] // precomputed factors based on strategy math
-  )
+    [1.52, 0.618, 1, 0.553, 1.923], // precomputed factors based on strategy math
+  );
 
   // const deltaNeutralMMETHUSDC = new DeltaNeutralMM(
   //   'ETH',

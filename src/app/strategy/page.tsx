@@ -2,8 +2,7 @@
 
 import Deposit from '@/components/Deposit';
 import CONSTANTS from '@/constants';
-import { useERC4626Value } from '@/hooks/useERC4626Value';
-import { DUMMY_BAL_ATOM, getBalanceAtom } from '@/store/balance.atoms';
+import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
 
 import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
 import {
@@ -65,14 +64,21 @@ export default function Strategy() {
   const setBalQueryEnable = useSetAtom(strategy?.balEnabled || atom(false));
   useEffect(() => {
     setBalQueryEnable(true);
-  }, [])
-  
+  }, []);
+
   // const balAtom = getBalanceAtom(strategy?.holdingTokens[0]);
   const balData = useAtomValue(strategy?.balanceAtom || DUMMY_BAL_ATOM);
   // cons{ balance, underlyingTokenInfo, isLoading, isError }
   useEffect(() => {
-    console.log('balData', balData.isError, balData.isLoading, balData.isPending, balData.data, balData.error)
-  }, [balData])
+    console.log(
+      'balData',
+      balData.isError,
+      balData.isLoading,
+      balData.isPending,
+      balData.data,
+      balData.error,
+    );
+  }, [balData]);
 
   useEffect(() => {
     mixpanel.track('Strategy page open', { name: searchParams.get('name') });
@@ -168,17 +174,22 @@ export default function Strategy() {
                   color="cyan"
                   marginTop={'20px'}
                 >
-                  {!balData.isLoading && !balData.isError && !balData.isPending && balData.data && (
-                    <Text>
-                      <b>Your Holdings: </b>
-                      {address
-                        ? `${balData.data.amount.toEtherToFixedDecimals(4)} ${balData.data.tokenInfo?.name}`
-                        : isMobile
-                          ? CONSTANTS.MOBILE_MSG
-                          : 'Connect wallet'}
-                    </Text>
-                  )}
-                  {(balData.isLoading || balData.isPending || !balData.data?.tokenInfo) && (
+                  {!balData.isLoading &&
+                    !balData.isError &&
+                    !balData.isPending &&
+                    balData.data && (
+                      <Text>
+                        <b>Your Holdings: </b>
+                        {address
+                          ? `${balData.data.amount.toEtherToFixedDecimals(4)} ${balData.data.tokenInfo?.name}`
+                          : isMobile
+                            ? CONSTANTS.MOBILE_MSG
+                            : 'Connect wallet'}
+                      </Text>
+                    )}
+                  {(balData.isLoading ||
+                    balData.isPending ||
+                    !balData.data?.tokenInfo) && (
                     <Text>
                       <b>Your Holdings: </b>
                       {address ? (
@@ -190,7 +201,7 @@ export default function Strategy() {
                       )}
                     </Text>
                   )}
-                  {(balData.isError) && (
+                  {balData.isError && (
                     <Text>
                       <b>Your Holdings: Error</b>
                     </Text>

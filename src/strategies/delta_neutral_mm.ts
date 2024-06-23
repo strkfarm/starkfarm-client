@@ -5,9 +5,9 @@ import { zkLend } from '@/store/zklend.store';
 import ERC20Abi from '@/abi/erc20.abi.json';
 import DeltaNeutralAbi from '@/abi/deltraNeutral.abi.json';
 import MyNumber from '@/utils/MyNumber';
-import { Call, Contract, ProviderInterface, num, uint256 } from 'starknet';
+import { Call, Contract, ProviderInterface, uint256 } from 'starknet';
 import { nostraLending } from '@/store/nostralending.store';
-import { getTokenInfoFromAddr, getTokenInfoFromName, standariseAddress } from '@/utils';
+import { standariseAddress } from '@/utils';
 import { DUMMY_BAL_ATOM, getBalanceAtom } from '@/store/balance.atoms';
 import { atom } from 'jotai';
 
@@ -33,9 +33,12 @@ export class DeltaNeutralMM extends IStrategy {
     stepAmountFactors: number[],
   ) {
     const rewardTokens = [{ logo: CONSTANTS.LOGOS.STRK }];
-    const nftInfo = NFTS.find((nft) => standariseAddress(nft.address) == standariseAddress(strategyAddress));
+    const nftInfo = NFTS.find(
+      (nft) =>
+        standariseAddress(nft.address) == standariseAddress(strategyAddress),
+    );
     if (!nftInfo) {
-        throw new Error('DeltaMM: NFT not found');
+      throw new Error('DeltaMM: NFT not found');
     }
     const holdingTokens: (TokenInfo | NFTInfo)[] = [nftInfo];
     super(
@@ -76,7 +79,9 @@ export class DeltaNeutralMM extends IStrategy {
     ];
 
     if (stepAmountFactors.length != this.steps.length) {
-        throw new Error('stepAmountFactors length should be equal to steps length');
+      throw new Error(
+        'stepAmountFactors length should be equal to steps length',
+      );
     }
     this.stepAmountFactors = stepAmountFactors;
 
@@ -92,14 +97,22 @@ export class DeltaNeutralMM extends IStrategy {
     this.strategyAddress = strategyAddress;
   }
 
-  filterMainToken(pools: PoolInfo[], amount: string, prevActions: StrategyAction[]) {
+  filterMainToken(
+    pools: PoolInfo[],
+    amount: string,
+    prevActions: StrategyAction[],
+  ) {
     const dapp = prevActions.length == 0 ? zkLend : nostraLending;
     return pools.filter(
       (p) => p.pool.name == this.token && p.protocol.name == dapp.name,
     );
   }
 
-  filterSecondaryToken(pools: PoolInfo[], amount: string, prevActions: StrategyAction[]) {
+  filterSecondaryToken(
+    pools: PoolInfo[],
+    amount: string,
+    prevActions: StrategyAction[],
+  ) {
     const dapp = prevActions.length == 1 ? zkLend : nostraLending;
     return pools.filter(
       (p) => p.pool.name == this.secondaryToken && p.protocol.name == dapp.name,
@@ -111,12 +124,17 @@ export class DeltaNeutralMM extends IStrategy {
     amount: string,
     actions: StrategyAction[],
   ): StrategyAction[] {
-    console.log('optimizer', actions.length, this.stepAmountFactors)
-    return [...actions, { 
-        pool: eligiblePools[0], 
-        amount: (Number(amount) * this.stepAmountFactors[actions.length]).toFixed(2), 
-        isDeposit: actions.length == 0 || actions.length == 2
-    }];
+    console.log('optimizer', actions.length, this.stepAmountFactors);
+    return [
+      ...actions,
+      {
+        pool: eligiblePools[0],
+        amount: (
+          Number(amount) * this.stepAmountFactors[actions.length]
+        ).toFixed(2),
+        isDeposit: actions.length == 0 || actions.length == 2,
+      },
+    ];
   }
 
   compounder(
@@ -124,14 +142,19 @@ export class DeltaNeutralMM extends IStrategy {
     amount: string,
     actions: StrategyAction[],
   ): StrategyAction[] {
-    const baseApr = actions.reduce((acc, a) => acc + (a.isDeposit ? a.pool.apr : - a.pool.borrow.apr), 0);
+    const baseApr = actions.reduce(
+      (acc, a) => acc + (a.isDeposit ? a.pool.apr : -a.pool.borrow.apr),
+      0,
+    );
     const compoundingApr = (1 + baseApr / 26) ** 26 - 1;
     console.log('compounder', baseApr, compoundingApr, actions);
     return [
       ...actions,
       {
         pool: { ...eligiblePools[0], apr: compoundingApr - baseApr },
-        amount: (Number(amount) * this.stepAmountFactors[actions.length]).toFixed(2),
+        amount: (
+          Number(amount) * this.stepAmountFactors[actions.length]
+        ).toFixed(2),
         isDeposit: true,
       },
     ];
@@ -151,8 +174,8 @@ export class DeltaNeutralMM extends IStrategy {
         {
           tokenInfo: baseTokenInfo,
           calls: [],
-            balanceAtom: DUMMY_BAL_ATOM
-        }
+          balanceAtom: DUMMY_BAL_ATOM,
+        },
       ];
     }
 
@@ -162,14 +185,14 @@ export class DeltaNeutralMM extends IStrategy {
       provider,
     );
     const strategyContract = new Contract(
-        DeltaNeutralAbi,
+      DeltaNeutralAbi,
       this.strategyAddress,
       provider,
     );
 
     // base token
     const call11 = baseTokenContract.populate('approve', [
-        strategyContract.address,
+      strategyContract.address,
       uint256.bnToUint256(amount.toString()),
     ]);
     const call12 = strategyContract.populate('deposit', [
@@ -183,8 +206,8 @@ export class DeltaNeutralMM extends IStrategy {
       {
         tokenInfo: baseTokenInfo,
         calls: calls1,
-        balanceAtom: getBalanceAtom(baseTokenInfo, atom(true))
-      }
+        balanceAtom: getBalanceAtom(baseTokenInfo, atom(true)),
+      },
     ];
   };
 
@@ -202,13 +225,13 @@ export class DeltaNeutralMM extends IStrategy {
         {
           tokenInfo: mainToken,
           calls: [],
-          balanceAtom: DUMMY_BAL_ATOM
+          balanceAtom: DUMMY_BAL_ATOM,
         },
       ];
     }
 
     const strategyContract = new Contract(
-        DeltaNeutralAbi,
+      DeltaNeutralAbi,
       this.strategyAddress,
       provider,
     );
@@ -220,15 +243,19 @@ export class DeltaNeutralMM extends IStrategy {
 
     const calls: Call[] = [call];
 
-    const nftInfo = NFTS.find((nft) => standariseAddress(nft.address) == standariseAddress(this.strategyAddress));
+    const nftInfo = NFTS.find(
+      (nft) =>
+        standariseAddress(nft.address) ==
+        standariseAddress(this.strategyAddress),
+    );
     if (!nftInfo) {
-        throw new Error('DeltaMM: NFT not found');
+      throw new Error('DeltaMM: NFT not found');
     }
     return [
       {
         tokenInfo: mainToken,
         calls,
-        balanceAtom: getBalanceAtom(nftInfo, atom(true))
+        balanceAtom: getBalanceAtom(nftInfo, atom(true)),
       },
     ];
   };

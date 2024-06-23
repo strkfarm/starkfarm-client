@@ -229,8 +229,10 @@ export default function Strategies() {
         marginBottom={'15px'}
         fontFamily={'arial'}
       >
-        <b>What are strategies?</b> Strategies are combination of investment steps that combine various pools and risk combinations to maximize yield. We currently have one High yield low risk strategy, and
-        adding more as you read this.
+        <b>What are strategies?</b> Strategies are combination of investment
+        steps that combine various pools and risk combinations to maximize
+        yield. We currently have one High yield low risk strategy, and adding
+        more as you read this.
       </Text>
       <Card
         variant={'filled'}

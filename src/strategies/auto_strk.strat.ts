@@ -1,15 +1,13 @@
 import CONSTANTS, { TOKENS, TokenName } from '@/constants';
 import { PoolInfo } from '@/store/pools';
 import { IStrategy, TokenInfo } from './IStrategy';
-import { zkLend } from '@/store/zklend.store';
 import ERC20Abi from '@/abi/erc20.abi.json';
 import AutoStrkAbi from '@/abi/autoStrk.abi.json';
 import MasterAbi from '@/abi/master.abi.json';
 import MyNumber from '@/utils/MyNumber';
 import { Contract, ProviderInterface, uint256 } from 'starknet';
 import { atom } from 'jotai';
-import { BalanceResult, DUMMY_BAL_ATOM, getBalanceAtom } from '@/store/balance.atoms';
-import { AtomWithQueryResult } from 'jotai-tanstack-query';
+import { DUMMY_BAL_ATOM, getBalanceAtom } from '@/store/balance.atoms';
 
 interface Step {
   name: string;
@@ -80,7 +78,6 @@ export class AutoTokenStrategy extends IStrategy {
     this.strategyAddress = strategyAddress;
   }
 
-
   optimizer(
     eligiblePools: PoolInfo[],
     amount: string,
@@ -129,12 +126,12 @@ export class AutoTokenStrategy extends IStrategy {
         {
           tokenInfo: baseTokenInfo,
           calls: [],
-          balanceAtom: DUMMY_BAL_ATOM
+          balanceAtom: DUMMY_BAL_ATOM,
         },
         {
           tokenInfo: zTokenInfo,
           calls: [],
-          balanceAtom: DUMMY_BAL_ATOM
+          balanceAtom: DUMMY_BAL_ATOM,
         },
       ];
     }
@@ -184,12 +181,12 @@ export class AutoTokenStrategy extends IStrategy {
       {
         tokenInfo: baseTokenInfo,
         calls: calls1,
-        balanceAtom: getBalanceAtom(baseTokenInfo, atom(true))
+        balanceAtom: getBalanceAtom(baseTokenInfo, atom(true)),
       },
       {
         tokenInfo: zTokenInfo,
         calls: calls2,
-        balanceAtom: getBalanceAtom(zTokenInfo, atom(true))
+        balanceAtom: getBalanceAtom(zTokenInfo, atom(true)),
       },
     ];
   };
@@ -208,7 +205,7 @@ export class AutoTokenStrategy extends IStrategy {
         {
           tokenInfo: frmToken,
           calls: [],
-          balanceAtom: DUMMY_BAL_ATOM
+          balanceAtom: DUMMY_BAL_ATOM,
         },
       ];
     }
@@ -243,7 +240,7 @@ export class AutoTokenStrategy extends IStrategy {
       {
         tokenInfo: frmToken,
         calls,
-        balanceAtom: getBalanceAtom(frmToken, atom(true))
+        balanceAtom: getBalanceAtom(frmToken, atom(true)),
       },
     ];
   };

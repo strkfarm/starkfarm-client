@@ -35,12 +35,12 @@ export interface TokenInfo {
 }
 
 export interface NFTInfo {
-  name: string,
-  address: string,
-  logo: any,
+  name: string;
+  address: string;
+  logo: any;
   config: {
-    mainTokenName: string
-  }
+    mainTokenName: string;
+  };
 }
 
 export interface StrategyAction {
@@ -76,7 +76,7 @@ export class IStrategyProps {
 
   readonly rewardTokens: { logo: string }[];
   readonly holdingTokens: (TokenInfo | NFTInfo)[];
-  
+
   balEnabled = atom(false);
   readonly balanceAtom: Atom<AtomWithQueryResult<BalanceResult, Error>>;
 
@@ -179,7 +179,11 @@ export class IStrategy extends IStrategyProps {
     return eligiblePools;
   }
 
-  filterStrkzkLend(pools: PoolInfo[], amount: string, prevActions: StrategyAction[]) {
+  filterStrkzkLend(
+    pools: PoolInfo[],
+    amount: string,
+    prevActions: StrategyAction[],
+  ) {
     return pools.filter(
       (p) => p.pool.name == 'STRK' && p.protocol.name == zkLend.name,
     );
@@ -216,7 +220,11 @@ export class IStrategy extends IStrategyProps {
         console.log('solve', i, _pools, pools.length, this.actions, _amount);
 
         if (_pools.length > 0) {
-          this.actions = step.optimizer.bind(this)(_pools, _amount, this.actions);
+          this.actions = step.optimizer.bind(this)(
+            _pools,
+            _amount,
+            this.actions,
+          );
           if (this.actions.length != i + 1) {
             console.warn(`actions`, this.actions.length, 'i', i);
             throw new Error('one new action per step required');
