@@ -1,12 +1,15 @@
 import CONSTANTS from '@/constants';
+import { StrategyTxProps, monitorNewTxAtom } from '@/store/transactions.atom';
 import { Box, Button, ButtonProps, Spinner } from '@chakra-ui/react';
 import { useAccount, useContractWrite } from '@starknet-react/core';
+import { useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useEffect, useMemo } from 'react';
 import { isMobile } from 'react-device-detect';
 import { Call } from 'starknet';
 
 interface TxButtonProps {
+  txInfo: StrategyTxProps;
   text: string;
   calls: Call[];
   buttonProps: ButtonProps;
@@ -14,6 +17,7 @@ interface TxButtonProps {
 
 export default function TxButton(props: TxButtonProps) {
   const { address } = useAccount();
+  const monitorNewTx = useSetAtom(monitorNewTxAtom);
   const disabledStyle = {
     bg: 'var(--chakra-colors-disabled_bg)',
     color: 'var(--chakra-colors-disabled_text)',
@@ -26,8 +30,18 @@ export default function TxButton(props: TxButtonProps) {
   });
 
   useEffect(() => {
-    console.log('status', isPending, status, isSuccess);
-  }, [status]);
+    console.log('status', isPending, status, isSuccess, data);
+    if (data && data.transaction_hash) {
+      console.log('txHash', data.transaction_hash);
+      // initiates a toast and adds the tx to tx history if successful
+      monitorNewTx({
+        txHash: data.transaction_hash,
+        info: props.txInfo,
+        status: 'pending', // 'success' | 'failed'
+        createdAt: new Date(),
+      });
+    }
+  }, [status, data]);
 
   const disabledText = useMemo(() => {
     if (isMobile) return CONSTANTS.MOBILE_MSG;
@@ -56,17 +70,17 @@ export default function TxButton(props: TxButtonProps) {
   }
 
   return (
-    <Box width={'100%'}>
+    <Box width={'100%'} textAlign={'center'}>
       <Button
-        color={'purple'}
-        bg="highlight"
+        color={'white'}
+        bg="purple"
         variant={'ghost'}
         width={'100%'}
         _active={{
-          bg: 'var(--chakra-colors-bg)',
+          bg: 'var(--chakra-colors-color2)',
         }}
         _hover={{
-          bg: 'var(--chakra-colors-bg)',
+          bg: 'var(--chakra-colors-color2)',
         }}
         onClick={() => {
           mixpanel.track('Click strategy button', {

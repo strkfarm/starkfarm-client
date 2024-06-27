@@ -13,6 +13,7 @@ import {
   Container,
   HStack,
   Heading,
+  Link,
   LinkBox,
   LinkOverlay,
   Popover,
@@ -31,12 +32,12 @@ import {
 import { useAtomValue } from 'jotai';
 import React from 'react';
 import mixpanel from 'mixpanel-browser';
-import { useRouter } from 'next/navigation';
+import TVL from './TVL';
+import CONSTANTS from '@/constants';
 
 export default function Strategies() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
   const strategies = useAtomValue(strategiesAtom);
-  const router = useRouter();
 
   function DepositButton(strat: StrategyInfo) {
     // const { isOpen, onOpen, onClose } = useDisclosure()
@@ -217,17 +218,21 @@ export default function Strategies() {
       </Stack>
     );
   }
+
   return (
     <Container width="100%" float={'left'} padding={'0px'} marginTop={'10px'}>
+      <TVL />
       <Text
+        marginTop={'15px'}
         color="light_grey"
-        fontSize={'13px'}
-        marginBottom={'10px'}
+        fontSize={'15px'}
+        marginBottom={'15px'}
         fontFamily={'arial'}
       >
-        Strategies are combination of deposit & borrow actions that combine
-        various pools and risk combinations to maximize yield. We currently have
-        one High yield low risk strategy, and adding more as you read this.
+        <b>What are strategies?</b> Strategies are combination of deposit &
+        borrow actions that combine various pools and risk combinations to
+        maximize yield. We currently have one High yield low risk strategy, and
+        adding more as you read this.
       </Text>
       <Card
         variant={'filled'}
@@ -248,7 +253,7 @@ export default function Strategies() {
           </HStack>
         </CardBody>
       </Card>
-      {strategies.length > 0 && (
+      {allPools.length && strategies.length > 0 && (
         <Stack spacing="4">
           {strategies.map((strat, index) => (
             <Card
@@ -280,8 +285,24 @@ export default function Strategies() {
       {allPools.length === 0 && (
         <Stack>
           <Skeleton height="70px" />
+          <Skeleton height="70px" />
+          <Skeleton height="70px" />
+          <Skeleton height="70px" />
         </Stack>
       )}
+      <Text
+        color="color2Text"
+        textAlign={'center'}
+        width={'100%'}
+        margin="15px 0"
+        fontSize="18px"
+      >
+        More strategies coming soon. Join our{' '}
+        <Link textDecoration={'underline'} href={CONSTANTS.COMMUNITY_TG}>
+          Telegram channel
+        </Link>{' '}
+        to stay upto date.
+      </Text>
     </Container>
   );
 }

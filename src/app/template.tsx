@@ -7,7 +7,7 @@ import {
   Flex,
   extendTheme,
 } from '@chakra-ui/react';
-import { sepolia } from '@starknet-react/chains';
+import { mainnet } from '@starknet-react/chains';
 import { StarknetConfig, jsonRpcProvider } from '@starknet-react/core';
 import { Provider as JotaiProvider } from 'jotai';
 import mixpanel from 'mixpanel-browser';
@@ -19,6 +19,7 @@ import { InjectedConnector } from 'starknetkit/injected';
 import { WebWalletConnector } from 'starknetkit/webwallet';
 
 import Navbar from '@/components/Navbar';
+import { Toaster } from 'react-hot-toast';
 
 // ! make page view more dynamic
 mixpanel.init('118f29da6a372f0ccb6f541079cad56b');
@@ -33,6 +34,7 @@ const theme = extendTheme({
     color1_35p: 'rgba(86, 118, 254, 0.35)',
     color1_light: '#bcc9ff80',
     color2: 'rgb(127 73 229)',
+    color2Text: 'rgb(165 118 255)',
     color2_65p: 'rgba(104, 51, 205, 0.65)',
     color2_50p: 'rgba(104, 51, 205, 0.5)',
     highlight: '#272932', // light grey
@@ -68,8 +70,15 @@ BigInt.prototype.toJSON = function () {
   return this.toString();
 };
 
+export const MYCONNECTORS = [
+  new InjectedConnector({ options: { id: 'braavos', name: 'Braavos' } }),
+  new InjectedConnector({ options: { id: 'argentX', name: 'Argent X' } }),
+  new WebWalletConnector({ url: 'https://web.argent.xyz' }),
+  new ArgentMobileConnector(),
+];
+
 export default function Template({ children }: { children: React.ReactNode }) {
-  const chains = [sepolia];
+  const chains = [mainnet];
   const provider = jsonRpcProvider({
     rpc: (chain) => {
       const args: RpcProviderOptions = {
@@ -80,22 +89,6 @@ export default function Template({ children }: { children: React.ReactNode }) {
       return args;
     },
   });
-
-  // const { connectors } = useInjectedConnectors({
-  //   // Show these connectors if the user has no connector installed.
-  //   recommended: [braavos(), argent()],
-  //   // Hide recommended connectors if the user has any connector installed.
-  //   includeRecommended: 'onlyIfNoConnectors',
-  //   // Randomize the order of the connectors.
-  //   order: 'alphabetical',
-  // });
-
-  const connectors = [
-    new InjectedConnector({ options: { id: 'braavos', name: 'Braavos' } }),
-    new InjectedConnector({ options: { id: 'argentX', name: 'Argent X' } }),
-    new WebWalletConnector({ url: 'https://web.argent.xyz' }),
-    new ArgentMobileConnector(),
-  ];
 
   function getIconNode(icon: typeof import('*.svg'), alt: string) {
     return (
@@ -110,29 +103,14 @@ export default function Template({ children }: { children: React.ReactNode }) {
       <StarknetConfig
         chains={chains}
         provider={provider}
-        connectors={connectors}
+        connectors={MYCONNECTORS}
       >
         <ChakraBaseProvider theme={theme}>
           <Flex minHeight={'100vh'} bgColor={'bg'}>
-            {/* <Sidebar collapsed={true} backgroundColor='var(--chakra-colors-highlight)' style={{"border": '0px'}} collapsedWidth={'150px'}>
-              <Center width='100%' marginTop='20px'><Image src={LogoSvg} alt='Logo' height={'50px'}/></Center>
-              <Menu style={{"marginTop": '100px', "backgroundColor": '#eecef9'}}
-              >
-                <MenuItem>
-                  <Box>{getIconNode(HomeSvg, 'home')}</Box>
-                </MenuItem>
-                <MenuItem active={true}>
-                  <Box>{getIconNode(PlaySvg, 'play')}</Box>
-                </MenuItem>
-                <MenuItem>
-                  <Box>{getIconNode(HomeSvg, 'home')}</Box>
-                </MenuItem>
-              </Menu>
-            </Sidebar>
-           */}
             <Container width={'100%'} padding="0px" paddingTop="100px">
               <Navbar />
               <React.Suspense>{children}</React.Suspense>
+              <Toaster />
             </Container>
           </Flex>
         </ChakraBaseProvider>

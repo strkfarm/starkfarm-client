@@ -75,7 +75,8 @@ export default function Pools() {
           return (
             <Flex width={'100%'} key={split.title}>
               <Text key="1" width={'70%'}>
-                {split.title} {split.description ? `(${split.description})` : ''}
+                {split.title}{' '}
+                {split.description ? `(${split.description})` : ''}
               </Text>
               <Text width={'30%'} textAlign={'right'} key="2">
                 {split.apr === 'Err' ? split.apr : (split.apr * 100).toFixed(2)}
@@ -154,13 +155,7 @@ export default function Pools() {
           </Pagination>
         </Container>
       }
-      {
-        <Box padding="0px 0" width={'100%'} float={'left'}>
-          <Text color="light_grey" textAlign={'right'} fontSize={'12px'}>
-            Max {ITEMS_PER_PAGE} per page, total {_filteredPools.length}
-          </Text>
-        </Box>
-      }
+
       <Container width="100%" float={'left'} padding={'0px'} marginTop={'10px'}>
         <Card variant={'filled'} bg="opacity_50p" color={'purple'}>
           <CardBody paddingTop={'5px'} paddingBottom={'5px'}>

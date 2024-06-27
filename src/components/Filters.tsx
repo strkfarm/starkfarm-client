@@ -62,19 +62,19 @@ const colourStyles: StylesConfig<Option, true> = {
   dropdownIndicator: (styles) => {
     return {
       ...styles,
-      color: 'var(--chakra-colors-color2)',
+      color: 'var(--chakra-colors-color2Text)',
     };
   },
   clearIndicator: (styles) => {
     return {
       ...styles,
-      color: 'var(--chakra-colors-color2)',
+      color: 'var(--chakra-colors-color2Text)',
     };
   },
   indicatorSeparator: (styles) => {
     return {
       ...styles,
-      backgroundColor: 'var(--chakra-colors-color2)',
+      backgroundColor: 'var(--chakra-colors-color2Text)',
     };
   },
   menu: (styles) => {
@@ -132,17 +132,17 @@ export default function Filters() {
     <Accordion allowToggle>
       <AccordionItem borderTop="0px" borderBottom="1px" borderColor={'bg'}>
         <h2>
-          <AccordionButton>
+          <AccordionButton fontWeight={'bold'}>
             <Box
               as="span"
               flex="1"
               textAlign="right"
-              color="color2"
+              color="color2Text"
               marginRight="10px"
             >
               Filters
             </Box>
-            <HamburgerIcon color="color2" />
+            <HamburgerIcon color="color2Text" />
           </AccordionButton>
         </h2>
         <AccordionPanel pb={4} bg="highlight" overflow={'visible'}>

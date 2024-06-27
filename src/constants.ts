@@ -32,6 +32,9 @@ const CONSTANTS = {
     BASE_APR_API: '/ekubo/pair',
     BASE_PRICE_API: '/ekubo/price',
   },
+  HAIKO: {
+    BASE_APR_API: 'haiko/markets?network=mainnet',
+  },
   CONTRACTS: {
     Master: '0x50314707690c31597849ed66a494fb4279dc060f8805f21593f52906846e28e',
     AutoStrkFarm:
