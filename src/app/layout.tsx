@@ -1,18 +1,28 @@
+import { GoogleAnalytics } from '@next/third-parties/google';
 import { Analytics } from '@vercel/analytics/react';
 import type { Metadata } from 'next';
-// import { Inter, Courier_Prime } from "next/font/google";
-import { GoogleAnalytics } from '@next/third-parties/google';
 import React from 'react';
-import './globals.css';
 
-// const courier = Courier_Prime({
-//   weight: '400',
-//   subsets: ['latin']
-// });
+import './globals.css';
 
 export const metadata: Metadata = {
   title: 'STRKFarm | Earn $STRK Tokens',
-  description: 'Farm on the best pools of Starknet',
+  description:
+    'Farm on the best pools of Starknet and earn $STRK tokens. STRKFarm is the best yield aggregator on Starknet.',
+  openGraph: {
+    title: 'STRKFarm | Earn $STRK Tokens',
+    description:
+      'Farm on the best pools of Starknet and earn $STRK tokens. STRKFarm is the best yield aggregator on Starknet.',
+    images: ['https://www.strkfarm.xyz/preview.png'],
+  },
+  twitter: {
+    creator: '@akiraonstarknet',
+    title: 'STRKFarm | Earn $STRK Tokens',
+    description:
+      'Farm on the best pools of Starknet and earn $STRK tokens. STRKFarm is the best yield aggregator on Starknet.t',
+    card: 'summary_large_image',
+    images: ['https://www.strkfarm.xyz/preview.png'],
+  },
 };
 
 export default function RootLayout({

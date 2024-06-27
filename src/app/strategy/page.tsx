@@ -1,12 +1,5 @@
 'use client';
 
-import Deposit from '@/components/Deposit';
-import CONSTANTS from '@/constants';
-import { useERC4626Value } from '@/hooks/useERC4626Value';
-
-import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
-import { getUniqueById } from '@/utils';
-
 import {
   Avatar,
   Box,
@@ -41,6 +34,12 @@ import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 import { isMobile } from 'react-device-detect';
 
+import Deposit from '@/components/Deposit';
+import CONSTANTS from '@/constants';
+import { useERC4626Value } from '@/hooks/useERC4626Value';
+import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
+import { getUniqueById } from '@/utils';
+
 export default function Strategy() {
   const { address } = useAccount();
   const searchParams = useSearchParams();
@@ -62,6 +61,7 @@ export default function Strategy() {
 
   const colSpan1: any = { base: '5', md: '3' };
   const colSpan2: any = { base: '5', md: '2' };
+
   return (
     <Container
       maxWidth={'1000px'}
