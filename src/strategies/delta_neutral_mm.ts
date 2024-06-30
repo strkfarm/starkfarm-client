@@ -48,7 +48,7 @@ export class DeltaNeutralMM extends IStrategy {
       description,
       rewardTokens,
       holdingTokens,
-      liveStatus
+      liveStatus,
     );
     this.token = token;
 

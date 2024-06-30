@@ -43,16 +43,16 @@ export default function Strategies() {
 
   function getStratCardBg(strat: IStrategyProps, index: number) {
     if (strat.liveStatus == StrategyLiveStatus.ACTIVE) {
-      return index % 2 === 0 ? 'color1_50p' : 'color2_50p'
+      return index % 2 === 0 ? 'color1_50p' : 'color2_50p';
     }
-    return 'bg'
+    return 'bg';
   }
 
   function getStratCardBgHover(strat: IStrategyProps, index: number) {
     if (strat.liveStatus == StrategyLiveStatus.ACTIVE) {
-      return index % 2 === 0 ? 'color1_65p' : 'color2_65p'
+      return index % 2 === 0 ? 'color1_65p' : 'color2_65p';
     }
-    return 'bg'
+    return 'bg';
   }
 
   function DepositButton(strat: StrategyInfo) {
@@ -157,15 +157,24 @@ export default function Strategies() {
                 marginBottom={'5px'}
                 fontWeight={'bold'}
               >
-                {strat.liveStatus == StrategyLiveStatus.ACTIVE && <LinkOverlay href={`/strategy?name=${strat.name}`}>
-                  {strat.name}
-                </LinkOverlay>}
-                {strat.liveStatus != StrategyLiveStatus.ACTIVE && <>
-                  {strat.name} 
-                  <Badge ml='1' bg='cyan' fontFamily={'sans-serif'} padding='3px 5px 2px'>
-                    Coming soon
-                  </Badge>
-                </>}
+                {strat.liveStatus == StrategyLiveStatus.ACTIVE && (
+                  <LinkOverlay href={`/strategy?name=${strat.name}`}>
+                    {strat.name}
+                  </LinkOverlay>
+                )}
+                {strat.liveStatus != StrategyLiveStatus.ACTIVE && (
+                  <>
+                    {strat.name}
+                    <Badge
+                      ml="1"
+                      bg="cyan"
+                      fontFamily={'sans-serif'}
+                      padding="3px 5px 2px"
+                    >
+                      Coming soon
+                    </Badge>
+                  </>
+                )}
               </Heading>
               <Heading
                 fontSize={{ base: '12px', md: '14px' }}

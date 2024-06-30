@@ -134,7 +134,7 @@ export class IStrategy extends IStrategyProps {
     description: string,
     rewardTokens: { logo: string }[],
     holdingTokens: (TokenInfo | NFTInfo)[],
-    liveStatus = StrategyLiveStatus.ACTIVE
+    liveStatus = StrategyLiveStatus.ACTIVE,
   ) {
     super(id, description, rewardTokens, holdingTokens, liveStatus);
     this.tag = tag;

@@ -44,7 +44,7 @@ export const strategiesAtom = atom<StrategyInfo[]>((get) => {
     CONSTANTS.CONTRACTS.DeltaNeutralMMUSDCETH,
     [1.52, 0.618, 1, 0.553, 1.923],
     StrategyLiveStatus.COMING_SOON,
-  )
+  );
   const deltaNeutralMMSTRKUSDC = new DeltaNeutralMM(
     'STRK',
     Mustache.render(DNMMDescription, { token1: 'STRK', token2: 'USDC' }),
@@ -53,7 +53,7 @@ export const strategiesAtom = atom<StrategyInfo[]>((get) => {
     CONSTANTS.CONTRACTS.DeltaNeutralMMUSDCETH,
     [1.52, 0.618, 1, 0.553, 1.923],
     StrategyLiveStatus.COMING_SOON,
-  )
+  );
 
   const allPools = get(allPoolsAtomUnSorted);
   const filteredPools = allPools.filter(
@@ -93,7 +93,7 @@ export const strategiesAtom = atom<StrategyInfo[]>((get) => {
   //     .
   // })
   strategies.sort((a, b) => {
-    return a.liveStatus - b.liveStatus || b.netYield - a.netYield
+    return a.liveStatus - b.liveStatus || b.netYield - a.netYield;
   });
   return strategies;
 });

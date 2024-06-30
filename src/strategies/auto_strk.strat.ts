@@ -7,7 +7,11 @@ import MasterAbi from '@/abi/master.abi.json';
 import MyNumber from '@/utils/MyNumber';
 import { Contract, ProviderInterface, uint256 } from 'starknet';
 import { atom } from 'jotai';
-import { DUMMY_BAL_ATOM, getBalanceAtom, getERC20BalanceAtom } from '@/store/balance.atoms';
+import {
+  DUMMY_BAL_ATOM,
+  getBalanceAtom,
+  getERC20BalanceAtom,
+} from '@/store/balance.atoms';
 
 interface Step {
   name: string;
