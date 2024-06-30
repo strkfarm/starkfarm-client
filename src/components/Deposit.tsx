@@ -176,7 +176,9 @@ export default function Deposit(props: DepositProps) {
             >
               <Center>
                 {/* <ImageC src={selectedMarket.logo.src} alt='' width={'20px'} marginRight='5px'/> */}
-                {selectedMarket.name}
+                {balData.data && balData.data.tokenInfo
+                  ? balData.data.tokenInfo.name
+                  : '-'}
               </Center>
             </MenuButton>
             <MenuList {...MyMenuListProps}>

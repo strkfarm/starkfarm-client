@@ -1,6 +1,6 @@
 import CONSTANTS, { NFTS, TOKENS, TokenName } from '@/constants';
 import { PoolInfo } from '@/store/pools';
-import { IStrategy, NFTInfo, TokenInfo } from './IStrategy';
+import { IStrategy, NFTInfo, StrategyLiveStatus, TokenInfo } from './IStrategy';
 import { zkLend } from '@/store/zklend.store';
 import ERC20Abi from '@/abi/erc20.abi.json';
 import DeltaNeutralAbi from '@/abi/deltraNeutral.abi.json';
@@ -31,6 +31,7 @@ export class DeltaNeutralMM extends IStrategy {
     secondaryTokenName: TokenName,
     strategyAddress: string,
     stepAmountFactors: number[],
+    liveStatus: StrategyLiveStatus,
   ) {
     const rewardTokens = [{ logo: CONSTANTS.LOGOS.STRK }];
     const nftInfo = NFTS.find(
@@ -47,6 +48,7 @@ export class DeltaNeutralMM extends IStrategy {
       description,
       rewardTokens,
       holdingTokens,
+      liveStatus,
     );
     this.token = token;
 
