@@ -8,7 +8,7 @@ import { addressAtom } from '@/store/claims.atoms';
 import ERC20Abi from '@/abi/erc20.abi.json';
 import DeltaNeutralAbi from '@/abi/deltraNeutral.abi.json';
 import { Atom } from 'jotai';
-import { getTokenInfoFromName } from '@/utils';
+import { getTokenInfoFromAddr, getTokenInfoFromName, standariseAddress } from '@/utils';
 
 export interface BalanceResult {
   amount: MyNumber;
@@ -57,10 +57,16 @@ async function getERC4626Balance(
   const balance = await erc4626Contract.call('convert_to_assets', [
     uint256.bnToUint256(bal.amount.toString()),
   ]);
-  console.log('erc4626 balData', token.token, balance);
+
+  const asset = await erc4626Contract.call('asset', []);
+  console.log('erc4626 balData', token.token, balance, standariseAddress(asset as string));
+  const assetInfo = getTokenInfoFromAddr(standariseAddress(asset as string));
+  if (!assetInfo) {
+    throw new Error('ERC4626: Asset not found');
+  }
   return {
     amount: new MyNumber(balance.toString(), token.decimals),
-    tokenInfo: token,
+    tokenInfo: assetInfo,
   };
 }
 
@@ -88,7 +94,7 @@ async function getERC721PositionValue(
   };
 }
 
-function getERC20BalanceAtom(token: TokenInfo | undefined) {
+export function getERC20BalanceAtom(token: TokenInfo | undefined) {
   return atomWithQuery((get) => {
     return {
       queryKey: ['getERC20Balance', token?.token],
@@ -129,8 +135,10 @@ export function getBalanceAtom(
   enabledAtom: Atom<boolean>,
 ) {
   if (token) {
+    console.log('token getBalanceAtom', token);
     if (Object.prototype.hasOwnProperty.call(token, 'isERC4626')) {
       const _token = <TokenInfo>token;
+      console.log('token getBalanceAtom isERC4626', _token.isERC4626)
       if (_token.isERC4626) return getERC4626BalanceAtom(_token);
     } else {
       const _token = <NFTInfo>token;
