@@ -1,12 +1,17 @@
 import CONSTANTS, { TOKENS, TokenName } from '@/constants';
 import { PoolInfo } from '@/store/pools';
 import { IStrategy, TokenInfo } from './IStrategy';
-import { zkLend } from '@/store/zklend.store';
 import ERC20Abi from '@/abi/erc20.abi.json';
 import AutoStrkAbi from '@/abi/autoStrk.abi.json';
 import MasterAbi from '@/abi/master.abi.json';
 import MyNumber from '@/utils/MyNumber';
 import { Contract, ProviderInterface, uint256 } from 'starknet';
+import { atom } from 'jotai';
+import {
+  DUMMY_BAL_ATOM,
+  getBalanceAtom,
+  getERC20BalanceAtom,
+} from '@/store/balance.atoms';
 
 interface Step {
   name: string;
@@ -44,6 +49,7 @@ export class AutoTokenStrategy extends IStrategy {
     const frmToken = TOKENS.find((t) => t.token == strategyAddress);
     if (!frmToken) throw new Error('frmToken undefined');
     const holdingTokens = [frmToken];
+
     super(
       `auto_token_${token}`,
       'AutoSTRK',
@@ -57,12 +63,12 @@ export class AutoTokenStrategy extends IStrategy {
       {
         name: `Supplies your ${token} to zkLend`,
         optimizer: this.optimizer,
-        filter: [this.filterStrk],
+        filter: [this.filterStrkzkLend],
       },
       {
         name: `Re-invest your STRK Rewards every 14 days`,
         optimizer: this.compounder,
-        filter: [this.filterStrk],
+        filter: [this.filterStrkzkLend],
       },
     ];
     const _risks = [...this.risks];
@@ -74,12 +80,6 @@ export class AutoTokenStrategy extends IStrategy {
     ];
     this.lpTokenName = lpTokenName;
     this.strategyAddress = strategyAddress;
-  }
-
-  filterStrk(pools: PoolInfo[], amount: string, prevActions: StrategyAction[]) {
-    return pools.filter(
-      (p) => p.pool.name == this.token && p.protocol.name == zkLend.name,
-    );
   }
 
   optimizer(
@@ -130,10 +130,12 @@ export class AutoTokenStrategy extends IStrategy {
         {
           tokenInfo: baseTokenInfo,
           calls: [],
+          balanceAtom: DUMMY_BAL_ATOM,
         },
         {
           tokenInfo: zTokenInfo,
           calls: [],
+          balanceAtom: DUMMY_BAL_ATOM,
         },
       ];
     }
@@ -183,10 +185,12 @@ export class AutoTokenStrategy extends IStrategy {
       {
         tokenInfo: baseTokenInfo,
         calls: calls1,
+        balanceAtom: getBalanceAtom(baseTokenInfo, atom(true)),
       },
       {
         tokenInfo: zTokenInfo,
         calls: calls2,
+        balanceAtom: getBalanceAtom(zTokenInfo, atom(true)),
       },
     ];
   };
@@ -205,6 +209,7 @@ export class AutoTokenStrategy extends IStrategy {
         {
           tokenInfo: frmToken,
           calls: [],
+          balanceAtom: DUMMY_BAL_ATOM,
         },
       ];
     }
@@ -239,6 +244,7 @@ export class AutoTokenStrategy extends IStrategy {
       {
         tokenInfo: frmToken,
         calls,
+        balanceAtom: getERC20BalanceAtom(frmToken),
       },
     ];
   };

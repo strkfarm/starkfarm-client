@@ -25,14 +25,23 @@ export default function TxButton(props: TxButtonProps) {
     borderWidth: '1px',
   };
 
-  const { writeAsync, data, status, isSuccess, isPending } = useContractWrite({
-    calls: props.calls,
-  });
+  const { writeAsync, data, status, isSuccess, isPending, error, isError } =
+    useContractWrite({
+      calls: props.calls,
+    });
 
   useEffect(() => {
-    console.log('status', isPending, status, isSuccess, data);
+    console.log(
+      'TxButton status',
+      isPending,
+      status,
+      isSuccess,
+      data,
+      error,
+      isError,
+    );
     if (data && data.transaction_hash) {
-      console.log('txHash', data.transaction_hash);
+      console.log('TxButton txHash', data.transaction_hash);
       // initiates a toast and adds the tx to tx history if successful
       monitorNewTx({
         txHash: data.transaction_hash,
@@ -42,6 +51,10 @@ export default function TxButton(props: TxButtonProps) {
       });
     }
   }, [status, data]);
+
+  // useEffect(() => {
+  //   console.log('TxButton props calls', props.calls);
+  // }, [props])
 
   const disabledText = useMemo(() => {
     if (isMobile) return CONSTANTS.MOBILE_MSG;

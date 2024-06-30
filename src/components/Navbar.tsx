@@ -7,6 +7,7 @@ import {
   Container,
   Flex,
   IconButton,
+  Image,
   Link,
   Menu,
   MenuButton,
@@ -18,12 +19,14 @@ import { useAtom, useSetAtom } from 'jotai';
 import { useStarknetkitConnectModal } from 'starknetkit';
 
 import tg from '@/assets/tg.svg';
+import fulllogo from '@public/fulllogo.png';
 import CONSTANTS from '@/constants';
 import { addressAtom } from '@/store/claims.atoms';
 import { MyMenuItemProps, MyMenuListProps, shortAddress } from '@/utils';
 import { useEffect } from 'react';
 import { lastWalletAtom } from '@/store/utils.atoms';
 import { useAccount, useConnect, useDisconnect } from '@starknet-react/core';
+import { CONNECTOR_NAMES, MYCONNECTORS } from '@/app/template';
 
 export default function Navbar() {
   const { address, connector } = useAccount();
@@ -35,6 +38,7 @@ export default function Navbar() {
     useStarknetkitConnectModal({
       modalMode: 'canAsk',
       modalTheme: 'dark',
+      connectors: MYCONNECTORS,
     });
 
   // backup
@@ -42,6 +46,7 @@ export default function Navbar() {
     useStarknetkitConnectModal({
       modalMode: 'alwaysAsk',
       modalTheme: 'dark',
+      connectors: MYCONNECTORS,
     });
 
   // Connect wallet using starknetkit
@@ -50,6 +55,7 @@ export default function Navbar() {
       const result = await starknetkitConnectModal1();
       await connect({ connector: result.connector });
     } catch (error) {
+      console.warn('connectWallet error', error);
       try {
         const result = await starknetkitConnectModal2();
         await connect({ connector: result.connector });
@@ -60,24 +66,30 @@ export default function Navbar() {
     }
   };
 
-  // Auto-connects to last wallet
-  useEffect(() => {
+  function autoConnect(retry = 0) {
     console.log('lastWallet', lastWallet, connectors);
     try {
       if (!address && lastWallet) {
-        const lastConnector = connectors.find((c) => c.name == lastWallet);
-        console.log('lastWallet connected', lastConnector);
-        if (!lastConnector) {
-          console.error('last connector name found, but no connector');
-          setLastWallet(null);
-        } else {
-          connectWallet();
+        const connectorIndex = CONNECTOR_NAMES.findIndex(
+          (name) => name === lastWallet,
+        );
+        if (connectorIndex >= 0) {
+          connect({ connector: MYCONNECTORS[connectorIndex] });
         }
       }
     } catch (error) {
       console.error('lastWallet error', error);
+      if (retry < 10) {
+        setTimeout(() => {
+          autoConnect(retry + 1);
+        }, 1000);
+      }
     }
-  }, [lastWallet, connectors]);
+  }
+  // Auto-connects to last wallet
+  useEffect(() => {
+    autoConnect();
+  }, [lastWallet]);
 
   // Set last wallet when a new wallet is connected
   useEffect(() => {
@@ -106,7 +118,7 @@ export default function Navbar() {
       <Center bg="highlight" color="orange" padding={0}>
         <Text fontSize="12px" textAlign={'center'} padding="0px 5px">
           {''}
-          <b>Alpha version, report bugs in our Telegram group.</b>
+          <b>Report bugs & share feedback in our Telegram group.</b>
           {''}
         </Text>
       </Center>
@@ -118,14 +130,11 @@ export default function Navbar() {
       >
         <Flex width={'100%'}>
           <Link href="/" margin="0 auto 0 0" textAlign={'left'}>
-            <Text
-              fontSize={{ base: '20px', sm: '25px', md: '30px' }}
-              color={'color2'}
-              letterSpacing={'10px'}
-              marginTop={{ base: '7px', sm: '3px', md: '0' }}
-            >
-              <b>STRKFarm</b>
-            </Text>
+            <Image
+              src={fulllogo.src}
+              alt="logo"
+              height={{ base: '40px', md: '50px' }}
+            />
           </Link>
           {/* <Link href={'/claims'} isExternal>
             <Button
@@ -219,8 +228,9 @@ export default function Navbar() {
               height={{ base: '2rem', sm: '2.5rem' }}
               my={{ base: 'auto', sm: 'initial' }}
               paddingX={{ base: '0.5rem', sm: '1rem' }}
-              fontSize={{ base: '0.9rem', sm: '1rem' }}
+              fontSize={{ base: '0.8rem', sm: '1rem' }}
               onClick={address ? undefined : connectWallet}
+              size="xs"
             >
               <Center>{address ? shortAddress(address) : 'Connect'}</Center>
             </MenuButton>

@@ -5,6 +5,7 @@ import { AddIcon } from '@chakra-ui/icons';
 import {
   Avatar,
   AvatarGroup,
+  Badge,
   Box,
   Button,
   Card,
@@ -34,10 +35,25 @@ import React from 'react';
 import mixpanel from 'mixpanel-browser';
 import TVL from './TVL';
 import CONSTANTS from '@/constants';
+import { IStrategyProps, StrategyLiveStatus } from '@/strategies/IStrategy';
 
 export default function Strategies() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
   const strategies = useAtomValue(strategiesAtom);
+
+  function getStratCardBg(strat: IStrategyProps, index: number) {
+    if (strat.liveStatus == StrategyLiveStatus.ACTIVE) {
+      return index % 2 === 0 ? 'color1_50p' : 'color2_50p';
+    }
+    return 'bg';
+  }
+
+  function getStratCardBgHover(strat: IStrategyProps, index: number) {
+    if (strat.liveStatus == StrategyLiveStatus.ACTIVE) {
+      return index % 2 === 0 ? 'color1_65p' : 'color2_65p';
+    }
+    return 'bg';
+  }
 
   function DepositButton(strat: StrategyInfo) {
     // const { isOpen, onOpen, onClose } = useDisclosure()
@@ -45,7 +61,7 @@ export default function Strategies() {
       <Box>
         <AvatarGroup
           size="xs"
-          max={2}
+          max={4}
           marginRight={'5px'}
           float={'left'}
           visibility={'hidden'}
@@ -124,7 +140,7 @@ export default function Strategies() {
           }}
         >
           <Box width={'100%'}>
-            <AvatarGroup size="xs" max={2} marginRight={'5px'}>
+            <AvatarGroup size="xs" max={4} marginRight={'5px'}>
               {getUniqueById(
                 strat.actions.map((p) => ({
                   id: p.pool.pool.name,
@@ -141,9 +157,24 @@ export default function Strategies() {
                 marginBottom={'5px'}
                 fontWeight={'bold'}
               >
-                <LinkOverlay href={`/strategy?name=${strat.name}`}>
-                  {strat.name}
-                </LinkOverlay>
+                {strat.liveStatus == StrategyLiveStatus.ACTIVE && (
+                  <LinkOverlay href={`/strategy?name=${strat.name}`}>
+                    {strat.name}
+                  </LinkOverlay>
+                )}
+                {strat.liveStatus != StrategyLiveStatus.ACTIVE && (
+                  <>
+                    {strat.name}
+                    <Badge
+                      ml="1"
+                      bg="cyan"
+                      fontFamily={'sans-serif'}
+                      padding="3px 5px 2px"
+                    >
+                      Coming soon
+                    </Badge>
+                  </>
+                )}
               </Heading>
               <Heading
                 fontSize={{ base: '12px', md: '14px' }}
@@ -178,7 +209,7 @@ export default function Strategies() {
           marginTop={{ base: '10px', md: '0px' }}
         >
           <Box width={'100%'} float="left" marginBottom={'5px'}>
-            <Tooltip label="Includes fees & rewards earn from tokens shown. Click to know the investment proceduce.">
+            <Tooltip label="Includes fees & rewards earn from tokens shown">
               <Text
                 textAlign={'right'}
                 color="cyan"
@@ -229,10 +260,10 @@ export default function Strategies() {
         marginBottom={'15px'}
         fontFamily={'arial'}
       >
-        <b>What are strategies?</b> Strategies are combination of deposit &
-        borrow actions that combine various pools and risk combinations to
-        maximize yield. We currently have one High yield low risk strategy, and
-        adding more as you read this.
+        <b>What are strategies?</b> Strategies are combination of investment
+        steps that combine various pools and risk combinations to maximize
+        yield. We currently have one High yield low risk strategy, and adding
+        more as you read this.
       </Text>
       <Card
         variant={'filled'}
@@ -259,11 +290,9 @@ export default function Strategies() {
             <Card
               key={`${strat.name}`}
               variant={'filled'}
-              bg={index % 2 === 0 ? 'color1_50p' : 'color2_50p'}
+              bg={getStratCardBg(strat, index)}
               color="white"
-              _hover={{
-                bg: index % 2 === 0 ? 'color1_65p' : 'color2_65p',
-              }}
+              _hover={getStratCardBgHover(strat, index)}
             >
               <CardBody padding={{ base: '15px', md: '20px' }}>
                 <Box width={'100%'} padding={'0px 10px 0 0'}>
