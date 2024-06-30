@@ -22,11 +22,12 @@ export class NostraDegen extends Jediswap {
           const tokens: TokenName[] = [poolData.tokenA, poolData.tokenB];
           const logo1 = CONSTANTS.LOGOS[tokens[0]];
           const logo2 = CONSTANTS.LOGOS[tokens[1]];
-          const baseApr = parseFloat(poolData.baseApr);
+          const baseApr =
+            poolData.baseApr === '0' ? 0.00 : parseFloat(poolData.baseApr);
           const rewardApr = parseFloat(poolData.rewardApr);
           const poolInfo: PoolInfo = {
             pool: {
-              name: poolData.id,
+              name: poolData.id.slice(0, -6),
               logos: [logo1, logo2],
             },
             protocol: {
@@ -38,7 +39,7 @@ export class NostraDegen extends Jediswap {
             tvl: Number(poolData.tvl),
             aprSplits: [
               {
-                apr: baseApr,
+                apr: baseApr || baseApr.toString() === '' ? baseApr : 0,
                 title: 'Base APR',
                 description: '',
               },
