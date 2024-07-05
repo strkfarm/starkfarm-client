@@ -9,6 +9,7 @@ import { TOKENS } from '@/constants';
 import { StrategyInfo, strategiesAtom } from './strategies.atoms';
 import { RpcProvider, TransactionExecutionStatus } from 'starknet';
 import toast from 'react-hot-toast';
+import Strategy from '@/app/strategy/page';
 
 export interface StrategyTxProps {
   strategyId: string;
@@ -17,10 +18,16 @@ export interface StrategyTxProps {
   tokenAddr: string;
 }
 
+export interface LoanGuardTxProps {
+  protocol: "zkLend" | "Nostra";
+  actionType: 'subscribe' | 'update' | 'unsubscribe';
+}
+
 // Standard tx info to be stored in local storage
 export interface TransactionInfo {
   txHash: string;
-  info: StrategyTxProps; // can add more types of txs in future
+  type: 'strategy' | 'loanGuard';
+  info: StrategyTxProps | LoanGuardTxProps; // can add more types of txs in future
   status: 'pending' | 'success' | 'failed';
   createdAt: Date;
 }
@@ -34,10 +41,12 @@ async function deserialiseTxInfo(key: string, initialValue: TransactionInfo[]) {
     ? JSON.parse(storedValue)
     : initialValue;
   txs.forEach((tx) => {
-    tx.info.amount = new MyNumber(
-      tx.info.amount.bigNumber.toString(),
-      tx.info.amount.decimals,
-    );
+    if (tx.type === 'strategy') {
+      (<StrategyTxProps>tx.info).amount = new MyNumber(
+        (<StrategyTxProps>tx.info).amount.bigNumber.toString(),
+        (<StrategyTxProps>tx.info).amount.decimals,
+      );
+    }
     tx.createdAt = new Date(tx.createdAt);
   });
   return txs;
@@ -80,7 +89,15 @@ async function waitForTransaction(
 }
 
 async function initToast(tx: TransactionInfo, get: Getter, set: Setter) {
-  const msg = StrategyTxPropsToMessage(tx.info, get);
+  let msg = ''
+  if (tx.type === 'strategy') {
+    msg = StrategyTxPropsToMessage(<StrategyTxProps>tx.info, get);
+  } else if (tx.type === 'loanGuard') {
+    msg = LoanGuardTxPropsToMessage(<LoanGuardTxProps>tx.info);
+  } else {
+    throw new Error(`Toast: Unknown tx type ${tx.type}`);
+  }
+  
   await toast.promise(
     waitForTransaction(tx, get, set),
     {
@@ -121,4 +138,8 @@ export function StrategyTxPropsToMessageWithStrategies(
     throw new Error(`Toast: Strategy ${tx.strategyId} not found`);
   }
   return `${capitalize(tx.actionType)} ${tx.amount.toEtherToFixedDecimals(4)} ${tokenInfo.name} in ${strategy.name}`;
+}
+
+export function LoanGuardTxPropsToMessage(tx: LoanGuardTxProps) {
+  return `${capitalize(tx.actionType)} LoanGuard on ${tx.protocol}`;
 }

@@ -104,3 +104,35 @@ body {
   border-bottom: 1px solid var(--chakra-colors-bg);
   padding: 3px;
 }
+
+/* Blinking dot css */
+.status-indicator {
+  display: flex;
+  align-items: center;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 8px;
+}
+
+.dot.active {
+  background-color: green;
+  animation: blink 2s infinite;
+}
+
+.dot.inactive {
+  background-color: #F44336;
+}
+
+.status-text {
+  font-family: Arial, sans-serif;
+}
+
+@keyframes blink {
+  0% { opacity: 0; }
+  50% { opacity: 1; }
+  100% { opacity: 0; }
+}

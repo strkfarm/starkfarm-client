@@ -47,6 +47,7 @@ const CONSTANTS = {
       '0x16912b22d5696e95ffde888ede4bd69fbbc60c5f873082857a47c543172694f',
     DeltaNeutralMMUSDCETH:
       '0x04937b58e05a3a2477402d1f74e66686f58a61a5070fcc6f694fb9a0b3bae422',
+    LoanGuard: '0x534475ec241a43cf5da17420ef9b20409ca74563971332355ee2706d9ebafb2'
   },
   MOBILE_MSG: 'Desktop/Tablet only',
 };

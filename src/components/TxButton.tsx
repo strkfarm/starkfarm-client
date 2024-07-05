@@ -45,6 +45,7 @@ export default function TxButton(props: TxButtonProps) {
       // initiates a toast and adds the tx to tx history if successful
       monitorNewTx({
         txHash: data.transaction_hash,
+        type: 'strategy',
         info: props.txInfo,
         status: 'pending', // 'success' | 'failed'
         createdAt: new Date(),

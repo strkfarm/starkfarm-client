@@ -1,0 +1,606 @@
+[
+    {
+      "name": "LoanGuardImpl",
+      "type": "impl",
+      "interface_name": "strkfarm::interfaces::loanguard::ILoanGuard"
+    },
+    {
+      "name": "strkfarm::interfaces::loanguard::ProtocolEnum",
+      "type": "enum",
+      "variants": [
+        {
+          "name": "None",
+          "type": "()"
+        },
+        {
+          "name": "ZkLend",
+          "type": "()"
+        },
+        {
+          "name": "Nostra",
+          "type": "()"
+        }
+      ]
+    },
+    {
+      "name": "strkfarm::interfaces::loanguard::LoanGuardUserSettings",
+      "type": "struct",
+      "members": [
+        {
+          "name": "min_health_factor",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "max_health_factor",
+          "type": "core::integer::u32"
+        },
+        {
+          "name": "target_health_factor",
+          "type": "core::integer::u32"
+        }
+      ]
+    },
+    {
+      "name": "core::bool",
+      "type": "enum",
+      "variants": [
+        {
+          "name": "False",
+          "type": "()"
+        },
+        {
+          "name": "True",
+          "type": "()"
+        }
+      ]
+    },
+    {
+      "name": "strkfarm::interfaces::loanguard::SubscriptionState",
+      "type": "struct",
+      "members": [
+        {
+          "name": "settings",
+          "type": "strkfarm::interfaces::loanguard::LoanGuardUserSettings"
+        },
+        {
+          "name": "is_active",
+          "type": "core::bool"
+        }
+      ]
+    },
+    {
+      "name": "strkfarm::components::zkLend::ZklendToken",
+      "type": "struct",
+      "members": [
+        {
+          "name": "underlying_asset",
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ]
+    },
+    {
+      "name": "core::array::Span::<strkfarm::components::zkLend::ZklendToken>",
+      "type": "struct",
+      "members": [
+        {
+          "name": "snapshot",
+          "type": "@core::array::Array::<strkfarm::components::zkLend::ZklendToken>"
+        }
+      ]
+    },
+    {
+      "name": "core::integer::u256",
+      "type": "struct",
+      "members": [
+        {
+          "name": "low",
+          "type": "core::integer::u128"
+        },
+        {
+          "name": "high",
+          "type": "core::integer::u128"
+        }
+      ]
+    },
+    {
+      "name": "strkfarm::interfaces::loanguard::ILoanGuard",
+      "type": "interface",
+      "items": [
+        {
+          "name": "subscribe",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "protocol",
+              "type": "strkfarm::interfaces::loanguard::ProtocolEnum"
+            },
+            {
+              "name": "settings",
+              "type": "strkfarm::interfaces::loanguard::LoanGuardUserSettings"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "name": "unsubscribe",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "protocol",
+              "type": "strkfarm::interfaces::loanguard::ProtocolEnum"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "name": "get_user_settings",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "user",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "protocol",
+              "type": "strkfarm::interfaces::loanguard::ProtocolEnum"
+            }
+          ],
+          "outputs": [
+            {
+              "type": "strkfarm::interfaces::loanguard::SubscriptionState"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "name": "set_zklend_deposit_tokens",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "tokens",
+              "type": "core::array::Span::<strkfarm::components::zkLend::ZklendToken>"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "name": "set_zklend_borrow_tokens",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "tokens",
+              "type": "core::array::Span::<strkfarm::components::zkLend::ZklendToken>"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "name": "increase_hf_zkLend",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "user",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "strategy",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "amount",
+              "type": "core::integer::u256"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "name": "decrease_hf_zkLend",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "user",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "withdraw_amount",
+              "type": "core::integer::u256"
+            },
+            {
+              "name": "withdraw_token",
+              "type": "core::starknet::contract_address::ContractAddress"
+            },
+            {
+              "name": "strategy",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        }
+      ]
+    },
+    {
+      "name": "CommonCompImpl",
+      "type": "impl",
+      "interface_name": "strkfarm::interfaces::common::ICommon"
+    },
+    {
+      "name": "strkfarm::interfaces::common::ICommon",
+      "type": "interface",
+      "items": [
+        {
+          "name": "upgrade",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "new_class",
+              "type": "core::starknet::class_hash::ClassHash"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "name": "pause",
+          "type": "function",
+          "inputs": [],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "name": "unpause",
+          "type": "function",
+          "inputs": [],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "name": "is_paused",
+          "type": "function",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::bool"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "name": "owner",
+          "type": "function",
+          "inputs": [],
+          "outputs": [
+            {
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "state_mutability": "view"
+        },
+        {
+          "name": "transfer_ownership",
+          "type": "function",
+          "inputs": [
+            {
+              "name": "new_owner",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ],
+          "outputs": [],
+          "state_mutability": "external"
+        },
+        {
+          "name": "renounce_ownership",
+          "type": "function",
+          "inputs": [],
+          "outputs": [],
+          "state_mutability": "external"
+        }
+      ]
+    },
+    {
+      "name": "strkfarm::interfaces::zkLend::IZkLendMarketDispatcher",
+      "type": "struct",
+      "members": [
+        {
+          "name": "contract_address",
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ]
+    },
+    {
+      "name": "strkfarm::interfaces::oracle::IPriceOracleDispatcher",
+      "type": "struct",
+      "members": [
+        {
+          "name": "contract_address",
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ]
+    },
+    {
+      "name": "strkfarm::components::zkLend::zkLendStruct",
+      "type": "struct",
+      "members": [
+        {
+          "name": "zkLendRouter",
+          "type": "strkfarm::interfaces::zkLend::IZkLendMarketDispatcher"
+        },
+        {
+          "name": "oracle",
+          "type": "strkfarm::interfaces::oracle::IPriceOracleDispatcher"
+        }
+      ]
+    },
+    {
+      "name": "constructor",
+      "type": "constructor",
+      "inputs": [
+        {
+          "name": "owner",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "registry",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "name": "zklend_settings",
+          "type": "strkfarm::components::zkLend::zkLendStruct"
+        }
+      ]
+    },
+    {
+      "kind": "struct",
+      "name": "openzeppelin::upgrades::upgradeable::UpgradeableComponent::Upgraded",
+      "type": "event",
+      "members": [
+        {
+          "kind": "data",
+          "name": "class_hash",
+          "type": "core::starknet::class_hash::ClassHash"
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "openzeppelin::upgrades::upgradeable::UpgradeableComponent::Event",
+      "type": "event",
+      "variants": [
+        {
+          "kind": "nested",
+          "name": "Upgraded",
+          "type": "openzeppelin::upgrades::upgradeable::UpgradeableComponent::Upgraded"
+        }
+      ]
+    },
+    {
+      "kind": "struct",
+      "name": "openzeppelin::security::pausable::PausableComponent::Paused",
+      "type": "event",
+      "members": [
+        {
+          "kind": "data",
+          "name": "account",
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ]
+    },
+    {
+      "kind": "struct",
+      "name": "openzeppelin::security::pausable::PausableComponent::Unpaused",
+      "type": "event",
+      "members": [
+        {
+          "kind": "data",
+          "name": "account",
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "openzeppelin::security::pausable::PausableComponent::Event",
+      "type": "event",
+      "variants": [
+        {
+          "kind": "nested",
+          "name": "Paused",
+          "type": "openzeppelin::security::pausable::PausableComponent::Paused"
+        },
+        {
+          "kind": "nested",
+          "name": "Unpaused",
+          "type": "openzeppelin::security::pausable::PausableComponent::Unpaused"
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "openzeppelin::security::reentrancyguard::ReentrancyGuardComponent::Event",
+      "type": "event",
+      "variants": []
+    },
+    {
+      "kind": "struct",
+      "name": "openzeppelin::access::ownable::ownable::OwnableComponent::OwnershipTransferred",
+      "type": "event",
+      "members": [
+        {
+          "kind": "key",
+          "name": "previous_owner",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "kind": "key",
+          "name": "new_owner",
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ]
+    },
+    {
+      "kind": "struct",
+      "name": "openzeppelin::access::ownable::ownable::OwnableComponent::OwnershipTransferStarted",
+      "type": "event",
+      "members": [
+        {
+          "kind": "key",
+          "name": "previous_owner",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "kind": "key",
+          "name": "new_owner",
+          "type": "core::starknet::contract_address::ContractAddress"
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "openzeppelin::access::ownable::ownable::OwnableComponent::Event",
+      "type": "event",
+      "variants": [
+        {
+          "kind": "nested",
+          "name": "OwnershipTransferred",
+          "type": "openzeppelin::access::ownable::ownable::OwnableComponent::OwnershipTransferred"
+        },
+        {
+          "kind": "nested",
+          "name": "OwnershipTransferStarted",
+          "type": "openzeppelin::access::ownable::ownable::OwnableComponent::OwnershipTransferStarted"
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "strkfarm::components::common::CommonComp::Event",
+      "type": "event",
+      "variants": []
+    },
+    {
+      "kind": "struct",
+      "name": "strkfarm::loanguard::loanguard::LoanGuard::SubscriptionUpdate",
+      "type": "event",
+      "members": [
+        {
+          "kind": "data",
+          "name": "user",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "kind": "data",
+          "name": "settings",
+          "type": "strkfarm::interfaces::loanguard::LoanGuardUserSettings"
+        },
+        {
+          "kind": "data",
+          "name": "is_active",
+          "type": "core::bool"
+        },
+        {
+          "kind": "data",
+          "name": "protocol",
+          "type": "strkfarm::interfaces::loanguard::ProtocolEnum"
+        },
+        {
+          "kind": "data",
+          "name": "timestamp",
+          "type": "core::integer::u64"
+        }
+      ]
+    },
+    {
+      "kind": "struct",
+      "name": "strkfarm::loanguard::loanguard::LoanGuard::Rebalance",
+      "type": "event",
+      "members": [
+        {
+          "kind": "data",
+          "name": "user",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "kind": "data",
+          "name": "strategy",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "kind": "data",
+          "name": "token",
+          "type": "core::starknet::contract_address::ContractAddress"
+        },
+        {
+          "kind": "data",
+          "name": "amount",
+          "type": "core::integer::u256"
+        },
+        {
+          "kind": "data",
+          "name": "protocol",
+          "type": "strkfarm::interfaces::loanguard::ProtocolEnum"
+        },
+        {
+          "kind": "data",
+          "name": "is_outflow",
+          "type": "core::bool"
+        },
+        {
+          "kind": "data",
+          "name": "previous_health_factor",
+          "type": "core::integer::u32"
+        },
+        {
+          "kind": "data",
+          "name": "new_health_factor",
+          "type": "core::integer::u32"
+        }
+      ]
+    },
+    {
+      "kind": "enum",
+      "name": "strkfarm::loanguard::loanguard::LoanGuard::Event",
+      "type": "event",
+      "variants": [
+        {
+          "kind": "flat",
+          "name": "UpgradeableEvent",
+          "type": "openzeppelin::upgrades::upgradeable::UpgradeableComponent::Event"
+        },
+        {
+          "kind": "flat",
+          "name": "PausableEvent",
+          "type": "openzeppelin::security::pausable::PausableComponent::Event"
+        },
+        {
+          "kind": "flat",
+          "name": "ReentrancyGuardEvent",
+          "type": "openzeppelin::security::reentrancyguard::ReentrancyGuardComponent::Event"
+        },
+        {
+          "kind": "flat",
+          "name": "OwnableEvent",
+          "type": "openzeppelin::access::ownable::ownable::OwnableComponent::Event"
+        },
+        {
+          "kind": "flat",
+          "name": "CommonCompEvent",
+          "type": "strkfarm::components::common::CommonComp::Event"
+        },
+        {
+          "kind": "nested",
+          "name": "SubscriptionUpdate",
+          "type": "strkfarm::loanguard::loanguard::LoanGuard::SubscriptionUpdate"
+        },
+        {
+          "kind": "nested",
+          "name": "Rebalance",
+          "type": "strkfarm::loanguard::loanguard::LoanGuard::Rebalance"
+        }
+      ]
+    }
+  ]

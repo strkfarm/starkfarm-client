@@ -84,19 +84,12 @@ export default function Template({ children }: { children: React.ReactNode }) {
       const args: RpcProviderOptions = {
         nodeUrl:
           'https://rpc.nethermind.io/mainnet-juno?apikey=t1HPjhplOyEQpxqVMhpwLGuwmOlbXN0XivWUiPAxIBs0kHVK',
-        chainId: constants.StarknetChainId.SN_MAIN,
+          chainId: constants.StarknetChainId.SN_MAIN,
+          blockIdentifier: 'pending'
       };
       return args;
     },
   });
-
-  function getIconNode(icon: typeof import('*.svg'), alt: string) {
-    return (
-      <Center className="my-menu-button" width="100%" marginLeft={'-20px'}>
-        <Image src={icon} alt={alt} />
-      </Center>
-    );
-  }
 
   return (
     <JotaiProvider>

@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("POSTGRES_CONNECTION_STRING")
+}
+
+model subscriptions {
+  block_number Int
+  txIndex      Int
+  eventIndex   Int
+  txHash       String
+
+  user                 String
+  is_active            Boolean
+  min_health_factor    Int
+  max_health_factor    Int
+  target_health_factor Int
+  protocol             String
+  timestamp            Int
+  cursor               BigInt? @map("_cursor")
+
+  @@unique([block_number, txIndex, eventIndex], name: "event_id")
+}
+
+model rebalances {
+  block_number Int
+  txIndex      Int
+  eventIndex   Int
+  txHash       String
+
+  user                   String
+  strategy               String
+  token                  String
+  amount                 BigInt
+  protocol               String
+  is_outflow             Boolean
+  previous_health_factor Int
+  new_health_factor      Int
+
+  cursor BigInt? @map("_cursor")
+
+  @@unique([block_number, txIndex, eventIndex], name: "event_id")
+}

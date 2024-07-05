@@ -4,6 +4,7 @@ import tg from '@/assets/tg.svg';
 import Pools from '@/components/Pools';
 import Strategies from '@/components/Strategies';
 import CONSTANTS from '@/constants';
+import LoanGuard from "@/components/LoanGuard";
 
 import {
   Box,
@@ -37,6 +38,8 @@ export default function Home() {
     console.log('tab', tab);
     if (tab === 'pools') {
       setTabIndex(1);
+    } else if (tab == 'loanguard') {
+      setTabIndex(2);
     } else {
       setTabIndex(0);
     }
@@ -51,6 +54,8 @@ export default function Home() {
   function handleTabsChange(index: number) {
     if (index === 1) {
       setRoute('pools');
+    } else if (index === 2) {
+      setRoute('loanguard')
     } else {
       setRoute('strategies');
     }
@@ -98,6 +103,15 @@ export default function Home() {
           >
             All Pools
           </Tab>
+          <Tab
+            color="light_grey"
+            _selected={{ color: 'color2Text' }}
+            onClick={() => {
+              mixpanel.track('LoanGuard clicked');
+            }}
+          >
+            LoanGuard
+          </Tab>
         </TabList>
         <TabIndicator
           mt="-1.5px"
@@ -112,6 +126,9 @@ export default function Home() {
           </TabPanel>
           <TabPanel bg="highlight" float={'left'} width={'100%'}>
             <Pools />
+          </TabPanel>
+          <TabPanel bg="highlight" float={'left'} width={'100%'}>
+            <LoanGuard />
           </TabPanel>
         </TabPanels>
       </Tabs>
