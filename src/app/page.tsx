@@ -96,7 +96,7 @@ export default function Home() {
               mixpanel.track('All pools clicked');
             }}
           >
-            All Pools
+            Find yields
           </Tab>
         </TabList>
         <TabIndicator
