@@ -1,6 +1,7 @@
 'use client';
 
 import tg from '@/assets/tg.svg';
+import { useDotButton } from '@/components/EmblaCarouselDotButton';
 import Pools from '@/components/Pools';
 import Strategies from '@/components/Strategies';
 import CONSTANTS from '@/constants';
@@ -8,8 +9,8 @@ import CONSTANTS from '@/constants';
 import {
   Box,
   Center,
+  Image as ChakraImage,
   Container,
-  Image,
   Link,
   Tab,
   TabIndicator,
@@ -19,9 +20,11 @@ import {
   Tabs,
   Text,
 } from '@chakra-ui/react';
+import Autoplay from 'embla-carousel-autoplay';
+import useEmblaCarousel from 'embla-carousel-react';
 import mixpanel from 'mixpanel-browser';
-import { useSearchParams } from 'next/navigation';
-import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function Home() {
@@ -56,6 +59,16 @@ export default function Home() {
     }
   }
 
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    {
+      loop: true,
+    },
+    [Autoplay({ playOnInit: true, delay: 8000 })]
+  );
+
+  const { selectedIndex, scrollSnaps, onDotButtonClick } =
+    useDotButton(emblaApi);
+
   return (
     <Container maxWidth={'1000px'} margin={'0 auto'}>
       <Box padding={'15px 30px'} borderRadius="10px" margin="20px 0px">
@@ -72,6 +85,68 @@ export default function Home() {
           rewards
         </Text>
       </Box>
+
+       <Box className="embla" ref={emblaRef}>
+        <Box className="embla__container">
+          <Box className="embla__slide" position="relative" height={'150px'}>
+            <Image
+              src="/banner1.svg"
+              alt="Degen Mode"
+              fill
+              style={{ objectFit: 'cover', borderRadius: '8px' }}
+            />
+          </Box>
+
+          <Box className="embla__slide" position="relative" height={'150px'}>
+            <Image
+              src="/banner2.svg"
+              alt="CCP Program"
+              fill
+              style={{ objectFit: 'cover', borderRadius: '8px' }}
+            />
+          </Box>
+        </Box>
+      </Box>
+
+       <Box
+        display="grid"
+        justifyContent="center"
+        gap="1.2rem"
+        mb="1.5rem"
+      >
+        <Box
+          display="flex"
+          flexWrap="wrap"
+          justifyContent="flex-end"
+          alignItems="center"
+          marginRight="calc((2.6rem - 1.4rem) / 2 * -1)"
+          gap=".5rem"
+        >
+          {scrollSnaps.map((_, index) => (
+            <Box
+              key={index}
+              onClick={() => onDotButtonClick(index)}
+              width="0.8rem"
+              height="0.8rem"
+              borderRadius="50%"
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              cursor="pointer"
+              backgroundColor={index === selectedIndex ? '#4D59E8' : 'black'}
+              padding="0"
+              margin="0"
+              border="1px solid #373A5D"
+              textDecoration="none"
+              appearance="none"
+              // boxShadow={
+              //   index === selectedIndex ? 'inset 0 0 0 0.2rem #4D59E8' : ''
+              // }
+            />
+          ))}
+        </Box>
+      </Box>
+
       <Tabs
         position="relative"
         variant="unstyled"
@@ -118,7 +193,7 @@ export default function Home() {
       {/* <hr style={{width: '100%', borderColor: '#5f5f5f', float: 'left', margin: '20px 0'}}/> */}
       <Center padding="10px 0" width={'100%'} float={'left'}>
         <Link href={CONSTANTS.COMMUNITY_TG} isExternal>
-          <Image src={tg.src} width="50" margin="0 auto" />
+          <ChakraImage src={tg.src} width="50" margin="0 auto" />
         </Link>
       </Center>
       <Center width={'100%'} float="left">
