@@ -1,16 +1,5 @@
 'use client';
 
-import Deposit from '@/components/Deposit';
-import CONSTANTS from '@/constants';
-import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
-
-import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
-import {
-  StrategyTxPropsToMessageWithStrategies,
-  transactionsAtom,
-} from '@/store/transactions.atom';
-import { getUniqueById, shortAddress } from '@/utils';
-
 import {
   Avatar,
   Box,
@@ -48,6 +37,7 @@ import { isMobile } from 'react-device-detect';
 
 import Deposit from '@/components/Deposit';
 import CONSTANTS from '@/constants';
+import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
 import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
 import {
   StrategyTxPropsToMessageWithStrategies,
