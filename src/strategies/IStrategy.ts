@@ -56,6 +56,12 @@ export enum StrategyStatus {
   SOLVED = 2,
 }
 
+export enum StrategyLiveStatus {
+  ACTIVE = 0,
+  COMING_SOON = 1,
+  RETIRED = 2,
+}
+
 export interface IStrategyActionHook {
   tokenInfo: TokenInfo;
   calls: Call[];
@@ -63,6 +69,7 @@ export interface IStrategyActionHook {
 }
 
 export class IStrategyProps {
+  readonly liveStatus: StrategyLiveStatus;
   readonly id: string;
   readonly description: string;
   exchanges: IDapp<any>[] = [];
@@ -106,12 +113,15 @@ export class IStrategyProps {
     description: string,
     rewardTokens: { logo: string }[],
     holdingTokens: (TokenInfo | NFTInfo)[],
+    liveStatus: StrategyLiveStatus,
   ) {
     this.id = id;
     this.description = description;
     this.rewardTokens = rewardTokens;
     this.holdingTokens = holdingTokens;
+    console.log('calling getBalanceAtom', id, holdingTokens[0]);
     this.balanceAtom = getBalanceAtom(holdingTokens[0], this.balEnabled);
+    this.liveStatus = liveStatus;
   }
 }
 
@@ -124,8 +134,9 @@ export class IStrategy extends IStrategyProps {
     description: string,
     rewardTokens: { logo: string }[],
     holdingTokens: (TokenInfo | NFTInfo)[],
+    liveStatus = StrategyLiveStatus.ACTIVE,
   ) {
-    super(id, description, rewardTokens, holdingTokens);
+    super(id, description, rewardTokens, holdingTokens, liveStatus);
     this.tag = tag;
   }
 

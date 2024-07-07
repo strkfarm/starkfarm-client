@@ -13,6 +13,7 @@ const LOGOS = {
 export type TokenName = 'USDT' | 'USDC' | 'ETH' | 'STRK' | 'WBTC' | 'DAI';
 const CONSTANTS = {
   DEX_INCENTIVE_URL: '/strk-incentives/fetchFile?file=strk_grant.json',
+  NOSTRA_DEGEN_INCENTIVE_URL: 'https://api.nostra.finance/query/pool_aprs',
   LENDING_INCENTIVES_URL:
     '/strk-incentives/fetchFile?file=prod-api/lending/lending_strk_grant.json',
   LOGOS,
@@ -34,6 +35,10 @@ const CONSTANTS = {
   },
   HAIKO: {
     BASE_APR_API: 'haiko/markets?network=mainnet',
+  },
+  MY_SWAP: {
+    POOLS_API: '/myswap/data/pools/all.json',
+    BASE_APR_API: '/myswap/data/pools',
   },
   CONTRACTS: {
     Master: '0x50314707690c31597849ed66a494fb4279dc060f8805f21593f52906846e28e',
