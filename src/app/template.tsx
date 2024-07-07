@@ -16,7 +16,6 @@ import * as React from 'react';
 import { RpcProviderOptions, constants } from 'starknet';
 import { ArgentMobileConnector } from 'starknetkit/argentMobile';
 import { InjectedConnector } from 'starknetkit/injected';
-import { WebWalletConnector } from 'starknetkit/webwallet';
 
 import Navbar from '@/components/Navbar';
 import { Toaster } from 'react-hot-toast';
@@ -70,11 +69,12 @@ BigInt.prototype.toJSON = function () {
   return this.toString();
 };
 
+export const CONNECTOR_NAMES = ['Braavos', 'Argent X', 'Argent (mobile)']; // 'Argent Web Wallet'];
 export const MYCONNECTORS = [
   new InjectedConnector({ options: { id: 'braavos', name: 'Braavos' } }),
   new InjectedConnector({ options: { id: 'argentX', name: 'Argent X' } }),
-  new WebWalletConnector({ url: 'https://web.argent.xyz' }),
   new ArgentMobileConnector(),
+  // new WebWalletConnector({ url: 'https://web.argent.xyz' }),
 ];
 
 export default function Template({ children }: { children: React.ReactNode }) {

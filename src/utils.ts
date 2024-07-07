@@ -67,3 +67,13 @@ export function getTokenInfoFromAddr(tokenAddr: string) {
   }
   return info;
 }
+
+export function getTokenInfoFromName(tokenName: string) {
+  const info = TOKENS.find(
+    (t) => t.name.toLowerCase() === tokenName.toLowerCase(),
+  );
+  if (!info) {
+    throw new Error('Token not found');
+  }
+  return info;
+}

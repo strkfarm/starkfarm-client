@@ -73,6 +73,24 @@
       "contributions": [
         "review"
       ]
+    },
+    {
+      "login": "Ugo-X",
+      "name": "Ugonna Paul Dike",
+      "avatar_url": "https://avatars.githubusercontent.com/u/133219527?v=4",
+      "profile": "https://github.com/Ugo-X",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "fishonamos",
+      "name": "Fishon Amos",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43862685?v=4",
+      "profile": "https://fishonsnote.medium.com/",
+      "contributions": [
+        "code"
+      ]
     }
   ]
 }

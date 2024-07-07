@@ -1,5 +1,16 @@
 'use client';
 
+import Deposit from '@/components/Deposit';
+import CONSTANTS from '@/constants';
+import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
+
+import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
+import {
+  StrategyTxPropsToMessageWithStrategies,
+  transactionsAtom,
+} from '@/store/transactions.atom';
+import { getUniqueById, shortAddress } from '@/utils';
+
 import {
   Avatar,
   Box,
@@ -29,7 +40,7 @@ import {
   WrapItem,
 } from '@chakra-ui/react';
 import { useAccount } from '@starknet-react/core';
-import { useAtomValue } from 'jotai';
+import { atom, useAtomValue, useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
@@ -37,7 +48,6 @@ import { isMobile } from 'react-device-detect';
 
 import Deposit from '@/components/Deposit';
 import CONSTANTS from '@/constants';
-import { useERC4626Value } from '@/hooks/useERC4626Value';
 import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
 import {
   StrategyTxPropsToMessageWithStrategies,
@@ -60,9 +70,24 @@ export default function Strategy() {
     return strategies.find((s) => s.name === name);
   }, [searchParams, strategies]);
 
-  const { balance, underlyingTokenInfo, isLoading, isError } = useERC4626Value(
-    strategy?.holdingTokens[0],
-  ); // @todo need to add multi token support
+  const setBalQueryEnable = useSetAtom(strategy?.balEnabled || atom(false));
+  useEffect(() => {
+    setBalQueryEnable(true);
+  }, []);
+
+  // const balAtom = getBalanceAtom(strategy?.holdingTokens[0]);
+  const balData = useAtomValue(strategy?.balanceAtom || DUMMY_BAL_ATOM);
+  // cons{ balance, underlyingTokenInfo, isLoading, isError }
+  useEffect(() => {
+    console.log(
+      'balData',
+      balData.isError,
+      balData.isLoading,
+      balData.isPending,
+      balData.data,
+      balData.error,
+    );
+  }, [balData]);
 
   useEffect(() => {
     mixpanel.track('Strategy page open', { name: searchParams.get('name') });
@@ -159,17 +184,23 @@ export default function Strategy() {
                   color="cyan"
                   marginTop={'20px'}
                 >
-                  {!isLoading && (
-                    <Text>
-                      <b>Your Holdings: </b>
-                      {address
-                        ? `${balance.toEtherToFixedDecimals(4)} ${underlyingTokenInfo?.name}`
-                        : isMobile
-                          ? CONSTANTS.MOBILE_MSG
-                          : 'Connect wallet'}
-                    </Text>
-                  )}
-                  {isLoading && (
+                  {!balData.isLoading &&
+                    !balData.isError &&
+                    !balData.isPending &&
+                    balData.data &&
+                    balData.data.tokenInfo && (
+                      <Text>
+                        <b>Your Holdings: </b>
+                        {address
+                          ? `${balData.data.amount.toEtherToFixedDecimals(4)} ${balData.data.tokenInfo?.name}`
+                          : isMobile
+                            ? CONSTANTS.MOBILE_MSG
+                            : 'Connect wallet'}
+                      </Text>
+                    )}
+                  {(balData.isLoading ||
+                    balData.isPending ||
+                    !balData.data?.tokenInfo) && (
                     <Text>
                       <b>Your Holdings: </b>
                       {address ? (
@@ -179,6 +210,11 @@ export default function Strategy() {
                       ) : (
                         'Connect wallet'
                       )}
+                    </Text>
+                  )}
+                  {balData.isError && (
+                    <Text>
+                      <b>Your Holdings: Error</b>
                     </Text>
                   )}
                 </Box>
@@ -313,7 +349,6 @@ export default function Strategy() {
                 <Text
                   display={{ base: 'none', md: 'block' }}
                   width={{ base: '100%', md: '10%' }}
-                  className="text-cell"
                   textAlign={'right'}
                   padding={'5px 10px'}
                 >
@@ -322,7 +357,6 @@ export default function Strategy() {
                 <Text
                   display={{ base: 'none', md: 'block' }}
                   width={{ base: '100%', md: '10%' }}
-                  className="text-cell"
                   textAlign={'right'}
                   padding={'5px 10px'}
                 >
