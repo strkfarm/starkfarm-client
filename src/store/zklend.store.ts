@@ -14,6 +14,7 @@ import { atom } from 'jotai';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { IDapp } from './IDapp.store';
 import { StrategyAction } from '@/strategies/simple.stable.strat';
+import zkLendLogo from '@public/zklend.png';
 const fetcher = (...args: any[]) => {
   return fetch(args[0], args[1]).then((res) => res.json());
 };
@@ -53,7 +54,7 @@ interface MyBaseAprDoc {
 export class ZkLend extends IDapp<MyBaseAprDoc[]> {
   name = 'zkLend';
   link = 'https://app.zklend.com/markets';
-  logo = 'https://app.zklend.com/favicon.ico';
+  logo = zkLendLogo.src;
 
   incentiveDataKey = 'zkLend';
   LIQUIDATION_THRESHOLD = 1;

@@ -104,6 +104,7 @@ export default function Navbar() {
   useEffect(() => {
     // setAddress('0x05b55db55f5884856860e63f3595b2ec6b2c9555f3f507b4ca728d8e427b7864')
     setAddress(address);
+    console.log('transactions set addr', address)
   }, [address]);
 
   return (

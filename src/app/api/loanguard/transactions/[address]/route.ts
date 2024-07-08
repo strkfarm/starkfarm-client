@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { Contract, RpcProvider, num, uint256 } from 'starknet';
 import ERC4626Abi from '@/abi/erc4626.abi.json';
 import axios from 'axios';
+import { PrismaClient, rebalances } from '@prisma/client';
 
 export const revalidate = 0;
 
@@ -22,11 +23,17 @@ export async function GET(req: Request, context: any) {
   }
 
   const prisma = new PrismaClient();
+  const transactions = await prisma.rebalances.findMany({
+    orderBy: {
+        block_number: 'desc'
+    },
+    where: {
+        user: pAddr
+    }
+  })
 
-  const result = await Promise.all(values);
-  const sum = result.reduce((a, b) => a + b, 0);
-  console.log({ pAddr, sum });
+  console.log(`transactions length: ${transactions.length}`);
   return NextResponse.json({
-    holdingsUSD: sum,
+    transactions,
   });
 }

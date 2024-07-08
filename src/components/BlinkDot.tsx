@@ -26,7 +26,7 @@ export const StatusIndicator = (props: StatusIndicatorProps) => {
   }, [props.isActive]);
 
   return (
-    <Tooltip label={props.isActive ? "Subscription active" : "Subscription inactive"}>
+    <Tooltip label={props.isActive ? "Subscription active and we are monitoring your debts" : "Subscription inactive"}>
         <Flex alignItems={'center'}>
         {/* <Box
             w="10px"

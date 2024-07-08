@@ -1,19 +1,23 @@
 import { addressAtom } from "@/store/claims.atoms";
-import { CheckCircleIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, HamburgerIcon, SettingsIcon } from "@chakra-ui/icons";
-import { Box, Card, Flex, Skeleton, Text, Stack, Container, Slider, SliderMark, SliderTrack, SliderFilledTrack, SliderThumb, Avatar, Center, HStack, Tag, RangeSlider, RangeSliderTrack, RangeSliderFilledTrack, RangeSliderThumb, Button, MenuList, MenuItem, Menu, MenuButton, Spinner, Icon, Accordion, AccordionItem, AccordionButton, AccordionIcon, AccordionPanel } from "@chakra-ui/react";
+import { ArrowForwardIcon, CheckCircleIcon, ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon, HamburgerIcon, RepeatClockIcon, SettingsIcon } from "@chakra-ui/icons";
+import { Box, Card, Flex, Skeleton, Text, Stack, Container, Slider, SliderMark, SliderTrack, SliderFilledTrack, SliderThumb, Avatar, Center, HStack, Tag, RangeSlider, RangeSliderTrack, RangeSliderFilledTrack, RangeSliderThumb, Button, MenuList, MenuItem, Menu, MenuButton, Spinner, Icon, Accordion, AccordionItem, AccordionButton, AccordionIcon, AccordionPanel, Link, Alert, AlertIcon } from "@chakra-ui/react";
 import { atom, useAtom, useAtomValue, useSetAtom } from "jotai";
 import { loadable, unwrap } from "jotai/utils";
 import { IConfig, Global, Pricer, ZkLend, getMainnetConfig, ContractAddr } from 'strkfarm-sdk';
 import { NumberInput } from "./NumberInput";
 import { useEffect, useMemo, useState } from "react";
-import { getTokenInfoFromName, MyMenuItemProps, MyMenuListProps } from "@/utils";
+import { getTokenInfoFromName, MyMenuItemProps, MyMenuListProps, shortAddress } from "@/utils";
 import LoanGuardAbi from '@/abi/loanguard.abi.json';
 import { useContractRead, useContractWrite, useProvider } from "@starknet-react/core";
-import { CairoCustomEnum, Call, Contract, Result, Uint256, uint256 } from "starknet";
+import { BlockTag, CairoCustomEnum, Call, Contract, Result, Uint256, uint256 } from "starknet";
 import CONSTANTS from "@/constants";
 import { monitorNewTxAtom } from "@/store/transactions.atom";
 import { atomWithQuery } from "jotai-tanstack-query";
 import StatusIndicator from "./BlinkDot";
+import { rebalances } from '@prisma/client';
+import axios from "axios";
+import strkfarmLogo from '@public/logo.png';
+import zkLendLogo from '@public/zklend.png';
 
 const config = getMainnetConfig();
 const provider: any = config.provider;
@@ -60,6 +64,21 @@ const zkLendInfoAsyncAtom = atom(async (get) => {
 const zkLendInfoAtom = unwrap(zkLendInfoAsyncAtom);
 const lendingAtoms = atom((get) => [get(zkLendInfoAtom)]);
 
+const transactionsAtom = atomWithQuery((get) => ({
+    queryKey: ['loanguard_transactions', get(addressAtom)],
+    queryFn: async (): Promise<rebalances[]> => {
+        const addr = get(addressAtom);
+        console.log(`transactions addr: ${addr}`);
+        if (addr) {
+            const res = await axios.get(`/api/loanguard/transactions/${addr}`);
+            console.log('transactions', res.data.transactions);
+            return res.data.transactions;
+        }
+        return []
+    },
+    refetchInterval: 30000,
+}));
+
 interface SubscriptionSettings {
     settings: {
         min_health_factor: number;
@@ -93,6 +112,13 @@ export default function LoanGuard() {
     const [healthFactors, setHealthFactors] = useState(defaultHealthFactors);
     const zkLendEnum = new CairoCustomEnum({ ZkLend: {} });
     const {
+        data: transactionsData,
+        isError: transactionsIsError,
+        isLoading: transactionsIsLoading,
+        isPending: transactionsIsPending,
+    } = useAtomValue(transactionsAtom);
+
+    const {
         data: _isSubscribed,
         isError: isErrorIsSubscribed,
         isLoading: isLoadingIsSubscribed,
@@ -103,7 +129,8 @@ export default function LoanGuard() {
         address: CONSTANTS.CONTRACTS.LoanGuard,
         functionName: 'get_user_settings',
         args: [address || '0x0', zkLendEnum],
-        watch: true
+        watch: true,
+        blockIdentifier: BlockTag.pending
     });
     const isSubscribed: SubscriptionSettings | undefined = useMemo(() => {
         return _isSubscribed as any
@@ -191,8 +218,8 @@ export default function LoanGuard() {
       }, [dataUnsub]);
 
     return <Container padding={0} fontFamily={'sans-serif'}>
-        <Box display={'flex'} marginBottom={'5px'}>
-            <Box width={'60%'}>
+        <Flex marginBottom={'5px'} width={'100%'}>
+            <Box width={'64%'} float={'left'}>
                 <Text width={'100%'}
                     color='color1'
                     fontWeight={'bold'}
@@ -208,6 +235,7 @@ export default function LoanGuard() {
                 </Text>
             </Box>
             <Box width={'40%'} padding={'10px'} 
+                float={'left'}
                 color={isSubscribed && isSubscribed.is_active ? 'purple' : '#cc7d2e'}
                 bg='bg'
                 borderRadius={'10px'}
@@ -217,7 +245,7 @@ export default function LoanGuard() {
                         <b>Subscription</b>
                     </Text>
                     {isSubscribed && isSubscribed.is_active && <Text>
-                        <b>#3</b>
+                        <b>#{transactionsData?.length}</b>
                     </Text>}
                 </Flex>
                 <Flex justifyContent={'space-between'}>
@@ -229,203 +257,252 @@ export default function LoanGuard() {
                     </Text>}
                 </Flex>
             </Box>
-        </Box>
+        </Flex>
         <hr style={{margin: '10px 0', borderColor: "var(--chakra-colors-bg)"}}/>
         
-        <Box width={'60%'} paddingRight={'15px'} float={'left'} color='light_grey'>
-            {lendingOptions.filter(l => l?.module).map((lendingOption) => {
-                return <Card bg='bg' padding={'10px'} key={lendingOption?.module.metadata.name}>
-                    <Flex justifyContent={'space-between'}>
-                        <Flex alignItems={'center'}>
-                            <Avatar size={'2xs'} src={lendingOption?.module.metadata.logo} marginRight={'5px'}/> 
-                            <Text fontWeight={'bold'} color='purple' fontSize='16px'>{lendingOption?.module.metadata.name}</Text>
+        <HStack align="stretch">
+            <Box flex={6} padding={'15px'} float={'left'} color='light_grey' bg={'bg'} borderRadius={'7px'}>
+                <Flex color='light_grey' alignItems={'center'} marginBottom={'5px'}>
+                    <HamburgerIcon boxSize='4' marginRight={'5px'}/>
+                    <Text>Your lending & borrowing positions</Text>
+                </Flex>
+                <hr style={{margin: '10px 0', borderColor: "var(--chakra-colors-highlight)"}}/>
+                {lendingOptions.filter(l => l?.module).map((lendingOption) => {
+                    return <Card bg='highlight' padding={'10px'} key={lendingOption?.module.metadata.name}>
+                        <Flex justifyContent={'space-between'}>
+                            <Flex alignItems={'center'}>
+                                <Avatar size={'2xs'} src={lendingOption?.module.metadata.logo} marginRight={'5px'}/> 
+                                <Text fontWeight={'bold'} color='purple' fontSize='16px'>{lendingOption?.module.metadata.name}</Text>
+                            </Flex>
+                            <Flex>
+                                {/* <HStack spacing={'1px'}>
+                                    {Array.from({length: 15}).map((_, i) => {
+                                        return <Box key={i} width={'2px'} height={'10px'} bg='green'/>
+                                    })}
+                                </HStack> */}
+                                <StatusIndicator isActive={isSubscribed && isSubscribed.is_active ? true : false} />
+                            </Flex>
                         </Flex>
-                        <Flex>
-                            {/* <HStack spacing={'1px'}>
-                                {Array.from({length: 15}).map((_, i) => {
-                                    return <Box key={i} width={'2px'} height={'10px'} bg='green'/>
-                                })}
-                            </HStack> */}
-                            <StatusIndicator isActive={isSubscribed && isSubscribed.is_active ? true : false} />
+                        <Flex marginTop={'10px'} justifyContent={'space-between'}>
+                            <Box>
+                                <Tag marginRight={'10px'} variant={'outline'}><Text fontWeight={'bold'} marginRight={'5px'}>Deposits:</Text>${lendingOption?.positionInfo.collateralUSD.toLocaleString()}</Tag>
+                                <Tag marginRight={'10px'} variant={'outline'}><Text fontWeight={'bold'} marginRight={'5px'}>Borrows:</Text>${lendingOption?.positionInfo.debtUSD.toLocaleString()}</Tag>
+                            </Box>
+                            <Box color={'light_grey'}>
+                                {Number(lendingOption?.hf) != Infinity && <Tag bg='purple' color='bg' alignItems={'center'}>
+                                    <Flex alignItems={'center'}><Text fontSize={'13px'} fontWeight={'bold'}>Health: {lendingOption?.hf.toFixed(2)}
+                                        </Text>
+                                        <CheckCircleIcon marginLeft={'5px'}/>
+                                    </Flex>
+                                </Tag>}
+                                {lendingOption?.hf == Infinity && <Text>No debt</Text>}
+                            </Box>
                         </Flex>
-                    </Flex>
-                    <Flex marginTop={'10px'} justifyContent={'space-between'}>
-                        <Box>
-                            <Tag marginRight={'10px'} variant={'outline'}><b>Deposits:</b>{' '}${lendingOption?.positionInfo.collateralUSD.toLocaleString()}</Tag>
-                            <Tag marginRight={'10px'} variant={'outline'}><b>Borrows:</b>{' '}${lendingOption?.positionInfo.debtUSD.toLocaleString()}</Tag>
-                        </Box>
-                        <Box color={'light_grey'}>
-                            {Number(lendingOption?.hf) != Infinity && <Tag bg='purple' color='bg' alignItems={'center'}>
-                                <Flex alignItems={'center'}><Text fontSize={'13px'} fontWeight={'bold'}>Health: {lendingOption?.hf.toFixed(2)}
-                                    </Text>
-                                    <CheckCircleIcon marginLeft={'5px'}/>
-                                </Flex>
-                            </Tag>}
-                            {lendingOption?.hf == Infinity && <Text>No debt</Text>}
-                        </Box>
+                        <hr style={{margin: '10px 0', borderColor: "var(--chakra-colors-bg)"}}/>
+                        {isSubscribed && isSubscribed.is_active && <Flex  justifyContent={'start'}>
+                            <Tag marginRight={'10px'} variant={'solid'}><b>Min: {(Number(isSubscribed.settings.min_health_factor) / 10000).toFixed(2)}</b></Tag>
+                            <Tag marginRight={'10px'} variant={'solid'}><b>Target: {(Number(isSubscribed.settings.target_health_factor) / 10000).toFixed(2)}</b></Tag>
+                            <Tag variant={'solid'}><b>Max: {(Number(isSubscribed.settings.max_health_factor) / 10000).toFixed(2)}</b></Tag>
+                        </Flex>}
+                    </Card>
+                })}
+
+                {lendingOptions.filter(l => l?.module).length > 0 && 
+                    <Card bg='highlight' padding={'10px'} marginTop={'10px'}>
+                        <Flex justifyContent={'space-between'}>
+                            <Flex alignItems={'center'}>
+                                <Avatar size={'2xs'} src={'https://app.nostra.finance/favicon.svg'} marginRight={'5px'}/> 
+                                <Text fontWeight={'bold'} color='purple' fontSize='16px'>Nostra</Text>
+                            </Flex>
+                            <Flex>
+                                {/* <HStack spacing={'1px'}>
+                                    {Array.from({length: 15}).map((_, i) => {
+                                        return <Box key={i} width={'2px'} height={'10px'} bg='green'/>
+                                    })}
+                                </HStack> */}
+                            </Flex>
+                        </Flex>
+                        <Flex marginTop={'10px'} justifyContent={'space-between'}>
+                            <Box>
+                                <Tag variant={'outline'} marginRight={'10px'}>Coming soon</Tag>
+                            </Box>
+                        </Flex>
+                    </Card>}
+
+                {lendingOptions.filter(l => l).length == 0 && <Stack>
+                    <Skeleton height='70px' />
+                    <Skeleton height='70px' />
+                </Stack>}
+            </Box>
+            <Box flex={4} float={'left'}>
+                <Box width={'100%'} bg='bg' borderRadius={'7px'} padding={'10px'}>
+                    <Flex color='light_grey' alignItems={'center'} marginBottom={'5px'}>
+                        <SettingsIcon boxSize='4' marginRight={'5px'}/>
+                        <Text>Subscription settings</Text>
                     </Flex>
                     <hr style={{margin: '10px 0', borderColor: "var(--chakra-colors-highlight)"}}/>
-                    {isSubscribed && isSubscribed.is_active && <Flex  justifyContent={'start'}>
-                        <Tag marginRight={'10px'} variant={'solid'}><b>Min: {(Number(isSubscribed.settings.min_health_factor) / 10000).toFixed(2)}</b></Tag>
-                        <Tag marginRight={'10px'} variant={'solid'}><b>Target: {(Number(isSubscribed.settings.target_health_factor) / 10000).toFixed(2)}</b></Tag>
-                        <Tag variant={'solid'}><b>Max: {(Number(isSubscribed.settings.max_health_factor) / 10000).toFixed(2)}</b></Tag>
-                    </Flex>}
-                </Card>
-            })}
-
-            <Card bg='bg' padding={'10px'} marginTop={'10px'}>
-                    <Flex justifyContent={'space-between'}>
-                        <Flex alignItems={'center'}>
-                            <Avatar size={'2xs'} src={'https://app.nostra.finance/favicon.svg'} marginRight={'5px'}/> 
-                            <Text fontWeight={'bold'} color='purple' fontSize='16px'>Nostra</Text>
-                        </Flex>
-                        <Flex>
-                            {/* <HStack spacing={'1px'}>
-                                {Array.from({length: 15}).map((_, i) => {
-                                    return <Box key={i} width={'2px'} height={'10px'} bg='green'/>
-                                })}
-                            </HStack> */}
-                        </Flex>
-                    </Flex>
-                    <Flex marginTop={'10px'} justifyContent={'space-between'}>
-                        <Box>
-                            <Tag variant={'outline'} marginRight={'10px'}>Coming soon</Tag>
-                        </Box>
-                    </Flex>
-                </Card>
-
-            {lendingOptions.filter(l => l).length == 0 && <Stack>
-                <Skeleton height='70px' />
-                <Skeleton height='70px' />
-            </Stack>}
-        </Box>
-        <Box width={'40%'} float={'left'}>
-            <Box width={'100%'} bg='bg' borderRadius={'7px'} padding={'10px'}>
-                <Flex color='light_grey' alignItems={'center'} marginBottom={'5px'}>
-                    <SettingsIcon boxSize='4' marginRight={'5px'}/>
-                    <Text as='h3'>Settings</Text>
-                </Flex>
-
-                <Menu>
-                <MenuButton as={Button} height={'100%'} rightIcon={<ChevronDownIcon />} bgColor={'highlight'} borderColor={'bg'} borderWidth={'1px'} color='color2Text'
-                    _hover={{
-                        bg: "bg"
-                    }}
-                    padding={'10px'}
-                    marginBottom={'10px'}
-                >
-                    <Center>zkLend</Center>
-                </MenuButton>
-                <MenuList {...MyMenuListProps}>
-                    <MenuItem {...MyMenuItemProps} key='zkLend'
-                        onClick={() => {
-                            
+                    <Menu>
+                    <MenuButton as={Button} height={'100%'} rightIcon={<ChevronDownIcon />} bgColor={'highlight'} borderColor={'bg'} borderWidth={'1px'} color='color2Text'
+                        _hover={{
+                            bg: "bg"
                         }}
+                        padding={'10px'}
+                        marginBottom={'10px'}
                     >
-                        zkLend
-                    </MenuItem>
-                    <MenuItem {...MyMenuItemProps} key='nostra'
-                        onClick={() => {
-                            
-                        }}
-                    >
-                        Nostra
-                    </MenuItem>
-                </MenuList>
-                </Menu>
-                <Flex justifyContent={'space-between'}>
-                    <Text color={'light_grey'} fontSize={'13px'}>Required health factor range:</Text>
-                    <Text color={'purple'} fontSize={'12px'} onClick={() => {
-                            setHealthFactors(defaultHealthFactors);
-                        }}
-                        cursor={'pointer'}
-                    >[Suggest]</Text>
-                </Flex>
-                <RangeSlider aria-label={['min', 'target', 'max']} defaultValue={defaultHealthFactors} 
-                    min={1} max={3} step={0.05}
-                    value={healthFactors}
-                    onChange={(values) => {
-                        let _values = values as number[];
-                        if (_values[0] < 1.1) _values[0] = 1.1;
-                        if (_values[0] >= _values[1]) {
-                            _values[1] = _values[0] + 0.1;
-                        }
-                        if (_values[1] >= _values[2]) {
-                            _values[2] = _values[1] + 0.1;
-                        }
-                        setHealthFactors(_values);
-                    }}
-                >
-                    <RangeSliderTrack bg='highlight'>
-                        <RangeSliderFilledTrack bg='purple'/>
-                    </RangeSliderTrack>
-                    <RangeSliderThumb index={0}>
-                        <Box as={ChevronLeftIcon} bg='purple' borderRadius={'10px'} color='white'></Box>
-                    </RangeSliderThumb>
-                    <RangeSliderThumb index={1}>
-                        <Box as={CheckCircleIcon} bg='purple' borderRadius={'10px'} color='white'></Box>
-                    </RangeSliderThumb>
-                    <RangeSliderThumb index={2}>
-                        <Box as={ChevronRightIcon} bg='purple' borderRadius={'10px'} color='white'></Box>
-                    </RangeSliderThumb>
-                </RangeSlider>
-
-                <Stack color='light_grey' fontSize={'13px'} marginTop={'10px'} gap={'2px'}>
-                    <Flex alignItems={'center'}>
-                        <Text marginRight={'5px'}><b>Min health factor:</b></Text>
-                        <Text color='cyan' fontSize={'14px'}>{healthFactors[0]}</Text>
-                    </Flex>
-                    <Flex alignItems={'center'}>
-                        <Text marginRight={'5px'}><b>Target health factor:</b></Text>
-                        <Text color='cyan' fontSize={'14px'}>{healthFactors[1]}</Text>
-                    </Flex>
-                    <Flex alignItems={'center'}>
-                        <Text marginRight={'5px'}><b>Max health factor:</b></Text>
-                        <Text color='cyan' fontSize={'14px'}>{healthFactors[2]}</Text>
-                    </Flex>
-                </Stack>
-
-                <HStack width={'100%'}>
-                    <Center width={isSubscribed && isSubscribed.is_active ? 'auto': '100%'}>
-                        <Button size={'sm'} marginTop={'20px'} bg='purple'
+                        <Center>zkLend</Center>
+                    </MenuButton>
+                    <MenuList {...MyMenuListProps}>
+                        <MenuItem {...MyMenuItemProps} key='zkLend'
                             onClick={() => {
-                                writeAsyncSubscribe();
+                                
                             }}
-                            isDisabled={isPending}
-                            minWidth={'150px'}
                         >
-                            {isPending || !isSubscribed ? <Spinner size={'sm'}/> : <></>}
-                            {isSubscribed && !isSubscribed.is_active && "Subscribe"}
-                            {isSubscribed && isSubscribed.is_active && "Update"}
-                        </Button>
-                    </Center>
-                    {
-                        isSubscribed && 
-                        isSubscribed.is_active &&
-                        <Button size={'sm'} marginTop={'20px'} bg='bg' color='light_grey' 
-                        borderColor='light_grey' variant={'outline'} flex={1}
+                            zkLend
+                        </MenuItem>
+                        <MenuItem {...MyMenuItemProps} key='nostra'
                             onClick={() => {
-                                writeAsyncUnSubscribe();
+                                
                             }}
-                            isDisabled={isPendingUnsub}
-                        >Unsubscribe</Button>
-                    }
-                </HStack>
-            </Box>
-        </Box>
+                        >
+                            Nostra
+                        </MenuItem>
+                    </MenuList>
+                    </Menu>
+                    <Flex justifyContent={'space-between'}>
+                        <Text color={'light_grey'} fontSize={'13px'}>Required health factor range:</Text>
+                        <Text color={'purple'} fontSize={'12px'} onClick={() => {
+                                setHealthFactors(defaultHealthFactors);
+                            }}
+                            cursor={'pointer'}
+                        >[Suggest]</Text>
+                    </Flex>
+                    <RangeSlider aria-label={['min', 'target', 'max']} defaultValue={defaultHealthFactors} 
+                        min={1} max={3} step={0.05}
+                        value={healthFactors}
+                        onChange={(values) => {
+                            let _values = values as number[];
+                            if (_values[0] < 1.1) _values[0] = 1.1;
+                            if (_values[0] >= _values[1]) {
+                                _values[1] = _values[0] + 0.1;
+                            }
+                            if (_values[1] >= _values[2]) {
+                                _values[2] = _values[1] + 0.1;
+                            }
+                            setHealthFactors(_values);
+                        }}
+                    >
+                        <RangeSliderTrack bg='highlight'>
+                            <RangeSliderFilledTrack bg='purple'/>
+                        </RangeSliderTrack>
+                        <RangeSliderThumb index={0}>
+                            <Box as={ChevronLeftIcon} bg='purple' borderRadius={'10px'} color='white'></Box>
+                        </RangeSliderThumb>
+                        <RangeSliderThumb index={1}>
+                            <Box as={CheckCircleIcon} bg='purple' borderRadius={'10px'} color='white'></Box>
+                        </RangeSliderThumb>
+                        <RangeSliderThumb index={2}>
+                            <Box as={ChevronRightIcon} bg='purple' borderRadius={'10px'} color='white'></Box>
+                        </RangeSliderThumb>
+                    </RangeSlider>
 
-        <Accordion marginTop={'10px'} float={'left'} borderColor={'bg'} width={'100%'}>
+                    <Stack color='light_grey' fontSize={'13px'} marginTop={'10px'} gap={'2px'}>
+                        <Flex alignItems={'center'}>
+                            <Text marginRight={'5px'}><b>Min health factor:</b></Text>
+                            <Text color='cyan' fontSize={'14px'}>{healthFactors[0]}</Text>
+                        </Flex>
+                        <Flex alignItems={'center'}>
+                            <Text marginRight={'5px'}><b>Target health factor:</b></Text>
+                            <Text color='cyan' fontSize={'14px'}>{healthFactors[1]}</Text>
+                        </Flex>
+                        <Flex alignItems={'center'}>
+                            <Text marginRight={'5px'}><b>Max health factor:</b></Text>
+                            <Text color='cyan' fontSize={'14px'}>{healthFactors[2]}</Text>
+                        </Flex>
+                    </Stack>
+                    <Alert status='info' 
+                        bg='highlight' marginTop={'10px'} 
+                        padding={'5px 10px'} borderRadius={'5px'}
+                        fontSize={'13px'}
+                        color='light_grey'
+                    >
+                        <AlertIcon color='light_grey'/>
+                        Your positions will be rebalanced to target health factor when they move out of range
+                    </Alert>
+                    <HStack width={'100%'}>
+                        <Center width={isSubscribed && isSubscribed.is_active ? 'auto': '100%'}>
+                            <Button size={'sm'} marginTop={'20px'} bg='purple'
+                                onClick={() => {
+                                    writeAsyncSubscribe();
+                                }}
+                                isDisabled={isPending}
+                                minWidth={'150px'}
+                            >
+                                {isPending || !isSubscribed ? <Spinner size={'sm'}/> : <></>}
+                                {isSubscribed && !isSubscribed.is_active && "Subscribe"}
+                                {isSubscribed && isSubscribed.is_active && "Update"}
+                            </Button>
+                        </Center>
+                        {
+                            isSubscribed && 
+                            isSubscribed.is_active &&
+                            <Button size={'sm'} marginTop={'20px'} bg='bg' color='light_grey' 
+                            borderColor='light_grey' variant={'outline'} flex={1}
+                                onClick={() => {
+                                    writeAsyncUnSubscribe();
+                                }}
+                                isDisabled={isPendingUnsub}
+                            >Unsubscribe</Button>
+                        }
+                    </HStack>
+                </Box>
+            </Box>
+        </HStack>
+
+        <Accordion marginTop={'10px'} float={'left'} borderColor={'bg'} width={'100%'} defaultIndex={[0]} allowToggle>
             <AccordionItem bg='bg' borderRadius={'5px'}>
                 <h2>
                 <AccordionButton color='light_grey'>
-                    <Box as='span' flex='1' textAlign='left'>
-                        Rebalance history
-                    </Box>
+                    <Flex as='span' flex='1' textAlign='left' alignItems={'center'}>
+                        <HamburgerIcon marginRight={'5px'}/> <Text>Rebalance history</Text>
+                    </Flex>
                     <AccordionIcon />
                 </AccordionButton>
                 </h2>
-                <AccordionPanel pb={4}>
-                    
+                <AccordionPanel pb={4} color='light_grey'>
+                    <Flex justifyContent={'space-between'} fontWeight={'bold'} borderBottom={'2px solid'} borderColor={'highlight'}>
+                        <Text width={'10%'}>Index</Text>
+                        <Text width={'30%'}>Transaction hash</Text>
+                        <Center width={'30%'}>Health change</Center>
+                        <Flex alignItems={'center'} width={'30%'} justifyContent={'end'}>Flow</Flex>
+                    </Flex>
+                    {(transactionsIsLoading || transactionsIsPending) && <Spinner color='light_grey' size='md' marginTop={'10px'}/>}
+                    {transactionsData && transactionsData.length == 0 && <Text>No rebalances yet</Text>}
+                    {transactionsData && transactionsData.length > 0 && <Box>
+                        {transactionsData.map((tx, i) => {
+                            return <Box key={i} padding={'10px'} 
+                                borderBottom={'1px solid var(--chakra-colors-highlight)'} 
+                                color='light_grey'
+                                justifyContent={'space-between'}
+                            >
+                                <Flex justifyContent={'space-between'}>
+                                    <Text width={'10%'}>#{i+1}</Text>
+                                    <Link width={'30%'} href={`https://starkscan.co/tx/{tx.txHash}`}>{shortAddress(tx.txHash)}</Link>
+                                    <Center width={'30%'}>{(tx.previous_health_factor / 10000).toFixed(2)}{" "}<ArrowForwardIcon/>{" "}{(tx.new_health_factor / 10000).toFixed(2)}</Center>
+                                    {tx.is_outflow && <Flex alignItems={'center'} width={'30%'} justifyContent={'end'}>
+                                        <Avatar size='2xs' src={strkfarmLogo.src} marginRight={'5px'}/>
+                                        <ArrowForwardIcon marginRight={'5px'}/>
+                                        <Avatar size='2xs' src={zkLendLogo.src}/>
+                                    </Flex>}
+                                    {!tx.is_outflow && 
+                                        <Flex alignItems={'center'} width={'30%'} justifyContent={'end'}>
+                                            <Avatar size='2xs' src={zkLendLogo.src} marginRight={'5px'}/>
+                                            <ArrowForwardIcon marginRight={'5px'}/>
+                                            <Avatar size='2xs' src={strkfarmLogo.src}/>
+                                        </Flex>}
+                                </Flex>
+                            </Box>
+                        })}
+                    </Box>}
                 </AccordionPanel>
             </AccordionItem>
         </Accordion>
