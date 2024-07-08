@@ -32,8 +32,8 @@ export const strategiesAtom = atom<StrategyInfo[]>((get) => {
     Mustache.render(DNMMDescription, { token1: 'USDC', token2: 'ETH' }),
     'ETH',
     CONSTANTS.CONTRACTS.DeltaNeutralMMUSDCETH,
-    [1.52, 0.618, 1, 0.553, 1.923], // precomputed factors based on strategy math
-    StrategyLiveStatus.COMING_SOON,
+    [1, 0.618, 1, 0.553], // precomputed factors based on strategy math
+    StrategyLiveStatus.ACTIVE,
   );
 
   const deltaNeutralMMETHUSDC = new DeltaNeutralMM(
@@ -42,7 +42,7 @@ export const strategiesAtom = atom<StrategyInfo[]>((get) => {
     'USDC',
     // ! change this later
     CONSTANTS.CONTRACTS.DeltaNeutralMMUSDCETH,
-    [1.52, 0.618, 1, 0.553, 1.923],
+    [1, 0.618, 1, 0.553], // precomputed factors based on strategy math
     StrategyLiveStatus.COMING_SOON,
   );
   const deltaNeutralMMSTRKUSDC = new DeltaNeutralMM(
@@ -51,7 +51,7 @@ export const strategiesAtom = atom<StrategyInfo[]>((get) => {
     'USDC',
     // ! change this later
     CONSTANTS.CONTRACTS.DeltaNeutralMMUSDCETH,
-    [1.52, 0.618, 1, 0.553, 1.923],
+    [1, 0.618, 1, 0.553], // precomputed factors based on strategy math
     StrategyLiveStatus.COMING_SOON,
   );
 

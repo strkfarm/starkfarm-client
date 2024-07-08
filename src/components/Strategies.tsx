@@ -236,9 +236,10 @@ export default function Strategies() {
               textAlign={{ base: 'left', md: 'right' }}
               width="100%"
               float={'left'}
-              color="color1_light"
+              color="#eeeeee"
+              fontWeight={'bold'}
             >
-              {strat.leverage.toFixed(1)}x higher returns
+              {strat.leverage.toFixed(1)}x
             </Text>
           </Tooltip>
         </Box>

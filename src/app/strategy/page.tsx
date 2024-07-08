@@ -306,7 +306,7 @@ export default function Strategy() {
                 fontSize={'14px'}
               >
                 <Text width={{ base: '100%', md: '50%' }} padding={'5px 10px'}>
-                  {index + 1} {action.name}
+                  {index + 1}{")"} {action.name}
                 </Text>
                 <Text width={{ base: '100%', md: '30%' }} padding={'5px 10px'}>
                   <Avatar
