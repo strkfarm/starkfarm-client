@@ -132,7 +132,9 @@ export class DeltaNeutralMM extends IStrategy {
     actions: StrategyAction[],
   ): StrategyAction[] {
     console.log('optimizer', actions.length, this.stepAmountFactors);
-    let _amount = (Number(amount) * this.stepAmountFactors[actions.length]).toFixed(2);
+    const _amount = (
+      Number(amount) * this.stepAmountFactors[actions.length]
+    ).toFixed(2);
     return [
       ...actions,
       {
@@ -143,34 +145,44 @@ export class DeltaNeutralMM extends IStrategy {
     ];
   }
 
-  getLookRepeatYieldAmount(eligiblePools: PoolInfo[],
+  getLookRepeatYieldAmount(
+    eligiblePools: PoolInfo[],
     amount: string,
-    actions: StrategyAction[]) {
+    actions: StrategyAction[],
+  ) {
     console.log('getLookRepeatYieldAmount', amount, actions);
     let full_amount = Number(amount);
     this.stepAmountFactors.forEach((factor, i) => {
-      full_amount = full_amount / factor;
+      full_amount /= factor;
     });
     const amount1 = 0.52 * full_amount;
-    const exp1 = amount1 * this.actions[0].pool.apr
+    const exp1 = amount1 * this.actions[0].pool.apr;
     const amount2 = this.stepAmountFactors[1] * 0.52 * full_amount;
-    const exp2 =  amount2 * (this.actions[2].pool.apr - this.actions[1].pool.borrow.apr);
+    const exp2 =
+      amount2 * (this.actions[2].pool.apr - this.actions[1].pool.borrow.apr);
     const amount3 = this.stepAmountFactors[3] * amount2;
-    const exp3 = - amount3 * (this.actions[3].pool.borrow.apr);
+    const exp3 = -amount3 * this.actions[3].pool.borrow.apr;
     const effecitveAmount = amount1 - amount3;
     const effectiveAPR = (exp1 + exp2 + exp3) / effecitveAmount;
-    const pool: PoolInfo = {...eligiblePools[0]};
+    const pool: PoolInfo = { ...eligiblePools[0] };
     pool.apr = effectiveAPR;
     const strategyAction: StrategyAction = {
-      pool: pool,
+      pool,
       amount: effecitveAmount.toString(),
-      isDeposit: true
-    }
-    console.log('getLookRepeatYieldAmount exp1', exp1, full_amount, exp2, amount2, this.actions[2], this.actions[1], exp3, amount3);
-    return [
-      ...actions,
-      strategyAction
-    ];
+      isDeposit: true,
+    };
+    console.log(
+      'getLookRepeatYieldAmount exp1',
+      exp1,
+      full_amount,
+      exp2,
+      amount2,
+      this.actions[2],
+      this.actions[1],
+      exp3,
+      amount3,
+    );
+    return [...actions, strategyAction];
   }
 
   compounder(
@@ -179,7 +191,7 @@ export class DeltaNeutralMM extends IStrategy {
     actions: StrategyAction[],
   ): StrategyAction[] {
     const amountWeights = this.actions.reduce((a, pool) => {
-      const sign = (pool.isDeposit ? 1 : -1 );
+      const sign = pool.isDeposit ? 1 : -1;
       const apr = pool.isDeposit ? pool.pool.apr : pool.pool.borrow.apr;
       console.log('compounder2', sign, pool.amount, apr);
       return sign * Number(pool.amount) * apr + a;
@@ -187,7 +199,14 @@ export class DeltaNeutralMM extends IStrategy {
     const amountIn = Number(this.actions[0].amount);
     const baseApr = amountWeights / amountIn;
     const compoundingApr = (1 + baseApr / 26) ** 26 - 1;
-    console.log('compounder', amountIn, amountWeights, baseApr, compoundingApr, actions);
+    console.log(
+      'compounder',
+      amountIn,
+      amountWeights,
+      baseApr,
+      compoundingApr,
+      actions,
+    );
     return [
       ...actions,
       {
