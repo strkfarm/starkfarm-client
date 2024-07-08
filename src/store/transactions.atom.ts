@@ -34,10 +34,12 @@ async function deserialiseTxInfo(key: string, initialValue: TransactionInfo[]) {
     ? JSON.parse(storedValue)
     : initialValue;
   txs.forEach((tx) => {
-    tx.info.amount = new MyNumber(
-      tx.info.amount.bigNumber.toString(),
-      tx.info.amount.decimals,
-    );
+    if (tx.info.amount) {
+      tx.info.amount = new MyNumber(
+        tx.info.amount.bigNumber.toString(),
+        tx.info.amount.decimals,
+      );
+    }
     tx.createdAt = new Date(tx.createdAt);
   });
   return txs;
