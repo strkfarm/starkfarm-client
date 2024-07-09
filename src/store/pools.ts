@@ -145,7 +145,6 @@ export const StrkDexIncentivesAtom = atomWithQuery((get) => ({
   },
 }));
 
-
 export const StrkIncentivesAtom = atomWithQuery((get) => ({
   queryKey: get(StrkIncentivesQueryKeyAtom),
   queryFn: async ({ queryKey }) => {
@@ -165,7 +164,10 @@ export const StrkIncentivesAtom = atomWithQuery((get) => ({
   },
 }));
 
-export const StrkIncentivesQueryKeyAtom = atom(['strk_incentives', 'isNostraDegen']);
+export const StrkIncentivesQueryKeyAtom = atom([
+  'strk_incentives',
+  'isNostraDegen',
+]);
 
 export const StrkLendingIncentivesAtom = atomWithQuery((get) => ({
   queryKey: ['strk_lending_incentives'],
