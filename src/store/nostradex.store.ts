@@ -27,7 +27,8 @@ export class NostraDex extends Jediswap {
           const tokens: TokenName[] = [poolData.tokenA, poolData.tokenB];
           const logo1 = CONSTANTS.LOGOS[tokens[0]];
           const logo2 = CONSTANTS.LOGOS[tokens[1]];
-          const baseApr = poolData.baseApr === '0' ? 0.0 : parseFloat(poolData.baseApr);
+          const baseApr =
+            poolData.baseApr === '0' ? 0.0 : parseFloat(poolData.baseApr);
           const rewardApr = parseFloat(poolData.rewardApr);
           const poolInfo: PoolInfo = {
             pool: {
