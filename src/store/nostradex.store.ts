@@ -1,30 +1,7 @@
-// import { PoolInfo, ProtocolAtoms, StrkDexIncentivesAtom } from './pools';
-// import { atom } from 'jotai';
-// import { Jediswap } from './jedi.store';
-
-// export class NostraDex extends Jediswap {
-//   name = 'Nostra DEX';
-//   link = 'https://app.nostra.finance/pools';
-//   logo = 'https://app.nostra.finance/favicon.svg';
-
-//   incentiveDataKey = 'Nostra';
-// }
-
-// export const nostraDex = new NostraDex();
-// const NostraDexAtoms: ProtocolAtoms = {
-//   pools: atom((get) => {
-//     const poolsInfo = get(StrkDexIncentivesAtom);
-//     const empty: PoolInfo[] = [];
-//     if (poolsInfo.data) return nostraDex._computePoolsInfo(poolsInfo.data);
-//     return empty;
-//   }),
-// };
-// export default NostraDexAtoms;
-
 import CONSTANTS, { TokenName } from '@/constants';
 import { Category, PoolType } from './pools';
 import { atom } from 'jotai';
-import { PoolInfo, ProtocolAtoms, StrkDex2IncentivesAtom } from './pools';
+import { PoolInfo, ProtocolAtoms, StrkIncentivesAtom } from './pools';
 import { Jediswap } from './jedi.store';
 
 export class NostraDex extends Jediswap {
@@ -38,15 +15,19 @@ export class NostraDex extends Jediswap {
       const myData = data;
       if (!myData) return [];
       const pools: PoolInfo[] = [];
-      Object.entries(myData)
-        .filter(([_, poolData]: any) => poolData.isDegen === false)
-        .forEach(([poolName, poolData]: any) => {
+
+      // Filter and map only the required pools
+      Object.values(myData)
+        .filter((poolData: any) => {
+          const id = poolData.id;
+          return id === 'ETH-USDC' || id === 'STRK-ETH' || id === 'STRK-USDC';
+        })
+        .forEach((poolData: any) => {
           const category = Category.Others;
           const tokens: TokenName[] = [poolData.tokenA, poolData.tokenB];
           const logo1 = CONSTANTS.LOGOS[tokens[0]];
           const logo2 = CONSTANTS.LOGOS[tokens[1]];
-          const baseApr =
-            poolData.baseApr === '0' ? 0.0 : parseFloat(poolData.baseApr);
+          const baseApr = poolData.baseApr === '0' ? 0.0 : parseFloat(poolData.baseApr);
           const rewardApr = parseFloat(poolData.rewardApr);
           const poolInfo: PoolInfo = {
             pool: {
@@ -95,7 +76,7 @@ export class NostraDex extends Jediswap {
 export const nostraDex = new NostraDex();
 const NostraDexAtoms: ProtocolAtoms = {
   pools: atom((get) => {
-    const poolsInfo = get(StrkDex2IncentivesAtom);
+    const poolsInfo = get(StrkIncentivesAtom);
     const empty: PoolInfo[] = [];
     if (poolsInfo.data) return nostraDex._computePoolsInfo(poolsInfo.data);
     return empty;
