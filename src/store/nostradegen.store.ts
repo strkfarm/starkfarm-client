@@ -1,7 +1,7 @@
 import CONSTANTS, { TokenName } from '@/constants';
 import { Category, PoolType } from './pools';
 import { atom } from 'jotai';
-import { PoolInfo, ProtocolAtoms, StrkDegenIncentivesAtom } from './pools';
+import { PoolInfo, ProtocolAtoms, StrkIncentivesAtom } from './pools';
 import { Jediswap } from './jedi.store';
 
 export class NostraDegen extends Jediswap {
@@ -72,7 +72,7 @@ export class NostraDegen extends Jediswap {
 export const nostraDegen = new NostraDegen();
 const NostraDegenAtoms: ProtocolAtoms = {
   pools: atom((get) => {
-    const poolsInfo = get(StrkDegenIncentivesAtom);
+    const poolsInfo = get(StrkIncentivesAtom);
     const empty: PoolInfo[] = [];
     if (poolsInfo.data) return nostraDegen._computePoolsInfo(poolsInfo.data);
     return empty;
