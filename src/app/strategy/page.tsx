@@ -218,15 +218,15 @@ export default function Strategy() {
             <GridItem display="grid" colSpan={colSpan2}>
               <Card width="100%" padding="15px" marginBottom="8px" color="white" bg="highlight">
                 <Stat>
-                  <StatLabel textAlign={{ base: 'left', md: 'right' }}>
+                  <StatLabel color="light_grey" marginBottom={'8px'} fontSize={'16px'} textAlign={{ base: 'left', md: 'right' }}>
                     Potential yield
                   </StatLabel>
-                  <StatNumber fontSize="medium" textAlign={{ base: 'left', md: 'right' }}>
+                  <StatNumber color="light_grey" fontSize="medium" textAlign={{ base: 'left', md: 'right' }}>
                     <Avatar marginRight="5px" width="20px" height="20px" src={strategy?.holdingTokens[0]?.logo} />
                     {(balData.isLoading || balData.isPending || !balData.data?.tokenInfo) ? (
                       <Spinner size="xs" marginTop="5px" />
                     ) : (
-                      (strategy.netYield * Number(balance.toEtherToFixedDecimals(4))).toFixed(2)
+                      new Intl.NumberFormat('en-US').format((strategy.netYield * Number(balance.toEtherToFixedDecimals(4))))
                     )}
                   </StatNumber>
                 </Stat>
