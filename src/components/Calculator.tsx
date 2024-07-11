@@ -444,7 +444,7 @@ export const Calculator: React.FC = () => {
                   boxShadow: 'none',
                   border: 'none',
                 }}
-                placeholder={"STRK"}
+                placeholder={'STRK'}
               >
                 {tokenList.map((data, index) => (
                   <option
@@ -492,7 +492,7 @@ export const Calculator: React.FC = () => {
                     setPair2('ETH');
                   }
                 }}
-                placeholder={"ETH"}
+                placeholder={'ETH'}
               >
                 {tokenList.map((data, index) => (
                   <option
