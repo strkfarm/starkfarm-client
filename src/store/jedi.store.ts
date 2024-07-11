@@ -49,6 +49,8 @@ export class Jediswap extends IDapp<string> {
             category = Category.Stable;
           } else if (poolName.includes('STRK')) {
             category = Category.STRK;
+          } else if (poolName.includes('DEGEN')) {
+            category = Category.Degen;
           }
 
           const tokens: TokenName[] = <TokenName[]>poolName.split('/');

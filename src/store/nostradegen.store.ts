@@ -4,25 +4,20 @@ import { atom } from 'jotai';
 import { PoolInfo, ProtocolAtoms, StrkIncentivesAtom } from './pools';
 import { Jediswap } from './jedi.store';
 
-export class NostraDex extends Jediswap {
-  name = 'Nostra DEX';
+export class NostraDegen extends Jediswap {
+  name = 'Nostra DEGEN';
   link = 'https://app.nostra.finance/pools';
   logo = 'https://app.nostra.finance/favicon.svg';
-  incentiveDataKey = 'isNostraDex';
+  incentiveDataKey = 'isNostraDegen';
 
   _computePoolsInfo(data: any) {
     try {
       const myData = data;
       if (!myData) return [];
       const pools: PoolInfo[] = [];
-
-      // Filter and map only the required pools
-      Object.values(myData)
-        .filter((poolData: any) => {
-          const id = poolData.id;
-          return id === 'ETH-USDC' || id === 'STRK-ETH' || id === 'STRK-USDC';
-        })
-        .forEach((poolData: any) => {
+      Object.entries(myData)
+        .filter(([_, poolData]: any) => poolData.isDegen)
+        .forEach(([poolName, poolData]: any) => {
           const category = Category.Others;
           const tokens: TokenName[] = [poolData.tokenA, poolData.tokenB];
           const logo1 = CONSTANTS.LOGOS[tokens[0]];
@@ -32,7 +27,7 @@ export class NostraDex extends Jediswap {
           const rewardApr = parseFloat(poolData.rewardApr);
           const poolInfo: PoolInfo = {
             pool: {
-              name: poolData.id,
+              name: poolData.id.slice(0, -6),
               logos: [logo1, logo2],
             },
             protocol: {
@@ -74,13 +69,13 @@ export class NostraDex extends Jediswap {
   }
 }
 
-export const nostraDex = new NostraDex();
-const NostraDexAtoms: ProtocolAtoms = {
+export const nostraDegen = new NostraDegen();
+const NostraDegenAtoms: ProtocolAtoms = {
   pools: atom((get) => {
     const poolsInfo = get(StrkIncentivesAtom);
     const empty: PoolInfo[] = [];
-    if (poolsInfo.data) return nostraDex._computePoolsInfo(poolsInfo.data);
+    if (poolsInfo.data) return nostraDegen._computePoolsInfo(poolsInfo.data);
     return empty;
   }),
 };
-export default NostraDexAtoms;
+export default NostraDegenAtoms;

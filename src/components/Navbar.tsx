@@ -1,5 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
-import { WalletName, lastWalletAtom } from '@/store/utils.atoms';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
   Avatar,
@@ -8,78 +6,119 @@ import {
   Center,
   Container,
   Flex,
+  IconButton,
+  Image,
   Link,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
-  Spinner,
   Text,
 } from '@chakra-ui/react';
-import { useAccount, useConnect, useDisconnect } from '@starknet-react/core';
+import { useAtom, useSetAtom } from 'jotai';
+import { useStarknetkitConnectModal } from 'starknetkit';
+
+import tg from '@/assets/tg.svg';
+import fulllogo from '@public/fulllogo.png';
 import CONSTANTS from '@/constants';
 import { addressAtom } from '@/store/claims.atoms';
-import {
-  capitalize,
-  shortAddress,
-  MyMenuListProps,
-  MyMenuItemProps,
-} from '@/utils';
-import { getStarknet } from 'get-starknet-core';
-import { useAtom, useSetAtom } from 'jotai/react';
+import { MyMenuItemProps, MyMenuListProps, shortAddress } from '@/utils';
 import { useEffect } from 'react';
+import { lastWalletAtom } from '@/store/utils.atoms';
+import { useAccount, useConnect, useDisconnect } from '@starknet-react/core';
+import { CONNECTOR_NAMES, MYCONNECTORS } from '@/app/template';
 
 export default function Navbar() {
-  const { address, chainId, status, connector } = useAccount();
+  const { address, connector } = useAccount();
   const { connect, connectors } = useConnect();
-  const { disconnect, disconnectAsync } = useDisconnect();
+  const { disconnectAsync } = useDisconnect();
   const setAddress = useSetAtom(addressAtom);
   const [lastWallet, setLastWallet] = useAtom(lastWalletAtom);
-  const getStarknetResult = getStarknet();
+  const { starknetkitConnectModal: starknetkitConnectModal1 } =
+    useStarknetkitConnectModal({
+      modalMode: 'canAsk',
+      modalTheme: 'dark',
+      connectors: MYCONNECTORS,
+    });
 
-  useEffect(() => {
-    console.log('lastWallet', lastWallet);
-    if (!address && lastWallet) {
-      const lastConnector = connectors.find((c) => c.name === lastWallet);
-      console.log('lastWallet connected', lastConnector);
-      if (!lastConnector)
-        console.error('last connector name found, but no connector');
-      else {
-        connect({ connector: lastConnector });
+  // backup
+  const { starknetkitConnectModal: starknetkitConnectModal2 } =
+    useStarknetkitConnectModal({
+      modalMode: 'alwaysAsk',
+      modalTheme: 'dark',
+      connectors: MYCONNECTORS,
+    });
+
+  // Connect wallet using starknetkit
+  const connectWallet = async () => {
+    try {
+      const result = await starknetkitConnectModal1();
+      await connect({ connector: result.connector });
+    } catch (error) {
+      console.warn('connectWallet error', error);
+      try {
+        const result = await starknetkitConnectModal2();
+        await connect({ connector: result.connector });
+      } catch (error) {
+        console.error('connectWallet error', error);
+        alert('Error connecting wallet');
       }
     }
+  };
+
+  function autoConnect(retry = 0) {
+    console.log('lastWallet', lastWallet, connectors);
+    try {
+      if (!address && lastWallet) {
+        const connectorIndex = CONNECTOR_NAMES.findIndex(
+          (name) => name === lastWallet,
+        );
+        if (connectorIndex >= 0) {
+          connect({ connector: MYCONNECTORS[connectorIndex] });
+        }
+      }
+    } catch (error) {
+      console.error('lastWallet error', error);
+      if (retry < 10) {
+        setTimeout(() => {
+          autoConnect(retry + 1);
+        }, 1000);
+      }
+    }
+  }
+  // Auto-connects to last wallet
+  useEffect(() => {
+    autoConnect();
   }, [lastWallet]);
 
+  // Set last wallet when a new wallet is connected
   useEffect(() => {
     console.log('lastWallet connector', connector?.name);
     if (connector) {
-      const name: WalletName = connector.name as WalletName;
+      const name: string = connector.name;
       setLastWallet(name);
     }
   }, [connector]);
 
+  // set address atom
   useEffect(() => {
-    console.log('lastWallet stats', {
-      address,
-      status,
-      connector,
-    });
-  }, [address, status, connector]);
+    setAddress(address);
+  }, [address]);
 
   return (
     <Container
       width={'100%'}
       padding={'0'}
-      borderBottom={'1px solid #272932'}
+      borderBottom={'1px solid var(--chakra-colors-color2)'}
       position={'fixed'}
-      bg="#020612"
+      bg="bg"
       zIndex={10000}
       top="0"
     >
       <Center bg="highlight" color="orange" padding={0}>
         <Text fontSize="12px" textAlign={'center'} padding="0px 5px">
           {''}
-          <b>Alpha version, report bugs in our Telegram group.</b>
+          <b>Report bugs & share feedback in our Telegram group.</b>
           {''}
         </Text>
       </Center>
@@ -87,26 +126,15 @@ export default function Navbar() {
         width={'100%'}
         maxWidth="1400px"
         margin={'0px auto'}
-        padding={'20px 20px 20px'}
+        padding={'20px 20px 10px'}
       >
-        <Flex display={'flex'} alignItems={'center'} width={'100%'}>
+        <Flex width={'100%'}>
           <Link href="/" margin="0 auto 0 0" textAlign={'left'}>
-            <Box marginTop={{ base: '7px', sm: '3px', md: '0' }}>
-              <Flex alignItems={'center'} gap={2}>
-                <img
-                  src={'/favicon.png'}
-                  width={'30px'}
-                  height={'30px'}
-                  alt={'Logo'}
-                />
-                <img
-                  src={'/strk-text-logo.png'}
-                  width={'120px'}
-                  height={'120px'}
-                  alt={'Logo'}
-                />
-              </Flex>
-            </Box>
+            <Image
+              src={fulllogo.src}
+              alt="logo"
+              height={{ base: '40px', md: '50px' }}
+            />
           </Link>
           {/* <Link href={'/claims'} isExternal>
             <Button
@@ -134,27 +162,54 @@ export default function Navbar() {
           </Link> */}
           <Link href={CONSTANTS.COMMUNITY_TG} isExternal>
             <Button
-              display={'flex'}
-              justifyContent={'center'}
-              alignItems={'center'}
-              color={'white'}
-              borderRadius={'10px'}
-              bg={'#272932'}
-              _hover={'none'}
-              fontSize={{ base: 'small' }}
-              _activeLink={'none'}
-              _active={'none'}
+              margin="0 0 0 auto"
+              borderColor="color2"
+              color="color2"
+              variant="outline"
+              rightIcon={
+                <Avatar
+                  size="sm"
+                  bg="highlight"
+                  color="color2"
+                  name="T G"
+                  src={tg.src}
+                />
+              }
+              _hover={{
+                bg: 'color2_50p',
+              }}
+              display={{ base: 'none !important', md: 'flex !important' }}
+              className="glow-button"
             >
               Join Telegram
             </Button>
+            <IconButton
+              aria-label="tg"
+              variant={'ghost'}
+              borderColor={'color2'}
+              display={{ base: 'block', md: 'none' }}
+              icon={
+                <Avatar
+                  size="sm"
+                  bg="highlight"
+                  className="glow-button"
+                  name="T G"
+                  color="color2"
+                  src={tg.src}
+                  _hover={{
+                    bg: 'color2_50p',
+                  }}
+                />
+              }
+            />
           </Link>
           <Menu>
             <MenuButton
               as={Button}
-              rightIcon={<ChevronDownIcon />}
+              rightIcon={address ? <ChevronDownIcon /> : <></>}
+              iconSpacing={{ base: '1px', sm: '5px' }}
               bgColor={'purple'}
               color="white"
-              fontSize={{ base: 'small' }}
               borderColor={'purple'}
               borderWidth="1px"
               _hover={{
@@ -169,42 +224,19 @@ export default function Navbar() {
                 color: 'purple',
               }}
               marginLeft={'10px'}
-              display={{ base: 'none', sm: 'flex' }}
+              display={{ base: 'flex' }}
+              height={{ base: '2rem', sm: '2.5rem' }}
+              my={{ base: 'auto', sm: 'initial' }}
+              paddingX={{ base: '0.5rem', sm: '1rem' }}
+              fontSize={{ base: '0.8rem', sm: '1rem' }}
+              onClick={address ? undefined : connectWallet}
+              size="xs"
             >
-              <Center>
-                {status === 'connecting' || status === 'reconnecting' ? (
-                  <Spinner size={'sm'} marginRight={'5px'} />
-                ) : (
-                  <></>
-                )}
-                {status === 'connected' && address ? shortAddress(address) : ''}
-                {status === 'disconnected' ? 'Connect' : ''}
-              </Center>
+              <Center>{address ? shortAddress(address) : 'Connect'}</Center>
             </MenuButton>
             <MenuList {...MyMenuListProps}>
-              {/* connectors */}
-              {status !== 'connected' &&
-                connectors.map((conn) => (
-                  <MenuItem
-                    {...MyMenuItemProps}
-                    key={conn.name}
-                    onClick={() => {
-                      connect({ connector: conn });
-                    }}
-                  >
-                    <Avatar
-                      src={conn.icon.light}
-                      size={'2xs'}
-                      marginRight={'5px'}
-                    />
-                    {capitalize(conn.name)}
-                  </MenuItem>
-                ))}
-
-              {/* disconnect buttons  */}
-              {status === 'connected' && address && (
+              {address && (
                 <MenuItem
-                  key="disconnect"
                   {...MyMenuItemProps}
                   onClick={() => {
                     disconnectAsync().then((data) => {

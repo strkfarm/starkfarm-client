@@ -1,4 +1,4 @@
-import { TokenInfo } from './strategies/IStrategy';
+import { NFTInfo, TokenInfo } from './strategies/IStrategy';
 import MyNumber from './utils/MyNumber';
 
 const LOGOS = {
@@ -13,13 +13,11 @@ const LOGOS = {
 export type TokenName = 'USDT' | 'USDC' | 'ETH' | 'STRK' | 'WBTC' | 'DAI';
 const CONSTANTS = {
   DEX_INCENTIVE_URL: '/strk-incentives/fetchFile?file=strk_grant.json',
+  NOSTRA_DEGEN_INCENTIVE_URL: 'https://api.nostra.finance/query/pool_aprs',
   LENDING_INCENTIVES_URL:
     '/strk-incentives/fetchFile?file=prod-api/lending/lending_strk_grant.json',
   LOGOS,
   COMMUNITY_TG: 'https://t.me/+HQ_eHaXmF-1lZDc1',
-  COMMUNITY_DISCORD: 'https://discord.com',
-  COMMUNITY_MEDIUM: 'https://meduim.com',
-  COMMUNITY_X: 'https://twitter.com/starknet',
   NOSTRA: {
     LENDING_GRAPH_URL: '/nostra/app/data-yqlpb/endpoint/data/v1/action/find',
   },
@@ -35,12 +33,21 @@ const CONSTANTS = {
     BASE_APR_API: '/ekubo/pair',
     BASE_PRICE_API: '/ekubo/price',
   },
+  HAIKO: {
+    BASE_APR_API: 'haiko/markets?network=mainnet',
+  },
+  MY_SWAP: {
+    POOLS_API: '/myswap/data/pools/all.json',
+    BASE_APR_API: '/myswap/data/pools',
+  },
   CONTRACTS: {
     Master: '0x50314707690c31597849ed66a494fb4279dc060f8805f21593f52906846e28e',
     AutoStrkFarm:
       '0x541681b9ad63dff1b35f79c78d8477f64857de29a27902f7298f7b620838ea',
     AutoUsdcFarm:
       '0x16912b22d5696e95ffde888ede4bd69fbbc60c5f873082857a47c543172694f',
+    DeltaNeutralMMUSDCETH:
+      '0x04937b58e05a3a2477402d1f74e66686f58a61a5070fcc6f694fb9a0b3bae422',
   },
   MOBILE_MSG: 'Desktop/Tablet only',
 };
@@ -55,6 +62,7 @@ export const TOKENS: TokenInfo[] = [
     minAmount: MyNumber.fromEther('10', 18),
     maxAmount: MyNumber.fromEther('10000', 18),
     stepAmount: MyNumber.fromEther('10', 18),
+    isERC4626: false,
   },
   {
     token: '0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
@@ -65,6 +73,7 @@ export const TOKENS: TokenInfo[] = [
     minAmount: MyNumber.fromEther('10', 18),
     maxAmount: MyNumber.fromEther('10000', 18),
     stepAmount: MyNumber.fromEther('10', 18),
+    isERC4626: false,
   },
   {
     token: '0x06d8fa671ef84f791b7f601fa79fea8f6ceb70b5fa84189e3159d532162efc21',
@@ -75,6 +84,7 @@ export const TOKENS: TokenInfo[] = [
     minAmount: MyNumber.fromEther('10', 18),
     maxAmount: MyNumber.fromEther('10000', 18),
     stepAmount: MyNumber.fromEther('10', 18),
+    isERC4626: false,
   },
   {
     token: CONSTANTS.CONTRACTS.AutoStrkFarm,
@@ -85,6 +95,7 @@ export const TOKENS: TokenInfo[] = [
     minAmount: MyNumber.fromEther('10', 18),
     maxAmount: MyNumber.fromEther('10000', 18),
     stepAmount: MyNumber.fromEther('10', 18),
+    isERC4626: true,
   },
   {
     token: '0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8',
@@ -95,6 +106,7 @@ export const TOKENS: TokenInfo[] = [
     minAmount: MyNumber.fromEther('10', 6),
     maxAmount: MyNumber.fromEther('10000', 6),
     stepAmount: MyNumber.fromEther('10', 6),
+    isERC4626: false,
   },
   {
     token: '0x068f5c6a61780768455de69077e07e89787839bf8166decfbf92b645209c0fb8',
@@ -105,6 +117,7 @@ export const TOKENS: TokenInfo[] = [
     minAmount: MyNumber.fromEther('10', 6),
     maxAmount: MyNumber.fromEther('10000', 6),
     stepAmount: MyNumber.fromEther('10', 6),
+    isERC4626: false,
   },
   {
     token: '0x047ad51726d891f972e74e4ad858a261b43869f7126ce7436ee0b2529a98f486',
@@ -115,6 +128,7 @@ export const TOKENS: TokenInfo[] = [
     minAmount: MyNumber.fromEther('10', 6),
     maxAmount: MyNumber.fromEther('10000', 6),
     stepAmount: MyNumber.fromEther('10', 6),
+    isERC4626: false,
   },
   {
     token: CONSTANTS.CONTRACTS.AutoUsdcFarm,
@@ -125,6 +139,18 @@ export const TOKENS: TokenInfo[] = [
     minAmount: MyNumber.fromEther('10', 6),
     maxAmount: MyNumber.fromEther('10000', 6),
     stepAmount: MyNumber.fromEther('10', 6),
+    isERC4626: true,
+  },
+];
+
+export const NFTS: NFTInfo[] = [
+  {
+    name: 'frmDNMMUSDCETH',
+    address: CONSTANTS.CONTRACTS.DeltaNeutralMMUSDCETH,
+    logo: CONSTANTS.LOGOS.USDC,
+    config: {
+      mainTokenName: 'USDC',
+    },
   },
 ];
 

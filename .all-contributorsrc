@@ -36,6 +36,61 @@
       "contributions": [
         "infra"
       ]
+    },
+    {
+      "login": "jedstroke",
+      "name": "Jed",
+      "avatar_url": "https://avatars.githubusercontent.com/u/86930056?v=4",
+      "profile": "https://github.com/jedstroke",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "EjembiEmmanuel",
+      "name": "Emmaunuel Ejembi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/83036156?v=4",
+      "profile": "https://github.com/EjembiEmmanuel",
+      "contributions": [
+        "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "kateberryd",
+      "name": "Catherine Jonathan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/35270183?v=4",
+      "profile": "https://github.com/kateberryd",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "NeelkanthTandel",
+      "name": "Neelkanth Tandel",
+      "avatar_url": "https://avatars.githubusercontent.com/u/68822066?v=4",
+      "profile": "https://github.com/NeelkanthTandel",
+      "contributions": [
+        "review"
+      ]
+    },
+    {
+      "login": "Ugo-X",
+      "name": "Ugonna Paul Dike",
+      "avatar_url": "https://avatars.githubusercontent.com/u/133219527?v=4",
+      "profile": "https://github.com/Ugo-X",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "fishonamos",
+      "name": "Fishon Amos",
+      "avatar_url": "https://avatars.githubusercontent.com/u/43862685?v=4",
+      "profile": "https://fishonsnote.medium.com/",
+      "contributions": [
+        "code"
+      ]
     }
   ]
 }

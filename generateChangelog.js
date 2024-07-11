@@ -1,8 +1,8 @@
-const fs = require("fs");
-const { version } = require("./package.json");
+import fs from "fs";
+import { version } from './package.json';
 
 // write changelog to CHANGELOG.md
-fs.writeFileSync("CHANGELOG.md", changelogContent);
+// fs.writeFileSync("CHANGELOG.md", changelogContent);
 
 // Update current version in README
 fs.readFile("README.md", "utf8", (err, data) => {

@@ -1,5 +1,6 @@
 import BigNumber from 'bignumber.js';
 import { ethers } from 'ethers';
+const customInspectSymbol = Symbol.for('nodejs.util.inspect.custom');
 
 export default class MyNumber {
   bigNumber: BigNumber;
@@ -60,5 +61,9 @@ export default class MyNumber {
         );
     const bn = BigNumber.min(a.bigNumber, b.bigNumber);
     return new MyNumber(bn.toString(), a.decimals);
+  }
+
+  [customInspectSymbol](depth: any, inspectOptions: any, inspect: any) {
+    return JSON.stringify({ raw: this.toString(), decimals: this.decimals });
   }
 }
