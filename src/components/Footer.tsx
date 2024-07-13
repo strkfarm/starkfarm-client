@@ -2,10 +2,7 @@ import { Center, Box } from '@chakra-ui/react';
 import Link from 'next/link';
 import React from 'react';
 import CONSTANTS from '@/constants';
-import { Discord } from './Icons/Discord';
-import { X } from './Icons/X';
 import { Telegram } from './Icons/Telegram';
-import { Medium } from './Icons/Medium';
 import { useMediaQuery } from 'react-responsive';
 
 export const Footer: React.FC = () => {
@@ -28,18 +25,18 @@ export const Footer: React.FC = () => {
           alignItems={'center'}
           borderRight={isMobile ? 'none' : 'solid 1px #242642'}
         >
-          <Link href={CONSTANTS.COMMUNITY_DISCORD} target="_blank">
+          {/* <Link href={CONSTANTS.COMMUNITY_DISCORD} target="_blank">
             <Discord />
           </Link>
           <Link href={CONSTANTS.COMMUNITY_X} target="_blank">
             <X />
-          </Link>
+          </Link> */}
           <Link href={CONSTANTS.COMMUNITY_TG} target="_blank">
             <Telegram />
           </Link>
-          <Link href={CONSTANTS.COMMUNITY_MEDIUM} target="_blank">
+          {/* <Link href={CONSTANTS.COMMUNITY_MEDIUM} target="_blank">
             <Medium />
-          </Link>
+          </Link> */}
         </Box>
         <Box
           display={'flex'}
