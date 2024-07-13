@@ -5,6 +5,7 @@ import { useDotButton } from '@/components/EmblaCarouselDotButton';
 import Pools from '@/components/Pools';
 import Strategies from '@/components/Strategies';
 import CONSTANTS from '@/constants';
+import { useWindowSize } from '@/utils/useWindowSize';
 
 import {
   Box,
@@ -34,6 +35,7 @@ export default function Home() {
 
   const searchParams = useSearchParams();
   const [tabIndex, setTabIndex] = useState(0);
+  const size = useWindowSize();
 
   useEffect(() => {
     const tab = searchParams.get('tab');
@@ -63,7 +65,7 @@ export default function Home() {
     {
       loop: true,
     },
-    [Autoplay({ playOnInit: true, delay: 8000 })]
+    [Autoplay({ playOnInit: true, delay: 8000 })],
   );
 
   const { selectedIndex, scrollSnaps, onDotButtonClick } =
@@ -86,34 +88,29 @@ export default function Home() {
         </Text>
       </Box>
 
-       <Box className="embla" ref={emblaRef}>
+      <Box className="embla" ref={emblaRef}>
         <Box className="embla__container">
-          <Box className="embla__slide" position="relative" height={'150px'}>
+          <Box className="embla__slide" position="relative" height={'200px'}>
             <Image
-              src="/banner1.svg"
-              alt="Degen Mode"
+              src={size.width < 768 ? '/banner1_small.svg' : '/banner1.svg'}
+              alt="banner2"
               fill
-              style={{ objectFit: 'cover', borderRadius: '8px' }}
+              style={{ objectFit: 'contain', borderRadius: '12px' }}
             />
           </Box>
 
-          <Box className="embla__slide" position="relative" height={'150px'}>
+          <Box className="embla__slide" position="relative" height={'200px'}>
             <Image
-              src="/banner2.svg"
-              alt="CCP Program"
+              src={size.width < 768 ? '/banner2_small.svg' : '/banner2.svg'}
+              alt="banner2"
               fill
-              style={{ objectFit: 'cover', borderRadius: '8px' }}
+              style={{ objectFit: 'contain', borderRadius: '12px' }}
             />
           </Box>
         </Box>
       </Box>
 
-       <Box
-        display="grid"
-        justifyContent="center"
-        gap="1.2rem"
-        mb="1.5rem"
-      >
+      <Box display="grid" justifyContent="center" gap="1.2rem" mb="1.5rem">
         <Box
           display="flex"
           flexWrap="wrap"
@@ -139,9 +136,6 @@ export default function Home() {
               border="1px solid #373A5D"
               textDecoration="none"
               appearance="none"
-              // boxShadow={
-              //   index === selectedIndex ? 'inset 0 0 0 0.2rem #4D59E8' : ''
-              // }
             />
           ))}
         </Box>
