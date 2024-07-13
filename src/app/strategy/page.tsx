@@ -12,7 +12,7 @@ export async function generateMetadata({ searchParams }: Props) {
     return {
       title: 'Auto Compounding STRK | STRKFarm',
       description:
-        'Strategies are combination of deposit & borrow actions that combine various pools and risk combinations to maximize yield. We currently have one High yield low risk strategy, and adding more as you read this.',
+        "Stake your STRK or zkLend's zSTRK token to receive DeFi Spring $STRK rewards every 14 days. The strategy auto-collects your rewards and re-invests them in the zkLend STRK pool, giving you higher return through compounding. You receive frmzSTRK LP token as representation for your stake on STRKFarm. You can withdraw anytime by redeeming your frmzSTRK for zSTRK and see your STRK in zkLend.",
     };
   }
 
@@ -20,7 +20,7 @@ export async function generateMetadata({ searchParams }: Props) {
     return {
       title: 'Auto Compounding USDC | STRKFarm',
       description:
-        'Strategies are combination of deposit & borrow actions that combine various pools and risk combinations to maximize yield. We currently have one High yield low risk strategy, and adding more as you read this.',
+        "Stake your USDC or zkLend's zUSDC token to receive DeFi Spring $STRK rewards every 14 days. The strategy auto-collects your $STRK rewards, swaps them to USDC and re-invests them in the zkLend USDC pool, giving you higher return through compounding. You receive frmzUSDC LP token as representation for your stake on STRKFarm. You can withdraw anytime by redeeming your frmzUSDC for zUSDC and see your STRK in zkLend.",
     };
   }
 }
