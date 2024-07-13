@@ -422,8 +422,10 @@ export const Calculator: React.FC = () => {
               <Select
                 fontSize={isMobile ? 'small' : 'normal'}
                 border={'none'}
+                value={pair1}
                 onChange={(e) => {
                   if (pair2 === e.target.value) {
+                    setPair1(pair1);
                     return;
                   }
                   try {
@@ -444,7 +446,6 @@ export const Calculator: React.FC = () => {
                   boxShadow: 'none',
                   border: 'none',
                 }}
-                placeholder={'STRK'}
               >
                 {tokenList.map((data, index) => (
                   <option
@@ -470,6 +471,7 @@ export const Calculator: React.FC = () => {
               <Select
                 fontSize={isMobile ? 'small' : 'normal'}
                 border={'none'}
+                value={pair2}
                 _focus={{
                   outline: 'none',
                   boxShadow: 'none',
@@ -477,6 +479,7 @@ export const Calculator: React.FC = () => {
                 }}
                 onChange={(e) => {
                   if (pair1 === e.target.value) {
+                    setPair2(pair2);
                     return;
                   }
                   try {
@@ -492,7 +495,6 @@ export const Calculator: React.FC = () => {
                     setPair2('ETH');
                   }
                 }}
-                placeholder={'ETH'}
               >
                 {tokenList.map((data, index) => (
                   <option
