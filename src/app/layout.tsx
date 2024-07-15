@@ -13,7 +13,7 @@ export const metadata: Metadata = {
     title: 'STRKFarm | Earn $STRK Tokens',
     description:
       'Farm on the best pools of Starknet and earn $STRK tokens. STRKFarm is the best yield aggregator on Starknet.',
-    images: ['https://www.strkfarm.xyz/preview.png'],
+    images: ['https://static-assets-8zct.onrender.com/strkfarm/preview.png'],
   },
   twitter: {
     creator: '@akiraonstarknet',
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     description:
       'Farm on the best pools of Starknet and earn $STRK tokens. STRKFarm is the best yield aggregator on Starknet.t',
     card: 'summary_large_image',
-    images: ['https://www.strkfarm.xyz/preview.png'],
+    images: ['https://static-assets-8zct.onrender.com/strkfarm/preview.png'],
   },
 };
 
