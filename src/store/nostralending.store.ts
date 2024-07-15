@@ -64,7 +64,8 @@ const PoolAddresses: { [token: string]: NostraPoolFactor } = {
 export class NostraLending extends ZkLend {
   name = 'Nostra MM';
   link = 'https://app.nostra.finance/';
-  logo = 'https://app.nostra.finance/favicon.svg';
+  logo =
+    'https://static-assets-8zct.onrender.com/integrations/nostra/logo_dark.jpg';
 
   incentiveDataKey = 'Nostra';
 

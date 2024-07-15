@@ -145,15 +145,29 @@ export const StrkDexIncentivesAtom = atomWithQuery((get) => ({
   },
 }));
 
-export const StrkDegenIncentivesAtom = atomWithQuery((get) => ({
-  queryKey: ['isNostraDegen'],
+export const StrkIncentivesAtom = atomWithQuery((get) => ({
+  queryKey: get(StrkIncentivesQueryKeyAtom),
   queryFn: async ({ queryKey }) => {
-    const res = await fetch(CONSTANTS.NOSTRA_DEGEN_INCENTIVE_URL); // specific to Nostra Degen
+    const res = await fetch(CONSTANTS.NOSTRA_DEGEN_INCENTIVE_URL);
     let data = await res.text();
     data = data.replaceAll('NaN', '0');
-    return JSON.parse(data);
+    const parsedData = JSON.parse(data);
+
+    if (queryKey[1] === 'isNostraDex') {
+      // Filter the data to include only the specific nostra dex pools we are tracking
+      return Object.values(parsedData).filter((item: any) => {
+        const id = item.id;
+        return id === 'ETH-USDC' || id === 'STRK-ETH' || id === 'STRK-USDC';
+      });
+    }
+    return parsedData;
   },
 }));
+
+export const StrkIncentivesQueryKeyAtom = atom([
+  'strk_incentives',
+  'isNostraDegen',
+]);
 
 export const StrkLendingIncentivesAtom = atomWithQuery((get) => ({
   queryKey: ['strk_lending_incentives'],

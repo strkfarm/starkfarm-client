@@ -1,13 +1,14 @@
 import CONSTANTS, { TokenName } from '@/constants';
 import { Category, PoolType } from './pools';
 import { atom } from 'jotai';
-import { PoolInfo, ProtocolAtoms, StrkDegenIncentivesAtom } from './pools';
+import { PoolInfo, ProtocolAtoms, StrkIncentivesAtom } from './pools';
 import { Jediswap } from './jedi.store';
 
 export class NostraDegen extends Jediswap {
   name = 'Nostra DEGEN';
   link = 'https://app.nostra.finance/pools';
-  logo = 'https://app.nostra.finance/favicon.svg';
+  logo =
+    'https://static-assets-8zct.onrender.com/integrations/nostra/logo_dark.jpg';
   incentiveDataKey = 'isNostraDegen';
 
   _computePoolsInfo(data: any) {
@@ -72,7 +73,7 @@ export class NostraDegen extends Jediswap {
 export const nostraDegen = new NostraDegen();
 const NostraDegenAtoms: ProtocolAtoms = {
   pools: atom((get) => {
-    const poolsInfo = get(StrkDegenIncentivesAtom);
+    const poolsInfo = get(StrkIncentivesAtom);
     const empty: PoolInfo[] = [];
     if (poolsInfo.data) return nostraDegen._computePoolsInfo(poolsInfo.data);
     return empty;
