@@ -5,6 +5,7 @@ import { AddIcon } from '@chakra-ui/icons';
 import {
   Avatar,
   AvatarGroup,
+  Badge,
   Box,
   Button,
   Card,
@@ -13,6 +14,7 @@ import {
   Container,
   HStack,
   Heading,
+  Link,
   LinkBox,
   LinkOverlay,
   Popover,
@@ -31,12 +33,27 @@ import {
 import { useAtomValue } from 'jotai';
 import React from 'react';
 import mixpanel from 'mixpanel-browser';
-import { useRouter } from 'next/navigation';
+import TVL from './TVL';
+import CONSTANTS from '@/constants';
+import { IStrategyProps, StrategyLiveStatus } from '@/strategies/IStrategy';
 
 export default function Strategies() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
   const strategies = useAtomValue(strategiesAtom);
-  const router = useRouter();
+
+  function getStratCardBg(strat: IStrategyProps, index: number) {
+    if (strat.liveStatus == StrategyLiveStatus.ACTIVE) {
+      return index % 2 === 0 ? 'color1_50p' : 'color2_50p';
+    }
+    return 'bg';
+  }
+
+  function getStratCardBgHover(strat: IStrategyProps, index: number) {
+    if (strat.liveStatus == StrategyLiveStatus.ACTIVE) {
+      return index % 2 === 0 ? 'color1_65p' : 'color2_65p';
+    }
+    return 'bg';
+  }
 
   function DepositButton(strat: StrategyInfo) {
     // const { isOpen, onOpen, onClose } = useDisclosure()
@@ -44,7 +61,7 @@ export default function Strategies() {
       <Box>
         <AvatarGroup
           size="xs"
-          max={2}
+          max={4}
           marginRight={'5px'}
           float={'left'}
           visibility={'hidden'}
@@ -123,7 +140,7 @@ export default function Strategies() {
           }}
         >
           <Box width={'100%'}>
-            <AvatarGroup size="xs" max={2} marginRight={'5px'}>
+            <AvatarGroup size="xs" max={4} marginRight={'5px'}>
               {getUniqueById(
                 strat.actions.map((p) => ({
                   id: p.pool.pool.name,
@@ -140,9 +157,24 @@ export default function Strategies() {
                 marginBottom={'5px'}
                 fontWeight={'bold'}
               >
-                <LinkOverlay href={`/strategy?name=${strat.name}`}>
-                  {strat.name}
-                </LinkOverlay>
+                {strat.liveStatus == StrategyLiveStatus.ACTIVE && (
+                  <LinkOverlay href={`/strategy?name=${strat.name}`}>
+                    {strat.name}
+                  </LinkOverlay>
+                )}
+                {strat.liveStatus != StrategyLiveStatus.ACTIVE && (
+                  <>
+                    {strat.name}
+                    <Badge
+                      ml="1"
+                      bg="cyan"
+                      fontFamily={'sans-serif'}
+                      padding="3px 5px 2px"
+                    >
+                      Coming soon
+                    </Badge>
+                  </>
+                )}
               </Heading>
               <Heading
                 fontSize={{ base: '12px', md: '14px' }}
@@ -177,7 +209,7 @@ export default function Strategies() {
           marginTop={{ base: '10px', md: '0px' }}
         >
           <Box width={'100%'} float="left" marginBottom={'5px'}>
-            <Tooltip label="Includes fees & rewards earn from tokens shown. Click to know the investment proceduce.">
+            <Tooltip label="Includes fees & rewards earn from tokens shown">
               <Text
                 textAlign={'right'}
                 color="cyan"
@@ -204,9 +236,10 @@ export default function Strategies() {
               textAlign={{ base: 'left', md: 'right' }}
               width="100%"
               float={'left'}
-              color="color1_light"
+              color="#eeeeee"
+              fontWeight={'bold'}
             >
-              {strat.leverage.toFixed(1)}x higher returns
+              {strat.leverage.toFixed(1)}x
             </Text>
           </Tooltip>
         </Box>
@@ -217,17 +250,21 @@ export default function Strategies() {
       </Stack>
     );
   }
+
   return (
     <Container width="100%" float={'left'} padding={'0px'} marginTop={'10px'}>
+      <TVL />
       <Text
+        marginTop={'15px'}
         color="light_grey"
-        fontSize={'13px'}
-        marginBottom={'10px'}
+        fontSize={'15px'}
+        marginBottom={'15px'}
         fontFamily={'arial'}
       >
-        Strategies are combination of deposit & borrow actions that combine
-        various pools and risk combinations to maximize yield. We currently have
-        one High yield low risk strategy, and adding more as you read this.
+        <b>What are strategies?</b> Strategies are combination of investment
+        steps that combine various pools and risk combinations to maximize
+        yield. We currently have one High yield low risk strategy, and adding
+        more as you read this.
       </Text>
       <Card
         variant={'filled'}
@@ -248,17 +285,15 @@ export default function Strategies() {
           </HStack>
         </CardBody>
       </Card>
-      {strategies.length > 0 && (
+      {allPools.length && strategies.length > 0 && (
         <Stack spacing="4">
           {strategies.map((strat, index) => (
             <Card
               key={`${strat.name}`}
               variant={'filled'}
-              bg={index % 2 === 0 ? 'color1_50p' : 'color2_50p'}
+              bg={getStratCardBg(strat, index)}
               color="white"
-              _hover={{
-                bg: index % 2 === 0 ? 'color1_65p' : 'color2_65p',
-              }}
+              _hover={getStratCardBgHover(strat, index)}
             >
               <CardBody padding={{ base: '15px', md: '20px' }}>
                 <Box width={'100%'} padding={'0px 10px 0 0'}>
@@ -280,8 +315,24 @@ export default function Strategies() {
       {allPools.length === 0 && (
         <Stack>
           <Skeleton height="70px" />
+          <Skeleton height="70px" />
+          <Skeleton height="70px" />
+          <Skeleton height="70px" />
         </Stack>
       )}
+      <Text
+        color="color2Text"
+        textAlign={'center'}
+        width={'100%'}
+        margin="15px 0"
+        fontSize="18px"
+      >
+        More strategies coming soon. Join our{' '}
+        <Link textDecoration={'underline'} href={CONSTANTS.COMMUNITY_TG}>
+          Telegram channel
+        </Link>{' '}
+        to stay upto date.
+      </Text>
     </Container>
   );
 }
