@@ -9,13 +9,13 @@ import React, {
 } from 'react';
 
 type UseDotButtonType = {
-  selectedIndex: number
-  scrollSnaps: number[]
-  onDotButtonClick: (index: number) => void
-}
+  selectedIndex: number;
+  scrollSnaps: number[];
+  onDotButtonClick: (index: number) => void;
+};
 
 export const useDotButton = (
-  emblaApi: EmblaCarouselType | undefined
+  emblaApi: EmblaCarouselType | undefined,
 ): UseDotButtonType => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [scrollSnaps, setScrollSnaps] = useState<number[]>([]);
@@ -25,7 +25,7 @@ export const useDotButton = (
       if (!emblaApi) return;
       emblaApi.scrollTo(index);
     },
-    [emblaApi]
+    [emblaApi],
   );
 
   const onInit = useCallback((emblaApi: EmblaCarouselType) => {
@@ -58,7 +58,7 @@ type PropType = PropsWithChildren<
     React.ButtonHTMLAttributes<HTMLButtonElement>,
     HTMLButtonElement
   >
->
+>;
 
 export const DotButton: React.FC<PropType> = (props) => {
   const { children, ...restProps } = props;

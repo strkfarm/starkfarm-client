@@ -27,6 +27,7 @@ import mixpanel from 'mixpanel-browser';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { isMobile } from 'react-device-detect';
 
 export default function Home() {
   useEffect(() => {
@@ -92,7 +93,11 @@ export default function Home() {
         <Box className="embla__container">
           <Box className="embla__slide" position="relative" height={'200px'}>
             <Image
-              src={size.width < 768 ? '/banner1_small.svg' : '/banner1.svg'}
+              src={
+                (!isMobile && size.width >= 768) || size.width == 0
+                  ? '/banner1.svg'
+                  : '/banner1_small.svg'
+              }
               alt="banner2"
               fill
               style={{ objectFit: 'contain', borderRadius: '12px' }}
@@ -101,7 +106,11 @@ export default function Home() {
 
           <Box className="embla__slide" position="relative" height={'200px'}>
             <Image
-              src={size.width < 768 ? '/banner2_small.svg' : '/banner2.svg'}
+              src={
+                (!isMobile && size.width >= 768) || size.width == 0
+                  ? '/banner2.svg'
+                  : '/banner2_small.svg'
+              }
               alt="banner2"
               fill
               style={{ objectFit: 'contain', borderRadius: '12px' }}

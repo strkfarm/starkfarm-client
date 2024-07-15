@@ -53,7 +53,8 @@ interface MyBaseAprDoc {
 export class ZkLend extends IDapp<MyBaseAprDoc[]> {
   name = 'zkLend';
   link = 'https://app.zklend.com/markets';
-  logo = 'https://app.zklend.com/favicon.ico';
+  logo =
+    'https://static-assets-8zct.onrender.com/integrations/zkLend/logo_dark.png';
 
   incentiveDataKey = 'zkLend';
   LIQUIDATION_THRESHOLD = 1;

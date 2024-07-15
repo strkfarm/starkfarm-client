@@ -7,7 +7,8 @@ import { Jediswap } from './jedi.store';
 export class NostraDegen extends Jediswap {
   name = 'Nostra DEGEN';
   link = 'https://app.nostra.finance/pools';
-  logo = 'https://app.nostra.finance/favicon.svg';
+  logo =
+    'https://static-assets-8zct.onrender.com/integrations/nostra/logo_dark.jpg';
   incentiveDataKey = 'isNostraDegen';
 
   _computePoolsInfo(data: any) {
