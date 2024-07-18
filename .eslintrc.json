@@ -29,6 +29,7 @@
         "argsIgnorePattern": "^_"
       }
     ],
+    "@typescript-eslint/no-namespace": "off",
     "strict": 0,
     "no-underscore-dangle": 0,
     "no-mixed-requires": 0,

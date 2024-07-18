@@ -1,7 +1,7 @@
 import { AtomWithQueryResult } from 'jotai-tanstack-query';
 import { APRSplit, PoolInfo, PoolMetadata } from './pools';
 import { TokenName } from '@/constants';
-import { StrategyAction } from '@/strategies/simple.stable.strat';
+import { StrategyAction } from '@/strategies/IStrategy';
 
 export interface APRInfo {
   asset: TokenName;

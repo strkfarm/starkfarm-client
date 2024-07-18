@@ -7,8 +7,9 @@ import {
   StrkLendingIncentivesAtom,
 } from './pools';
 import { atom } from 'jotai';
-import { ZkLend } from './zklend.store';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
+import { LendingSpace } from './lending.base';
+import { IDapp } from './IDapp.store';
 
 interface MyBaseAprDoc {
   _id: string;
@@ -61,13 +62,26 @@ const PoolAddresses: { [token: string]: NostraPoolFactor } = {
   },
 };
 
-export class NostraLending extends ZkLend {
+export class NostraLending extends IDapp<LendingSpace.MyBaseAprDoc[]> {
   name = 'Nostra MM';
   link = 'https://app.nostra.finance/';
   logo =
     'https://static-assets-8zct.onrender.com/integrations/nostra/logo_dark.jpg';
 
   incentiveDataKey = 'Nostra';
+
+  _computePoolsInfo(data: any) {
+    return LendingSpace.computePoolsInfo(
+      data,
+      this.incentiveDataKey,
+      {
+        name: this.name,
+        link: this.link,
+        logo: this.logo,
+      },
+      this.commonVaultFilter,
+    );
+  }
 
   getBaseAPY(p: PoolInfo, data: AtomWithQueryResult<any, Error>) {
     let baseAPY: number | 'Err' = 'Err';
