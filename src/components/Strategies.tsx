@@ -42,7 +42,10 @@ export default function Strategies() {
   const strategies = useAtomValue(strategiesAtom);
 
   function getStratCardBg(strat: IStrategyProps, index: number) {
-    if (strat.liveStatus == StrategyLiveStatus.ACTIVE) {
+    if (
+      strat.liveStatus == StrategyLiveStatus.ACTIVE ||
+      strat.liveStatus == StrategyLiveStatus.NEW
+    ) {
       return index % 2 === 0 ? 'color1_50p' : 'color2_50p';
     }
     return 'bg';
@@ -129,6 +132,13 @@ export default function Strategies() {
     );
   }
 
+  function isLive(strat: StrategyInfo) {
+    return (
+      strat.liveStatus == StrategyLiveStatus.ACTIVE ||
+      strat.liveStatus == StrategyLiveStatus.NEW
+    );
+  }
+
   function getStratCard(strat: StrategyInfo) {
     return (
       <Stack direction={{ base: 'column', md: 'row' }} width={'100%'}>
@@ -140,42 +150,37 @@ export default function Strategies() {
           }}
         >
           <Box width={'100%'}>
-            <AvatarGroup size="xs" max={4} marginRight={'5px'}>
-              {getUniqueById(
-                strat.actions.map((p) => ({
-                  id: p.pool.pool.name,
-                  logo: p.pool.pool.logos[0],
-                })),
-              ).map((p: any) => (
-                <Avatar key={p.id} src={p.logo} />
-              ))}
-            </AvatarGroup>
             <Box>
-              <Heading
-                size={{ base: 'sm', md: 'md' }}
-                textAlign={'left'}
-                marginBottom={'5px'}
-                fontWeight={'bold'}
+              <LinkOverlay
+                href={isLive(strat) ? `/strategy?id=${strat.id}` : '#'}
+                cursor={isLive(strat) ? 'pointer' : 'default'}
               >
-                {strat.liveStatus == StrategyLiveStatus.ACTIVE && (
-                  <LinkOverlay href={`/strategy?name=${strat.name}`}>
+                <HStack
+                  fontSize={{ base: '25px', md: '25px' }}
+                  textAlign={'left'}
+                  marginBottom={'5px'}
+                  fontWeight={'bold'}
+                  alignItems={'center'}
+                >
+                  <Heading
+                    size={{ base: 'sm', md: 'md' }}
+                    marginBottom={'5px'}
+                    fontWeight={'bold'}
+                  >
                     {strat.name}
-                  </LinkOverlay>
-                )}
-                {strat.liveStatus != StrategyLiveStatus.ACTIVE && (
-                  <>
-                    {strat.name}
+                  </Heading>
+                  {strat.liveStatus != StrategyLiveStatus.ACTIVE && (
                     <Badge
                       ml="1"
                       bg="cyan"
                       fontFamily={'sans-serif'}
                       padding="3px 5px 2px"
                     >
-                      Coming soon
+                      {strat.liveStatus.valueOf()}
                     </Badge>
-                  </>
-                )}
-              </Heading>
+                  )}
+                </HStack>
+              </LinkOverlay>
               <Heading
                 fontSize={{ base: '12px', md: '14px' }}
                 color="color1_light"
@@ -219,15 +224,15 @@ export default function Strategies() {
                 {(strat.netYield * 100).toFixed(2)}%
               </Text>
             </Tooltip>
-            <AvatarGroup
-              size={{ base: '2xs', md: 'xs' }}
-              max={4}
-              spacing={'-6px'}
-              margin={{ base: '3px 5px 0', md: '0 5px' }}
-              float={{ base: 'left', md: 'right' }}
-            >
-              {strat.rewardTokens.map((token) => (
-                <Avatar key={token.logo} src={token.logo} />
+
+            <AvatarGroup size="xs" max={4} marginRight={'5px'} float={'right'}>
+              {getUniqueById(
+                strat.actions.map((p) => ({
+                  id: p.pool.pool.name,
+                  logo: p.pool.pool.logos[0],
+                })),
+              ).map((p: any) => (
+                <Avatar key={p.id} src={p.logo} />
               ))}
             </AvatarGroup>
           </Box>
@@ -296,7 +301,11 @@ export default function Strategies() {
               _hover={getStratCardBgHover(strat, index)}
             >
               <CardBody padding={{ base: '15px', md: '20px' }}>
-                <Box width={'100%'} padding={'0px 10px 0 0'}>
+                <Box
+                  width={'100%'}
+                  padding={'0px 10px 0 0'}
+                  pointerEvents={isLive(strat) ? 'auto' : 'none'}
+                >
                   {getStratCard(strat)}
                 </Box>
                 {/* {DepositButton(strat)} */}

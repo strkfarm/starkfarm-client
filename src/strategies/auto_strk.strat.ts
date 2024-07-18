@@ -1,6 +1,12 @@
 import CONSTANTS, { TOKENS, TokenName } from '@/constants';
 import { PoolInfo } from '@/store/pools';
-import { IStrategy, TokenInfo } from './IStrategy';
+import {
+  IStrategy,
+  IStrategySettings,
+  StrategyAction,
+  StrategyLiveStatus,
+  TokenInfo,
+} from './IStrategy';
 import ERC20Abi from '@/abi/erc20.abi.json';
 import AutoStrkAbi from '@/abi/autoStrk.abi.json';
 import MasterAbi from '@/abi/master.abi.json';
@@ -9,9 +15,13 @@ import { Contract, ProviderInterface, uint256 } from 'starknet';
 import { atom } from 'jotai';
 import {
   DUMMY_BAL_ATOM,
+  getBalance,
   getBalanceAtom,
+  getERC20Balance,
   getERC20BalanceAtom,
 } from '@/store/balance.atoms';
+import { getTokenInfoFromName } from '@/utils';
+import axios from 'axios';
 
 interface Step {
   name: string;
@@ -27,23 +37,18 @@ interface Step {
   ) => PoolInfo[])[];
 }
 
-export interface StrategyAction {
-  pool: PoolInfo;
-  amount: string;
-  isDeposit: boolean;
-  name?: string;
-}
-
 export class AutoTokenStrategy extends IStrategy {
-  token: TokenName;
+  token: TokenInfo;
   readonly lpTokenName: string;
   readonly strategyAddress: string;
 
   constructor(
     token: TokenName,
+    name: string,
     description: string,
     lpTokenName: string,
     strategyAddress: string,
+    settings: IStrategySettings,
   ) {
     const rewardTokens = [{ logo: CONSTANTS.LOGOS.STRK }];
     const frmToken = TOKENS.find((t) => t.token == strategyAddress);
@@ -51,13 +56,16 @@ export class AutoTokenStrategy extends IStrategy {
     const holdingTokens = [frmToken];
 
     super(
-      `auto_token_${token}`,
+      `auto_token_${token.toLowerCase()}`,
       'AutoSTRK',
+      name,
       description,
       rewardTokens,
       holdingTokens,
+      StrategyLiveStatus.ACTIVE,
+      settings,
     );
-    this.token = token;
+    this.token = getTokenInfoFromName(token);
 
     this.steps = [
       {
@@ -107,6 +115,56 @@ export class AutoTokenStrategy extends IStrategy {
     ];
   }
 
+  getUserTVL = async (user: string) => {
+    if (this.liveStatus == StrategyLiveStatus.COMING_SOON)
+      return {
+        amount: MyNumber.fromEther('0', this.token.decimals),
+        usdValue: 0,
+        tokenInfo: this.token,
+      };
+
+    // returns zToken
+    const balanceInfo = await getBalance(this.holdingTokens[0], user);
+    if (!balanceInfo.tokenInfo) {
+      return {
+        amount: MyNumber.fromEther('0', this.token.decimals),
+        usdValue: 0,
+        tokenInfo: this.token,
+      };
+    }
+    const priceInfo = await axios.get(
+      `https://api.coinbase.com/v2/prices/${this.token.name}-USDT/spot`,
+    );
+    const price = Number(priceInfo.data.data.amount);
+    console.log('getUserTVL autoc', price, balanceInfo.amount.toEtherStr());
+    return {
+      amount: balanceInfo.amount,
+      usdValue: Number(balanceInfo.amount.toEtherStr()) * price,
+      tokenInfo: balanceInfo.tokenInfo,
+    };
+  };
+
+  getTVL = async () => {
+    if (!this.isLive())
+      return {
+        amount: MyNumber.fromEther('0', this.token.decimals),
+        usdValue: 0,
+        tokenInfo: this.token,
+      };
+
+    const zTokenInfo = getTokenInfoFromName(this.lpTokenName);
+    const bal = await getERC20Balance(zTokenInfo, this.strategyAddress);
+    const priceInfo = await axios.get(
+      `https://api.coinbase.com/v2/prices/${this.token.name}-USDT/spot`,
+    );
+    const price = Number(priceInfo.data.data.amount);
+    return {
+      amount: bal.amount,
+      usdValue: Number(bal.amount.toEtherStr()) * price,
+      tokenInfo: this.token,
+    };
+  };
+
   // postSolve() {
   //     const normalYield = this.netYield;
   //     this.netYield = (1 + this.netYield/26)**26 - 1; // biweekly compounding
@@ -119,7 +177,7 @@ export class AutoTokenStrategy extends IStrategy {
     provider: ProviderInterface,
   ) => {
     const baseTokenInfo: TokenInfo = TOKENS.find(
-      (t) => t.name == this.token,
+      (t) => t.name == this.token.name,
     ) as TokenInfo; //
     const zTokenInfo: TokenInfo = TOKENS.find(
       (t) => t.name == this.lpTokenName,

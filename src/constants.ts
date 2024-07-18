@@ -48,6 +48,8 @@ const CONSTANTS = {
       '0x16912b22d5696e95ffde888ede4bd69fbbc60c5f873082857a47c543172694f',
     DeltaNeutralMMUSDCETH:
       '0x04937b58e05a3a2477402d1f74e66686f58a61a5070fcc6f694fb9a0b3bae422',
+    DeltaNeutralMMSTRKETH:
+      '0x20d5fc4c9df4f943ebb36078e703369c04176ed00accf290e8295b659d2cea6',
   },
   MOBILE_MSG: 'Desktop/Tablet only',
 };
@@ -150,6 +152,14 @@ export const NFTS: NFTInfo[] = [
     logo: CONSTANTS.LOGOS.USDC,
     config: {
       mainTokenName: 'USDC',
+    },
+  },
+  {
+    name: 'frmDNMMSTRKETH',
+    address: CONSTANTS.CONTRACTS.DeltaNeutralMMSTRKETH,
+    logo: CONSTANTS.LOGOS.STRK,
+    config: {
+      mainTokenName: 'STRK',
     },
   },
 ];

@@ -1,6 +1,7 @@
 import { Container } from '@chakra-ui/react';
 
 import Strategy from './components/Strategy';
+import { getStrategies } from '@/store/strategies.atoms';
 
 type Props = {
   params: { name: string };
@@ -8,21 +9,20 @@ type Props = {
 };
 
 export async function generateMetadata({ searchParams }: Props) {
-  if (searchParams?.name?.includes('STRK')) {
+  const strategies = getStrategies();
+  const strategy = strategies.find((s) => s.id === searchParams?.id);
+  if (strategy) {
     return {
-      title: 'Auto Compounding STRK | STRKFarm',
-      description:
-        "Stake your STRK or zkLend's zSTRK token to receive DeFi Spring $STRK rewards every 14 days. The strategy auto-collects your rewards and re-invests them in the zkLend STRK pool, giving you higher return through compounding. You receive frmzSTRK LP token as representation for your stake on STRKFarm. You can withdraw anytime by redeeming your frmzSTRK for zSTRK and see your STRK in zkLend.",
+      title: `${strategy.name} | STRKFarm`,
+      description: strategy.description,
     };
   }
 
-  if (searchParams?.name?.includes('USDC')) {
-    return {
-      title: 'Auto Compounding USDC | STRKFarm',
-      description:
-        "Stake your USDC or zkLend's zUSDC token to receive DeFi Spring $STRK rewards every 14 days. The strategy auto-collects your $STRK rewards, swaps them to USDC and re-invests them in the zkLend USDC pool, giving you higher return through compounding. You receive frmzUSDC LP token as representation for your stake on STRKFarm. You can withdraw anytime by redeeming your frmzUSDC for zUSDC and see your STRK in zkLend.",
-    };
-  }
+  return {
+    title: 'Yield Strategy | STRKFarm',
+    description:
+      "STRKFarm's yield strategies are designed to maximize your yield farming returns. Stake your assets in our strategies to earn passive income while we take care of the rest.",
+  };
 }
 
 export default function StrategyPage() {
