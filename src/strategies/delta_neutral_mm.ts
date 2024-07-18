@@ -1,37 +1,33 @@
 import CONSTANTS, { NFTS, TOKENS, TokenName } from '@/constants';
 import { PoolInfo } from '@/store/pools';
-import { IStrategy, NFTInfo, StrategyLiveStatus, TokenInfo } from './IStrategy';
+import { IStrategy, IStrategySettings, NFTInfo, StrategyAction, StrategyLiveStatus, TokenInfo } from './IStrategy';
 import { zkLend } from '@/store/zklend.store';
 import ERC20Abi from '@/abi/erc20.abi.json';
 import DeltaNeutralAbi from '@/abi/deltraNeutral.abi.json';
 import MyNumber from '@/utils/MyNumber';
 import { Call, Contract, ProviderInterface, uint256 } from 'starknet';
 import { nostraLending } from '@/store/nostralending.store';
-import { standariseAddress } from '@/utils';
-import { DUMMY_BAL_ATOM, getBalanceAtom } from '@/store/balance.atoms';
+import { getTokenInfoFromName, standariseAddress } from '@/utils';
+import { DUMMY_BAL_ATOM, getBalance, getBalanceAtom, getERC20Balance } from '@/store/balance.atoms';
 import { atom } from 'jotai';
-
-export interface StrategyAction {
-  pool: PoolInfo;
-  amount: string;
-  isDeposit: boolean;
-  name?: string;
-}
+import axios from 'axios';
 
 export class DeltaNeutralMM extends IStrategy {
-  token: TokenName;
+  token: TokenInfo;
   readonly secondaryToken: string;
   readonly strategyAddress: string;
   // Factor of Amount to be deposited/borrowed at each step relative to the previous step
   readonly stepAmountFactors: number[];
 
   constructor(
-    token: TokenName,
+    token: TokenInfo,
+    name: string,
     description: string,
     secondaryTokenName: TokenName,
     strategyAddress: string,
     stepAmountFactors: number[],
     liveStatus: StrategyLiveStatus,
+    settings: IStrategySettings
   ) {
     const rewardTokens = [{ logo: CONSTANTS.LOGOS.STRK }];
     const nftInfo = NFTS.find(
@@ -43,18 +39,20 @@ export class DeltaNeutralMM extends IStrategy {
     }
     const holdingTokens: (TokenInfo | NFTInfo)[] = [nftInfo];
     super(
-      `delta_neutral_mm_${token}`,
+      `${token.name.toLowerCase()}_sensei`,
       'DeltaNeutralMM',
+      name,
       description,
       rewardTokens,
       holdingTokens,
       liveStatus,
+      settings
     );
     this.token = token;
 
     this.steps = [
       {
-        name: `Supplies your ${token} to zkLend`,
+        name: `Supply's your ${token.name} to zkLend`,
         optimizer: this.optimizer,
         filter: [this.filterMainToken],
       },
@@ -69,7 +67,7 @@ export class DeltaNeutralMM extends IStrategy {
         filter: [this.filterSecondaryToken],
       },
       {
-        name: `Borrow ${token} from Nostra`,
+        name: `Borrow ${token.name} from Nostra`,
         optimizer: this.optimizer,
         filter: [this.filterMainToken],
       },
@@ -79,13 +77,13 @@ export class DeltaNeutralMM extends IStrategy {
         filter: [this.filterMainToken],
       },
       {
-        name: `Re-invest your STRK Rewards every 14 days`,
+        name: `Re-invest your STRK Rewards every 14 days (Compound)`,
         optimizer: this.compounder,
         filter: [this.filterStrkzkLend],
       },
     ];
 
-    if (stepAmountFactors.length != 4) {
+    if (stepAmountFactors.length != 5) {
       throw new Error(
         'stepAmountFactors length should be equal to steps length',
       );
@@ -111,7 +109,7 @@ export class DeltaNeutralMM extends IStrategy {
   ) {
     const dapp = prevActions.length == 0 ? zkLend : nostraLending;
     return pools.filter(
-      (p) => p.pool.name == this.token && p.protocol.name == dapp.name,
+      (p) => p.pool.name == this.token.name && p.protocol.name == dapp.name,
     );
   }
 
@@ -152,12 +150,13 @@ export class DeltaNeutralMM extends IStrategy {
   ) {
     console.log('getLookRepeatYieldAmount', amount, actions);
     let full_amount = Number(amount);
-    this.stepAmountFactors.forEach((factor, i) => {
+    this.stepAmountFactors.slice(0, 4).forEach((factor, i) => {
       full_amount /= factor;
     });
-    const amount1 = 0.52 * full_amount;
+    const excessFactor = this.stepAmountFactors[4];
+    const amount1 = excessFactor * full_amount;
     const exp1 = amount1 * this.actions[0].pool.apr;
-    const amount2 = this.stepAmountFactors[1] * 0.52 * full_amount;
+    const amount2 = this.stepAmountFactors[1] * excessFactor * full_amount;
     const exp2 =
       amount2 * (this.actions[2].pool.apr - this.actions[1].pool.borrow.apr);
     const amount3 = this.stepAmountFactors[3] * amount2;
@@ -222,9 +221,7 @@ export class DeltaNeutralMM extends IStrategy {
     address: string,
     provider: ProviderInterface,
   ) => {
-    const baseTokenInfo: TokenInfo = TOKENS.find(
-      (t) => t.name == this.token,
-    ) as TokenInfo; //
+    const baseTokenInfo = this.token;
 
     if (!address || address == '0x0') {
       return [
@@ -268,14 +265,62 @@ export class DeltaNeutralMM extends IStrategy {
     ];
   };
 
+  getUserTVL = async (user: string) => {
+    if (this.liveStatus == StrategyLiveStatus.COMING_SOON) return { amount: MyNumber.fromEther('0', this.token.decimals), usdValue: 0, tokenInfo: this.token };
+    const balanceInfo = await getBalance(this.holdingTokens[0], user);
+    if (!balanceInfo.tokenInfo) {
+      return {
+        amount: MyNumber.fromEther('0', this.token.decimals),
+        usdValue: 0,
+        tokenInfo: this.token,
+      }
+    }
+    const priceInfo = await axios.get(`https://api.coinbase.com/v2/prices/${balanceInfo.tokenInfo.name}-USDT/spot`)
+    const price = Number(priceInfo.data.data.amount);
+    console.log('getUserTVL dnmm', price, balanceInfo.amount.toEtherStr())
+    return {
+      amount: balanceInfo.amount,
+      usdValue: Number(balanceInfo.amount.toEtherStr()) * price,
+      tokenInfo: balanceInfo.tokenInfo
+    }
+  }
+
+  getTVL = async () => {
+    if (!this.isLive()) return { amount: MyNumber.fromEther('0', this.token.decimals), usdValue: 0, tokenInfo: this.token };
+
+    try {
+      const mainTokenName = this.token.name;
+      const zToken = getTokenInfoFromName(`z${mainTokenName}`);
+      
+      const bal = await getERC20Balance(zToken, this.strategyAddress);
+      console.log('getTVL', bal.amount.toString());
+      // This reduces the zToken TVL to near actual deposits made by users wihout looping
+      const discountFactor = this.stepAmountFactors[4];
+      const amount = bal.amount.operate('div', 1 + discountFactor)
+      console.log('getTVL1', amount.toString());
+      const priceInfo = await axios.get(`https://api.coinbase.com/v2/prices/${mainTokenName}-USDT/spot`)
+      console.log('getTVL2', priceInfo);
+      const price = Number(priceInfo.data.data.amount);
+      return {
+        amount,
+        usdValue: Number(amount.toEtherStr()) * price,
+        tokenInfo: this.token
+      }
+    } catch (e) {
+      console.log('getTVL err', e);
+      throw e;
+    }
+  }
+
   withdrawMethods = (
     amount: MyNumber,
     address: string,
     provider: ProviderInterface,
   ) => {
-    const mainToken: TokenInfo = TOKENS.find(
-      (t) => t.name == this.token,
-    ) as TokenInfo;
+    const mainToken = {...this.token};
+
+    // removing max amount restrictions on withdrawal
+    mainToken.maxAmount = MyNumber.fromEther("100000000000", mainToken.maxAmount.decimals);
 
     if (!address || address == '0x0') {
       return [

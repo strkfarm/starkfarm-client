@@ -54,9 +54,9 @@ const Strategy = () => {
     console.log('txs', transactions);
   }, [transactions]);
   const strategy: StrategyInfo | undefined = useMemo(() => {
-    const name = searchParams.get('name');
-    console.log('name', name);
-    return strategies.find((s) => s.name === name);
+    const id = searchParams.get('id');
+    console.log('id', id);
+    return strategies.find((s) => s.id === id);
   }, [searchParams, strategies]);
 
   const setBalQueryEnable = useSetAtom(strategy?.balEnabled || atom(false));

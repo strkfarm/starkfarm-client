@@ -8,8 +8,12 @@ import {
 } from './pools';
 import { atom } from 'jotai';
 import { ZkLend } from './zklend.store';
+import { IDapp } from './IDapp.store';
+import { LendingSpace } from './lending.base';
+import { AtomWithQueryResult } from 'jotai-tanstack-query';
+import { StrategyAction } from '@/strategies/IStrategy';
 
-export class Hashstack extends ZkLend {
+export class Hashstack extends IDapp<LendingSpace.MyBaseAprDoc[]> {
   name = 'Hashstack';
   link = 'https://app.hashstack.finance/';
   logo = 'https://app.hashstack.finance/favicon-32x32.png';
@@ -74,6 +78,11 @@ export class Hashstack extends ZkLend {
 
     return pools;
   }
+
+  getBaseAPY(p: PoolInfo, data: AtomWithQueryResult<LendingSpace.MyBaseAprDoc[], Error>) {
+    return LendingSpace.getBaseAPY(p, data)
+  }
+
 }
 
 export const hashstack = new Hashstack();

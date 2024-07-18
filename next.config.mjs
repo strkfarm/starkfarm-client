@@ -1,11 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // output: 'export',
-  compiler: {
-    removeConsole: {
-      exclude: ['error'],
-    },
-  },
+    // compiler: {
+    // removeConsole: {
+    //   exclude: ['error'],
+    // },
+    // },
   async rewrites() {
     return [
       {
@@ -38,6 +38,10 @@ const nextConfig = {
         destination: 'https://myswap-cl-charts.s3.amazonaws.com/:path*',
       },
     ];
+  },
+  webpack(config, options) {
+    if (options.isServer) config.devtool = 'source-map';
+    return config;
   },
 };
 

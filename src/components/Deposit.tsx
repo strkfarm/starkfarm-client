@@ -3,6 +3,7 @@ import {
   Box,
   Button,
   Center,
+  Flex,
   Grid,
   GridItem,
   Image as ImageC,
@@ -15,6 +16,8 @@ import {
   NumberInput,
   NumberInputField,
   NumberInputStepper,
+  Progress,
+  Spinner,
   Text,
   Tooltip,
 } from '@chakra-ui/react';
@@ -48,6 +51,8 @@ export default function Deposit(props: DepositProps) {
   const { address } = useAccount();
   const { provider } = useProvider();
   const [dirty, setDirty] = useState(false);
+
+  const tvlInfo = useAtomValue(props.strategy.tvlAtom);
 
   // This is the selected market token
   const [selectedMarket, setSelectedMarket] = useState(
@@ -91,8 +96,10 @@ export default function Deposit(props: DepositProps) {
   // const { balance, isLoading, isError } = useERC20Balance(selectedMarket);
 
   const maxAmount: MyNumber = useMemo(() => {
-    return MyNumber.min(balance, selectedMarket.maxAmount);
-  }, [balance, selectedMarket]);
+    const currentTVl = tvlInfo.data?.amount || MyNumber.fromZero();
+    const maxAllowed = props.strategy.settings.maxTVL - Number(currentTVl.toEtherStr());
+    return MyNumber.min(balance, MyNumber.fromEther(maxAllowed.toFixed(6), selectedMarket.decimals));
+  }, [balance, props.strategy, selectedMarket]);
 
   function BalanceComponent(props: {
     token: TokenInfo;
@@ -247,6 +254,7 @@ export default function Deposit(props: DepositProps) {
         keepWithinRange={false}
         clampValueOnBlur={false}
         value={rawAmount}
+        isDisabled={maxAmount.isZero()}
       >
         <NumberInputField
           border={'0px'}
@@ -287,8 +295,25 @@ export default function Deposit(props: DepositProps) {
         fontSize="12px"
         marginTop="20px"
       >
-        No additional fees by STRKFarm
+        No additional fees by STRKFarm  
       </Text>
+          
+      <Box width='100%' marginTop={'15px'}>
+        <Flex justifyContent='space-between'>
+          <Text fontSize={'12px'} color='color2Text' fontWeight={'bold'}>Current TVL Limit:</Text>
+          <Text fontSize={'12px'} color='color2Text'>
+            {!tvlInfo || !tvlInfo?.data ? <Spinner size='2xs'/> : Number(tvlInfo.data?.amount.toFixedStr(0)).toLocaleString()}
+            {' / '}{props.strategy.settings.maxTVL.toLocaleString()}{' '}{selectedMarket.name}
+          </Text>
+        </Flex>
+        <Progress 
+          colorScheme='green'
+          bg='bg'
+          value={(100 * (Number(tvlInfo.data?.amount.toEtherStr()) || props.strategy.settings.maxTVL)) / props.strategy.settings.maxTVL} 
+          isIndeterminate ={!tvlInfo || !tvlInfo?.data}
+        />
+        {/* {tvlInfo.isError ? 1 : 0}{tvlInfo.isLoading ? 1 : 0} {JSON.stringify(tvlInfo.error)} */}
+      </Box>
     </Box>
   );
 }

@@ -12,7 +12,12 @@ export default class MyNumber {
   }
 
   static fromEther(num: string, decimals: number) {
-    return new MyNumber(ethers.parseUnits(num, decimals).toString(), decimals);
+    try {
+      return new MyNumber(Number(ethers.parseUnits(num, decimals)).toFixed(6), decimals);
+    } catch (e) {
+      console.error('fromEther', e, num, decimals);
+      throw e;
+    }
   }
 
   static fromZero() {
@@ -25,6 +30,10 @@ export default class MyNumber {
 
   toEtherStr() {
     return ethers.formatUnits(this.bigNumber.toFixed(), this.decimals);
+  }
+
+  toFixedStr(decimals: number) {
+    return Number(this.toEtherStr()).toFixed(decimals);
   }
 
   toEtherToFixedDecimals(decimals: number) {
@@ -51,6 +60,11 @@ export default class MyNumber {
       ethers.parseUnits(amountEther, this.decimals).toString(),
     );
     return this.bigNumber[command](fullNum);
+  }
+
+  operate(command: 'div' | 'plus', value: string | number) {
+    const bn = new BigNumber(Number(value).toFixed(6));
+    return new MyNumber(this.bigNumber[command](bn).toFixed(0), this.decimals);
   }
 
   static min(a: MyNumber, b: MyNumber) {

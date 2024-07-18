@@ -16,7 +16,7 @@ import {
 
 export interface BalanceResult {
   amount: MyNumber;
-  tokenInfo: TokenInfo | NFTInfo | undefined;
+  tokenInfo: TokenInfo | undefined;
 }
 
 function returnEmptyBal(): BalanceResult {
@@ -26,7 +26,7 @@ function returnEmptyBal(): BalanceResult {
   };
 }
 
-async function getERC20Balance(
+export async function getERC20Balance(
   token: TokenInfo | undefined,
   address: string | undefined,
 ) {
@@ -45,7 +45,7 @@ async function getERC20Balance(
   };
 }
 
-async function getERC4626Balance(
+export async function getERC4626Balance(
   token: TokenInfo | undefined,
   address: string | undefined,
 ) {
@@ -79,7 +79,7 @@ async function getERC4626Balance(
   };
 }
 
-async function getERC721PositionValue(
+export async function getERC721PositionValue(
   token: NFTInfo | undefined,
   address: string | undefined,
 ) {
@@ -137,6 +137,24 @@ function getERC721PositionValueAtom(token: NFTInfo | undefined) {
       refetchInterval: 5000,
     };
   });
+}
+
+export async function getBalance(token: TokenInfo | NFTInfo | undefined, address: string) {
+  if (token) {
+    console.log('token getBalance', token);
+    if (Object.prototype.hasOwnProperty.call(token, 'isERC4626')) {
+      const _token = <TokenInfo>token;
+      console.log('token getBalance isERC4626', _token.isERC4626);
+      if (_token.isERC4626) return getERC4626Balance(_token, address);
+    } else {
+      const _token = <NFTInfo>token;
+      const isNFT = NFTS.find((nft) => nft.address === _token.address);
+      if (isNFT) return getERC721PositionValue(_token, address);
+    }
+    return getERC20Balance(<TokenInfo>token, address);
+  }
+
+  return returnEmptyBal();
 }
 
 export function getBalanceAtom(

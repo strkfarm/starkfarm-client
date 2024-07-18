@@ -27,6 +27,7 @@ import { useEffect } from 'react';
 import { lastWalletAtom } from '@/store/utils.atoms';
 import { useAccount, useConnect, useDisconnect } from '@starknet-react/core';
 import { CONNECTOR_NAMES, MYCONNECTORS } from '@/app/template';
+import { isMobile } from 'react-device-detect';
 
 export default function Navbar() {
   const { address, connector } = useAccount();
@@ -203,7 +204,7 @@ export default function Navbar() {
               }
             />
           </Link>
-          <Menu>
+          {!isMobile && <Menu>
             <MenuButton
               as={Button}
               rightIcon={address ? <ChevronDownIcon /> : <></>}
@@ -249,7 +250,7 @@ export default function Navbar() {
                 </MenuItem>
               )}
             </MenuList>
-          </Menu>
+          </Menu>}
         </Flex>
       </Box>
     </Container>
