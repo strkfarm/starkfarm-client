@@ -70,13 +70,13 @@ export interface IStrategyActionHook {
 }
 
 export interface IStrategySettings {
-  maxTVL: number
+  maxTVL: number;
 }
 
 export interface AmountInfo {
-  amount: MyNumber
-  usdValue: number
-  tokenInfo: TokenInfo
+  amount: MyNumber;
+  usdValue: number;
+  tokenInfo: TokenInfo;
 }
 
 export class IStrategyProps {
@@ -100,7 +100,6 @@ export class IStrategyProps {
   balEnabled = atom(false);
   readonly balanceAtom: Atom<AtomWithQueryResult<BalanceResult, Error>>;
   readonly tvlAtom: Atom<AtomWithQueryResult<AmountInfo, Error>>;
-  
 
   risks: string[] = [
     'The strategy involves exposure to smart contracts, which inherently carry risks like hacks, albeit relatively low',
@@ -125,14 +124,17 @@ export class IStrategyProps {
 
   getTVL = async (): Promise<AmountInfo> => {
     throw new Error('getTVL: Not implemented');
-  }
+  };
 
   getUserTVL = async (user: string): Promise<AmountInfo> => {
     throw new Error('getTVL: Not implemented');
-  }
+  };
 
   isLive() {
-    return this.liveStatus == StrategyLiveStatus.ACTIVE || this.liveStatus == StrategyLiveStatus.NEW;
+    return (
+      this.liveStatus == StrategyLiveStatus.ACTIVE ||
+      this.liveStatus == StrategyLiveStatus.NEW
+    );
   }
 
   constructor(
@@ -142,7 +144,7 @@ export class IStrategyProps {
     rewardTokens: { logo: string }[],
     holdingTokens: (TokenInfo | NFTInfo)[],
     liveStatus: StrategyLiveStatus,
-    settings: IStrategySettings
+    settings: IStrategySettings,
   ) {
     this.id = id;
     this.name = name;
@@ -153,7 +155,7 @@ export class IStrategyProps {
     this.balanceAtom = getBalanceAtom(holdingTokens[0], this.balEnabled);
     this.liveStatus = liveStatus;
     this.settings = settings;
-    this.tvlAtom =  atomWithQuery((get) => {
+    this.tvlAtom = atomWithQuery((get) => {
       return {
         queryKey: ['tvl', this.id],
         queryFn: async ({ queryKey }: any): Promise<AmountInfo> => {
@@ -161,7 +163,7 @@ export class IStrategyProps {
         },
         refetchInterval: 15000,
       };
-    })
+    });
   }
 }
 
@@ -176,9 +178,17 @@ export class IStrategy extends IStrategyProps {
     rewardTokens: { logo: string }[],
     holdingTokens: (TokenInfo | NFTInfo)[],
     liveStatus = StrategyLiveStatus.ACTIVE,
-    settings: IStrategySettings
+    settings: IStrategySettings,
   ) {
-    super(id, name, description, rewardTokens, holdingTokens, liveStatus, settings);
+    super(
+      id,
+      name,
+      description,
+      rewardTokens,
+      holdingTokens,
+      liveStatus,
+      settings,
+    );
     this.tag = tag;
   }
 

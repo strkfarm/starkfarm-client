@@ -1,10 +1,9 @@
-import CONSTANTS, { TokenName } from "@/constants";
-import { APRSplit, Category, PoolInfo, PoolMetadata, PoolType } from "./pools";
-import { AtomWithQueryResult } from "jotai-tanstack-query";
-import { StrategyAction } from "@/strategies/IStrategy";
+import CONSTANTS, { TokenName } from '@/constants';
+import { APRSplit, Category, PoolInfo, PoolMetadata, PoolType } from './pools';
+import { AtomWithQueryResult } from 'jotai-tanstack-query';
+import { StrategyAction } from '@/strategies/IStrategy';
 
 export namespace LendingSpace {
-  
   export interface MyBaseAprDoc {
     token: {
       decimals: number;
@@ -41,11 +40,11 @@ export namespace LendingSpace {
     data: any,
     incentiveDataKey: string,
     info: {
-      name: string,
-      link: string,
-      logo: string
+      name: string;
+      link: string;
+      logo: string;
     },
-    commonVaultFilter: (poolName: string) => boolean
+    commonVaultFilter: (poolName: string) => boolean,
   ) {
     const myData = data[incentiveDataKey];
     if (!myData) return [];
@@ -100,7 +99,10 @@ export namespace LendingSpace {
     return pools;
   }
 
-  export function getBaseAPY(p: PoolInfo, data: AtomWithQueryResult<MyBaseAprDoc[], Error>) {
+  export function getBaseAPY(
+    p: PoolInfo,
+    data: AtomWithQueryResult<MyBaseAprDoc[], Error>,
+  ) {
     let baseAPY: number | 'Err' = 'Err';
     let splitApr: APRSplit | null = null;
     let metadata: PoolMetadata | null = null;
@@ -135,7 +137,10 @@ export namespace LendingSpace {
     };
   }
 
-  export function getHF(positions: StrategyAction[], LIQUIDATION_THRESHOLD: number) {
+  export function getHF(
+    positions: StrategyAction[],
+    LIQUIDATION_THRESHOLD: number,
+  ) {
     // * HF = Sum(Collateral_usd * col_factor) / Sum(debt_usd/debt_factor);
     let numerator = 0;
     let denominator = 0;

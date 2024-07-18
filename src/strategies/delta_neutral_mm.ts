@@ -1,6 +1,13 @@
-import CONSTANTS, { NFTS, TOKENS, TokenName } from '@/constants';
+import CONSTANTS, { NFTS, TokenName } from '@/constants';
 import { PoolInfo } from '@/store/pools';
-import { IStrategy, IStrategySettings, NFTInfo, StrategyAction, StrategyLiveStatus, TokenInfo } from './IStrategy';
+import {
+  IStrategy,
+  IStrategySettings,
+  NFTInfo,
+  StrategyAction,
+  StrategyLiveStatus,
+  TokenInfo,
+} from './IStrategy';
 import { zkLend } from '@/store/zklend.store';
 import ERC20Abi from '@/abi/erc20.abi.json';
 import DeltaNeutralAbi from '@/abi/deltraNeutral.abi.json';
@@ -8,7 +15,12 @@ import MyNumber from '@/utils/MyNumber';
 import { Call, Contract, ProviderInterface, uint256 } from 'starknet';
 import { nostraLending } from '@/store/nostralending.store';
 import { getTokenInfoFromName, standariseAddress } from '@/utils';
-import { DUMMY_BAL_ATOM, getBalance, getBalanceAtom, getERC20Balance } from '@/store/balance.atoms';
+import {
+  DUMMY_BAL_ATOM,
+  getBalance,
+  getBalanceAtom,
+  getERC20Balance,
+} from '@/store/balance.atoms';
 import { atom } from 'jotai';
 import axios from 'axios';
 
@@ -27,7 +39,7 @@ export class DeltaNeutralMM extends IStrategy {
     strategyAddress: string,
     stepAmountFactors: number[],
     liveStatus: StrategyLiveStatus,
-    settings: IStrategySettings
+    settings: IStrategySettings,
   ) {
     const rewardTokens = [{ logo: CONSTANTS.LOGOS.STRK }];
     const nftInfo = NFTS.find(
@@ -46,7 +58,7 @@ export class DeltaNeutralMM extends IStrategy {
       rewardTokens,
       holdingTokens,
       liveStatus,
-      settings
+      settings,
     );
     this.token = token;
 
@@ -107,7 +119,10 @@ export class DeltaNeutralMM extends IStrategy {
     amount: string,
     prevActions: StrategyAction[],
   ) {
-    const dapp = prevActions.length == 0 ? zkLend : nostraLending;
+    const dapp =
+      prevActions.length == 0 || prevActions.length == 4
+        ? zkLend
+        : nostraLending;
     return pools.filter(
       (p) => p.pool.name == this.token.name && p.protocol.name == dapp.name,
     );
@@ -266,61 +281,78 @@ export class DeltaNeutralMM extends IStrategy {
   };
 
   getUserTVL = async (user: string) => {
-    if (this.liveStatus == StrategyLiveStatus.COMING_SOON) return { amount: MyNumber.fromEther('0', this.token.decimals), usdValue: 0, tokenInfo: this.token };
+    if (this.liveStatus == StrategyLiveStatus.COMING_SOON)
+      return {
+        amount: MyNumber.fromEther('0', this.token.decimals),
+        usdValue: 0,
+        tokenInfo: this.token,
+      };
     const balanceInfo = await getBalance(this.holdingTokens[0], user);
     if (!balanceInfo.tokenInfo) {
       return {
         amount: MyNumber.fromEther('0', this.token.decimals),
         usdValue: 0,
         tokenInfo: this.token,
-      }
+      };
     }
-    const priceInfo = await axios.get(`https://api.coinbase.com/v2/prices/${balanceInfo.tokenInfo.name}-USDT/spot`)
+    const priceInfo = await axios.get(
+      `https://api.coinbase.com/v2/prices/${balanceInfo.tokenInfo.name}-USDT/spot`,
+    );
     const price = Number(priceInfo.data.data.amount);
-    console.log('getUserTVL dnmm', price, balanceInfo.amount.toEtherStr())
+    console.log('getUserTVL dnmm', price, balanceInfo.amount.toEtherStr());
     return {
       amount: balanceInfo.amount,
       usdValue: Number(balanceInfo.amount.toEtherStr()) * price,
-      tokenInfo: balanceInfo.tokenInfo
-    }
-  }
+      tokenInfo: balanceInfo.tokenInfo,
+    };
+  };
 
   getTVL = async () => {
-    if (!this.isLive()) return { amount: MyNumber.fromEther('0', this.token.decimals), usdValue: 0, tokenInfo: this.token };
+    if (!this.isLive())
+      return {
+        amount: MyNumber.fromEther('0', this.token.decimals),
+        usdValue: 0,
+        tokenInfo: this.token,
+      };
 
     try {
       const mainTokenName = this.token.name;
       const zToken = getTokenInfoFromName(`z${mainTokenName}`);
-      
+
       const bal = await getERC20Balance(zToken, this.strategyAddress);
       console.log('getTVL', bal.amount.toString());
       // This reduces the zToken TVL to near actual deposits made by users wihout looping
       const discountFactor = this.stepAmountFactors[4];
-      const amount = bal.amount.operate('div', 1 + discountFactor)
+      const amount = bal.amount.operate('div', 1 + discountFactor);
       console.log('getTVL1', amount.toString());
-      const priceInfo = await axios.get(`https://api.coinbase.com/v2/prices/${mainTokenName}-USDT/spot`)
+      const priceInfo = await axios.get(
+        `https://api.coinbase.com/v2/prices/${mainTokenName}-USDT/spot`,
+      );
       console.log('getTVL2', priceInfo);
       const price = Number(priceInfo.data.data.amount);
       return {
         amount,
         usdValue: Number(amount.toEtherStr()) * price,
-        tokenInfo: this.token
-      }
+        tokenInfo: this.token,
+      };
     } catch (e) {
       console.log('getTVL err', e);
       throw e;
     }
-  }
+  };
 
   withdrawMethods = (
     amount: MyNumber,
     address: string,
     provider: ProviderInterface,
   ) => {
-    const mainToken = {...this.token};
+    const mainToken = { ...this.token };
 
     // removing max amount restrictions on withdrawal
-    mainToken.maxAmount = MyNumber.fromEther("100000000000", mainToken.maxAmount.decimals);
+    mainToken.maxAmount = MyNumber.fromEther(
+      '100000000000',
+      mainToken.maxAmount.decimals,
+    );
 
     if (!address || address == '0x0') {
       return [

@@ -12,7 +12,6 @@ import {
   CardBody,
   Center,
   Container,
-  Flex,
   HStack,
   Heading,
   Link,
@@ -43,7 +42,10 @@ export default function Strategies() {
   const strategies = useAtomValue(strategiesAtom);
 
   function getStratCardBg(strat: IStrategyProps, index: number) {
-    if (strat.liveStatus == StrategyLiveStatus.ACTIVE || strat.liveStatus == StrategyLiveStatus.NEW) {
+    if (
+      strat.liveStatus == StrategyLiveStatus.ACTIVE ||
+      strat.liveStatus == StrategyLiveStatus.NEW
+    ) {
       return index % 2 === 0 ? 'color1_50p' : 'color2_50p';
     }
     return 'bg';
@@ -131,7 +133,10 @@ export default function Strategies() {
   }
 
   function isLive(strat: StrategyInfo) {
-    return strat.liveStatus == StrategyLiveStatus.ACTIVE || strat.liveStatus == StrategyLiveStatus.NEW;
+    return (
+      strat.liveStatus == StrategyLiveStatus.ACTIVE ||
+      strat.liveStatus == StrategyLiveStatus.NEW
+    );
   }
 
   function getStratCard(strat: StrategyInfo) {
@@ -143,12 +148,11 @@ export default function Strategies() {
           onClick={() => {
             mixpanel.track('Strategy expanded', { name: strat.name });
           }}
-          
         >
           <Box width={'100%'}>
             <Box>
-              <LinkOverlay 
-                href={isLive(strat) ? `/strategy?id=${strat.id}`: '#'} 
+              <LinkOverlay
+                href={isLive(strat) ? `/strategy?id=${strat.id}` : '#'}
                 cursor={isLive(strat) ? 'pointer' : 'default'}
               >
                 <HStack
@@ -158,18 +162,23 @@ export default function Strategies() {
                   fontWeight={'bold'}
                   alignItems={'center'}
                 >
-                  <Heading size={{ base: 'sm', md: 'md' }}
+                  <Heading
+                    size={{ base: 'sm', md: 'md' }}
                     marginBottom={'5px'}
                     fontWeight={'bold'}
-                  >{strat.name}</Heading>
-                  {strat.liveStatus != StrategyLiveStatus.ACTIVE && <Badge
-                    ml="1"
-                    bg="cyan"
-                    fontFamily={'sans-serif'}
-                    padding="3px 5px 2px"
                   >
-                    {strat.liveStatus.valueOf()}
-                  </Badge>}
+                    {strat.name}
+                  </Heading>
+                  {strat.liveStatus != StrategyLiveStatus.ACTIVE && (
+                    <Badge
+                      ml="1"
+                      bg="cyan"
+                      fontFamily={'sans-serif'}
+                      padding="3px 5px 2px"
+                    >
+                      {strat.liveStatus.valueOf()}
+                    </Badge>
+                  )}
                 </HStack>
               </LinkOverlay>
               <Heading
@@ -215,7 +224,7 @@ export default function Strategies() {
                 {(strat.netYield * 100).toFixed(2)}%
               </Text>
             </Tooltip>
-            
+
             <AvatarGroup size="xs" max={4} marginRight={'5px'} float={'right'}>
               {getUniqueById(
                 strat.actions.map((p) => ({
@@ -290,10 +299,13 @@ export default function Strategies() {
               bg={getStratCardBg(strat, index)}
               color="white"
               _hover={getStratCardBgHover(strat, index)}
-              
             >
               <CardBody padding={{ base: '15px', md: '20px' }}>
-                <Box width={'100%'} padding={'0px 10px 0 0'} pointerEvents={isLive(strat) ? 'auto' : 'none'}>
+                <Box
+                  width={'100%'}
+                  padding={'0px 10px 0 0'}
+                  pointerEvents={isLive(strat) ? 'auto' : 'none'}
+                >
                   {getStratCard(strat)}
                 </Box>
                 {/* {DepositButton(strat)} */}

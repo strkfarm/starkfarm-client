@@ -13,7 +13,10 @@ export default class MyNumber {
 
   static fromEther(num: string, decimals: number) {
     try {
-      return new MyNumber(Number(ethers.parseUnits(num, decimals)).toFixed(6), decimals);
+      return new MyNumber(
+        Number(ethers.parseUnits(num, decimals)).toFixed(6),
+        decimals,
+      );
     } catch (e) {
       console.error('fromEther', e, num, decimals);
       throw e;

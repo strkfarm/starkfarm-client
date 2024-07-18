@@ -24,7 +24,6 @@ import {
 import Autoplay from 'embla-carousel-autoplay';
 import useEmblaCarousel from 'embla-carousel-react';
 import mixpanel from 'mixpanel-browser';
-import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
@@ -72,29 +71,35 @@ export default function Home() {
   const { selectedIndex, scrollSnaps, onDotButtonClick } =
     useDotButton(emblaApi);
 
-  const banner_images = [{
-    desktop: '/banners/ognft.svg',
-    mobile: '/banners/ognft_small.svg',
-    link: 'https://x.com/strkfarm/status/1788558092109775029'
-  }, {
-    desktop: '/banners/seed_grant.svg',
-    mobile: '/banners/seed_grant_small.jpg',
-    link: 'https://x.com/strkfarm/status/1787783906982260881'
-  }]
+  const banner_images = [
+    {
+      desktop: '/banners/ognft.svg',
+      mobile: '/banners/ognft_small.svg',
+      link: 'https://x.com/strkfarm/status/1788558092109775029',
+    },
+    {
+      desktop: '/banners/seed_grant.svg',
+      mobile: '/banners/seed_grant_small.jpg',
+      link: 'https://x.com/strkfarm/status/1787783906982260881',
+    },
+  ];
 
   return (
     <Container maxWidth={'1000px'} margin={'0 auto'}>
-      <Box padding={'15px 30px'} borderRadius="10px" margin={"20px 0px 10px"}>
-        <Text fontSize={{base: '28px', md: '35px'}} 
+      <Box padding={'15px 30px'} borderRadius="10px" margin={'20px 0px 10px'}>
+        <Text
+          fontSize={{ base: '28px', md: '35px' }}
           lineHeight={'30px'}
           marginBottom={'10px'}
-          color={'cyan'} textAlign={'center'}>
+          color={'cyan'}
+          textAlign={'center'}
+        >
           <b>{"Starknet's"} Yield Powerhouse🚀</b>
         </Text>
         <Text
           color="color2"
           textAlign={'center'}
-          fontSize={{base: '16px', md: '18px'}}
+          fontSize={{ base: '16px', md: '18px' }}
           marginBottom={'0px'}
         >
           Identify & Invest in the best $STRK rewarding pools and maximize your
@@ -102,27 +107,29 @@ export default function Home() {
         </Text>
       </Box>
 
-      <Box className="embla" ref={emblaRef} margin={0} width={'100%'}
-      >
+      <Box className="embla" ref={emblaRef} margin={0} width={'100%'}>
         <Box className="embla__container">
           {banner_images.map((banner, index) => (
-            <Box className="embla__slide" position="relative" 
-              height={'auto'} key={index}
+            <Box
+              className="embla__slide"
+              position="relative"
+              height={'auto'}
+              key={index}
               padding={'10px'}
             >
               <Link href={banner.link} isExternal>
-              <ChakraImage
-                src={
-                  (!isMobile && size.width > 450) || size.width == 0
-                    ? banner.desktop
-                    : banner.mobile
-                }
-                height={'auto'}
-                boxShadow={'0px 0px 2px #484848'}
-                width='100%'
-                alt="Banner"
-                style={{ objectFit: 'cover', borderRadius: '10px' }}
-              />
+                <ChakraImage
+                  src={
+                    (!isMobile && size.width > 450) || size.width == 0
+                      ? banner.desktop
+                      : banner.mobile
+                  }
+                  height={'auto'}
+                  boxShadow={'0px 0px 2px #484848'}
+                  width="100%"
+                  alt="Banner"
+                  style={{ objectFit: 'cover', borderRadius: '10px' }}
+                />
               </Link>
             </Box>
           ))}

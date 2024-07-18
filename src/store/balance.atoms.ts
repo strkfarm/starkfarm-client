@@ -139,7 +139,10 @@ function getERC721PositionValueAtom(token: NFTInfo | undefined) {
   });
 }
 
-export async function getBalance(token: TokenInfo | NFTInfo | undefined, address: string) {
+export async function getBalance(
+  token: TokenInfo | NFTInfo | undefined,
+  address: string,
+) {
   if (token) {
     console.log('token getBalance', token);
     if (Object.prototype.hasOwnProperty.call(token, 'isERC4626')) {

@@ -1,6 +1,5 @@
 import { PoolInfo, ProtocolAtoms, StrkLendingIncentivesAtom } from './pools';
 import { atom } from 'jotai';
-import { ZkLend } from './zklend.store';
 import { AtomWithQueryResult } from 'jotai-tanstack-query';
 import { LendingSpace } from './lending.base';
 import { IDapp } from './IDapp.store';
@@ -14,17 +13,23 @@ export class Nimbora extends IDapp<LendingSpace.MyBaseAprDoc[]> {
   incentiveDataKey = 'Nimbora';
 
   _computePoolsInfo(data: any) {
-    return LendingSpace.computePoolsInfo(data, this.incentiveDataKey, {
+    return LendingSpace.computePoolsInfo(
+      data,
+      this.incentiveDataKey,
+      {
         name: this.name,
         link: this.link,
-        logo: this.logo
+        logo: this.logo,
       },
-      this.commonVaultFilter
-    )
+      this.commonVaultFilter,
+    );
   }
 
-  getBaseAPY(p: PoolInfo, data: AtomWithQueryResult<LendingSpace.MyBaseAprDoc[], Error>) {
-    return LendingSpace.getBaseAPY(p, data)
+  getBaseAPY(
+    p: PoolInfo,
+    data: AtomWithQueryResult<LendingSpace.MyBaseAprDoc[], Error>,
+  ) {
+    return LendingSpace.getBaseAPY(p, data);
   }
 }
 

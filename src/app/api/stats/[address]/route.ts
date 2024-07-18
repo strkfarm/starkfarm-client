@@ -1,10 +1,6 @@
 import { NextResponse } from 'next/server';
-import { Contract, RpcProvider, num, uint256 } from 'starknet';
-import ERC4626Abi from '@/abi/erc4626.abi.json';
-import axios from 'axios';
+import { num } from 'starknet';
 import { getStrategies } from '@/store/strategies.atoms';
-import { getBalance } from '@/store/balance.atoms';
-import { getTokenInfoFromName } from '@/utils';
 
 export const revalidate = 0;
 
@@ -30,8 +26,8 @@ export async function GET(req: Request, context: any) {
     return {
       id: strategy.id,
       usdValue: balanceInfo.usdValue,
-      amount: balanceInfo.amount.toEtherStr()
-    }
+      amount: balanceInfo.amount.toEtherStr(),
+    };
   });
 
   const result = await Promise.all(values);
@@ -39,6 +35,6 @@ export async function GET(req: Request, context: any) {
   console.log({ pAddr, sum });
   return NextResponse.json({
     holdingsUSD: sum,
-    strategyWise: result
+    strategyWise: result,
   });
 }

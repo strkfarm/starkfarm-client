@@ -1,11 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // output: 'export',
-    // compiler: {
-    // removeConsole: {
-    //   exclude: ['error'],
-    // },
-    // },
+    compiler: {
+      removeConsole: {
+        exclude: ['error'],
+      },
+    },
   async rewrites() {
     return [
       {

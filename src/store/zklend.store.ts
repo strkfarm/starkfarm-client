@@ -1,15 +1,7 @@
 'use client';
 
-import CONSTANTS, { TokenName } from '@/constants';
-import {
-  APRSplit,
-  Category,
-  PoolInfo,
-  PoolMetadata,
-  PoolType,
-  ProtocolAtoms,
-  StrkLendingIncentivesAtom,
-} from './pools';
+import CONSTANTS from '@/constants';
+import { PoolInfo, ProtocolAtoms, StrkLendingIncentivesAtom } from './pools';
 import { atom } from 'jotai';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { IDapp } from './IDapp.store';
@@ -18,7 +10,6 @@ import { LendingSpace } from './lending.base';
 const fetcher = (...args: any[]) => {
   return fetch(args[0], args[1]).then((res) => res.json());
 };
-
 
 export class ZkLend extends IDapp<LendingSpace.MyBaseAprDoc[]> {
   name = 'zkLend';
@@ -29,17 +20,23 @@ export class ZkLend extends IDapp<LendingSpace.MyBaseAprDoc[]> {
   incentiveDataKey = 'zkLend';
   LIQUIDATION_THRESHOLD = 1;
   _computePoolsInfo(data: any) {
-    return LendingSpace.computePoolsInfo(data, this.incentiveDataKey, {
+    return LendingSpace.computePoolsInfo(
+      data,
+      this.incentiveDataKey,
+      {
         name: this.name,
         link: this.link,
-        logo: this.logo
+        logo: this.logo,
       },
-      this.commonVaultFilter
-    )
+      this.commonVaultFilter,
+    );
   }
 
-  getBaseAPY(p: PoolInfo, data: AtomWithQueryResult<LendingSpace.MyBaseAprDoc[], Error>) {
-    return LendingSpace.getBaseAPY(p, data)
+  getBaseAPY(
+    p: PoolInfo,
+    data: AtomWithQueryResult<LendingSpace.MyBaseAprDoc[], Error>,
+  ) {
+    return LendingSpace.getBaseAPY(p, data);
   }
 
   // ! To consider price of tokens later. used for stables only for now.

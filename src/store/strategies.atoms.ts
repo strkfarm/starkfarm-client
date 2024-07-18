@@ -1,7 +1,11 @@
 import { atom } from 'jotai';
 import { allPoolsAtomUnSorted } from './pools';
 import { AutoTokenStrategy } from '@/strategies/auto_strk.strat';
-import { IStrategy, IStrategyProps, StrategyLiveStatus } from '@/strategies/IStrategy';
+import {
+  IStrategy,
+  IStrategyProps,
+  StrategyLiveStatus,
+} from '@/strategies/IStrategy';
 import CONSTANTS from '@/constants';
 import { DeltaNeutralMM } from '@/strategies/delta_neutral_mm';
 import Mustache from 'mustache';
@@ -20,8 +24,8 @@ export function getStrategies() {
     'zSTRK',
     CONSTANTS.CONTRACTS.AutoStrkFarm,
     {
-      maxTVL: 50000
-    }
+      maxTVL: 50000,
+    },
   );
   const autoUSDCStrategy = new AutoTokenStrategy(
     'USDC',
@@ -30,8 +34,8 @@ export function getStrategies() {
     'zUSDC',
     CONSTANTS.CONTRACTS.AutoUsdcFarm,
     {
-      maxTVL: 50000
-    }
+      maxTVL: 50000,
+    },
   );
 
   const DNMMDescription = `Deposit your {{token1}} to automatically loop your funds between zkLend and Nostra to create a delta neutral position. This strategy is designed to maximize your yield on {{token1}}. Your position is automatically adjusted periodically to maintain a healthy health factor. You receive a NFT as representation for your stake on STRKFarm. You can withdraw anytime by redeeming your NFT for {{token1}}.`;
@@ -45,8 +49,8 @@ export function getStrategies() {
     [1, 0.608, 1, 0.552509, 0.552509], // precomputed factors based on strategy math
     StrategyLiveStatus.ACTIVE,
     {
-      maxTVL: 5000
-    }
+      maxTVL: 5000,
+    },
   );
 
   const deltaNeutralMMETHUSDC = new DeltaNeutralMM(
@@ -59,8 +63,8 @@ export function getStrategies() {
     [1, 0.608, 1, 0.552509, 0.552509], // precomputed factors based on strategy math
     StrategyLiveStatus.COMING_SOON,
     {
-      maxTVL: 50000
-    }
+      maxTVL: 50000,
+    },
   );
   const deltaNeutralMMSTRKETH = new DeltaNeutralMM(
     getTokenInfoFromName('STRK'),
@@ -72,8 +76,8 @@ export function getStrategies() {
     [1, 0.384215, 1, 0.233276, 0.233276], // precomputed factors based on strategy math, last is the excess deposit1 that is happening
     StrategyLiveStatus.NEW,
     {
-      maxTVL: 50000
-    }
+      maxTVL: 50000,
+    },
   );
 
   const strategies: IStrategy[] = [
@@ -83,11 +87,11 @@ export function getStrategies() {
     deltaNeutralMMETHUSDC,
     deltaNeutralMMSTRKETH,
   ];
-  
+
   return strategies;
 }
 
-export const STRATEGIES_INFO = getStrategies()
+export const STRATEGIES_INFO = getStrategies();
 
 export const strategiesAtom = atom<StrategyInfo[]>((get) => {
   const strategies = getStrategies();
@@ -96,10 +100,10 @@ export const strategiesAtom = atom<StrategyInfo[]>((get) => {
     (p) => p.protocol.name === 'zkLend' || p.protocol.name === 'Nostra MM',
   );
 
-  for(let s of strategies) {
-    s.solve(filteredPools, "1000");
+  for (const s of strategies) {
+    s.solve(filteredPools, '1000');
   }
-  
+
   strategies.sort((a, b) => {
     const status1 = getLiveStatusNumber(a.liveStatus);
     const status2 = getLiveStatusNumber(b.liveStatus);
@@ -115,6 +119,6 @@ function getLiveStatusNumber(status: StrategyLiveStatus) {
     return 2;
   } else if (status == StrategyLiveStatus.COMING_SOON) {
     return 3;
-  } 
+  }
   return 4;
 }

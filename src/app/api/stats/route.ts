@@ -1,21 +1,17 @@
 import { NextResponse } from 'next/server';
-import { Contract, RpcProvider, uint256 } from 'starknet';
-import ERC20Abi from '@/abi/erc20.abi.json';
-import axios from 'axios';
 import { getStrategies } from '@/store/strategies.atoms';
 
 export const revalidate = 60;
 
 export async function GET(req: Request) {
-  const provider = new RpcProvider({
-    nodeUrl: process.env.RPC_URL || '',
-  });
   const strategies = getStrategies();
-  const values = strategies.map(async (strategy) => {
+  console.log('strategies', strategies.length);
+  const values = strategies.map(async (strategy, index) => {
     let retry = 0;
     while (retry < 3) {
       try {
-        const tvlInfo = await strategy.getTVL()
+        const tvlInfo = await strategy.getTVL();
+        console.log('tvlInfo', index, tvlInfo);
         return tvlInfo.usdValue;
       } catch (e) {
         console.log(e);

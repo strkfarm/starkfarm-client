@@ -1,6 +1,12 @@
 import CONSTANTS, { TOKENS, TokenName } from '@/constants';
 import { PoolInfo } from '@/store/pools';
-import { IStrategy, IStrategySettings, StrategyAction, StrategyLiveStatus, TokenInfo } from './IStrategy';
+import {
+  IStrategy,
+  IStrategySettings,
+  StrategyAction,
+  StrategyLiveStatus,
+  TokenInfo,
+} from './IStrategy';
 import ERC20Abi from '@/abi/erc20.abi.json';
 import AutoStrkAbi from '@/abi/autoStrk.abi.json';
 import MasterAbi from '@/abi/master.abi.json';
@@ -42,7 +48,7 @@ export class AutoTokenStrategy extends IStrategy {
     description: string,
     lpTokenName: string,
     strategyAddress: string,
-    settings: IStrategySettings
+    settings: IStrategySettings,
   ) {
     const rewardTokens = [{ logo: CONSTANTS.LOGOS.STRK }];
     const frmToken = TOKENS.find((t) => t.token == strategyAddress);
@@ -57,7 +63,7 @@ export class AutoTokenStrategy extends IStrategy {
       rewardTokens,
       holdingTokens,
       StrategyLiveStatus.ACTIVE,
-      settings
+      settings,
     );
     this.token = getTokenInfoFromName(token);
 
@@ -110,8 +116,13 @@ export class AutoTokenStrategy extends IStrategy {
   }
 
   getUserTVL = async (user: string) => {
-    if (this.liveStatus == StrategyLiveStatus.COMING_SOON) return { amount: MyNumber.fromEther('0', this.token.decimals), usdValue: 0, tokenInfo: this.token };
-   
+    if (this.liveStatus == StrategyLiveStatus.COMING_SOON)
+      return {
+        amount: MyNumber.fromEther('0', this.token.decimals),
+        usdValue: 0,
+        tokenInfo: this.token,
+      };
+
     // returns zToken
     const balanceInfo = await getBalance(this.holdingTokens[0], user);
     if (!balanceInfo.tokenInfo) {
@@ -119,31 +130,40 @@ export class AutoTokenStrategy extends IStrategy {
         amount: MyNumber.fromEther('0', this.token.decimals),
         usdValue: 0,
         tokenInfo: this.token,
-      }
+      };
     }
-    const priceInfo = await axios.get(`https://api.coinbase.com/v2/prices/${this.token.name}-USDT/spot`)
+    const priceInfo = await axios.get(
+      `https://api.coinbase.com/v2/prices/${this.token.name}-USDT/spot`,
+    );
     const price = Number(priceInfo.data.data.amount);
-    console.log('getUserTVL autoc', price, balanceInfo.amount.toEtherStr())
+    console.log('getUserTVL autoc', price, balanceInfo.amount.toEtherStr());
     return {
       amount: balanceInfo.amount,
       usdValue: Number(balanceInfo.amount.toEtherStr()) * price,
-      tokenInfo: balanceInfo.tokenInfo
-    }
-  }
+      tokenInfo: balanceInfo.tokenInfo,
+    };
+  };
 
   getTVL = async () => {
-    if (!this.isLive()) return { amount: MyNumber.fromEther('0', this.token.decimals), usdValue: 0, tokenInfo: this.token };
+    if (!this.isLive())
+      return {
+        amount: MyNumber.fromEther('0', this.token.decimals),
+        usdValue: 0,
+        tokenInfo: this.token,
+      };
 
     const zTokenInfo = getTokenInfoFromName(this.lpTokenName);
     const bal = await getERC20Balance(zTokenInfo, this.strategyAddress);
-    const priceInfo = await axios.get(`https://api.coinbase.com/v2/prices/${this.token.name}-USDT/spot`)
+    const priceInfo = await axios.get(
+      `https://api.coinbase.com/v2/prices/${this.token.name}-USDT/spot`,
+    );
     const price = Number(priceInfo.data.data.amount);
     return {
       amount: bal.amount,
       usdValue: Number(bal.amount.toEtherStr()) * price,
       tokenInfo: this.token,
-    }
-  }
+    };
+  };
 
   // postSolve() {
   //     const normalYield = this.netYield;
