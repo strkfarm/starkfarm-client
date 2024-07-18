@@ -166,6 +166,7 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
             (parseInt(pool.tvl1_total, 10) * parseFloat(pool.price1)) /
             10 ** pool.decimals1;
 
+          if (tvl0 + tvl1 < 10000) return 0;
           return 365 * ((fees0 + fees1) / (tvl0 + tvl1));
         });
 
