@@ -73,7 +73,7 @@ export function getStrategies() {
     'ETH',
     // ! change this later
     CONSTANTS.CONTRACTS.DeltaNeutralMMSTRKETH,
-    [1, 0.384215, 1, 0.233276, 0.233276], // precomputed factors based on strategy math, last is the excess deposit1 that is happening
+    [1, 0.384215, 1, 0.492308, 0.233276], // precomputed factors based on strategy math, last is the excess deposit1 that is happening
     StrategyLiveStatus.NEW,
     {
       maxTVL: 50000,
@@ -97,7 +97,7 @@ export const strategiesAtom = atom<StrategyInfo[]>((get) => {
   const strategies = getStrategies();
   const allPools = get(allPoolsAtomUnSorted);
   const filteredPools = allPools.filter(
-    (p) => p.protocol.name === 'zkLend' || p.protocol.name === 'Nostra MM',
+    (p) => p.protocol.name === 'zkLend' || p.protocol.name === 'Nostra Money Markets',
   );
 
   for (const s of strategies) {

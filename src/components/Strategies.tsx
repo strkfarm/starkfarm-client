@@ -161,10 +161,9 @@ export default function Strategies() {
                   marginBottom={'5px'}
                   fontWeight={'bold'}
                   alignItems={'center'}
-                >
+                  >
                   <Heading
                     size={{ base: 'sm', md: 'md' }}
-                    marginBottom={'5px'}
                     fontWeight={'bold'}
                   >
                     {strat.name}

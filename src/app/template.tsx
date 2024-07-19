@@ -16,7 +16,7 @@ import * as React from 'react';
 import { RpcProviderOptions, constants } from 'starknet';
 import { ArgentMobileConnector } from 'starknetkit/argentMobile';
 import { InjectedConnector } from 'starknetkit/injected';
-
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import Navbar from '@/components/Navbar';
 import { Toaster } from 'react-hot-toast';
 
