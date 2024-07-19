@@ -268,7 +268,7 @@ const Strategy = () => {
               Behind the scenes
             </Text>
             <Text fontSize={'15px'} marginBottom={'10px'}>
-              This is what happens when you invest $1000 in this strategy:
+              Actions done automatically by the strategy (smart-contract) with an investment of $1000
             </Text>
             <Flex
               color="white"
