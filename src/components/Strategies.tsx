@@ -161,11 +161,8 @@ export default function Strategies() {
                   marginBottom={'5px'}
                   fontWeight={'bold'}
                   alignItems={'center'}
-                  >
-                  <Heading
-                    size={{ base: 'sm', md: 'md' }}
-                    fontWeight={'bold'}
-                  >
+                >
+                  <Heading size={{ base: 'sm', md: 'md' }} fontWeight={'bold'}>
                     {strat.name}
                   </Heading>
                   {strat.liveStatus != StrategyLiveStatus.ACTIVE && (
