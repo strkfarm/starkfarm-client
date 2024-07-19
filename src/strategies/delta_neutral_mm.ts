@@ -171,7 +171,7 @@ export class DeltaNeutralMM extends IStrategy {
     const excessFactor = this.stepAmountFactors[4];
     const amount1 = excessFactor * full_amount;
     const exp1 = amount1 * this.actions[0].pool.apr;
-    const amount2 = this.stepAmountFactors[1] * excessFactor * full_amount;
+    const amount2 = this.stepAmountFactors[1] * amount1;
     const exp2 =
       amount2 * (this.actions[2].pool.apr - this.actions[1].pool.borrow.apr);
     const amount3 = this.stepAmountFactors[3] * amount2;
@@ -187,6 +187,7 @@ export class DeltaNeutralMM extends IStrategy {
     };
     console.log(
       'getLookRepeatYieldAmount exp1',
+      this.id,
       exp1,
       full_amount,
       exp2,
@@ -194,6 +195,7 @@ export class DeltaNeutralMM extends IStrategy {
       this.actions[2],
       this.actions[1],
       exp3,
+      amount1,
       amount3,
     );
     return [...actions, strategyAction];

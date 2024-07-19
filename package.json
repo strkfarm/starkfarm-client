@@ -30,6 +30,7 @@
     "@types/mixpanel-browser": "2.49.0",
     "@types/mustache": "4.2.5",
     "@vercel/analytics": "1.2.2",
+    "@vercel/speed-insights": "^1.0.12",
     "axios": "1.6.7",
     "bignumber.js": "4.0.4",
     "chroma.ts": "1.0.10",
