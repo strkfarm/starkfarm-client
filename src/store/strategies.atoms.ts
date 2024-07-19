@@ -97,7 +97,9 @@ export const strategiesAtom = atom<StrategyInfo[]>((get) => {
   const strategies = getStrategies();
   const allPools = get(allPoolsAtomUnSorted);
   const filteredPools = allPools.filter(
-    (p) => p.protocol.name === 'zkLend' || p.protocol.name === 'Nostra Money Markets',
+    (p) =>
+      p.protocol.name === 'zkLend' ||
+      p.protocol.name === 'Nostra Money Markets',
   );
 
   for (const s of strategies) {
