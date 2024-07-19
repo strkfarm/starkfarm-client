@@ -8,6 +8,7 @@ import JediAtoms, { jedi } from './jedi.store';
 import MySwapAtoms, { mySwap } from './myswap.store';
 import NimboraAtoms, { nimbora } from './nimbora.store';
 import NostraDexAtoms, { nostraDex } from './nostradex.store';
+import NostraDegenAtoms, { nostraDegen } from './nostradegen.store';
 import NostraLendingAtoms, { nostraLending } from './nostralending.store';
 import SithswapAtoms, { sithswap } from './sithswap.store';
 import StarkDefiAtoms, { starkDefi } from './starkdefi.store';
@@ -17,6 +18,7 @@ import ZkLendAtoms, { zkLend } from './zklend.store';
 export enum Category {
   Stable = 'Stable Pools',
   STRK = 'STRK Pools',
+  Degen = 'MetaStable Pools',
   Others = 'Others',
 }
 
@@ -97,6 +99,11 @@ export const PROTOCOLS = [
     atoms: NostraDexAtoms,
   },
   {
+    name: nostraDegen.name,
+    class: nostraDegen,
+    atoms: NostraDegenAtoms,
+  },
+  {
     name: starkDefi.name,
     class: starkDefi,
     atoms: StarkDefiAtoms,
@@ -137,6 +144,30 @@ export const StrkDexIncentivesAtom = atomWithQuery((get) => ({
     return JSON.parse(data);
   },
 }));
+
+export const StrkIncentivesAtom = atomWithQuery((get) => ({
+  queryKey: get(StrkIncentivesQueryKeyAtom),
+  queryFn: async ({ queryKey }) => {
+    const res = await fetch(CONSTANTS.NOSTRA_DEGEN_INCENTIVE_URL);
+    let data = await res.text();
+    data = data.replaceAll('NaN', '0');
+    const parsedData = JSON.parse(data);
+
+    if (queryKey[1] === 'isNostraDex') {
+      // Filter the data to include only the specific nostra dex pools we are tracking
+      return Object.values(parsedData).filter((item: any) => {
+        const id = item.id;
+        return id === 'ETH-USDC' || id === 'STRK-ETH' || id === 'STRK-USDC';
+      });
+    }
+    return parsedData;
+  },
+}));
+
+export const StrkIncentivesQueryKeyAtom = atom([
+  'strk_incentives',
+  'isNostraDegen',
+]);
 
 export const StrkLendingIncentivesAtom = atomWithQuery((get) => ({
   queryKey: ['strk_lending_incentives'],

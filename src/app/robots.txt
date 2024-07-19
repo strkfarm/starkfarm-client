@@ -1,0 +1,3 @@
+User-agent: *
+allow: /
+Sitemap: https://www.strkfarm.xyz/sitemap.xml

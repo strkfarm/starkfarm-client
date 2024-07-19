@@ -104,3 +104,25 @@ body {
   border-bottom: 1px solid var(--chakra-colors-bg);
   padding: 3px;
 }
+
+
+.embla {
+  width: 95%;
+  margin: auto;
+  overflow: hidden;
+  margin-top: -28px;
+  margin-bottom: 16px;
+}
+
+.embla__container {
+  display: flex;
+  align-items: center;
+  backface-visibility: hidden;
+  touch-action: pan-y;
+  width: 100%;
+}
+
+.embla__slide {
+  width: 95%;
+  flex: 0 0 100%;
+}

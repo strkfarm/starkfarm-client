@@ -4,7 +4,7 @@ import { Category, PoolInfo } from '@/store/pools';
 import { zkLend } from '@/store/zklend.store';
 import MyNumber from '@/utils/MyNumber';
 import { Atom, atom } from 'jotai';
-import { AtomWithQueryResult } from 'jotai-tanstack-query';
+import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { Call, ProviderInterface } from 'starknet';
 
 interface Step {
@@ -57,9 +57,10 @@ export enum StrategyStatus {
 }
 
 export enum StrategyLiveStatus {
-  ACTIVE = 0,
-  COMING_SOON = 1,
-  RETIRED = 2,
+  ACTIVE = 'Active',
+  NEW = 'New',
+  COMING_SOON = 'Coming Soon',
+  RETIRED = 'Retired',
 }
 
 export interface IStrategyActionHook {
@@ -68,10 +69,22 @@ export interface IStrategyActionHook {
   balanceAtom: Atom<AtomWithQueryResult<BalanceResult, Error>>;
 }
 
+export interface IStrategySettings {
+  maxTVL: number;
+}
+
+export interface AmountInfo {
+  amount: MyNumber;
+  usdValue: number;
+  tokenInfo: TokenInfo;
+}
+
 export class IStrategyProps {
   readonly liveStatus: StrategyLiveStatus;
   readonly id: string;
+  readonly name: string;
   readonly description: string;
+  readonly settings: IStrategySettings;
   exchanges: IDapp<any>[] = [];
 
   steps: Step[] = [];
@@ -86,6 +99,7 @@ export class IStrategyProps {
 
   balEnabled = atom(false);
   readonly balanceAtom: Atom<AtomWithQueryResult<BalanceResult, Error>>;
+  readonly tvlAtom: Atom<AtomWithQueryResult<AmountInfo, Error>>;
 
   risks: string[] = [
     'The strategy involves exposure to smart contracts, which inherently carry risks like hacks, albeit relatively low',
@@ -108,20 +122,48 @@ export class IStrategyProps {
     return [];
   };
 
+  getTVL = async (): Promise<AmountInfo> => {
+    throw new Error('getTVL: Not implemented');
+  };
+
+  getUserTVL = async (user: string): Promise<AmountInfo> => {
+    throw new Error('getTVL: Not implemented');
+  };
+
+  isLive() {
+    return (
+      this.liveStatus == StrategyLiveStatus.ACTIVE ||
+      this.liveStatus == StrategyLiveStatus.NEW
+    );
+  }
+
   constructor(
     id: string,
+    name: string,
     description: string,
     rewardTokens: { logo: string }[],
     holdingTokens: (TokenInfo | NFTInfo)[],
     liveStatus: StrategyLiveStatus,
+    settings: IStrategySettings,
   ) {
     this.id = id;
+    this.name = name;
     this.description = description;
     this.rewardTokens = rewardTokens;
     this.holdingTokens = holdingTokens;
     console.log('calling getBalanceAtom', id, holdingTokens[0]);
     this.balanceAtom = getBalanceAtom(holdingTokens[0], this.balEnabled);
     this.liveStatus = liveStatus;
+    this.settings = settings;
+    this.tvlAtom = atomWithQuery((get) => {
+      return {
+        queryKey: ['tvl', this.id],
+        queryFn: async ({ queryKey }: any): Promise<AmountInfo> => {
+          return this.getTVL();
+        },
+        refetchInterval: 15000,
+      };
+    });
   }
 }
 
@@ -131,12 +173,22 @@ export class IStrategy extends IStrategyProps {
   constructor(
     id: string,
     tag: string,
+    name: string,
     description: string,
     rewardTokens: { logo: string }[],
     holdingTokens: (TokenInfo | NFTInfo)[],
     liveStatus = StrategyLiveStatus.ACTIVE,
+    settings: IStrategySettings,
   ) {
-    super(id, description, rewardTokens, holdingTokens, liveStatus);
+    super(
+      id,
+      name,
+      description,
+      rewardTokens,
+      holdingTokens,
+      liveStatus,
+      settings,
+    );
     this.tag = tag;
   }
 

@@ -27,6 +27,7 @@ import { useEffect } from 'react';
 import { lastWalletAtom } from '@/store/utils.atoms';
 import { useAccount, useConnect, useDisconnect } from '@starknet-react/core';
 import { CONNECTOR_NAMES, MYCONNECTORS } from '@/app/template';
+import { isMobile } from 'react-device-detect';
 
 export default function Navbar() {
   const { address, connector } = useAccount();
@@ -203,53 +204,55 @@ export default function Navbar() {
               }
             />
           </Link>
-          <Menu>
-            <MenuButton
-              as={Button}
-              rightIcon={address ? <ChevronDownIcon /> : <></>}
-              iconSpacing={{ base: '1px', sm: '5px' }}
-              bgColor={'purple'}
-              color="white"
-              borderColor={'purple'}
-              borderWidth="1px"
-              _hover={{
-                bg: 'bg',
-                borderColor: 'purple',
-                borderWidth: '1px',
-                color: 'purple',
-              }}
-              _active={{
-                bg: 'bg',
-                borderColor: 'purple',
-                color: 'purple',
-              }}
-              marginLeft={'10px'}
-              display={{ base: 'flex' }}
-              height={{ base: '2rem', sm: '2.5rem' }}
-              my={{ base: 'auto', sm: 'initial' }}
-              paddingX={{ base: '0.5rem', sm: '1rem' }}
-              fontSize={{ base: '0.8rem', sm: '1rem' }}
-              onClick={address ? undefined : connectWallet}
-              size="xs"
-            >
-              <Center>{address ? shortAddress(address) : 'Connect'}</Center>
-            </MenuButton>
-            <MenuList {...MyMenuListProps}>
-              {address && (
-                <MenuItem
-                  {...MyMenuItemProps}
-                  onClick={() => {
-                    disconnectAsync().then((data) => {
-                      console.log('wallet disconnected');
-                      setLastWallet(null);
-                    });
-                  }}
-                >
-                  Disconnect
-                </MenuItem>
-              )}
-            </MenuList>
-          </Menu>
+          {!isMobile && (
+            <Menu>
+              <MenuButton
+                as={Button}
+                rightIcon={address ? <ChevronDownIcon /> : <></>}
+                iconSpacing={{ base: '1px', sm: '5px' }}
+                bgColor={'purple'}
+                color="white"
+                borderColor={'purple'}
+                borderWidth="1px"
+                _hover={{
+                  bg: 'bg',
+                  borderColor: 'purple',
+                  borderWidth: '1px',
+                  color: 'purple',
+                }}
+                _active={{
+                  bg: 'bg',
+                  borderColor: 'purple',
+                  color: 'purple',
+                }}
+                marginLeft={'10px'}
+                display={{ base: 'flex' }}
+                height={{ base: '2rem', sm: '2.5rem' }}
+                my={{ base: 'auto', sm: 'initial' }}
+                paddingX={{ base: '0.5rem', sm: '1rem' }}
+                fontSize={{ base: '0.8rem', sm: '1rem' }}
+                onClick={address ? undefined : connectWallet}
+                size="xs"
+              >
+                <Center>{address ? shortAddress(address) : 'Connect'}</Center>
+              </MenuButton>
+              <MenuList {...MyMenuListProps}>
+                {address && (
+                  <MenuItem
+                    {...MyMenuItemProps}
+                    onClick={() => {
+                      disconnectAsync().then((data) => {
+                        console.log('wallet disconnected');
+                        setLastWallet(null);
+                      });
+                    }}
+                  >
+                    Disconnect
+                  </MenuItem>
+                )}
+              </MenuList>
+            </Menu>
+          )}
         </Flex>
       </Box>
     </Container>

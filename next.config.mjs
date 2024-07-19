@@ -1,11 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // output: 'export',
-  compiler: {
-    removeConsole: {
-      exclude: ['error'],
+    compiler: {
+      removeConsole: {
+        exclude: ['error'],
+      },
     },
-  },
   async rewrites() {
     return [
       {
@@ -33,7 +33,15 @@ const nextConfig = {
         source: '/nostra/:path*',
         destination: 'https://us-east-2.aws.data.mongodb-api.com/:path*',
       },
+      {
+        source: '/myswap/:path*',
+        destination: 'https://myswap-cl-charts.s3.amazonaws.com/:path*',
+      },
     ];
+  },
+  webpack(config, options) {
+    if (options.isServer) config.devtool = 'source-map';
+    return config;
   },
 };
 

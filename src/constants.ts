@@ -13,6 +13,7 @@ const LOGOS = {
 export type TokenName = 'USDT' | 'USDC' | 'ETH' | 'STRK' | 'WBTC' | 'DAI';
 const CONSTANTS = {
   DEX_INCENTIVE_URL: '/strk-incentives/fetchFile?file=strk_grant.json',
+  NOSTRA_DEGEN_INCENTIVE_URL: 'https://api.nostra.finance/query/pool_aprs',
   LENDING_INCENTIVES_URL:
     '/strk-incentives/fetchFile?file=prod-api/lending/lending_strk_grant.json',
   LOGOS,
@@ -35,6 +36,10 @@ const CONSTANTS = {
   HAIKO: {
     BASE_APR_API: 'haiko/markets?network=mainnet',
   },
+  MY_SWAP: {
+    POOLS_API: '/myswap/data/pools/all.json',
+    BASE_APR_API: '/myswap/data/pools',
+  },
   CONTRACTS: {
     Master: '0x50314707690c31597849ed66a494fb4279dc060f8805f21593f52906846e28e',
     AutoStrkFarm:
@@ -43,6 +48,8 @@ const CONSTANTS = {
       '0x16912b22d5696e95ffde888ede4bd69fbbc60c5f873082857a47c543172694f',
     DeltaNeutralMMUSDCETH:
       '0x04937b58e05a3a2477402d1f74e66686f58a61a5070fcc6f694fb9a0b3bae422',
+    DeltaNeutralMMSTRKETH:
+      '0x20d5fc4c9df4f943ebb36078e703369c04176ed00accf290e8295b659d2cea6',
   },
   MOBILE_MSG: 'Desktop/Tablet only',
 };
@@ -145,6 +152,14 @@ export const NFTS: NFTInfo[] = [
     logo: CONSTANTS.LOGOS.USDC,
     config: {
       mainTokenName: 'USDC',
+    },
+  },
+  {
+    name: 'frmDNMMSTRKETH',
+    address: CONSTANTS.CONTRACTS.DeltaNeutralMMSTRKETH,
+    logo: CONSTANTS.LOGOS.STRK,
+    config: {
+      mainTokenName: 'STRK',
     },
   },
 ];
