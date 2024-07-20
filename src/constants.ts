@@ -30,8 +30,7 @@ const CONSTANTS = {
   EKUBO: {
     CLAIMS_URL:
       '/ekubo/airdrops/{{address}}?token=0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
-    BASE_APR_API: '/ekubo/pair',
-    BASE_PRICE_API: '/ekubo/price',
+    BASE_API: '/ekubo',
   },
   HAIKO: {
     BASE_APR_API: 'haiko/markets?network=mainnet',
