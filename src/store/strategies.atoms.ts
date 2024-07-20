@@ -47,7 +47,7 @@ export function getStrategies() {
     'ETH',
     CONSTANTS.CONTRACTS.DeltaNeutralMMUSDCETH,
     [1, 0.608, 1, 0.552509, 0.552509], // precomputed factors based on strategy math
-    StrategyLiveStatus.COMING_SOON,
+    StrategyLiveStatus.NEW,
     {
       maxTVL: 5000,
     },
