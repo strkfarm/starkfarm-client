@@ -10,7 +10,8 @@
     "lint:check": "eslint --config .eslintrc.json .",
     "lint:fix": "eslint --config .eslintrc.json . --fix",
     "format:check": "prettier --check \"**/*.{ts,tsx,json}\"",
-    "format:fix": "prettier --write \"**/*.{ts,tsx,json}\""
+    "format:fix": "prettier --write \"**/*.{ts,tsx,json}\"",
+    "postinstall": "husky install"
   },
   "files": [
     "CHANGELOG.md",
@@ -72,6 +73,7 @@
     "eslint": "8",
     "eslint-config-next": "14.1.0",
     "eslint-plugin-unused-imports": "3.1.0",
+    "husky": "^9.1.1",
     "postcss": "8",
     "prettier": "3.3.3",
     "tailwindcss": "3.3.0",
