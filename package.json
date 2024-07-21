@@ -11,7 +11,7 @@
     "lint:fix": "eslint --config .eslintrc.json . --fix",
     "format:check": "prettier --check \"**/*.{ts,tsx,json}\"",
     "format:fix": "prettier --write \"**/*.{ts,tsx,json}\"",
-    "postinstall": "husky install"
+    "prepare": "husky"
   },
   "files": [
     "CHANGELOG.md",
