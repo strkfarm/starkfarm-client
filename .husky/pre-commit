@@ -1,1 +1,2 @@
-npm run lint:fix
+yarn run lint:fix
+yarn run format:fix
