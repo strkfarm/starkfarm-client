@@ -14,6 +14,7 @@ import SithswapAtoms, { sithswap } from './sithswap.store';
 import StarkDefiAtoms, { starkDefi } from './starkdefi.store';
 import TenkSwapAtoms, { tenkswap } from './tenkswap.store';
 import ZkLendAtoms, { zkLend } from './zklend.store';
+import CarmineOptionsAtoms, { carmineOptions} from './carmineOptions.store';
 
 export enum Category {
   Stable = 'Stable Pools',
@@ -132,6 +133,11 @@ export const PROTOCOLS = [
     name: nimbora.name,
     class: nimbora,
     atoms: NimboraAtoms,
+  },
+  {
+    name: carmineOptions.name,
+    class: carmineOptions,
+    atoms: CarmineOptionsAtoms,
   },
 ];
 
