@@ -91,6 +91,7 @@ Thanks goes to these wonderful people.
     <tr>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Ugo-X"><img src="https://avatars.githubusercontent.com/u/133219527?v=4?s=100" width="100px;" alt="Ugonna Paul Dike"/><br /><sub><b>Ugonna Paul Dike</b></sub></a><br /><a href="#code-Ugo-X" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://fishonsnote.medium.com/"><img src="https://avatars.githubusercontent.com/u/43862685?v=4?s=100" width="100px;" alt="Fishon Amos"/><br /><sub><b>Fishon Amos</b></sub></a><br /><a href="#code-fishonamos" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/ooochoche"><img src="https://avatars.githubusercontent.com/u/101812348?v=4?s=100" width="100px;" alt="Benedict Ejembi"/><br /><sub><b>Benedict Ejembi</b></sub></a><br /><a href="#infra-ooochoche" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
     </tr>
   </tbody>
 </table>
