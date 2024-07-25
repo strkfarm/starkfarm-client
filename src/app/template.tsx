@@ -18,6 +18,7 @@ import { ArgentMobileConnector } from 'starknetkit/argentMobile';
 import { InjectedConnector } from 'starknetkit/injected';
 import Navbar from '@/components/Navbar';
 import { Toaster } from 'react-hot-toast';
+import { usePathname } from 'next/navigation';
 
 // ! make page view more dynamic
 mixpanel.init('118f29da6a372f0ccb6f541079cad56b');
@@ -88,6 +89,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
       return args;
     },
   });
+  const pathname = usePathname();
 
   function getIconNode(icon: typeof import('*.svg'), alt: string) {
     return (
@@ -107,7 +109,10 @@ export default function Template({ children }: { children: React.ReactNode }) {
         <ChakraBaseProvider theme={theme}>
           <Flex minHeight={'100vh'} bgColor={'bg'}>
             <Container width={'100%'} padding="0px" paddingTop="100px">
-              <Navbar />
+              <Navbar
+                hideTg={pathname.includes('slinks')}
+                forceShowConnect={pathname.includes('slinks')}
+              />
               <React.Suspense>{children}</React.Suspense>
               <Toaster />
             </Container>

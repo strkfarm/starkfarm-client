@@ -23,7 +23,10 @@ export default function RootLayout({
           name="twitter:description"
           content="Find and invest in high yield pools. STRKFarm is the best yield aggregator on Starknet."
         />
-        <meta name="twitter:player" content="https://beta.strkfarm.xyz/slinks" />
+        <meta
+          name="twitter:player"
+          content="https://beta.strkfarm.xyz/slinks"
+        />
         <meta name="twitter:player:width" content="360" />
         <meta name="twitter:player:height" content="560" />
         <meta
