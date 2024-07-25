@@ -29,7 +29,12 @@ import { useAccount, useConnect, useDisconnect } from '@starknet-react/core';
 import { CONNECTOR_NAMES, MYCONNECTORS } from '@/app/template';
 import { isMobile } from 'react-device-detect';
 
-export default function Navbar() {
+interface NavbarProps {
+  hideTg?: boolean;
+  forceShowConnect?: boolean;
+}
+
+export default function Navbar(props: NavbarProps) {
   const { address, connector } = useAccount();
   const { connect, connectors } = useConnect();
   const { disconnectAsync } = useDisconnect();
@@ -161,7 +166,7 @@ export default function Navbar() {
               Claims
             </Button>
           </Link> */}
-          <Link href={CONSTANTS.COMMUNITY_TG} isExternal>
+          {!props.hideTg && <Link href={CONSTANTS.COMMUNITY_TG} isExternal>
             <Button
               margin="0 0 0 auto"
               borderColor="color2"
@@ -203,8 +208,8 @@ export default function Navbar() {
                 />
               }
             />
-          </Link>
-          {!isMobile && (
+          </Link>}
+          {(!isMobile || props.forceShowConnect) && (
             <Menu>
               <MenuButton
                 as={Button}
