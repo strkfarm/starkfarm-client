@@ -17,20 +17,6 @@ const metadata: Metadata = {
   title: 'STRKFarm | Yield aggregator on Starknet',
   description:
     'Find and invest in high yield pools. STRKFarm is the best yield aggregator on Starknet.',
-  openGraph: {
-    title: 'STRKFarm | Yield aggregator on Starknet',
-    description:
-      'Find and invest in high yield pools. STRKFarm is the best yield aggregator on Starknet.',
-    images: ['https://static-assets-8zct.onrender.com/strkfarm/preview.png'],
-  },
-  twitter: {
-    title: 'STRKFarm | Best Yields on Starknet',
-    description:
-      'Find and invest in high yield pools. STRKFarm is the best yield aggregator on Starknet.',
-    card: 'player',
-    images: ['https://static-assets-8zct.onrender.com/strkfarm/preview.png'],
-    site: '@strkfarm',
-  },
 };
 
 function getCardSimple(strat: StrategyInfo) {
@@ -51,7 +37,7 @@ function getCardSimple(strat: StrategyInfo) {
           />
           {strat.name}{' '}
         </Text>
-        <Text color='cyan'>{strat.netYield.toFixed(2)}%</Text>
+        <Text color="cyan">{strat.netYield.toFixed(2)}%</Text>
         <Box>
           <Text fontSize={'13px'}>Bal: 10 STRK</Text>
         </Box>
@@ -66,7 +52,13 @@ function getCardSimple(strat: StrategyInfo) {
           marginRight={'10px'}
           placeholder="Amount"
         />
-        <Button size="sm" bg="purple" color="white" float={'right'} padding={'5px 10px'}>
+        <Button
+          size="sm"
+          bg="purple"
+          color="white"
+          float={'right'}
+          padding={'5px 10px'}
+        >
           Deposit
         </Button>
       </Flex>
