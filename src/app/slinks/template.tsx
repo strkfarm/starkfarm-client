@@ -107,9 +107,9 @@ export default function Template({ children }: { children: React.ReactNode }) {
         <ChakraBaseProvider theme={theme}>
           <Flex minHeight={'100vh'} bgColor={'bg'}>
             <Container width={'100%'} padding="0px" paddingTop="100px">
-                <Navbar hideTg={true} forceShowConnect={true}/>
-                <React.Suspense>{children}</React.Suspense>
-                <Toaster />
+              <Navbar hideTg={true} forceShowConnect={true} />
+              <React.Suspense>{children}</React.Suspense>
+              <Toaster />
             </Container>
           </Flex>
         </ChakraBaseProvider>

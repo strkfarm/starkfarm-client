@@ -166,49 +166,51 @@ export default function Navbar(props: NavbarProps) {
               Claims
             </Button>
           </Link> */}
-          {!props.hideTg && <Link href={CONSTANTS.COMMUNITY_TG} isExternal>
-            <Button
-              margin="0 0 0 auto"
-              borderColor="color2"
-              color="color2"
-              variant="outline"
-              rightIcon={
-                <Avatar
-                  size="sm"
-                  bg="highlight"
-                  color="color2"
-                  name="T G"
-                  src={tg.src}
-                />
-              }
-              _hover={{
-                bg: 'color2_50p',
-              }}
-              display={{ base: 'none !important', md: 'flex !important' }}
-              className="glow-button"
-            >
-              Join Telegram
-            </Button>
-            <IconButton
-              aria-label="tg"
-              variant={'ghost'}
-              borderColor={'color2'}
-              display={{ base: 'block', md: 'none' }}
-              icon={
-                <Avatar
-                  size="sm"
-                  bg="highlight"
-                  className="glow-button"
-                  name="T G"
-                  color="color2"
-                  src={tg.src}
-                  _hover={{
-                    bg: 'color2_50p',
-                  }}
-                />
-              }
-            />
-          </Link>}
+          {!props.hideTg && (
+            <Link href={CONSTANTS.COMMUNITY_TG} isExternal>
+              <Button
+                margin="0 0 0 auto"
+                borderColor="color2"
+                color="color2"
+                variant="outline"
+                rightIcon={
+                  <Avatar
+                    size="sm"
+                    bg="highlight"
+                    color="color2"
+                    name="T G"
+                    src={tg.src}
+                  />
+                }
+                _hover={{
+                  bg: 'color2_50p',
+                }}
+                display={{ base: 'none !important', md: 'flex !important' }}
+                className="glow-button"
+              >
+                Join Telegram
+              </Button>
+              <IconButton
+                aria-label="tg"
+                variant={'ghost'}
+                borderColor={'color2'}
+                display={{ base: 'block', md: 'none' }}
+                icon={
+                  <Avatar
+                    size="sm"
+                    bg="highlight"
+                    className="glow-button"
+                    name="T G"
+                    color="color2"
+                    src={tg.src}
+                    _hover={{
+                      bg: 'color2_50p',
+                    }}
+                  />
+                }
+              />
+            </Link>
+          )}
           {(!isMobile || props.forceShowConnect) && (
             <Menu>
               <MenuButton
