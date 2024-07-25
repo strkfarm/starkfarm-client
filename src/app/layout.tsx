@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     title: 'STRKFarm | Yield aggregator on Starknet',
     description:
       'Find and invest in high yield pools. STRKFarm is the best yield aggregator on Starknet.',
-    card: 'summary_large_image',
+    card: 'player',
     images: ['https://static-assets-8zct.onrender.com/strkfarm/preview.png'],
   },
 };
