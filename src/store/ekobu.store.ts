@@ -101,8 +101,8 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
 
   _computePoolsInfo(data: any) {
     try {
-      const myData = data[this.incentiveDataKey];
-      console.log('ekubo', myData);
+      const myData = data[0][this.incentiveDataKey];
+      const baseInfo = data[1];
       if (!myData) return [];
       const pools: PoolInfo[] = [];
 
@@ -150,6 +150,18 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
               apr: 0,
             },
           };
+
+          const { rewardAPY } = this.getBaseAPY(poolInfo, baseInfo);
+          if (rewardAPY) {
+            poolInfo.apr = rewardAPY;
+            poolInfo.aprSplits = [
+              {
+                apr: rewardAPY,
+                title: 'STRK rewards',
+                description: 'Starknet DeFi Spring incentives',
+              },
+            ];
+          }
           pools.push(poolInfo);
         });
 
@@ -177,6 +189,7 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
   }
 
   getBaseAPY(p: PoolInfo, data: AtomWithQueryResult<EkuboBaseAprDoc, Error>) {
+    let rewardAPY: number = 0;
     let baseAPY: number | 'Err' = 'Err';
     let splitApr: APRSplit | null = null;
     const metadata: PoolMetadata | null = null;
@@ -270,6 +283,7 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
       const pool = pools.find((p) => p.pool === poolName);
 
       baseAPY = pool ? pool.apyBase : 0;
+      rewardAPY = pool && pool.apyReward ? pool.apyReward : 0;
 
       splitApr = {
         apr: baseAPY,
@@ -280,6 +294,7 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
 
     return {
       baseAPY,
+      rewardAPY,
       splitApr,
       metadata,
     };
@@ -376,7 +391,7 @@ const EkuboAtoms: ProtocolAtoms = {
     if (!EkuboAtoms.baseAPRs) return empty;
     const baseInfo = get(EkuboAtoms.baseAPRs);
     if (poolsInfo.data) {
-      const pools = ekubo._computePoolsInfo(poolsInfo.data);
+      const pools = ekubo._computePoolsInfo([poolsInfo.data, baseInfo]);
       return ekubo.addBaseAPYs(pools, baseInfo);
     }
 
