@@ -94,7 +94,6 @@ export default function Deposit(props: DepositProps) {
     return balData.data?.amount || MyNumber.fromZero();
   }, [balData]);
   // const { balance, isLoading, isError } = useERC20Balance(selectedMarket);
-
   const maxAmount: MyNumber = useMemo(() => {
     const currentTVl = tvlInfo.data?.amount || MyNumber.fromZero();
     const maxAllowed =
@@ -114,7 +113,6 @@ export default function Deposit(props: DepositProps) {
         MyNumber.fromEther('0.001', selectedMarket.decimals),
       );
     }
-
     return MyNumber.min(reducedBalance, adjustedMaxAllowed);
   }, [balance, props.strategy, selectedMarket]);
 
