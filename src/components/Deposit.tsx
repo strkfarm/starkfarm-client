@@ -90,20 +90,26 @@ export default function Deposit(props: DepositProps) {
     actions.find((a) => a.tokenInfo.name === selectedMarket.name)
       ?.balanceAtom || DUMMY_BAL_ATOM,
   );
+  
   const balance = useMemo(() => {
     return balData.data?.amount || MyNumber.fromZero();
   }, [balData]);
-  // const { balance, isLoading, isError } = useERC20Balance(selectedMarket);
-
   const maxAmount: MyNumber = useMemo(() => {
-    const currentTVl = tvlInfo.data?.amount || MyNumber.fromZero();
+    const currentTVL = tvlInfo.data?.amount || MyNumber.fromZero();
     const maxAllowed =
-      props.strategy.settings.maxTVL - Number(currentTVl.toEtherStr());
+      props.strategy.settings.maxTVL - Number(currentTVL.toEtherStr());
+    let balanceAfterGasReserve = balance;
+    if (selectedMarket.name === 'STRK') {
+        balanceAfterGasReserve = balance.subtract(MyNumber.fromEther('1.5', selectedMarket.decimals));
+    } else if (selectedMarket.name === 'ETH') {
+        balanceAfterGasReserve = balance.subtract(MyNumber.fromEther('0.001', selectedMarket.decimals));
+    }
+
     return MyNumber.min(
-      balance,
-      MyNumber.fromEther(maxAllowed.toFixed(6), selectedMarket.decimals),
+      balanceAfterGasReserve,
+      MyNumber.fromEther(maxAllowed.toFixed(6), selectedMarket.decimals)
     );
-  }, [balance, props.strategy, selectedMarket]);
+}, [balance, props.strategy, selectedMarket, tvlInfo]);
 
   function BalanceComponent(props: {
     token: TokenInfo;
