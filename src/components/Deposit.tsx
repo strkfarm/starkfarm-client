@@ -97,18 +97,26 @@ export default function Deposit(props: DepositProps) {
 
   const maxAmount: MyNumber = useMemo(() => {
     const currentTVl = tvlInfo.data?.amount || MyNumber.fromZero();
-    const maxAllowed = props.strategy.settings.maxTVL - Number(currentTVl.toEtherStr());
-    const adjustedMaxAllowed = MyNumber.fromEther(maxAllowed.toFixed(6), selectedMarket.decimals);
+    const maxAllowed =
+      props.strategy.settings.maxTVL - Number(currentTVl.toEtherStr());
+    const adjustedMaxAllowed = MyNumber.fromEther(
+      maxAllowed.toFixed(6),
+      selectedMarket.decimals,
+    );
     let reducedBalance = balance;
-    
+
     if (selectedMarket.name === 'STRK') {
-      reducedBalance = balance.subtract(MyNumber.fromEther('1.5', selectedMarket.decimals));
+      reducedBalance = balance.subtract(
+        MyNumber.fromEther('1.5', selectedMarket.decimals),
+      );
     } else if (selectedMarket.name === 'ETH') {
-      reducedBalance = balance.subtract(MyNumber.fromEther('0.001', selectedMarket.decimals));
+      reducedBalance = balance.subtract(
+        MyNumber.fromEther('0.001', selectedMarket.decimals),
+      );
     }
-  
+
     return MyNumber.min(reducedBalance, adjustedMaxAllowed);
-  }, [balance, props.strategy, selectedMarket]);  
+  }, [balance, props.strategy, selectedMarket]);
 
   function BalanceComponent(props: {
     token: TokenInfo;

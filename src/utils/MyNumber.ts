@@ -85,7 +85,10 @@ export default class MyNumber {
       }
     }
     const bn = BigNumber.min(a.bigNumber, b.bigNumber);
-    return new MyNumber(bn.toString(), a.decimals > b.decimals ? a.decimals : b.decimals);
+    return new MyNumber(
+      bn.toString(),
+      a.decimals > b.decimals ? a.decimals : b.decimals,
+    );
   }
 
   [customInspectSymbol](depth: any, inspectOptions: any, inspect: any) {
