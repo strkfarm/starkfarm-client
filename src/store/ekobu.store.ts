@@ -1,6 +1,6 @@
 'use client';
 
-import CONSTANTS, { TOKENS, TokenName } from '@/constants';
+import CONSTANTS, { TokenName } from '@/constants';
 import {
   APRSplit,
   Category,
@@ -12,53 +12,85 @@ import {
 } from './pools';
 import { atom } from 'jotai';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
-import { TokenInfo } from '@/strategies/IStrategy';
 import { IDapp } from './IDapp.store';
 const fetcher = (...args: any[]) => {
   return fetch(args[0], args[1]).then((res) => res.json());
 };
 
 interface EkuboBaseAprDoc {
-  [key: string]: Pool[];
+  tokens: Token[];
+  defiSpringData: DefiSpringData;
+  pairData: PairData;
+  pricesETH: PricesOfToken;
+  pricesSTRK: PricesOfToken;
+  pricesUSDC: PricesOfToken;
+  priceOfStrk: PriceOfToken;
+  priceOfEth: PriceOfToken;
 }
 
-interface TokenPrice {
+type Token = {
+  name: string;
+  symbol: string;
+  decimals: number;
+  l2_token_address: string;
+  sort_order: number;
+  total_supply: number;
+  hidden?: boolean;
+  logo_url: string;
+};
+
+type DefiSpringData = {
+  strkPrice: number;
+  totalStrk: number;
+  pairs: [
+    {
+      token0: Token;
+      token1: Token;
+      allocations: [
+        {
+          date: string;
+          allocation: number;
+          thirty_day_realized_volatility: number;
+        },
+      ];
+      currentApr: number;
+      volatilityInTicks: number;
+    },
+  ];
+};
+
+type PairData = {
+  topPairs: [
+    {
+      token0: string;
+      token1: string;
+      volume0_24h: string;
+      volume1_24h: string;
+      fees0_24h: string;
+      fees1_24h: string;
+      tvl0_total: string;
+      tvl1_total: string;
+      tvl0_delta_24h: string;
+      tvl1_delta_24h: string;
+    },
+  ];
+};
+
+type PricesOfToken = {
+  timestamp: number;
+  prices: [
+    {
+      token: string;
+      price: string;
+      k_volume: string;
+    },
+  ];
+};
+
+type PriceOfToken = {
   timestamp: string;
   price: string;
-}
-
-interface Pool {
-  fee: string;
-  tick_spacing: number;
-  extension: string;
-  volume0_24h: string;
-  volume1_24h: string;
-  fees0_24h: string;
-  fees1_24h: string;
-  tvl0_total: string;
-  tvl1_total: string;
-  tvl0_delta_24h: string;
-  tvl1_delta_24h: string;
-  price0: string;
-  price1: string;
-  decimals0: number;
-  decimals1: number;
-}
-
-interface PoolsData {
-  topPools: Pool[];
-}
-
-type IndexedTokenPrices = Record<string, TokenPrice>;
-type IndexedPools = Record<string, Pool[]>;
-
-const POOL_NAMES: string[] = ['STRK/USDC', 'STRK/ETH', 'ETH/USDC', 'USDC/USDT'];
-const PRICE_PAIRS: string[] = [
-  'STRK/USDC',
-  'ETH/USDC',
-  'USDC/USDC',
-  'USDT/USDC',
-];
+};
 
 export class Ekubo extends IDapp<EkuboBaseAprDoc> {
   name = 'Ekubo';
@@ -69,7 +101,8 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
 
   _computePoolsInfo(data: any) {
     try {
-      const myData = data[this.incentiveDataKey];
+      const myData = data[0][this.incentiveDataKey];
+      const baseInfo = data[1];
       if (!myData) return [];
       const pools: PoolInfo[] = [];
 
@@ -117,6 +150,18 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
               apr: 0,
             },
           };
+
+          const { rewardAPY } = this.getBaseAPY(poolInfo, baseInfo);
+          if (rewardAPY) {
+            poolInfo.apr = rewardAPY;
+            poolInfo.aprSplits = [
+              {
+                apr: rewardAPY,
+                title: 'STRK rewards',
+                description: 'Starknet DeFi Spring incentives',
+              },
+            ];
+          }
           pools.push(poolInfo);
         });
 
@@ -144,36 +189,101 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
   }
 
   getBaseAPY(p: PoolInfo, data: AtomWithQueryResult<EkuboBaseAprDoc, Error>) {
+    let rewardAPY: number = 0;
     let baseAPY: number | 'Err' = 'Err';
     let splitApr: APRSplit | null = null;
     const metadata: PoolMetadata | null = null;
+
     if (data.isSuccess) {
       const poolName = p.pool.name;
-      const pools: Pool[] = data.data[poolName];
 
-      if (pools.length) {
-        const baseAPRs: number[] = pools.map((pool) => {
-          const fees0 =
-            (parseInt(pool.fees0_24h, 10) * parseFloat(pool.price0)) /
-            10 ** pool.decimals0;
-          const fees1 =
-            (parseInt(pool.fees1_24h, 10) * parseFloat(pool.price1)) /
-            10 ** pool.decimals1;
-          const tvl0 =
-            (parseInt(pool.tvl0_total, 10) * parseFloat(pool.price0)) /
-            10 ** pool.decimals0;
-          const tvl1 =
-            (parseInt(pool.tvl1_total, 10) * parseFloat(pool.price1)) /
-            10 ** pool.decimals1;
+      const {
+        tokens,
+        defiSpringData,
+        pairData,
+        pricesETH,
+        pricesSTRK,
+        pricesUSDC,
+        priceOfStrk,
+        priceOfEth,
+      } = data.data;
 
-          if (tvl0 + tvl1 < 10000) return 0;
-          return 365 * ((fees0 + fees1) / (tvl0 + tvl1));
-        });
+      const strkToken = tokens.find((t) => t.symbol === 'STRK');
 
-        baseAPY = Math.max(...baseAPRs);
-      } else {
-        baseAPY = 0;
-      }
+      const pools = pairData.topPairs
+        .map((p) => {
+          const t0 = BigInt(p.token0);
+          const t1 = BigInt(p.token1);
+          const token0 = tokens.find((t) => BigInt(t.l2_token_address) === t0);
+          if (!token0 || token0.hidden) return;
+          const token1 = tokens.find((t) => BigInt(t.l2_token_address) === t1);
+          if (!token1 || token1.hidden) return;
+
+          const springPair = defiSpringData.pairs.find(
+            (pair) =>
+              BigInt(pair.token0.l2_token_address) === t0 &&
+              BigInt(pair.token1.l2_token_address) === t1,
+          );
+
+          const price0 =
+            token0.symbol === 'USDC'
+              ? 1
+              : getPrice({
+                  t: t0,
+                  pricesETH,
+                  pricesUSDC,
+                  pricesSTRK,
+                  priceOfEth,
+                  priceOfStrk,
+                });
+          const price1 =
+            token1.symbol === 'USDC'
+              ? 1
+              : getPrice({
+                  t: t1,
+                  pricesETH,
+                  pricesUSDC,
+                  pricesSTRK,
+                  priceOfEth,
+                  priceOfStrk,
+                });
+          const tvlUsd =
+            ((price0 ?? 0) * Number(p.tvl0_total)) /
+              Math.pow(10, token0.decimals) +
+            ((price1 ?? 0) * Number(p.tvl1_total)) /
+              Math.pow(10, token1.decimals);
+
+          if (tvlUsd < 10000) return;
+          const feesUsd =
+            ((price0 ?? 0) * Number(p.fees0_24h)) /
+              Math.pow(10, token0.decimals) +
+            ((price1 ?? 0) * Number(p.fees1_24h)) /
+              Math.pow(10, token1.decimals);
+
+          const apyBase = (feesUsd * 365) / tvlUsd;
+          const apyReward = springPair ? springPair.currentApr : undefined;
+
+          return {
+            pool: `${token0.symbol}/${token1.symbol}`,
+            symbol: `${token0.symbol}/${token1.symbol}`,
+            rewardTokens:
+              apyReward && strkToken ? [strkToken.l2_token_address] : [],
+            underlyingTokens: [
+              token0.l2_token_address,
+              token1.l2_token_address,
+            ],
+            tvlUsd,
+            apyBase,
+            apyReward,
+          };
+        })
+        .filter((p) => !!p)
+        .sort((a, b) => b.tvlUsd - a.tvlUsd);
+
+      const pool = pools.find((p) => p.pool === poolName);
+
+      baseAPY = pool ? pool.apyBase : 0;
+      rewardAPY = pool && pool.apyReward ? pool.apyReward : 0;
 
       splitApr = {
         apr: baseAPY,
@@ -184,38 +294,87 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
 
     return {
       baseAPY,
+      rewardAPY,
       splitApr,
       metadata,
     };
   }
 }
 
-const fetchData = async <T>(
-  items: string[],
-  apiPath: keyof typeof CONSTANTS.EKUBO,
-  tokensMetadata: Record<string, TokenInfo>,
-  processResponse: (
-    item: string,
-    data: any,
-    tokensMetadata: Record<string, TokenInfo>,
-  ) => [string, T],
-): Promise<Record<string, T>> => {
-  const responses = await Promise.all(
-    items.map(async (item) => {
-      const [token0Name, token1Name] = item.split('/');
-      const token0 = tokensMetadata[token0Name];
-      const token1 = tokensMetadata[token1Name];
+const getPrice = ({
+  t,
+  pricesUSDC,
+  pricesETH,
+  pricesSTRK,
+  priceOfEth,
+  priceOfStrk,
+}: {
+  t: bigint;
+  pricesUSDC: PricesOfToken;
+  pricesETH: PricesOfToken;
+  pricesSTRK: PricesOfToken;
+  priceOfEth: PriceOfToken;
+  priceOfStrk: PriceOfToken;
+}) => {
+  let p = pricesUSDC.prices.find(({ token }) => BigInt(token) === t);
+  if (p) return Number(p.price);
+  p = pricesETH.prices.find(({ token }) => BigInt(token) === t);
+  if (p && priceOfEth) {
+    return Number(p.price) * Number(priceOfEth.price);
+  }
+  p = pricesSTRK.prices.find(({ token }) => BigInt(token) === t);
+  if (p && priceOfStrk) {
+    return Number(p.price) * Number(priceOfStrk);
+  }
+};
 
-      const response = await fetch(
-        `${CONSTANTS.EKUBO[apiPath]}/${token0.token}/${token1.token}`,
-      );
-      const data = await response.json();
+const getData = async (): Promise<EkuboBaseAprDoc> => {
+  const [
+    tokens,
+    defiSpringData,
+    pairData,
+    pricesETH,
+    pricesSTRK,
+    pricesUSDC,
+    priceOfStrk,
+    priceOfEth,
+  ] = await Promise.all([
+    fetch(`${CONSTANTS.EKUBO.BASE_API}/tokens`).then((response) =>
+      response.json(),
+    ),
+    fetch(`${CONSTANTS.EKUBO.BASE_API}/defi-spring-incentives`).then(
+      (response) => response.json(),
+    ),
+    fetch(`${CONSTANTS.EKUBO.BASE_API}/overview/pairs`).then((response) =>
+      response.json(),
+    ),
+    fetch(`${CONSTANTS.EKUBO.BASE_API}/price/ETH?period=21600`).then(
+      (response) => response.json(),
+    ),
+    fetch(`${CONSTANTS.EKUBO.BASE_API}/price/STRK?period=21600`).then(
+      (response) => response.json(),
+    ),
+    fetch(`${CONSTANTS.EKUBO.BASE_API}/price/USDC?period=21600`).then(
+      (response) => response.json(),
+    ),
+    fetch(`${CONSTANTS.EKUBO.BASE_API}/price/STRK/USDC?period=21600`).then(
+      (response) => response.json(),
+    ),
+    fetch(`${CONSTANTS.EKUBO.BASE_API}/price/ETH/USDC?period=21600`).then(
+      (response) => response.json(),
+    ),
+  ]);
 
-      return processResponse(item, data, tokensMetadata);
-    }),
-  );
-
-  return Object.fromEntries(responses);
+  return {
+    tokens,
+    defiSpringData,
+    pairData,
+    pricesETH,
+    pricesSTRK,
+    pricesUSDC,
+    priceOfStrk,
+    priceOfEth,
+  };
 };
 
 export const ekubo = new Ekubo();
@@ -223,43 +382,7 @@ const EkuboAtoms: ProtocolAtoms = {
   baseAPRs: atomWithQuery((get) => ({
     queryKey: ['ekubo_base_aprs'],
     queryFn: async ({ queryKey }) => {
-      const tokensMetadata: Record<string, TokenInfo> = Object.fromEntries(
-        TOKENS.map((token) => [token.name, token]),
-      );
-
-      const indexedTokenPrices: IndexedTokenPrices = await fetchData(
-        PRICE_PAIRS,
-        'BASE_PRICE_API',
-        tokensMetadata,
-        (pair, priceData) => [pair.split('/')[0], priceData],
-      );
-
-      const indexedPools: IndexedPools = await fetchData(
-        POOL_NAMES,
-        'BASE_APR_API',
-        tokensMetadata,
-        (poolName, poolsData: PoolsData) => {
-          const [token0Name, token1Name] = poolName.split('/');
-          const filterResponseData = poolsData.topPools
-            .filter(
-              (pool) =>
-                pool.fees0_24h !== '0' &&
-                pool.fees1_24h !== '0' &&
-                pool.tvl0_total !== '0' &&
-                pool.tvl1_total !== '0',
-            )
-            .map((pool) => ({
-              ...pool,
-              price0: indexedTokenPrices[token0Name].price,
-              price1: indexedTokenPrices[token1Name].price,
-              decimals0: tokensMetadata[token0Name].decimals,
-              decimals1: tokensMetadata[token1Name].decimals,
-            }));
-
-          return [poolName, filterResponseData];
-        },
-      );
-      return indexedPools;
+      return await getData();
     },
   })),
   pools: atom((get) => {
@@ -268,7 +391,7 @@ const EkuboAtoms: ProtocolAtoms = {
     if (!EkuboAtoms.baseAPRs) return empty;
     const baseInfo = get(EkuboAtoms.baseAPRs);
     if (poolsInfo.data) {
-      const pools = ekubo._computePoolsInfo(poolsInfo.data);
+      const pools = ekubo._computePoolsInfo([poolsInfo.data, baseInfo]);
       return ekubo.addBaseAPYs(pools, baseInfo);
     }
 
