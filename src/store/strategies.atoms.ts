@@ -46,10 +46,10 @@ export function getStrategies() {
     Mustache.render(DNMMDescription, { token1: 'USDC', token2: 'ETH' }),
     'ETH',
     CONSTANTS.CONTRACTS.DeltaNeutralMMUSDCETH,
-    [1, 0.608, 1, 0.552509, 0.552509], // precomputed factors based on strategy math
-    StrategyLiveStatus.COMING_SOON,
+    [1, 0.615384615, 1, 0.584615385, 0.552509024], // precomputed factors based on strategy math
+    StrategyLiveStatus.NEW,
     {
-      maxTVL: 5000,
+      maxTVL: 50000,
     },
   );
 
@@ -73,10 +73,10 @@ export function getStrategies() {
     'ETH',
     // ! change this later
     CONSTANTS.CONTRACTS.DeltaNeutralMMSTRKETH,
-    [1, 0.384215, 1, 0.492308, 0.233276], // precomputed factors based on strategy math, last is the excess deposit1 that is happening
+    [1, 0.384615, 1, 0.492308, 0.233276], // precomputed factors based on strategy math, last is the excess deposit1 that is happening
     StrategyLiveStatus.NEW,
     {
-      maxTVL: 150000,
+      maxTVL: 250000,
     },
   );
 
