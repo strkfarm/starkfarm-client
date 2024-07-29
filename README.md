@@ -103,4 +103,3 @@ Thanks goes to these wonderful people.
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 [![All Contributors](https://img.shields.io/github/all-contributors/akiraonstarknet/starkfarm-client?color=ee8449&style=flat-square)](#contributors)
-
