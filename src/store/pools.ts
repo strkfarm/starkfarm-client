@@ -14,6 +14,7 @@ import SithswapAtoms, { sithswap } from './sithswap.store';
 import StarkDefiAtoms, { starkDefi } from './starkdefi.store';
 import TenkSwapAtoms, { tenkswap } from './tenkswap.store';
 import ZkLendAtoms, { zkLend } from './zklend.store';
+import CarmineAtoms, { Carmine } from './carmine.store';
 
 export enum Category {
   Stable = 'Stable Pools',
@@ -104,6 +105,11 @@ export const PROTOCOLS = [
     atoms: NostraDegenAtoms,
   },
   {
+    name: Carmine.name,
+    class: Carmine,
+    atoms: CarmineAtoms,
+  },
+  {
     name: starkDefi.name,
     class: starkDefi,
     atoms: StarkDefiAtoms,
@@ -176,6 +182,67 @@ export const StrkLendingIncentivesAtom = atomWithQuery((get) => ({
     let data = await res.text();
     data = data.replaceAll('NaN', '0');
     return JSON.parse(data);
+  },
+}));
+
+const poolEndpoints = [
+  { name: 'STRK/USDC Call Pool (STRK)', endpoint: 'strk-usdc-call' },
+  { name: 'STRK/USDC Put Pool (USDC)', endpoint: 'strk-usdc-put' },
+  { name: 'ETH/STRK Call Pool (ETH)', endpoint: 'eth-strk-call' },
+  { name: 'ETH/STRK Put Pool (STRK)', endpoint: 'eth-strk-put' },
+  { name: 'ETH/USDC Call Pool (ETH)', endpoint: 'eth-usdc-call' },
+  { name: 'ETH/USDC Put Pool (USDC)', endpoint: 'eth-usdc-put' },
+  { name: 'wBTC/USDC Put Pool (USDC)', endpoint: 'btc-usdc-put' },
+  { name: 'wBTC/USDC Call Pool (wBTC)', endpoint: 'btc-usdc-call' },
+];
+
+const rewardAprEndpoint = 'https://api.carmine.finance/api/v1/mainnet/defispring';
+
+export const CarmineAtom = atomWithQuery((get) => ({
+  queryKey: ['isCarmine'],
+  queryFn: async ({ queryKey }) => {
+    const fetchPool = async (endpoint: any) => {
+      const res = await fetch(`https://api.carmine.finance/api/v2/mainnet/${endpoint}/apy`);
+      let data = await res.text();
+      data = data.replaceAll('NaN', '0');
+      return JSON.parse(data);
+    };
+
+    const fetchRewardApr = async () => {
+      const res = await fetch(`${rewardAprEndpoint}`);
+      let data = await res.text();
+      data = data.replaceAll('NaN', '0');
+      return JSON.parse(data);
+    };
+
+    const rewardAprData = await fetchRewardApr();
+    const rewardApr = rewardAprData.data.apy; 
+    const tvl = rewardAprData.data.tvl;
+
+    const poolData = await Promise.all(
+      poolEndpoints.map(async (pool) => {
+        const data = await fetchPool(pool.endpoint);
+        return { name: pool.name, data };
+      })
+    );
+
+    const combinedData = poolData.reduce((acc, pool) => {
+      acc[pool.name] = {
+        ...pool.data,
+        rewardApr,
+        tvl,
+      };
+      return acc;
+    }, {} as { [key: string]: any });
+
+    const specificPools = ['wBTC/USDC Call Pool (wBTC)', 'wBTC/USDC Put Pool (USDC)'];
+    specificPools.forEach(poolName => {
+      if (combinedData[poolName]) {
+        combinedData[poolName].rewardApr = 0.00;
+      }
+    });
+
+    return combinedData;
   },
 }));
 
