@@ -195,17 +195,11 @@ const poolEndpoints = [
   { name: 'wBTC/USDC Put Pool (USDC)', endpoint: 'btc-usdc-put' },
   { name: 'wBTC/USDC Call Pool (wBTC)', endpoint: 'btc-usdc-call' },
 ];
-
-const rewardAprEndpoint =
-  '';
-
 export const CarmineAtom = atomWithQuery((get) => ({
   queryKey: ['isCarmine'],
   queryFn: async ({ queryKey }) => {
     const fetchPool = async (endpoint: any) => {
-      const res = await fetch(
-        `${CONSTANTS.CARMINE_URL}/${endpoint}/apy`,
-      );
+      const res = await fetch(`${CONSTANTS.CARMINE_URL}/${endpoint}/apy`);
       let data = await res.text();
       data = data.replaceAll('NaN', '0');
       return JSON.parse(data);
