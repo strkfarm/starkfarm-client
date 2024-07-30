@@ -91,6 +91,23 @@ export default class MyNumber {
     );
   }
 
+  static max(a: MyNumber, b: MyNumber) {
+    if (a.decimals !== b.decimals) {
+      const diff = Math.abs(a.decimals - b.decimals);
+      if (a.decimals > b.decimals) {
+        b = new MyNumber(b.bigNumber.times(10 ** diff).toString(), a.decimals);
+      } else {
+        a = new MyNumber(a.bigNumber.times(10 ** diff).toString(), b.decimals);
+      }
+    }
+    const bn = BigNumber.max(a.bigNumber, b.bigNumber);
+    return new MyNumber(
+      bn.toString(),
+      a.decimals > b.decimals ? a.decimals : b.decimals,
+    );
+
+  }
+
   [customInspectSymbol](depth: any, inspectOptions: any, inspect: any) {
     return JSON.stringify({ raw: this.toString(), decimals: this.decimals });
   }
