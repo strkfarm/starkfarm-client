@@ -27,6 +27,7 @@ export enum PoolType {
   DEXV2 = 'V2 LP DEX',
   DEXV3 = 'Concentrated LP DEX',
   Lending = 'Lending',
+  Derivatives = 'Derivatives',
 }
 
 export interface APRSplit {
