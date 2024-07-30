@@ -18,7 +18,8 @@ const poolConfigs = [
 export class Carmine extends Jediswap {
   name = 'Carmine Options';
   link = 'https://app.carmine.finance/staking';
-  logo = 'https://static-assets-8zct.onrender.com/integrations/carmine/carmine.jpg';
+  logo =
+    'https://static-assets-8zct.onrender.com/integrations/carmine/carmine.jpg';
   incentiveDataKey = 'isCarmine';
 
   _computePoolsInfo(data: any) {
@@ -31,7 +32,7 @@ export class Carmine extends Jediswap {
         const poolData = myData[config.name];
         if (!poolData || !poolData.data) return;
 
-        const category = Category.Others;
+        const category = Category.Derivatives;
         const logo1 =
           CONSTANTS.LOGOS[config.tokenA as keyof typeof CONSTANTS.LOGOS];
         const logo2 =
