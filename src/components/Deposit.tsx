@@ -104,8 +104,6 @@ export default function Deposit(props: DepositProps) {
     );
     let reducedBalance = balance;
 
-    console.log('Deposit:: selectedMarket.name', selectedMarket.name);
-    console.log('Deposit:: reducedBalance', reducedBalance.toEtherStr());
     if (selectedMarket.name === 'STRK') {
       reducedBalance = balance.subtract(
         MyNumber.fromEther('1.5', selectedMarket.decimals),
