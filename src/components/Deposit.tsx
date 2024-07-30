@@ -113,7 +113,9 @@ export default function Deposit(props: DepositProps) {
         MyNumber.fromEther('0.001', selectedMarket.decimals),
       );
     }
-    return MyNumber.min(reducedBalance, adjustedMaxAllowed);
+    console.log('Deposit:: reducedBalance2', reducedBalance.toEtherStr());
+    const min = MyNumber.min(reducedBalance, adjustedMaxAllowed);
+    return MyNumber.max(min, MyNumber.fromEther('0', selectedMarket.decimals));
   }, [balance, props.strategy, selectedMarket]);
 
   function BalanceComponent(props: {
