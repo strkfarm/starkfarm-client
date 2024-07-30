@@ -196,49 +196,58 @@ const poolEndpoints = [
   { name: 'wBTC/USDC Call Pool (wBTC)', endpoint: 'btc-usdc-call' },
 ];
 
-const rewardAprEndpoint = 'https://api.carmine.finance/api/v1/mainnet/defispring';
+const rewardAprEndpoint =
+  '';
 
 export const CarmineAtom = atomWithQuery((get) => ({
   queryKey: ['isCarmine'],
   queryFn: async ({ queryKey }) => {
     const fetchPool = async (endpoint: any) => {
-      const res = await fetch(`https://api.carmine.finance/api/v2/mainnet/${endpoint}/apy`);
+      const res = await fetch(
+        `${CONSTANTS.CARMINE_URL}/${endpoint}/apy`,
+      );
       let data = await res.text();
       data = data.replaceAll('NaN', '0');
       return JSON.parse(data);
     };
 
     const fetchRewardApr = async () => {
-      const res = await fetch(`${rewardAprEndpoint}`);
+      const res = await fetch(CONSTANTS.CARMINE_INCENTIVES_URL);
       let data = await res.text();
       data = data.replaceAll('NaN', '0');
       return JSON.parse(data);
     };
 
     const rewardAprData = await fetchRewardApr();
-    const rewardApr = rewardAprData.data.apy; 
+    const rewardApr = rewardAprData.data.apy;
     const tvl = rewardAprData.data.tvl;
 
     const poolData = await Promise.all(
       poolEndpoints.map(async (pool) => {
         const data = await fetchPool(pool.endpoint);
         return { name: pool.name, data };
-      })
+      }),
     );
 
-    const combinedData = poolData.reduce((acc, pool) => {
-      acc[pool.name] = {
-        ...pool.data,
-        rewardApr,
-        tvl,
-      };
-      return acc;
-    }, {} as { [key: string]: any });
+    const combinedData = poolData.reduce(
+      (acc, pool) => {
+        acc[pool.name] = {
+          ...pool.data,
+          rewardApr,
+          tvl,
+        };
+        return acc;
+      },
+      {} as { [key: string]: any },
+    );
 
-    const specificPools = ['wBTC/USDC Call Pool (wBTC)', 'wBTC/USDC Put Pool (USDC)'];
-    specificPools.forEach(poolName => {
+    const specificPools = [
+      'wBTC/USDC Call Pool (wBTC)',
+      'wBTC/USDC Put Pool (USDC)',
+    ];
+    specificPools.forEach((poolName) => {
       if (combinedData[poolName]) {
-        combinedData[poolName].rewardApr = 0.00;
+        combinedData[poolName].rewardApr = 0.0;
       }
     });
 

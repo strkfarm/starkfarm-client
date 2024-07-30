@@ -26,16 +26,21 @@ export class Carmine extends Jediswap {
       const myData = data;
       if (!myData) return [];
       const pools: PoolInfo[] = [];
-      
+
       poolConfigs.forEach((config) => {
         const poolData = myData[config.name];
         if (!poolData || !poolData.data) return;
-        
+
         const category = Category.Others;
-        const logo1 = CONSTANTS.LOGOS[config.tokenA as keyof typeof CONSTANTS.LOGOS];
-        const logo2 = CONSTANTS.LOGOS[config.tokenB as keyof typeof CONSTANTS.LOGOS];
-        
-        const baseApr = poolData.data.launch_annualized / 100 === 0 ? 0.0 : parseFloat(poolData.data.launch_annualized) / 100;
+        const logo1 =
+          CONSTANTS.LOGOS[config.tokenA as keyof typeof CONSTANTS.LOGOS];
+        const logo2 =
+          CONSTANTS.LOGOS[config.tokenB as keyof typeof CONSTANTS.LOGOS];
+
+        const baseApr =
+          poolData.data.launch_annualized / 100 === 0
+            ? 0.0
+            : parseFloat(poolData.data.launch_annualized) / 100;
         const rewardApr = parseFloat(poolData.rewardApr) || 0;
 
         const poolInfo: PoolInfo = {
@@ -49,7 +54,7 @@ export class Carmine extends Jediswap {
             logo: this.logo,
           },
           apr: baseApr + rewardApr,
-          tvl: poolData.tvl, 
+          tvl: poolData.tvl,
           aprSplits: [
             {
               apr: baseApr || baseApr.toString() === '' ? baseApr : 0,
