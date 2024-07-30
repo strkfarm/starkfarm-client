@@ -13,6 +13,7 @@ interface TxButtonProps {
   text: string;
   calls: Call[];
   buttonProps: ButtonProps;
+  justDisableIfNoWalletConnect?: boolean;
 }
 
 export default function TxButton(props: TxButtonProps) {
@@ -57,10 +58,14 @@ export default function TxButton(props: TxButtonProps) {
   // }, [props])
 
   const disabledText = useMemo(() => {
+    if (props.justDisableIfNoWalletConnect) {
+      if (!address) return props.text;
+      return '';
+    }
     if (isMobile) return CONSTANTS.MOBILE_MSG;
     if (!address) return 'Wallet not connected';
     return '';
-  }, [isMobile, address]);
+  }, [isMobile, address, props]);
 
   if (disabledText) {
     return (
@@ -76,6 +81,7 @@ export default function TxButton(props: TxButtonProps) {
         }}
         isDisabled={true}
         width={'100%'}
+        {...props.buttonProps}
       >
         {disabledText}
       </Button>

@@ -2,9 +2,9 @@
 const nextConfig = {
   // output: 'export',
     compiler: {
-      removeConsole: {
-        exclude: ['error'],
-      },
+      // removeConsole: {
+      //   exclude: ['error'],
+      // },
     },
   async rewrites() {
     return [
@@ -38,6 +38,25 @@ const nextConfig = {
         destination: 'https://myswap-cl-charts.s3.amazonaws.com/:path*',
       },
     ];
+  },
+  async redirects() {
+    return [
+      {
+        source: '/usdc',
+        destination: '/strategy?id=usdc_sensei',
+        permanent: true
+      },
+      {
+        source: '/strk',
+        destination: '/strategy?id=strk_sensei',
+        permanent: true
+      },
+      {
+        source: '/eth',
+        destination: '/strategy?id=eth_sensei',
+        permanent: true
+      },
+    ]
   },
   webpack(config, options) {
     if (options.isServer) config.devtool = 'source-map';
