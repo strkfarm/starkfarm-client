@@ -20,7 +20,6 @@ export enum Category {
   Stable = 'Stable Pools',
   STRK = 'STRK Pools',
   Degen = 'MetaStable Pools',
-  Derivatives = 'Derivatives',
   Others = 'Others',
 }
 
