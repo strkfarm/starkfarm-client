@@ -30,7 +30,6 @@ import {
 import { useAccount } from '@starknet-react/core';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
-import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 import { isMobile } from 'react-device-detect';
 
@@ -43,23 +42,29 @@ import {
   transactionsAtom,
 } from '@/store/transactions.atom';
 import { getUniqueById, shortAddress } from '@/utils';
+import { StrategyParams } from '../page';
 
-const Strategy = () => {
+const Strategy = ({ params }: StrategyParams) => {
   const { address } = useAccount();
-  const searchParams = useSearchParams();
   const strategies = useAtomValue(strategiesAtom);
   const transactions = useAtomValue(transactionsAtom);
+
+  console.log(params, 'paramsparamsparams');
 
   useEffect(() => {
     console.log('txs', transactions);
   }, [transactions]);
+
   const strategy: StrategyInfo | undefined = useMemo(() => {
-    const id = searchParams.get('id');
+    const id = params.strategyId;
+
     console.log('id', id);
+
     return strategies.find((s) => s.id === id);
-  }, [searchParams, strategies]);
+  }, [params.strategyId, strategies]);
 
   const setBalQueryEnable = useSetAtom(strategy?.balEnabled || atom(false));
+
   useEffect(() => {
     setBalQueryEnable(true);
   }, []);
@@ -79,8 +84,8 @@ const Strategy = () => {
   }, [balData]);
 
   useEffect(() => {
-    mixpanel.track('Strategy page open', { name: searchParams.get('name') });
-  }, [searchParams]);
+    mixpanel.track('Strategy page open', { name: params.strategyId });
+  }, [params.strategyId]);
 
   const colSpan1: any = { base: '5', md: '3' };
   const colSpan2: any = { base: '5', md: '2' };
@@ -184,17 +189,17 @@ const Strategy = () => {
                   {(balData.isLoading ||
                     balData.isPending ||
                     !balData.data?.tokenInfo) && (
-                    <Text>
-                      <b>Your Holdings: </b>
-                      {address ? (
-                        <Spinner size="sm" marginTop={'5px'} />
-                      ) : isMobile ? (
-                        CONSTANTS.MOBILE_MSG
-                      ) : (
-                        'Connect wallet'
-                      )}
-                    </Text>
-                  )}
+                      <Text>
+                        <b>Your Holdings: </b>
+                        {address ? (
+                          <Spinner size="sm" marginTop={'5px'} />
+                        ) : isMobile ? (
+                          CONSTANTS.MOBILE_MSG
+                        ) : (
+                          'Connect wallet'
+                        )}
+                      </Text>
+                    )}
                   {balData.isError && (
                     <Text>
                       <b>Your Holdings: Error</b>
@@ -382,64 +387,64 @@ const Strategy = () => {
             {/* If more than 1 filtered tx */}
             {transactions.filter((tx) => tx.info.strategyId == strategy.id)
               .length > 0 && (
-              <>
-                <Text
-                  fontSize={'14px'}
-                  marginBottom={'10px'}
-                  color="light_grey"
-                >
-                  Note: This feature saves and shows transactions made on this
-                  device since it was added. Clearing your browser cache will
-                  remove this data.
-                </Text>
+                <>
+                  <Text
+                    fontSize={'14px'}
+                    marginBottom={'10px'}
+                    color="light_grey"
+                  >
+                    Note: This feature saves and shows transactions made on this
+                    device since it was added. Clearing your browser cache will
+                    remove this data.
+                  </Text>
 
-                {transactions
-                  .filter((tx) => tx.info.strategyId == strategy.id)
-                  .map((tx, index) => {
-                    return (
-                      <Box
-                        className="text-cell"
-                        key={index}
-                        width={'100%'}
-                        color="light_grey"
-                        fontSize={'14px'}
-                      >
-                        <Text width={'100%'} color="white" padding={'5px 10px'}>
-                          {/* The default msg contains strategy name, since this for a specific strategy, replace it */}
-                          {index + 1}){' '}
-                          {StrategyTxPropsToMessageWithStrategies(
-                            tx.info,
-                            strategies,
-                          ).replace(` in ${strategy.name}`, '')}
-                        </Text>
-                        <Text width={'100%'} padding={'5px 10px'}>
-                          {/* The default msg contains strategy name, since this for a specific strategy, replace it */}
-                          Transacted on {tx.createdAt.toLocaleDateString()} [
-                          <Link
-                            textDecoration={'underline'}
-                            href={`https://starkscan.co/tx/${tx.txHash}`}
-                            target="_blank"
-                          >
-                            {shortAddress(tx.txHash)}
-                          </Link>
-                          ]
-                        </Text>
-                      </Box>
-                    );
-                  })}
-              </>
-            )}
+                  {transactions
+                    .filter((tx) => tx.info.strategyId == strategy.id)
+                    .map((tx, index) => {
+                      return (
+                        <Box
+                          className="text-cell"
+                          key={index}
+                          width={'100%'}
+                          color="light_grey"
+                          fontSize={'14px'}
+                        >
+                          <Text width={'100%'} color="white" padding={'5px 10px'}>
+                            {/* The default msg contains strategy name, since this for a specific strategy, replace it */}
+                            {index + 1}){' '}
+                            {StrategyTxPropsToMessageWithStrategies(
+                              tx.info,
+                              strategies,
+                            ).replace(` in ${strategy.name}`, '')}
+                          </Text>
+                          <Text width={'100%'} padding={'5px 10px'}>
+                            {/* The default msg contains strategy name, since this for a specific strategy, replace it */}
+                            Transacted on {tx.createdAt.toLocaleDateString()} [
+                            <Link
+                              textDecoration={'underline'}
+                              href={`https://starkscan.co/tx/${tx.txHash}`}
+                              target="_blank"
+                            >
+                              {shortAddress(tx.txHash)}
+                            </Link>
+                            ]
+                          </Text>
+                        </Box>
+                      );
+                    })}
+                </>
+              )}
 
             {/* If no filtered tx */}
             {transactions.filter((tx) => tx.info.strategyId == strategy.id)
               .length == 0 && (
-              <Text fontSize={'14px'} textAlign={'center'} color="light_grey">
-                No transactions recorded since this feature was added. We use
-                your {"browser's"} storage to save your transaction history.
-                Make a deposit or withdrawal to see your transactions here.
-                Clearning browser cache will remove this data.
-              </Text>
-            )}
+                <Text fontSize={'14px'} textAlign={'center'} color="light_grey">
+                  No transactions recorded since this feature was added. We use
+                  your {"browser's"} storage to save your transaction history.
+                  Make a deposit or withdrawal to see your transactions here.
+                  Clearning browser cache will remove this data.
+                </Text>
+              )}
           </Card>
         </VStack>
       )}

@@ -1,11 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // output: 'export',
-    compiler: {
-      removeConsole: {
-        exclude: ['error'],
-      },
+  compiler: {
+    removeConsole: {
+      exclude: ['error'],
     },
+  },
   async rewrites() {
     return [
       {
@@ -43,20 +43,20 @@ const nextConfig = {
     return [
       {
         source: '/usdc',
-        destination: '/strategy?id=usdc_sensei',
-        permanent: true
+        destination: '/strategy/usdc_sensei',
+        permanent: true,
       },
       {
         source: '/strk',
-        destination: '/strategy?id=strk_sensei',
-        permanent: true
+        destination: '/strategy/strk_sensei',
+        permanent: true,
       },
       {
         source: '/eth',
-        destination: '/strategy?id=eth_sensei',
-        permanent: true
+        destination: '/strategy/eth_sensei',
+        permanent: true,
       },
-    ]
+    ];
   },
   webpack(config, options) {
     if (options.isServer) config.devtool = 'source-map';

@@ -18,15 +18,17 @@ import {
 import { useAtom, useSetAtom } from 'jotai';
 import { useStarknetkitConnectModal } from 'starknetkit';
 
-import tg from '@/assets/tg.svg';
-import fulllogo from '@public/fulllogo.png';
-import CONSTANTS from '@/constants';
-import { addressAtom } from '@/store/claims.atoms';
-import { MyMenuItemProps, MyMenuListProps, shortAddress } from '@/utils';
-import { useEffect } from 'react';
-import { lastWalletAtom } from '@/store/utils.atoms';
-import { useAccount, useConnect, useDisconnect } from '@starknet-react/core';
 import { CONNECTOR_NAMES, MYCONNECTORS } from '@/app/template';
+import tg from '@/assets/tg.svg';
+import CONSTANTS from '@/constants';
+import { getERC20Balance } from '@/store/balance.atoms';
+import { addressAtom } from '@/store/claims.atoms';
+import { lastWalletAtom } from '@/store/utils.atoms';
+import { getTokenInfoFromName, MyMenuItemProps, MyMenuListProps, shortAddress } from '@/utils';
+import fulllogo from '@public/fulllogo.png';
+import { useAccount, useConnect, useDisconnect } from '@starknet-react/core';
+import mixpanel from 'mixpanel-browser';
+import { useEffect } from 'react';
 import { isMobile } from 'react-device-detect';
 
 interface NavbarProps {
@@ -55,16 +57,42 @@ export default function Navbar(props: NavbarProps) {
       connectors: MYCONNECTORS,
     });
 
+  const getTokenBalance = async (token: string, address: string) => {
+    const tokenInfo = getTokenInfoFromName(token);
+    const balance = await getERC20Balance(tokenInfo, address);
+
+    return balance.amount;
+  };
+
   // Connect wallet using starknetkit
   const connectWallet = async () => {
     try {
       const result = await starknetkitConnectModal1();
-      await connect({ connector: result.connector });
+
+      connect({ connector: result.connector });
+
+      if (address) {
+        mixpanel.track('manual connect wallet', {
+          address,
+          ethAmount: getTokenBalance('ETH', address),
+          usdcAmount: getTokenBalance('USDC', address),
+          strkAmount: getTokenBalance('STRK', address),
+        });
+      }
     } catch (error) {
       console.warn('connectWallet error', error);
       try {
         const result = await starknetkitConnectModal2();
-        await connect({ connector: result.connector });
+        connect({ connector: result.connector });
+
+        if (address) {
+          mixpanel.track('manual connect wallet', {
+            address,
+            ethAmount: getTokenBalance('ETH', address),
+            usdcAmount: getTokenBalance('USDC', address),
+            strkAmount: getTokenBalance('STRK', address),
+          });
+        }
       } catch (error) {
         console.error('connectWallet error', error);
         alert('Error connecting wallet');
@@ -81,6 +109,14 @@ export default function Navbar(props: NavbarProps) {
         );
         if (connectorIndex >= 0) {
           connect({ connector: MYCONNECTORS[connectorIndex] });
+          if (address) {
+            mixpanel.track('auto connect wallet', {
+              address,
+              ethAmount: getTokenBalance('ETH', address),
+              usdcAmount: getTokenBalance('USDC', address),
+              strkAmount: getTokenBalance('STRK', address),
+            });
+          }
         }
       }
     } catch (error) {
