@@ -105,7 +105,6 @@ export default class MyNumber {
       bn.toString(),
       a.decimals > b.decimals ? a.decimals : b.decimals,
     );
-
   }
 
   [customInspectSymbol](depth: any, inspectOptions: any, inspect: any) {

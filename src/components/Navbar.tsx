@@ -24,7 +24,12 @@ import CONSTANTS from '@/constants';
 import { getERC20Balance } from '@/store/balance.atoms';
 import { addressAtom } from '@/store/claims.atoms';
 import { lastWalletAtom } from '@/store/utils.atoms';
-import { getTokenInfoFromName, MyMenuItemProps, MyMenuListProps, shortAddress } from '@/utils';
+import {
+  getTokenInfoFromName,
+  MyMenuItemProps,
+  MyMenuListProps,
+  shortAddress,
+} from '@/utils';
 import fulllogo from '@public/fulllogo.png';
 import { useAccount, useConnect, useDisconnect } from '@starknet-react/core';
 import mixpanel from 'mixpanel-browser';
