@@ -30,7 +30,7 @@ import {
 import { useAccount } from '@starknet-react/core';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 
 import Deposit from '@/components/Deposit';
@@ -48,8 +48,7 @@ const Strategy = ({ params }: StrategyParams) => {
   const { address } = useAccount();
   const strategies = useAtomValue(strategiesAtom);
   const transactions = useAtomValue(transactionsAtom);
-
-  console.log(params, 'paramsparamsparams');
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     console.log('txs', transactions);
@@ -89,6 +88,13 @@ const Strategy = ({ params }: StrategyParams) => {
 
   const colSpan1: any = { base: '5', md: '3' };
   const colSpan2: any = { base: '5', md: '2' };
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return null;
+
   return (
     <>
       <Flex marginBottom={'10px'}>
@@ -189,17 +195,17 @@ const Strategy = ({ params }: StrategyParams) => {
                   {(balData.isLoading ||
                     balData.isPending ||
                     !balData.data?.tokenInfo) && (
-                    <Text>
-                      <b>Your Holdings: </b>
-                      {address ? (
-                        <Spinner size="sm" marginTop={'5px'} />
-                      ) : isMobile ? (
-                        CONSTANTS.MOBILE_MSG
-                      ) : (
-                        'Connect wallet'
-                      )}
-                    </Text>
-                  )}
+                      <Text>
+                        <b>Your Holdings: </b>
+                        {address ? (
+                          <Spinner size="sm" marginTop={'5px'} />
+                        ) : isMobile ? (
+                          CONSTANTS.MOBILE_MSG
+                        ) : (
+                          'Connect wallet'
+                        )}
+                      </Text>
+                    )}
                   {balData.isError && (
                     <Text>
                       <b>Your Holdings: Error</b>
@@ -387,64 +393,64 @@ const Strategy = ({ params }: StrategyParams) => {
             {/* If more than 1 filtered tx */}
             {transactions.filter((tx) => tx.info.strategyId == strategy.id)
               .length > 0 && (
-              <>
-                <Text
-                  fontSize={'14px'}
-                  marginBottom={'10px'}
-                  color="light_grey"
-                >
-                  Note: This feature saves and shows transactions made on this
-                  device since it was added. Clearing your browser cache will
-                  remove this data.
-                </Text>
+                <>
+                  <Text
+                    fontSize={'14px'}
+                    marginBottom={'10px'}
+                    color="light_grey"
+                  >
+                    Note: This feature saves and shows transactions made on this
+                    device since it was added. Clearing your browser cache will
+                    remove this data.
+                  </Text>
 
-                {transactions
-                  .filter((tx) => tx.info.strategyId == strategy.id)
-                  .map((tx, index) => {
-                    return (
-                      <Box
-                        className="text-cell"
-                        key={index}
-                        width={'100%'}
-                        color="light_grey"
-                        fontSize={'14px'}
-                      >
-                        <Text width={'100%'} color="white" padding={'5px 10px'}>
-                          {/* The default msg contains strategy name, since this for a specific strategy, replace it */}
-                          {index + 1}){' '}
-                          {StrategyTxPropsToMessageWithStrategies(
-                            tx.info,
-                            strategies,
-                          ).replace(` in ${strategy.name}`, '')}
-                        </Text>
-                        <Text width={'100%'} padding={'5px 10px'}>
-                          {/* The default msg contains strategy name, since this for a specific strategy, replace it */}
-                          Transacted on {tx.createdAt.toLocaleDateString()} [
-                          <Link
-                            textDecoration={'underline'}
-                            href={`https://starkscan.co/tx/${tx.txHash}`}
-                            target="_blank"
-                          >
-                            {shortAddress(tx.txHash)}
-                          </Link>
-                          ]
-                        </Text>
-                      </Box>
-                    );
-                  })}
-              </>
-            )}
+                  {transactions
+                    .filter((tx) => tx.info.strategyId == strategy.id)
+                    .map((tx, index) => {
+                      return (
+                        <Box
+                          className="text-cell"
+                          key={index}
+                          width={'100%'}
+                          color="light_grey"
+                          fontSize={'14px'}
+                        >
+                          <Text width={'100%'} color="white" padding={'5px 10px'}>
+                            {/* The default msg contains strategy name, since this for a specific strategy, replace it */}
+                            {index + 1}){' '}
+                            {StrategyTxPropsToMessageWithStrategies(
+                              tx.info,
+                              strategies,
+                            ).replace(` in ${strategy.name}`, '')}
+                          </Text>
+                          <Text width={'100%'} padding={'5px 10px'}>
+                            {/* The default msg contains strategy name, since this for a specific strategy, replace it */}
+                            Transacted on {tx.createdAt.toLocaleDateString()} [
+                            <Link
+                              textDecoration={'underline'}
+                              href={`https://starkscan.co/tx/${tx.txHash}`}
+                              target="_blank"
+                            >
+                              {shortAddress(tx.txHash)}
+                            </Link>
+                            ]
+                          </Text>
+                        </Box>
+                      );
+                    })}
+                </>
+              )}
 
             {/* If no filtered tx */}
             {transactions.filter((tx) => tx.info.strategyId == strategy.id)
               .length == 0 && (
-              <Text fontSize={'14px'} textAlign={'center'} color="light_grey">
-                No transactions recorded since this feature was added. We use
-                your {"browser's"} storage to save your transaction history.
-                Make a deposit or withdrawal to see your transactions here.
-                Clearning browser cache will remove this data.
-              </Text>
-            )}
+                <Text fontSize={'14px'} textAlign={'center'} color="light_grey">
+                  No transactions recorded since this feature was added. We use
+                  your {"browser's"} storage to save your transaction history.
+                  Make a deposit or withdrawal to see your transactions here.
+                  Clearning browser cache will remove this data.
+                </Text>
+              )}
           </Card>
         </VStack>
       )}
