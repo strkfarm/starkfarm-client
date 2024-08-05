@@ -1,9 +1,7 @@
-import { NextResponse } from 'next/server';
 import { getStrategies } from '@/store/strategies.atoms';
+import { NextResponse } from 'next/server';
 
-export const revalidate = 60;
-
-export async function GET(req: Request) {
+export async function GET(_req: Request) {
   const strategies = getStrategies();
   console.log('strategies', strategies.length);
   const values = strategies.map(async (strategy, index) => {
