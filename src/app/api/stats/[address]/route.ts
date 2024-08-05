@@ -2,6 +2,8 @@ import { getStrategies } from '@/store/strategies.atoms';
 import { NextResponse } from 'next/server';
 import { num } from 'starknet';
 
+export const revalidate = 0;
+
 function standariseAddress(address: string | bigint) {
   return num.getHexString(num.getDecimalString(address.toString()));
 }
