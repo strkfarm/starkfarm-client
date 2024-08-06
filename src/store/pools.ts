@@ -14,6 +14,7 @@ import SithswapAtoms, { sithswap } from './sithswap.store';
 import StarkDefiAtoms, { starkDefi } from './starkdefi.store';
 import TenkSwapAtoms, { tenkswap } from './tenkswap.store';
 import ZkLendAtoms, { zkLend } from './zklend.store';
+import CarmineAtoms, { carmine } from './carmine.store';
 
 export enum Category {
   Stable = 'Stable Pools',
@@ -26,6 +27,7 @@ export enum PoolType {
   DEXV2 = 'V2 LP DEX',
   DEXV3 = 'Concentrated LP DEX',
   Lending = 'Lending',
+  Derivatives = 'Derivatives',
 }
 
 export interface APRSplit {
@@ -102,6 +104,11 @@ export const PROTOCOLS = [
     name: nostraDegen.name,
     class: nostraDegen,
     atoms: NostraDegenAtoms,
+  },
+  {
+    name: carmine.name,
+    class: carmine,
+    atoms: CarmineAtoms,
   },
   {
     name: starkDefi.name,
