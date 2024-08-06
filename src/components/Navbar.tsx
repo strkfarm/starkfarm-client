@@ -69,35 +69,28 @@ export default function Navbar(props: NavbarProps) {
     return balance.amount;
   };
 
+  useEffect(() => {
+    if (address) {
+      mixpanel.track('wallet connect trigger', {
+        address,
+        ethAmount: getTokenBalance('ETH', address),
+        usdcAmount: getTokenBalance('USDC', address),
+        strkAmount: getTokenBalance('STRK', address),
+      });
+    }
+  }, [address]);
+
   // Connect wallet using starknetkit
   const connectWallet = async () => {
     try {
       const result = await starknetkitConnectModal1();
 
       connect({ connector: result.connector });
-
-      if (address) {
-        mixpanel.track('manual connect wallet', {
-          address,
-          ethAmount: getTokenBalance('ETH', address),
-          usdcAmount: getTokenBalance('USDC', address),
-          strkAmount: getTokenBalance('STRK', address),
-        });
-      }
     } catch (error) {
       console.warn('connectWallet error', error);
       try {
         const result = await starknetkitConnectModal2();
         connect({ connector: result.connector });
-
-        if (address) {
-          mixpanel.track('manual connect wallet', {
-            address,
-            ethAmount: getTokenBalance('ETH', address),
-            usdcAmount: getTokenBalance('USDC', address),
-            strkAmount: getTokenBalance('STRK', address),
-          });
-        }
       } catch (error) {
         console.error('connectWallet error', error);
         alert('Error connecting wallet');
@@ -114,14 +107,6 @@ export default function Navbar(props: NavbarProps) {
         );
         if (connectorIndex >= 0) {
           connect({ connector: MYCONNECTORS[connectorIndex] });
-          if (address) {
-            mixpanel.track('auto connect wallet', {
-              address,
-              ethAmount: getTokenBalance('ETH', address),
-              usdcAmount: getTokenBalance('USDC', address),
-              strkAmount: getTokenBalance('STRK', address),
-            });
-          }
         }
       }
     } catch (error) {
@@ -169,6 +154,13 @@ export default function Navbar(props: NavbarProps) {
           {''}
         </Text>
       </Center>
+      <Button
+        onClick={() => {
+          mixpanel.track('click for track');
+        }}
+      >
+        Click for track
+      </Button>
       <Box
         width={'100%'}
         maxWidth="1400px"
