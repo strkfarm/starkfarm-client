@@ -165,7 +165,6 @@ export const CarmineAtom = atomWithQuery((get) => ({
   },
 }));
 
-
 const CarmineAtoms: ProtocolAtoms = {
   pools: atom((get) => {
     const poolsInfo = get(CarmineAtom);
