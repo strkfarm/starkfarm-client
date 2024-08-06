@@ -70,14 +70,16 @@ export default function Navbar(props: NavbarProps) {
   };
 
   useEffect(() => {
-    if (address) {
-      mixpanel.track('wallet connect trigger', {
-        address,
-        ethAmount: getTokenBalance('ETH', address),
-        usdcAmount: getTokenBalance('USDC', address),
-        strkAmount: getTokenBalance('STRK', address),
-      });
-    }
+    (async () => {
+      if (address) {
+        mixpanel.track('wallet connect trigger', {
+          address,
+          ethAmount: await getTokenBalance('ETH', address),
+          usdcAmount: await getTokenBalance('USDC', address),
+          strkAmount: await getTokenBalance('STRK', address),
+        });
+      }
+    })();
   }, [address]);
 
   // Connect wallet using starknetkit
