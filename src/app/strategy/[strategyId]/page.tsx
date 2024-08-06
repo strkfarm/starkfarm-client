@@ -8,9 +8,9 @@ export type StrategyParams = {
   searchParams?: { [key: string]: string | string[] | undefined };
 };
 
-export async function generateMetadata({ searchParams }: StrategyParams) {
+export async function generateMetadata({ params }: StrategyParams) {
   const strategies = getStrategies();
-  const strategy = strategies.find((s) => s.id === searchParams?.id);
+  const strategy = strategies.find((s) => s.id === params?.strategyId);
   if (strategy) {
     return {
       title: `${strategy.name} | STRKFarm`,
