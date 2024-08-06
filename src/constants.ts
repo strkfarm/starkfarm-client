@@ -14,6 +14,8 @@ export type TokenName = 'USDT' | 'USDC' | 'ETH' | 'STRK' | 'WBTC' | 'DAI';
 const CONSTANTS = {
   DEX_INCENTIVE_URL: '/strk-incentives/fetchFile?file=strk_grant.json',
   NOSTRA_DEGEN_INCENTIVE_URL: 'https://api.nostra.finance/query/pool_aprs',
+  CARMINE_INCENTIVES_URL: '/carmine/api/v1/mainnet/defispring',
+  CARMINE_URL: '/carmine/api/v2/mainnet',
   LENDING_INCENTIVES_URL:
     '/strk-incentives/fetchFile?file=prod-api/lending/lending_strk_grant.json',
   LOGOS,
