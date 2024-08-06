@@ -154,13 +154,6 @@ export default function Navbar(props: NavbarProps) {
           {''}
         </Text>
       </Center>
-      <Button
-        onClick={() => {
-          mixpanel.track('click for track');
-        }}
-      >
-        Click for track
-      </Button>
       <Box
         width={'100%'}
         maxWidth="1400px"
