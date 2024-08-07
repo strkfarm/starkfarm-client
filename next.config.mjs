@@ -34,6 +34,10 @@ const nextConfig = {
         destination: 'https://us-east-2.aws.data.mongodb-api.com/:path*',
       },
       {
+        source: '/carmine/:path*',
+        destination: 'https://api.carmine.finance/:path*',
+      },
+      {
         source: '/myswap/:path*',
         destination: 'https://myswap-cl-charts.s3.amazonaws.com/:path*',
       },
