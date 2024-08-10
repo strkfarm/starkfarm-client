@@ -293,4 +293,3 @@ export default function Navbar(props: NavbarProps) {
     </Container>
   );
 }
-
