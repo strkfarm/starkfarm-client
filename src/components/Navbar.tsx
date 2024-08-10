@@ -25,7 +25,12 @@ import { addressAtom } from '@/store/claims.atoms';
 import { MyMenuItemProps, MyMenuListProps, shortAddress } from '@/utils';
 import { useEffect } from 'react';
 import { lastWalletAtom } from '@/store/utils.atoms';
-import { useAccount, useConnect, useDisconnect } from '@starknet-react/core';
+import {
+  useAccount,
+  useConnect,
+  useDisconnect,
+  useStarkProfile,
+} from '@starknet-react/core';
 import { CONNECTOR_NAMES, MYCONNECTORS } from '@/app/template';
 import { isMobile } from 'react-device-detect';
 
@@ -39,6 +44,10 @@ export default function Navbar(props: NavbarProps) {
   const { connect, connectors } = useConnect();
   const { disconnectAsync } = useDisconnect();
   const setAddress = useSetAtom(addressAtom);
+  const { data: starkProfile } = useStarkProfile({
+    address,
+    useDefaultPfp: true,
+  });
   const [lastWallet, setLastWallet] = useAtom(lastWalletAtom);
   const { starknetkitConnectModal: starknetkitConnectModal1 } =
     useStarknetkitConnectModal({
@@ -241,7 +250,26 @@ export default function Navbar(props: NavbarProps) {
                 onClick={address ? undefined : connectWallet}
                 size="xs"
               >
-                <Center>{address ? shortAddress(address) : 'Connect'}</Center>
+                <Center>
+                  {address ? (
+                    starkProfile ? (
+                      <Box display="flex" alignItems="center" gap=".5rem">
+                        <Image
+                          src={starkProfile?.profilePicture}
+                          alt="pfp"
+                          width={30}
+                          height={30}
+                          rounded="full"
+                        />{' '}
+                        <h3>{starkProfile?.name}</h3>
+                      </Box>
+                    ) : (
+                      shortAddress(address)
+                    )
+                  ) : (
+                    'Connect'
+                  )}
+                </Center>
               </MenuButton>
               <MenuList {...MyMenuListProps}>
                 {address && (
@@ -265,3 +293,4 @@ export default function Navbar(props: NavbarProps) {
     </Container>
   );
 }
+
