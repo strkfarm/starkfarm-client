@@ -20,7 +20,7 @@ import { RpcProviderOptions, constants } from 'starknet';
 import { ArgentMobileConnector } from 'starknetkit/argentMobile';
 import { InjectedConnector } from 'starknetkit/injected';
 
-mixpanel.init('118f29da6a372f0ccb6f541079cad56b');
+mixpanel.init('a4f00d9907e2563e535bc062f79adfe3');
 
 const theme = extendTheme({
   colors: {

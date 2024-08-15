@@ -51,6 +51,22 @@ export default function TxButton(props: TxButtonProps) {
         createdAt: new Date(),
       });
     }
+
+    if (isSuccess && data && data.transaction_hash) {
+      mixpanel.track('Transaction success', {
+        info: props.txInfo,
+        status: 'success',
+        createdAt: new Date(),
+      });
+    }
+
+    if (isError && error) {
+      mixpanel.track('Transaction failed', {
+        info: props.txInfo,
+        status: 'failed',
+        createdAt: new Date(),
+      });
+    }
   }, [status, data]);
 
   // useEffect(() => {
