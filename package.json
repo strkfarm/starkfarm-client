@@ -52,7 +52,7 @@
     "react-pro-sidebar": "1.1.0",
     "react-responsive-carousel": "3.2.23",
     "react-select": "5.8.0",
-    "react-share": "5.1.0",
+    "react-share": "^5.1.0",
     "sharp": "0.33.4",
     "starknet": "6.4.1",
     "starknetkit": "1.1.9",
