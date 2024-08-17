@@ -193,7 +193,7 @@ export default function TxButton(props: TxButtonProps) {
               address,
             });
             writeAsync().then((tx) => {
-              onOpen();
+              if (props.text.includes('Deposit')) onOpen();
               mixpanel.track('Submitted tx', {
                 txHash: tx.transaction_hash,
                 address,
