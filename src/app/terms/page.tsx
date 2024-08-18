@@ -13,7 +13,8 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { useAccount, useSignTypedData } from '@starknet-react/core';
-import { useEffect } from 'react';
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 
 const exampleData = {
   types: {
@@ -51,18 +52,46 @@ const exampleData = {
   },
 };
 
-function TncPage() {
-  const { data, isPending, signTypedData } = useSignTypedData(exampleData);
+async function TncPage() {
+  const {
+    signTypedData,
+    isPending,
+    data: signatureData,
+  } = useSignTypedData(exampleData);
   const { address } = useAccount();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  useEffect(() => {
-    if (data) {
-      console.log(data);
-    }
-  }, [data]);
+  const [isSigned, setIsSigned] = useState(false);
 
-  return (
+  useEffect(() => {
+    (async () => {
+      const data = await axios.post('/api/tnc/getSignedUser', {
+        address,
+      });
+
+      if (data.data.user) {
+        setIsSigned(true);
+      }
+    })();
+  }, [address]);
+
+  const handleSign = async () => {
+    if (isSigned) {
+      alert('User already signed');
+    } else {
+      signTypedData();
+      if (signatureData) {
+        await axios.post('/api/tnc/signUser', {
+          address,
+          message: 'I agree to the terms and conditions',
+        });
+      }
+    }
+  };
+
+  return !address ? (
+    <Button className="w-full">Connect Your Wallet First</Button>
+  ) : (
     <>
       <Modal onClose={onClose} isOpen={isOpen} isCentered>
         <ModalOverlay />
@@ -103,21 +132,20 @@ function TncPage() {
                 opacity: 0.9,
                 backgroundColor: '#7F49E5',
               }}
-              onClick={() => signTypedData()}
+              onClick={handleSign}
             >
               Agree
             </Button>
           </ModalBody>
         </ModalContent>
       </Modal>
-
       <Button
         className="w-full"
         onClick={onOpen}
         disabled={!address || isPending}
       >
         {isPending ? <Spinner size="xs" className="h-4 w-4 mr-2" /> : ''}
-        {!address ? 'Connect Wallet' : 'Sign Message'}
+        Sign Message
       </Button>
     </>
   );
