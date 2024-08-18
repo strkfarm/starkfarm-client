@@ -86,15 +86,10 @@ function TncPage() {
             </Text>
 
             <Text textAlign="center">
-              Please read the full doc{' '}
-              <Link
-                href="/tnc"
-                color="purple"
-                _hover={{ textDecor: 'underline' }}
-              >
-                here
-              </Link>{' '}
-              and agree to the terms and conditions.
+              You agree to STRKFarm terms and conditions as stated in{' '}
+              <Link href="#" color="purple" _hover={{ textDecor: 'underline' }}>
+                githublink
+              </Link>
             </Text>
 
             <Button

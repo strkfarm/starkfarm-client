@@ -146,7 +146,7 @@ export default function Navbar(props: NavbarProps) {
       borderBottom={'1px solid var(--chakra-colors-color2)'}
       position={'fixed'}
       bg="bg"
-      zIndex={10000}
+      zIndex={999}
       top="0"
     >
       <Center bg="highlight" color="orange" padding={0}>
