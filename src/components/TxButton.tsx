@@ -1,5 +1,6 @@
 import CONSTANTS from '@/constants';
 import { StrategyTxProps, monitorNewTxAtom } from '@/store/transactions.atom';
+import { TokenInfo } from '@/strategies/IStrategy';
 import {
   Box,
   Button,
@@ -17,6 +18,7 @@ import { useAccount, useContractWrite } from '@starknet-react/core';
 import { useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 import { isMobile } from 'react-device-detect';
 import { TwitterShareButton } from 'react-share';
@@ -28,12 +30,17 @@ interface TxButtonProps {
   calls: Call[];
   buttonProps: ButtonProps;
   justDisableIfNoWalletConnect?: boolean;
+  selectedMarket?: TokenInfo;
+  strategyName?: string;
 }
 
 export default function TxButton(props: TxButtonProps) {
   const { address } = useAccount();
   const monitorNewTx = useSetAtom(monitorNewTxAtom);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const pathname = usePathname();
+
+  console.log(pathname, 'pathname');
 
   const disabledStyle = {
     bg: 'var(--chakra-colors-disabled_bg)',
@@ -159,8 +166,9 @@ export default function TxButton(props: TxButtonProps) {
               }}
             >
               <TwitterShareButton
-                url={'https://www.strkfarm.xyz/'}
-                title={'STRKFarm - The best yield optimizer on Starknet'}
+                url={`https://www.strkfarm.xyz${pathname}`}
+                title={`I just invested my ${props.selectedMarket?.name ?? ''} token in ${props.strategyName ?? ''} in @strkfarm. \n\nHere's the strategy:`}
+                related={['strkfarm']}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
