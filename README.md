@@ -93,6 +93,7 @@ Thanks goes to these wonderful people.
       <td align="center" valign="top" width="14.28%"><a href="https://fishonsnote.medium.com/"><img src="https://avatars.githubusercontent.com/u/43862685?v=4?s=100" width="100px;" alt="Fishon Amos"/><br /><sub><b>Fishon Amos</b></sub></a><br /><a href="#code-fishonamos" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/ooochoche"><img src="https://avatars.githubusercontent.com/u/101812348?v=4?s=100" width="100px;" alt="Benedict Ejembi"/><br /><sub><b>Benedict Ejembi</b></sub></a><br /><a href="#infra-ooochoche" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Jemiiah"><img src="https://avatars.githubusercontent.com/u/160767568?v=4?s=100" width="100px;" alt="Jemiiah"/><br /><sub><b>Jemiiah</b></sub></a><br /><a href="#code-Jemiiah" title="Code">💻</a></td>
+      <td align="center" valign="top" width="14.28%"><a href="https://github.com/Dprof-in-tech"><img src="https://avatars.githubusercontent.com/u/116242877?v=4?s=100" width="100px;" alt="Isaac Onyemaechi Ugwu"/><br /><sub><b>Isaac Onyemaechi Ugwu</b></sub></a><br /><a href="#code-Dprof-in-tech" title="Code">💻</a></td>
     </tr>
   </tbody>
 </table>
