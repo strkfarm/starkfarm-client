@@ -52,7 +52,7 @@ const exampleData = {
   },
 };
 
-async function TncPage() {
+function TncPage() {
   const {
     signTypedData,
     isPending,
