@@ -25,6 +25,7 @@ import { Call } from 'starknet';
 
 interface TxButtonProps {
   txInfo: StrategyTxProps;
+  buttonText?: 'Deposit' | 'Redeem';
   text: string;
   calls: Call[];
   buttonProps: ButtonProps;
@@ -39,8 +40,6 @@ export default function TxButton(props: TxButtonProps) {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const pathname = usePathname();
 
-  console.log(pathname, 'pathname');
-
   const disabledStyle = {
     bg: 'var(--chakra-colors-disabled_bg)',
     color: 'var(--chakra-colors-disabled_text)',
@@ -54,17 +53,7 @@ export default function TxButton(props: TxButtonProps) {
     });
 
   useEffect(() => {
-    console.log(
-      'TxButton status',
-      isPending,
-      status,
-      isSuccess,
-      data,
-      error,
-      isError,
-    );
     if (data && data.transaction_hash) {
-      console.log('TxButton txHash', data.transaction_hash);
       // initiates a toast and adds the tx to tx history if successful
       monitorNewTx({
         txHash: data.transaction_hash,
@@ -78,7 +67,7 @@ export default function TxButton(props: TxButtonProps) {
       mixpanel.track('Transaction success', {
         strategyId: props.txInfo.strategyId,
         actionType: props.txInfo.actionType,
-        amount: (Number(props.txInfo.amount) / 10 ** 18).toFixed(6),
+        amount: props.txInfo.amount.toEtherToFixedDecimals(6),
         tokenAddr: props.txInfo.tokenAddr,
         status: 'success',
         createdAt: new Date(),
@@ -89,7 +78,7 @@ export default function TxButton(props: TxButtonProps) {
       mixpanel.track('Transaction failed', {
         strategyId: props.txInfo.strategyId,
         actionType: props.txInfo.actionType,
-        amount: (Number(props.txInfo.amount) / 10 ** 18).toFixed(6),
+        amount: props.txInfo.amount.toEtherToFixedDecimals(6),
         tokenAddr: props.txInfo.tokenAddr,
         status: 'failed',
         createdAt: new Date(),
@@ -222,7 +211,7 @@ export default function TxButton(props: TxButtonProps) {
               address,
             });
             writeAsync().then((tx) => {
-              if (props.text.includes('Deposit')) onOpen();
+              if (props.buttonText === 'Deposit') onOpen();
               mixpanel.track('Submitted tx', {
                 strategyId: props.txInfo.strategyId,
                 txHash: tx.transaction_hash,

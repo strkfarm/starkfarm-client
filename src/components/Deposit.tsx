@@ -299,6 +299,7 @@ export default function Deposit(props: DepositProps) {
       <Center marginTop={'10px'}>
         <TxButton
           txInfo={txInfo}
+          buttonText={props.buttonText}
           text={`${props.buttonText}: ${amount.toEtherToFixedDecimals(2)} ${selectedMarket.name}`}
           calls={calls}
           buttonProps={{
