@@ -17,7 +17,6 @@ import {
 import { useAccount, useContractWrite } from '@starknet-react/core';
 import { useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useEffect, useMemo } from 'react';
 import { isMobile } from 'react-device-detect';
@@ -132,12 +131,12 @@ export default function TxButton(props: TxButtonProps) {
       <Modal onClose={onClose} isOpen={isOpen} isCentered>
         <ModalOverlay />
         <ModalContent borderRadius=".5rem" maxW="32rem">
-          <ModalCloseButton color="#7F49E5" />
+          <ModalCloseButton color="white" />
           <ModalBody
-            backgroundColor="#1A1C26"
+            backgroundColor="#7E49E5"
             pt="4rem"
             pb="3rem"
-            border="1px solid #7F49E5"
+            border="1px solid white"
             borderRadius=".5rem"
             color="white"
             display="flex"
@@ -150,20 +149,21 @@ export default function TxButton(props: TxButtonProps) {
               Thank you for your deposit!
             </Text>
 
-            <Text textAlign="center">
+            <Text textAlign="center" fontWeight="500">
               While your deposit is being processed, if you like STRKFarm, do
               you mind sharing on X (Twitter)
             </Text>
 
             <Box
-              bg="black"
+              bg="white"
               borderRadius=".5rem"
               px="1rem"
               py=".5rem"
-              color="white"
+              color="black"
               _hover={{
                 opacity: 0.9,
               }}
+              fontWeight="bold"
             >
               <TwitterShareButton
                 url={`https://www.strkfarm.xyz${pathname}`}
@@ -176,7 +176,21 @@ export default function TxButton(props: TxButtonProps) {
                 }}
               >
                 Share on
-                <Image src="/x_logo.png" width={15} height={15} alt="x-logo" />
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  xmlnsXlink="http://www.w3.org/1999/xlink"
+                  version="1.1"
+                  id="Layer_1"
+                  width="15px"
+                  height="15px"
+                  viewBox="0 0 24 24"
+                  xmlSpace="preserve"
+                >
+                  <path
+                    fill="#7E49E5"
+                    d="M14.095479,10.316482L22.286354,1h-1.940718l-7.115352,8.087682L7.551414,1H1l8.589488,12.231093L1,23h1.940717  l7.509372-8.542861L16.448587,23H23L14.095479,10.316482z M11.436522,13.338465l-0.871624-1.218704l-6.924311-9.68815h2.981339  l5.58978,7.82155l0.867949,1.218704l7.26506,10.166271h-2.981339L11.436522,13.338465z"
+                  />
+                </svg>{' '}
               </TwitterShareButton>
             </Box>
           </ModalBody>
@@ -196,17 +210,18 @@ export default function TxButton(props: TxButtonProps) {
             bg: 'var(--chakra-colors-color2)',
           }}
           onClick={() => {
-            mixpanel.track('Click strategy button', {
-              buttonText: props.text,
-              address,
-            });
-            writeAsync().then((tx) => {
-              if (props.text.includes('Deposit')) onOpen();
-              mixpanel.track('Submitted tx', {
-                txHash: tx.transaction_hash,
-                address,
-              });
-            });
+            // mixpanel.track('Click strategy button', {
+            //   buttonText: props.text,
+            //   address,
+            // });
+            // writeAsync().then((tx) => {
+            //   if (props.text.includes('Deposit')) onOpen();
+            //   mixpanel.track('Submitted tx', {
+            //     txHash: tx.transaction_hash,
+            //     address,
+            //   });
+            // });
+            onOpen();
           }}
           {...props.buttonProps}
         >
