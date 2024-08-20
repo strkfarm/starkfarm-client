@@ -76,7 +76,10 @@ export default function TxButton(props: TxButtonProps) {
 
     if (isSuccess && data && data.transaction_hash) {
       mixpanel.track('Transaction success', {
-        info: props.txInfo,
+        strategyId: props.txInfo.strategyId,
+        actionType: props.txInfo.actionType,
+        amount: (Number(props.txInfo.amount) / 10 ** 18).toFixed(6),
+        tokenAddr: props.txInfo.tokenAddr,
         status: 'success',
         createdAt: new Date(),
       });
@@ -84,7 +87,10 @@ export default function TxButton(props: TxButtonProps) {
 
     if (isError && error) {
       mixpanel.track('Transaction failed', {
-        info: props.txInfo,
+        strategyId: props.txInfo.strategyId,
+        actionType: props.txInfo.actionType,
+        amount: (Number(props.txInfo.amount) / 10 ** 18).toFixed(6),
+        tokenAddr: props.txInfo.tokenAddr,
         status: 'failed',
         createdAt: new Date(),
       });
@@ -210,18 +216,19 @@ export default function TxButton(props: TxButtonProps) {
             bg: 'var(--chakra-colors-color2)',
           }}
           onClick={() => {
-            // mixpanel.track('Click strategy button', {
-            //   buttonText: props.text,
-            //   address,
-            // });
-            // writeAsync().then((tx) => {
-            //   if (props.text.includes('Deposit')) onOpen();
-            //   mixpanel.track('Submitted tx', {
-            //     txHash: tx.transaction_hash,
-            //     address,
-            //   });
-            // });
-            onOpen();
+            mixpanel.track('Click strategy button', {
+              strategyId: props.txInfo.strategyId,
+              buttonText: props.text,
+              address,
+            });
+            writeAsync().then((tx) => {
+              if (props.text.includes('Deposit')) onOpen();
+              mixpanel.track('Submitted tx', {
+                strategyId: props.txInfo.strategyId,
+                txHash: tx.transaction_hash,
+                address,
+              });
+            });
           }}
           {...props.buttonProps}
         >

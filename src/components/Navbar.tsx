@@ -66,7 +66,7 @@ export default function Navbar(props: NavbarProps) {
     const tokenInfo = getTokenInfoFromName(token);
     const balance = await getERC20Balance(tokenInfo, address);
 
-    return Number(balance.amount) / 10 ** 18;
+    return (Number(balance.amount) / 10 ** 18).toFixed(6);
   };
 
   useEffect(() => {

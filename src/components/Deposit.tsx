@@ -165,7 +165,8 @@ export default function Deposit(props: DepositProps) {
               setAmount(maxAmount);
               setRawAmount(maxAmount.toEtherStr());
               mixpanel.track('Chose max amount', {
-                strategy: props.strategy.name,
+                strategyId: props.strategy.id,
+                strategyName: props.strategy.name,
                 buttonText: props.buttonText,
                 amount: amount.toEtherStr(),
                 token: selectedMarket.name,
@@ -259,7 +260,8 @@ export default function Deposit(props: DepositProps) {
           setRawAmount(value);
           setDirty(true);
           mixpanel.track('Enter amount', {
-            strategy: props.strategy.name,
+            strategyId: props.strategy.id,
+            strategyName: props.strategy.name,
             buttonText: props.buttonText,
             amount: amount.toEtherStr(),
             token: selectedMarket.name,
