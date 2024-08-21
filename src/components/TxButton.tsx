@@ -1,4 +1,4 @@
-import CONSTANTS from '@/constants';
+import CONSTANTS, { TNC_DOC_VERSION } from '@/constants';
 import { StrategyTxProps, monitorNewTxAtom } from '@/store/transactions.atom';
 import { TokenInfo } from '@/strategies/IStrategy';
 import {
@@ -15,13 +15,15 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { useAccount, useContractWrite } from '@starknet-react/core';
+import axios from 'axios';
 import { useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { usePathname } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { TwitterShareButton } from 'react-share';
 import { Call } from 'starknet';
+import TncModal from './TncModal';
 
 interface TxButtonProps {
   txInfo: StrategyTxProps;
@@ -39,6 +41,8 @@ export default function TxButton(props: TxButtonProps) {
   const monitorNewTx = useSetAtom(monitorNewTxAtom);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const pathname = usePathname();
+
+  const [showTncModal, setShowTncModal] = useState(false);
 
   const disabledStyle = {
     bg: 'var(--chakra-colors-disabled_bg)',
@@ -86,10 +90,6 @@ export default function TxButton(props: TxButtonProps) {
     }
   }, [status, data]);
 
-  // useEffect(() => {
-  //   console.log('TxButton props calls', props.calls);
-  // }, [props])
-
   const disabledText = useMemo(() => {
     if (props.justDisableIfNoWalletConnect) {
       if (!address) return props.text;
@@ -120,6 +120,24 @@ export default function TxButton(props: TxButtonProps) {
       </Button>
     );
   }
+
+  const getSignedUser = async () => {
+    if (props.buttonText === 'Deposit') {
+      const data = await axios.post('/api/tnc/getSignedUser', {
+        address,
+      });
+
+      if (
+        (data.data.user && data.data.user.tncDocVersion !== TNC_DOC_VERSION) ||
+        !data.data.user
+      ) {
+        setShowTncModal(true);
+        return true;
+      }
+
+      return false;
+    }
+  };
 
   return (
     <>
@@ -192,6 +210,13 @@ export default function TxButton(props: TxButtonProps) {
         </ModalContent>
       </Modal>
 
+      {showTncModal && (
+        <TncModal
+          isOpen={showTncModal}
+          onClose={() => setShowTncModal(false)}
+        />
+      )}
+
       <Box width={'100%'} textAlign={'center'}>
         <Button
           color={'white'}
@@ -204,20 +229,25 @@ export default function TxButton(props: TxButtonProps) {
           _hover={{
             bg: 'var(--chakra-colors-color2)',
           }}
-          onClick={() => {
+          onClick={async () => {
             mixpanel.track('Click strategy button', {
               strategyId: props.txInfo.strategyId,
               buttonText: props.text,
               address,
             });
-            writeAsync().then((tx) => {
-              if (props.buttonText === 'Deposit') onOpen();
-              mixpanel.track('Submitted tx', {
-                strategyId: props.txInfo.strategyId,
-                txHash: tx.transaction_hash,
-                address,
+
+            const res = await getSignedUser();
+
+            if (!res) {
+              writeAsync().then((tx) => {
+                if (props.buttonText === 'Deposit') onOpen();
+                mixpanel.track('Submitted tx', {
+                  strategyId: props.txInfo.strategyId,
+                  txHash: tx.transaction_hash,
+                  address,
+                });
               });
-            });
+            }
           }}
           {...props.buttonProps}
         >

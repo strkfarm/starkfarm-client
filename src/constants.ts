@@ -166,4 +166,6 @@ export const NFTS: NFTInfo[] = [
   },
 ];
 
+export const TNC_DOC_VERSION = '1.0';
+
 export default CONSTANTS;
