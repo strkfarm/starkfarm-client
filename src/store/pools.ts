@@ -15,6 +15,7 @@ import StarkDefiAtoms, { starkDefi } from './starkdefi.store';
 import TenkSwapAtoms, { tenkswap } from './tenkswap.store';
 import ZkLendAtoms, { zkLend } from './zklend.store';
 import CarmineAtoms, { carmine } from './carmine.store';
+import VesuAtoms, { Vesu } from './vesu.store';
 
 export enum Category {
   Stable = 'Stable Pools',
@@ -74,6 +75,11 @@ export const PROTOCOLS = [
     name: ekubo.name,
     class: ekubo,
     atoms: EkuboAtoms,
+  },
+  {
+    name: Vesu.name,
+    class: Vesu,
+    atoms: VesuAtoms,
   },
   {
     name: jedi.name,
