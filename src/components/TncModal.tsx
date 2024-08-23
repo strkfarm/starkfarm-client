@@ -61,16 +61,18 @@ const TncModal: React.FC<TncModalProps> = ({ isOpen, onClose }) => {
   const { signTypedData, data: signatureData } = useSignTypedData(exampleData);
   const { address } = useAccount();
 
+  console.log(signatureData?.toLocaleString(), '-------signatureData');
+
   const handleSign = async () => {
     signTypedData();
 
-    // if (signatureData) {
-    onClose();
-    await axios.post('/api/tnc/signUser', {
-      address,
-      message: 'I agree to the terms and conditions',
-    });
-    // }
+    if (signatureData && signatureData?.toString().length > 0) {
+      onClose();
+      await axios.post('/api/tnc/signUser', {
+        address,
+        message: 'I agree to the terms and conditions',
+      });
+    }
   };
 
   return (
