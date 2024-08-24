@@ -31,29 +31,37 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 
+const banner_images = [
+  {
+    desktop: '/banners/ognft.svg',
+    mobile: '/banners/ognft_small.svg',
+    link: 'https://x.com/strkfarm/status/1788558092109775029',
+  },
+  {
+    desktop: '/banners/seed_grant.svg',
+    mobile: '/banners/seed_grant_small.jpg',
+    link: 'https://x.com/strkfarm/status/1787783906982260881',
+  },
+];
+
 export default function Home() {
   const [referralCode, setReferralCode] = useState('');
-  const { address } = useAccount();
-
-  useEffect(() => {
-    mixpanel.track('Page open');
-  }, []);
-
-  const searchParams = useSearchParams();
   const [tabIndex, setTabIndex] = useState(0);
+
+  const { address } = useAccount();
+  const searchParams = useSearchParams();
   const size = useWindowSize();
-
-  useEffect(() => {
-    const tab = searchParams.get('tab');
-    console.log('tab', tab);
-    if (tab === 'pools') {
-      setTabIndex(1);
-    } else {
-      setTabIndex(0);
-    }
-  }, [searchParams]);
-
   const router = useRouter();
+
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    {
+      loop: true,
+    },
+    [Autoplay({ playOnInit: true, delay: 8000 })],
+  );
+
+  const { selectedIndex, scrollSnaps, onDotButtonClick } =
+    useDotButton(emblaApi);
 
   function setRoute(value: string) {
     router.push(`?tab=${value}`);
@@ -67,28 +75,35 @@ export default function Home() {
     }
   }
 
-  const [emblaRef, emblaApi] = useEmblaCarousel(
-    {
-      loop: true,
-    },
-    [Autoplay({ playOnInit: true, delay: 8000 })],
-  );
+  useEffect(() => {
+    mixpanel.track('Page open');
+  }, []);
 
-  const { selectedIndex, scrollSnaps, onDotButtonClick } =
-    useDotButton(emblaApi);
+  useEffect(() => {
+    (async () => {
+      const tab = searchParams.get('tab');
+      if (tab === 'pools') {
+        setTabIndex(1);
+      } else {
+        setTabIndex(0);
+      }
 
-  const banner_images = [
-    {
-      desktop: '/banners/ognft.svg',
-      mobile: '/banners/ognft_small.svg',
-      link: 'https://x.com/strkfarm/status/1788558092109775029',
-    },
-    {
-      desktop: '/banners/seed_grant.svg',
-      mobile: '/banners/seed_grant_small.jpg',
-      link: 'https://x.com/strkfarm/status/1787783906982260881',
-    },
-  ];
+      const referrer = searchParams.get('referrer');
+
+      if (address && referrer) {
+        if (address === referrer) return alert('You cannot refer yourself');
+
+        try {
+          await axios.post('/api/referral/updateUser', {
+            referrerAddress: referrer,
+            refreeAddress: address,
+          });
+        } catch (error) {
+          console.error('Error while updating user', error);
+        }
+      }
+    })();
+  }, [address, searchParams]);
 
   useEffect(() => {
     (async () => {
@@ -133,8 +148,7 @@ export default function Home() {
           color={'cyan'}
           textAlign={'center'}
         >
-          <b>{"Starknet's"} Yield Powerhouse🚀</b>
-          {referralCode}
+          <b>Starknet&apos;s Yield Powerhouse🚀</b>
         </Text>
         <Text
           color="color2"

@@ -10,8 +10,10 @@ import {
   Stat,
   StatLabel,
   StatNumber,
+  Tooltip,
 } from '@chakra-ui/react';
 import { useAtomValue } from 'jotai';
+import Link from 'next/link';
 import React from 'react';
 
 interface TVLProps {
@@ -67,7 +69,12 @@ const TVL: React.FC<TVLProps> = ({ referralCode }) => {
       <GridItem display="flex">
         <Card width="100%" padding={'15px 30px'} color="white" bg="purple">
           <Stat>
-            <StatLabel>Your referral link (?)</StatLabel>
+            <StatLabel>
+              Your referral link{' '}
+              <Tooltip label="docs">
+                <Link href="#">(?)</Link>
+              </Tooltip>
+            </StatLabel>
             <Box
               display="flex"
               justifyContent="space-between"
@@ -83,7 +90,11 @@ const TVL: React.FC<TVLProps> = ({ referralCode }) => {
 
               <CopyIcon
                 cursor="pointer"
-                onClick={() => navigator.clipboard.writeText(referralCode)}
+                onClick={() =>
+                  navigator.clipboard.writeText(
+                    `${window.location.origin}/r/${referralCode}`,
+                  )
+                }
               />
             </Box>
           </Stat>
