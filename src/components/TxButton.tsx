@@ -1,4 +1,4 @@
-import CONSTANTS, { TNC_DOC_VERSION } from '@/constants';
+import CONSTANTS, { LATEST_TNC_DOC_VERSION } from '@/constants';
 import { StrategyTxProps, monitorNewTxAtom } from '@/store/transactions.atom';
 import { TokenInfo } from '@/strategies/IStrategy';
 import {
@@ -121,15 +121,16 @@ export default function TxButton(props: TxButtonProps) {
     );
   }
 
-  const getSignedUser = async () => {
+  const getUser = async () => {
     if (props.buttonText === 'Deposit') {
-      const data = await axios.post('/api/tnc/getSignedUser', {
+      const data = await axios.post('/api/tnc/getUser', {
         address,
       });
 
       if (
-        (data.data.user && data.data.user.tncDocVersion !== TNC_DOC_VERSION) ||
-        !data.data.user
+        (data.data.user.isTncSigned &&
+          data.data.user.tncDocVersion !== LATEST_TNC_DOC_VERSION) ||
+        !data.data.user.isTncSigned
       ) {
         setShowTncModal(true);
         return true;
@@ -236,7 +237,7 @@ export default function TxButton(props: TxButtonProps) {
               address,
             });
 
-            const res = await getSignedUser();
+            const res = await getUser();
 
             if (!res) {
               writeAsync().then((tx) => {

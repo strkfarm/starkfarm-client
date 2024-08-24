@@ -1,5 +1,5 @@
+import { db } from '@/db';
 import { NextResponse } from 'next/server';
-import { db } from '../../../../../db';
 
 export async function GET(_req: Request) {
   const users = await db.user.findMany({

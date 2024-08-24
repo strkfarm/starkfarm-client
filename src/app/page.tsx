@@ -5,6 +5,7 @@ import { useDotButton } from '@/components/EmblaCarouselDotButton';
 import Pools from '@/components/Pools';
 import Strategies from '@/components/Strategies';
 import CONSTANTS from '@/constants';
+import { generateReferralCode } from '@/utils';
 import { useWindowSize } from '@/utils/useWindowSize';
 
 import {
@@ -21,6 +22,8 @@ import {
   Tabs,
   Text,
 } from '@chakra-ui/react';
+import { useAccount } from '@starknet-react/core';
+import axios from 'axios';
 import Autoplay from 'embla-carousel-autoplay';
 import useEmblaCarousel from 'embla-carousel-react';
 import mixpanel from 'mixpanel-browser';
@@ -29,6 +32,9 @@ import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 
 export default function Home() {
+  const [referralCode, setReferralCode] = useState('');
+  const { address } = useAccount();
+
   useEffect(() => {
     mixpanel.track('Page open');
   }, []);
@@ -84,6 +90,39 @@ export default function Home() {
     },
   ];
 
+  useEffect(() => {
+    (async () => {
+      if (address) {
+        try {
+          const { data } = await axios.post('/api/tnc/getUser', {
+            address,
+          });
+
+          if (data.success && data.user) {
+            setReferralCode(data.user.referralCode);
+          }
+
+          if (!data.success) {
+            try {
+              const res = await axios.post('/api/referral/createUser', {
+                address,
+                referralCode: generateReferralCode(),
+              });
+
+              if (res.data.success && res.data.user) {
+                setReferralCode(res.data.user.referralCode);
+              }
+            } catch (error) {
+              console.error('Error while creating user', error);
+            }
+          }
+        } catch (error) {
+          console.error('Error while getting signed user', error);
+        }
+      }
+    })();
+  }, [address]);
+
   return (
     <Container maxWidth={'1000px'} margin={'0 auto'}>
       <Box padding={'15px 30px'} borderRadius="10px" margin={'20px 0px 10px'}>
@@ -95,6 +134,7 @@ export default function Home() {
           textAlign={'center'}
         >
           <b>{"Starknet's"} Yield Powerhouse🚀</b>
+          {referralCode}
         </Text>
         <Text
           color="color2"
@@ -203,7 +243,7 @@ export default function Home() {
         />
         <TabPanels>
           <TabPanel bg="highlight" width={'100%'} float={'left'}>
-            <Strategies></Strategies>
+            <Strategies referralCode={referralCode} />
           </TabPanel>
           <TabPanel bg="highlight" float={'left'} width={'100%'}>
             <Pools />

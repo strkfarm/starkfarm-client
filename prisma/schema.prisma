@@ -8,10 +8,12 @@ generator client {
 }
 
 model User {
-  id            Int    @id @default(autoincrement())
-  address       String @unique
-  message       String
-  tncDocVersion String @default("1.0")
+  id            Int      @id @default(autoincrement())
+  address       String   @unique
+  isTncSigned   Boolean? @default(false)
+  message       String?
+  tncDocVersion String?  @default("1.0")
+  referralCode  String   @unique
 
   createdAt DateTime @default(now())
 }

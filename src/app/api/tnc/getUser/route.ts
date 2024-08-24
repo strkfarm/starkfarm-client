@@ -1,5 +1,5 @@
+import { db } from '@/db';
 import { NextResponse } from 'next/server';
-import { db } from '../../../../../db';
 
 export async function POST(req: Request) {
   const { address } = await req.json();

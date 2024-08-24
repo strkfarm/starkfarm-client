@@ -2,11 +2,12 @@ import { db } from '@/db';
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
-  const { address, message } = await req.json();
+  const { address, referralCode } = await req.json();
 
-  const user = await db.user.findFirst({
-    where: {
+  const user = await db.user.create({
+    data: {
       address,
+      referralCode,
     },
   });
 
@@ -17,18 +18,8 @@ export async function POST(req: Request) {
     });
   }
 
-  const updatedUser = await db.user.update({
-    where: {
-      address,
-    },
-    data: {
-      message,
-      isTncSigned: true,
-    },
-  });
-
   return NextResponse.json({
     success: true,
-    user: updatedUser,
+    user,
   });
 }

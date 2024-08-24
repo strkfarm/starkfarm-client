@@ -1,6 +1,8 @@
 import { strategiesAtom } from '@/store/strategies.atoms';
 import { dAppStatsAtom, userStatsAtom } from '@/store/utils.atoms';
+import { CopyIcon } from '@chakra-ui/icons';
 import {
+  Box,
   Card,
   Grid,
   GridItem,
@@ -10,16 +12,21 @@ import {
   StatNumber,
 } from '@chakra-ui/react';
 import { useAtomValue } from 'jotai';
+import React from 'react';
 
-export default function TVL() {
-  const strategies = useAtomValue(strategiesAtom);
+interface TVLProps {
+  referralCode: string;
+}
+
+const TVL: React.FC<TVLProps> = ({ referralCode }) => {
+  const _strategies = useAtomValue(strategiesAtom);
   const { data, isPending } = useAtomValue(dAppStatsAtom);
   const { data: userData, isPending: userStatsPending } =
     useAtomValue(userStatsAtom);
 
   return (
     <Grid
-      templateColumns={{ base: 'repeat(1, 1fr)', md: 'repeat(2, 1fr)' }}
+      templateColumns={{ base: 'repeat(1, 1, 1fr)', md: 'repeat(3, 1fr)' }}
       gap="6"
       width="100%"
     >
@@ -38,6 +45,7 @@ export default function TVL() {
           </Stat>
         </Card>
       </GridItem>
+
       <GridItem display="flex">
         <Card width="100%" padding={'15px 30px'} color="white" bg="bg">
           <Stat>
@@ -55,6 +63,34 @@ export default function TVL() {
           </Stat>
         </Card>
       </GridItem>
+
+      <GridItem display="flex">
+        <Card width="100%" padding={'15px 30px'} color="white" bg="purple">
+          <Stat>
+            <StatLabel>Your referral link (?)</StatLabel>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <StatNumber
+                fontSize="1.5rem"
+                textDecoration="underline"
+                fontWeight="600"
+              >
+                {referralCode}
+              </StatNumber>
+
+              <CopyIcon
+                cursor="pointer"
+                onClick={() => navigator.clipboard.writeText(referralCode)}
+              />
+            </Box>
+          </Stat>
+        </Card>
+      </GridItem>
     </Grid>
   );
-}
+};
+
+export default TVL;
