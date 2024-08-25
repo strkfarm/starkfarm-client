@@ -16,6 +16,7 @@ import {
 import { useAtomValue } from 'jotai';
 import Link from 'next/link';
 import React from 'react';
+import toast from 'react-hot-toast';
 
 const TVL: React.FC = () => {
   const _strategies = useAtomValue(strategiesAtom);
@@ -71,6 +72,7 @@ const TVL: React.FC = () => {
             <StatLabel>
               Your referral link{' '}
               <Tooltip label="docs">
+                {/* TODO: update the url */}
                 <Link href="#">(?)</Link>
               </Tooltip>
             </StatLabel>
@@ -79,21 +81,33 @@ const TVL: React.FC = () => {
               justifyContent="space-between"
               alignItems="center"
             >
-              <StatNumber
-                fontSize="1.5rem"
-                textDecoration="underline"
-                fontWeight="600"
-              >
-                {referralCode}
-              </StatNumber>
+              {!referralCode ? (
+                <Spinner size="sm" color="white" marginTop={'8px'} />
+              ) : (
+                <StatNumber
+                  fontSize="1.5rem"
+                  textDecoration="underline"
+                  fontWeight="600"
+                >
+                  {referralCode}
+                </StatNumber>
+              )}
 
               <CopyIcon
                 cursor="pointer"
-                onClick={() =>
-                  navigator.clipboard.writeText(
-                    `${window.location.origin}/r/${referralCode}`,
-                  )
-                }
+                onClick={() => {
+                  if (window.location.origin.includes('app.strkfarm.xyz')) {
+                    navigator.clipboard.writeText(
+                      `https://strkfarm.xyz/r/${referralCode}`,
+                    );
+                  } else {
+                    navigator.clipboard.writeText(
+                      `${window.location.origin}/r/${referralCode}`,
+                    );
+                  }
+
+                  toast.success('Referral link copied to clipboard');
+                }}
               />
             </Box>
           </Stat>
