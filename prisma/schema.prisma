@@ -25,6 +25,6 @@ model Referral {
   refreeAddress String   @unique
   createdAt     DateTime @default(now())
 
-  User   User? @relation(fields: [userId], references: [id])
-  userId Int?
+  User   User @relation(fields: [userId], references: [id])
+  userId Int
 }
