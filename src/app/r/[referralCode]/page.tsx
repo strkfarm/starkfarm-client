@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import React from 'react';
 
 import { db } from '@/db';
+import { Text } from '@chakra-ui/react';
 
 interface RefferalPageProps {
   params: {
@@ -17,10 +18,23 @@ const RefferalPage: React.FC<RefferalPageProps> = async ({ params }) => {
   });
 
   if (!user) {
-    return <div>There is no user with this referral code</div>;
+    return (
+      <Text
+        fontSize="28px"
+        lineHeight="40px"
+        my="1rem"
+        color="cyan"
+        textAlign="center"
+      >
+        <b>
+          There is no user with this referral code. <br /> Please try again with
+          a valid referral code.
+        </b>
+      </Text>
+    );
   }
 
-  redirect(`http://strkfarm.xyz?referrer=${user.address}`);
+  redirect(`${process.env.NEXT_PUBLIC_APP_DOMAIN}?referrer=${user.address}`);
 };
 
 export default RefferalPage;

@@ -23,8 +23,10 @@ import tg from '@/assets/tg.svg';
 import CONSTANTS from '@/constants';
 import { getERC20Balance } from '@/store/balance.atoms';
 import { addressAtom } from '@/store/claims.atoms';
+import { referralCodeAtom } from '@/store/referral.store';
 import { lastWalletAtom } from '@/store/utils.atoms';
 import {
+  generateReferralCode,
   getTokenInfoFromName,
   MyMenuItemProps,
   MyMenuListProps,
@@ -37,6 +39,7 @@ import {
   useDisconnect,
   useStarkProfile,
 } from '@starknet-react/core';
+import axios from 'axios';
 import mixpanel from 'mixpanel-browser';
 import { useEffect } from 'react';
 import { isMobile } from 'react-device-detect';
@@ -50,6 +53,7 @@ export default function Navbar(props: NavbarProps) {
   const { address, connector } = useAccount();
   const { connect, connectors } = useConnect();
   const { disconnectAsync } = useDisconnect();
+  const setReferralCode = useSetAtom(referralCodeAtom);
   const setAddress = useSetAtom(addressAtom);
   const { data: starkProfile } = useStarkProfile({
     address,
@@ -146,6 +150,39 @@ export default function Navbar(props: NavbarProps) {
   // set address atom
   useEffect(() => {
     setAddress(address);
+  }, [address]);
+
+  useEffect(() => {
+    (async () => {
+      if (address) {
+        try {
+          const { data } = await axios.post('/api/tnc/getUser', {
+            address,
+          });
+
+          if (data.success && data.user) {
+            setReferralCode(data.user.referralCode);
+          }
+
+          if (!data.success) {
+            try {
+              const res = await axios.post('/api/referral/createUser', {
+                address,
+                referralCode: generateReferralCode(),
+              });
+
+              if (res.data.success && res.data.user) {
+                setReferralCode(res.data.user.referralCode);
+              }
+            } catch (error) {
+              console.error('Error while creating user', error);
+            }
+          }
+        } catch (error) {
+          console.error('Error while getting signed user', error);
+        }
+      }
+    })();
   }, [address]);
 
   return (

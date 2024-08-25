@@ -1,12 +1,8 @@
 import { getStrategies } from '@/store/strategies.atoms';
+import { standariseAddress } from '@/utils';
 import { NextResponse } from 'next/server';
-import { num } from 'starknet';
 
 export const revalidate = 0;
-
-function standariseAddress(address: string | bigint) {
-  return num.getHexString(num.getDecimalString(address.toString()));
-}
 
 export async function GET(_req: Request, context: any) {
   const { params } = context;

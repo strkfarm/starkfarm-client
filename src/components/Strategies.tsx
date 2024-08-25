@@ -37,11 +37,7 @@ import mixpanel from 'mixpanel-browser';
 import React from 'react';
 import TVL from './TVL';
 
-interface StrategiesProps {
-  referralCode: string;
-}
-
-const Strategies: React.FC<StrategiesProps> = ({ referralCode }) => {
+const Strategies: React.FC = () => {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
   const strategies = useAtomValue(strategiesAtom);
 
@@ -258,7 +254,7 @@ const Strategies: React.FC<StrategiesProps> = ({ referralCode }) => {
 
   return (
     <Container width="100%" float={'left'} padding={'0px'} marginTop={'10px'}>
-      <TVL referralCode={referralCode} />
+      <TVL />
       <Text
         marginTop={'15px'}
         color="light_grey"

@@ -5,7 +5,6 @@ import { useDotButton } from '@/components/EmblaCarouselDotButton';
 import Pools from '@/components/Pools';
 import Strategies from '@/components/Strategies';
 import CONSTANTS from '@/constants';
-import { generateReferralCode } from '@/utils';
 import { useWindowSize } from '@/utils/useWindowSize';
 
 import {
@@ -45,7 +44,6 @@ const banner_images = [
 ];
 
 export default function Home() {
-  const [referralCode, setReferralCode] = useState('');
   const [tabIndex, setTabIndex] = useState(0);
 
   const { address } = useAccount();
@@ -91,7 +89,7 @@ export default function Home() {
       const referrer = searchParams.get('referrer');
 
       if (address && referrer) {
-        if (address === referrer) return alert('You cannot refer yourself');
+        if (address === referrer) return;
 
         try {
           await axios.post('/api/referral/updateUser', {
@@ -104,39 +102,6 @@ export default function Home() {
       }
     })();
   }, [address, searchParams]);
-
-  useEffect(() => {
-    (async () => {
-      if (address) {
-        try {
-          const { data } = await axios.post('/api/tnc/getUser', {
-            address,
-          });
-
-          if (data.success && data.user) {
-            setReferralCode(data.user.referralCode);
-          }
-
-          if (!data.success) {
-            try {
-              const res = await axios.post('/api/referral/createUser', {
-                address,
-                referralCode: generateReferralCode(),
-              });
-
-              if (res.data.success && res.data.user) {
-                setReferralCode(res.data.user.referralCode);
-              }
-            } catch (error) {
-              console.error('Error while creating user', error);
-            }
-          }
-        } catch (error) {
-          console.error('Error while getting signed user', error);
-        }
-      }
-    })();
-  }, [address]);
 
   return (
     <Container maxWidth={'1000px'} margin={'0 auto'}>
@@ -257,7 +222,7 @@ export default function Home() {
         />
         <TabPanels>
           <TabPanel bg="highlight" width={'100%'} float={'left'}>
-            <Strategies referralCode={referralCode} />
+            <Strategies />
           </TabPanel>
           <TabPanel bg="highlight" float={'left'} width={'100%'}>
             <Pools />

@@ -1,3 +1,4 @@
+import { referralCodeAtom } from '@/store/referral.store';
 import { strategiesAtom } from '@/store/strategies.atoms';
 import { dAppStatsAtom, userStatsAtom } from '@/store/utils.atoms';
 import { CopyIcon } from '@chakra-ui/icons';
@@ -16,15 +17,13 @@ import { useAtomValue } from 'jotai';
 import Link from 'next/link';
 import React from 'react';
 
-interface TVLProps {
-  referralCode: string;
-}
-
-const TVL: React.FC<TVLProps> = ({ referralCode }) => {
+const TVL: React.FC = () => {
   const _strategies = useAtomValue(strategiesAtom);
   const { data, isPending } = useAtomValue(dAppStatsAtom);
   const { data: userData, isPending: userStatsPending } =
     useAtomValue(userStatsAtom);
+
+  const referralCode = useAtomValue(referralCodeAtom);
 
   return (
     <Grid

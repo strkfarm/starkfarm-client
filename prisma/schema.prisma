@@ -8,22 +8,22 @@ generator client {
 }
 
 model User {
-  id            Int      @id @default(autoincrement())
-  address       String   @unique
-  isTncSigned   Boolean? @default(false)
+  id            Int        @id @default(autoincrement())
+  address       String     @unique
+  isTncSigned   Boolean?   @default(false)
   message       String?
-  tncDocVersion String?  @default("1.0")
-  referralCode  String   @unique
-  refrees       Refree[]
-  refreeCount   Int?     @default(0)
+  tncDocVersion String?    @default("1.0")
+  referralCode  String     @unique
+  referrals     Referral[]
+  referralCount Int?       @default(0)
 
   createdAt DateTime @default(now())
 }
 
-model Refree {
-  id        Int      @id @default(autoincrement())
-  address   String   @unique
-  createdAt DateTime @default(now())
+model Referral {
+  referralId    Int      @id @default(autoincrement())
+  refreeAddress String   @unique
+  createdAt     DateTime @default(now())
 
   User   User? @relation(fields: [userId], references: [id])
   userId Int?
