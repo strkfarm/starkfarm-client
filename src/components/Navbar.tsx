@@ -261,7 +261,7 @@ export default function Navbar(props: NavbarProps) {
                         rounded="full"
                       />{' '}
                       <h3>
-                        {starkProfile
+                        {starkProfile && starkProfile.name
                           ? starkProfile.name
                           : shortAddress(address)}
                       </h3>
