@@ -14,7 +14,7 @@ export async function POST(req: Request) {
   }
 
   // standardised address
-  let parsedAddress = standariseAddress(address);
+  const parsedAddress = standariseAddress(address);
 
   const user = await db.user.findFirst({
     where: {

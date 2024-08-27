@@ -31,41 +31,46 @@ export async function POST(req: Request) {
   }
 
   // standardised address
-  let parsedAddress = standariseAddress(address);
+  const parsedAddress = standariseAddress(address);
 
   const newUserData = {
     address: parsedAddress,
     referralCode: myReferralCode,
   };
-  const [newUser, referralUpdate] = await db.$transaction(referrerAddress ? [
-      // create new user
-      db.user.create({
-        data: newUserData
-      }),
+  const result = await db.$transaction(
+    referrerAddress
+      ? [
+          // create new user
+          db.user.create({
+            data: newUserData,
+          }),
 
-      // since referrer is present, update referrer's referral count and add refree
-      db.user.update({
-        where: {
-          address: standariseAddress(referrerAddress),
-        },
-        data: {
-          referrals: {
-            create: {
-              refreeAddress: parsedAddress,
+          // since referrer is present, update referrer's referral count and add refree
+          db.user.update({
+            where: {
+              address: standariseAddress(referrerAddress),
             },
-          },
-          referralCount: { increment: 1 },
-        },
-      })
-    ]: [
-    db.user.create({
-      data: newUserData
-    })
-  ]);
+            data: {
+              referrals: {
+                create: {
+                  refreeAddress: parsedAddress,
+                },
+              },
+              referralCount: { increment: 1 },
+            },
+          }),
+        ]
+      : [
+          db.user.create({
+            data: newUserData,
+          }),
+        ],
+  );
 
-  console.info('newUser', newUser);
-  console.info('referralUpdate', referralUpdate);
+  console.info('newUser', result[0]);
+  console.info('referralUpdate', result[1], referrerAddress);
 
+  const newUser = result[0];
   if (!newUser) {
     return NextResponse.json({
       success: false,

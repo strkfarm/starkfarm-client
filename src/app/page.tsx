@@ -22,7 +22,6 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useAccount } from '@starknet-react/core';
-import axios from 'axios';
 import Autoplay from 'embla-carousel-autoplay';
 import useEmblaCarousel from 'embla-carousel-react';
 import mixpanel from 'mixpanel-browser';
@@ -85,23 +84,8 @@ export default function Home() {
       } else {
         setTabIndex(0);
       }
-
-      const referrer = searchParams.get('referrer');
-
-      if (address && referrer) {
-        if (address === referrer) return;
-
-        try {
-          await axios.post('/api/referral/updateUser', {
-            referrerAddress: referrer,
-            refreeAddress: address,
-          });
-        } catch (error) {
-          console.error('Error while updating user', error);
-        }
-      }
     })();
-  }, [address, searchParams]);
+  }, [searchParams]);
 
   return (
     <Container maxWidth={'1000px'} margin={'0 auto'}>
