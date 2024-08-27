@@ -30,8 +30,7 @@ import {
 import { useAccount } from '@starknet-react/core';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 
 import Deposit from '@/components/Deposit';
@@ -43,23 +42,28 @@ import {
   transactionsAtom,
 } from '@/store/transactions.atom';
 import { getUniqueById, shortAddress } from '@/utils';
+import { StrategyParams } from '../page';
 
-const Strategy = () => {
+const Strategy = ({ params }: StrategyParams) => {
   const { address } = useAccount();
-  const searchParams = useSearchParams();
   const strategies = useAtomValue(strategiesAtom);
   const transactions = useAtomValue(transactionsAtom);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     console.log('txs', transactions);
   }, [transactions]);
+
   const strategy: StrategyInfo | undefined = useMemo(() => {
-    const id = searchParams.get('id');
+    const id = params.strategyId;
+
     console.log('id', id);
+
     return strategies.find((s) => s.id === id);
-  }, [searchParams, strategies]);
+  }, [params.strategyId, strategies]);
 
   const setBalQueryEnable = useSetAtom(strategy?.balEnabled || atom(false));
+
   useEffect(() => {
     setBalQueryEnable(true);
   }, []);
@@ -79,11 +83,18 @@ const Strategy = () => {
   }, [balData]);
 
   useEffect(() => {
-    mixpanel.track('Strategy page open', { name: searchParams.get('name') });
-  }, [searchParams]);
+    mixpanel.track('Strategy page open', { name: params.strategyId });
+  }, [params.strategyId]);
 
   const colSpan1: any = { base: '5', md: '3' };
   const colSpan2: any = { base: '5', md: '2' };
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) return null;
+
   return (
     <>
       <Flex marginBottom={'10px'}>

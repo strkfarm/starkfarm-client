@@ -21,6 +21,8 @@ import {
   Tabs,
   Text,
 } from '@chakra-ui/react';
+import { useAccount } from '@starknet-react/core';
+import axios from 'axios';
 import Autoplay from 'embla-carousel-autoplay';
 import useEmblaCarousel from 'embla-carousel-react';
 import mixpanel from 'mixpanel-browser';
@@ -28,26 +30,36 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 
+const banner_images = [
+  {
+    desktop: '/banners/ognft.svg',
+    mobile: '/banners/ognft_small.svg',
+    link: 'https://x.com/strkfarm/status/1788558092109775029',
+  },
+  {
+    desktop: '/banners/seed_grant.svg',
+    mobile: '/banners/seed_grant_small.jpg',
+    link: 'https://x.com/strkfarm/status/1787783906982260881',
+  },
+];
+
 export default function Home() {
-  useEffect(() => {
-    mixpanel.track('Page open');
-  }, []);
-
-  const searchParams = useSearchParams();
   const [tabIndex, setTabIndex] = useState(0);
+
+  const { address } = useAccount();
+  const searchParams = useSearchParams();
   const size = useWindowSize();
-
-  useEffect(() => {
-    const tab = searchParams.get('tab');
-    console.log('tab', tab);
-    if (tab === 'pools') {
-      setTabIndex(1);
-    } else {
-      setTabIndex(0);
-    }
-  }, [searchParams]);
-
   const router = useRouter();
+
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    {
+      loop: true,
+    },
+    [Autoplay({ playOnInit: true, delay: 8000 })],
+  );
+
+  const { selectedIndex, scrollSnaps, onDotButtonClick } =
+    useDotButton(emblaApi);
 
   function setRoute(value: string) {
     router.push(`?tab=${value}`);
@@ -61,28 +73,35 @@ export default function Home() {
     }
   }
 
-  const [emblaRef, emblaApi] = useEmblaCarousel(
-    {
-      loop: true,
-    },
-    [Autoplay({ playOnInit: true, delay: 8000 })],
-  );
+  useEffect(() => {
+    mixpanel.track('Page open');
+  }, []);
 
-  const { selectedIndex, scrollSnaps, onDotButtonClick } =
-    useDotButton(emblaApi);
+  useEffect(() => {
+    (async () => {
+      const tab = searchParams.get('tab');
+      if (tab === 'pools') {
+        setTabIndex(1);
+      } else {
+        setTabIndex(0);
+      }
 
-  const banner_images = [
-    {
-      desktop: '/banners/ognft.svg',
-      mobile: '/banners/ognft_small.svg',
-      link: 'https://x.com/strkfarm/status/1788558092109775029',
-    },
-    {
-      desktop: '/banners/seed_grant.svg',
-      mobile: '/banners/seed_grant_small.jpg',
-      link: 'https://x.com/strkfarm/status/1787783906982260881',
-    },
-  ];
+      const referrer = searchParams.get('referrer');
+
+      if (address && referrer) {
+        if (address === referrer) return;
+
+        try {
+          await axios.post('/api/referral/updateUser', {
+            referrerAddress: referrer,
+            refreeAddress: address,
+          });
+        } catch (error) {
+          console.error('Error while updating user', error);
+        }
+      }
+    })();
+  }, [address, searchParams]);
 
   return (
     <Container maxWidth={'1000px'} margin={'0 auto'}>
@@ -94,7 +113,7 @@ export default function Home() {
           color={'cyan'}
           textAlign={'center'}
         >
-          <b>{"Starknet's"} Yield Powerhouse🚀</b>
+          <b>Starknet&apos;s Yield Powerhouse🚀</b>
         </Text>
         <Text
           color="color2"
@@ -203,7 +222,7 @@ export default function Home() {
         />
         <TabPanels>
           <TabPanel bg="highlight" width={'100%'} float={'left'}>
-            <Strategies></Strategies>
+            <Strategies />
           </TabPanel>
           <TabPanel bg="highlight" float={'left'} width={'100%'}>
             <Pools />

@@ -77,3 +77,8 @@ export function getTokenInfoFromName(tokenName: string) {
   }
   return info;
 }
+
+export function generateReferralCode() {
+  const code = Math.random().toString(36).slice(2, 8);
+  return code;
+}

@@ -1,6 +1,9 @@
 'use client';
 
 import CONSTANTS, { TokenName } from '@/constants';
+import { atom } from 'jotai';
+import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
+import { IDapp } from './IDapp.store';
 import {
   APRSplit,
   Category,
@@ -10,10 +13,8 @@ import {
   ProtocolAtoms,
   StrkDexIncentivesAtom,
 } from './pools';
-import { atom } from 'jotai';
-import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
-import { IDapp } from './IDapp.store';
-const fetcher = (...args: any[]) => {
+
+const _fetcher = async (...args: any[]) => {
   return fetch(args[0], args[1]).then((res) => res.json());
 };
 
@@ -379,9 +380,9 @@ const getData = async (): Promise<EkuboBaseAprDoc> => {
 
 export const ekubo = new Ekubo();
 const EkuboAtoms: ProtocolAtoms = {
-  baseAPRs: atomWithQuery((get) => ({
+  baseAPRs: atomWithQuery((_get) => ({
     queryKey: ['ekubo_base_aprs'],
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({ queryKey: _ }) => {
       return await getData();
     },
   })),
