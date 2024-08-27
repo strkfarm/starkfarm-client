@@ -37,6 +37,7 @@ import {
 } from '@ajna/pagination';
 import CONSTANTS from '@/constants';
 import Filters from '@/components/Filters';
+import mixpanel from 'mixpanel-browser';
 
 export default function Pools() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
@@ -199,6 +200,13 @@ export default function Pools() {
                   width={'100%'}
                   borderWidth={'0px'}
                   target="_blank"
+                  onClick={() => {
+                    mixpanel.track('Pool clicked', {
+                      pool: pool.pool.name,
+                      protocol: pool.protocol.name,
+                      yield: pool.apr,
+                    });
+                  }}
                 >
                   <CardBody>
                     <HStack width={'100%'}>
