@@ -27,4 +27,6 @@ model Referral {
 
   User   User @relation(fields: [userId], references: [id])
   userId Int
+
+  @@unique([userId, refreeAddress], name: "unique_referral")
 }

@@ -34,7 +34,7 @@ const RefferalPage: React.FC<RefferalPageProps> = async ({ params }) => {
     );
   }
 
-  redirect(`${process.env.NEXT_PUBLIC_APP_DOMAIN}?referrer=${user.address}`);
+  redirect(`${window.location.origin}?referrer=${user.address}`);
 };
 
 export default RefferalPage;

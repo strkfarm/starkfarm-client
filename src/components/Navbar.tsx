@@ -170,7 +170,7 @@ export default function Navbar(props: NavbarProps) {
             try {
               const res = await axios.post('/api/referral/createUser', {
                 address,
-                referralCode: generateReferralCode(),
+                myReferralCode: generateReferralCode(),
               });
 
               if (res.data.success && res.data.user) {
