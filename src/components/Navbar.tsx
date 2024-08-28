@@ -24,12 +24,14 @@ import CONSTANTS from '@/constants';
 import { getERC20Balance } from '@/store/balance.atoms';
 import { addressAtom } from '@/store/claims.atoms';
 import { referralCodeAtom } from '@/store/referral.store';
+import { useEffect } from 'react';
 import { lastWalletAtom } from '@/store/utils.atoms';
 import {
   generateReferralCode,
   getTokenInfoFromName,
   MyMenuItemProps,
   MyMenuListProps,
+  truncate,
   shortAddress,
 } from '@/utils';
 import fulllogo from '@public/fulllogo.png';
@@ -41,8 +43,8 @@ import {
 } from '@starknet-react/core';
 import axios from 'axios';
 import mixpanel from 'mixpanel-browser';
-import { useEffect } from 'react';
 import { isMobile } from 'react-device-detect';
+import { useSearchParams } from 'next/navigation';
 
 interface NavbarProps {
   hideTg?: boolean;
@@ -52,6 +54,7 @@ interface NavbarProps {
 export default function Navbar(props: NavbarProps) {
   const { address, connector } = useAccount();
   const { connect, connectors } = useConnect();
+  const searchParams = useSearchParams();
   const { disconnectAsync } = useDisconnect();
   const setReferralCode = useSetAtom(referralCodeAtom);
   const setAddress = useSetAtom(addressAtom);
@@ -166,9 +169,16 @@ export default function Navbar(props: NavbarProps) {
 
           if (!data.success) {
             try {
+              let referrer = searchParams.get('referrer');
+
+              if (address && referrer && address === referrer) {
+                referrer = null;
+              }
+
               const res = await axios.post('/api/referral/createUser', {
                 address,
-                referralCode: generateReferralCode(),
+                myReferralCode: generateReferralCode(),
+                referrerAddress: referrer,
               });
 
               if (res.data.success && res.data.user) {
@@ -317,7 +327,7 @@ export default function Navbar(props: NavbarProps) {
               >
                 <Center>
                   {address ? (
-                    <Box display="flex" alignItems="center" gap=".5rem">
+                    <Center display="flex" alignItems="center" gap=".5rem">
                       <Image
                         src={starkProfile?.profilePicture}
                         alt="pfp"
@@ -325,12 +335,12 @@ export default function Navbar(props: NavbarProps) {
                         height={30}
                         rounded="full"
                       />{' '}
-                      <h3>
+                      <Text as="h3" marginTop={'3px !important'}>
                         {starkProfile && starkProfile.name
-                          ? starkProfile.name
+                          ? truncate(starkProfile.name, 6, 6)
                           : shortAddress(address)}
-                      </h3>
-                    </Box>
+                      </Text>
+                    </Center>
                   ) : (
                     'Connect'
                   )}

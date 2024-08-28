@@ -14,12 +14,7 @@ export async function POST(req: Request) {
   }
 
   // standardised address
-  let parsedAddress = address;
-  try {
-    parsedAddress = standariseAddress(address);
-  } catch (e) {
-    throw new Error('Invalid address');
-  }
+  const parsedAddress = standariseAddress(address);
 
   const user = await db.user.findFirst({
     where: {

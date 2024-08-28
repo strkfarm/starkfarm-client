@@ -3,8 +3,16 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { standariseAddress } from '@/utils';
 
+function isSixDigitAlphanumeric(str: string) {
+  const regex = /^[a-zA-Z0-9]{6}$/;
+  return regex.test(str);
+}
+
 export async function POST(req: Request) {
-  const { address, referralCode } = await req.json();
+  const { address, myReferralCode, referrerAddress } = await req.json();
+
+  // todo: Ask user to sign with the referrer address as input and send the signed msg
+  // verify the signature is signed by address and contains the referrer address
 
   if (!address) {
     return NextResponse.json({
@@ -13,29 +21,80 @@ export async function POST(req: Request) {
     });
   }
 
-  if (!referralCode) {
+  // referral value check is important bcz, an attacker can send a very big or small code
+  // can break the UI
+  if (!myReferralCode || !isSixDigitAlphanumeric(myReferralCode)) {
     return NextResponse.json({
       success: false,
-      message: 'No referral code found',
+      message: 'Not a valid referral code',
     });
   }
 
   // standardised address
-  let parsedAddress = address;
-  try {
-    parsedAddress = standariseAddress(address);
-  } catch (e) {
-    throw new Error('Invalid address');
+  const parsedAddress = standariseAddress(address);
+
+  const newUserData = {
+    address: parsedAddress,
+    referralCode: myReferralCode,
+  };
+
+  const dbActions = [
+    db.user.create({
+      data: newUserData,
+    }),
+  ];
+  if (referrerAddress) {
+    dbActions.push(
+      db.user.update({
+        where: {
+          address: standariseAddress(referrerAddress),
+        },
+        data: {
+          referrals: {
+            create: {
+              refreeAddress: parsedAddress,
+            },
+          },
+          referralCount: { increment: 1 },
+        },
+      }),
+    );
   }
 
-  const user = await db.user.create({
-    data: {
-      address: parsedAddress,
-      referralCode,
-    },
-  });
+  let result = [];
+  if (referrerAddress) {
+    result = await db.$transaction([
+      db.user.create({
+        data: newUserData,
+      }),
+      // since referrer is present, update referrer's referral count and add refree
+      db.user.update({
+        where: {
+          address: standariseAddress(referrerAddress),
+        },
+        data: {
+          referrals: {
+            create: {
+              refreeAddress: parsedAddress,
+            },
+          },
+          referralCount: { increment: 1 },
+        },
+      }),
+    ]);
+  } else {
+    result = [
+      await db.user.create({
+        data: newUserData,
+      }),
+    ];
+  }
 
-  if (!user) {
+  console.info('newUser', result[0]);
+  console.info('referralUpdate', result[1], referrerAddress);
+
+  const newUser = result[0];
+  if (!newUser) {
     return NextResponse.json({
       success: false,
       message: 'Error creating user',
@@ -46,6 +105,6 @@ export async function POST(req: Request) {
   return NextResponse.json({
     success: true,
     message: 'User created successfully',
-    user,
+    user: newUser,
   });
 }
