@@ -113,7 +113,7 @@ export default function Pools() {
           backgroundColor={color}
           opacity={0.3}
           filter={'blur(30.549999237060547px)'}
-          right={{ base: '70%', md: '18px' }}
+          right={{ base: '70%', md: '35px' }}
           bottom={'-80px'}
           width={'94px'}
           height={'94px'}
