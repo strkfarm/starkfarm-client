@@ -59,6 +59,12 @@ const theme = extendTheme({
     MenuItem: {
       bg: 'highlight',
     },
+    Badge: {
+      baseStyle: {
+        lineHeight: 'initial',
+        borderRadius: '4px',
+      },
+    },
   },
   fonts: {
     heading: `'Courier New', Courier, monospace`,

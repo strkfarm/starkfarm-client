@@ -29,8 +29,6 @@ import {
   Tooltip,
   Wrap,
   WrapItem,
-  extendTheme,
-  // ChakraProvider,
 } from '@chakra-ui/react';
 import { useAtomValue } from 'jotai';
 import React from 'react';
@@ -38,25 +36,7 @@ import mixpanel from 'mixpanel-browser';
 import TVL from './TVL';
 import CONSTANTS from '@/constants';
 import { IStrategyProps, StrategyLiveStatus } from '@/strategies/IStrategy';
-
-const customTheme = extendTheme({
-  components: {
-    Heading: {
-      baseStyle: {
-        fontFamily: 'Inter, sans-serif',
-      },
-    },
-    Badge: {
-      baseStyle: {
-        lineHeight: 'initial',
-        borderRadius: '4px',
-      },
-    },
-    Tooltip: {
-      fontFamily: 'Inter, sans-serif',
-    },
-  },
-});
+import CardHeading from './CardHeader';
 
 export default function Strategies() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
@@ -269,9 +249,9 @@ export default function Strategies() {
                       <Avatar key={p.id} src={p.logo} />
                     ))}
                   </AvatarGroup>
-                  <Heading fontSize="xs" fontWeight={600} marginTop={'2px'}>
+                  <CardHeading fontSize="xs" fontWeight={600} marginTop={'2px'}>
                     {strat.name}
-                  </Heading>
+                  </CardHeading>
                   {strat.liveStatus != StrategyLiveStatus.ACTIVE && (
                     <Badge
                       ml="1"
@@ -286,9 +266,9 @@ export default function Strategies() {
                   )}
                 </HStack>
               </LinkOverlay>
-              <Heading
+              <CardHeading
                 fontSize={{ base: '12px', md: '14px' }}
-                color="color1_light"
+                color="grey_text"
                 marginTop="12px"
               >
                 <Wrap>
@@ -317,7 +297,7 @@ export default function Strategies() {
                     </WrapItem>
                   ))}
                 </Wrap>
-              </Heading>
+              </CardHeading>
             </Box>
           </Box>
         </LinkBox>
@@ -370,13 +350,7 @@ export default function Strategies() {
   }
 
   return (
-    <Container
-      theme={customTheme}
-      width="100%"
-      float={'left'}
-      padding={'0px'}
-      marginTop={'10px'}
-    >
+    <Container width="100%" float={'left'} padding={'0px'} marginTop={'10px'}>
       <TVL />
       <Text
         marginTop={'15px'}
