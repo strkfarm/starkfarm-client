@@ -37,35 +37,58 @@ export async function POST(req: Request) {
     address: parsedAddress,
     referralCode: myReferralCode,
   };
-  const result = await db.$transaction(
-    referrerAddress
-      ? [
-          // create new user
-          db.user.create({
-            data: newUserData,
-          }),
 
-          // since referrer is present, update referrer's referral count and add refree
-          db.user.update({
-            where: {
-              address: standariseAddress(referrerAddress),
+  const dbActions = [
+    db.user.create({
+      data: newUserData,
+    }),
+  ];
+  if (referrerAddress) {
+    dbActions.push(
+      db.user.update({
+        where: {
+          address: standariseAddress(referrerAddress),
+        },
+        data: {
+          referrals: {
+            create: {
+              refreeAddress: parsedAddress,
             },
-            data: {
-              referrals: {
-                create: {
-                  refreeAddress: parsedAddress,
-                },
-              },
-              referralCount: { increment: 1 },
+          },
+          referralCount: { increment: 1 },
+        },
+      }),
+    );
+  }
+
+  let result = [];
+  if (referrerAddress) {
+    result = await db.$transaction([
+      db.user.create({
+        data: newUserData,
+      }),
+      // since referrer is present, update referrer's referral count and add refree
+      db.user.update({
+        where: {
+          address: standariseAddress(referrerAddress),
+        },
+        data: {
+          referrals: {
+            create: {
+              refreeAddress: parsedAddress,
             },
-          }),
-        ]
-      : [
-          db.user.create({
-            data: newUserData,
-          }),
-        ],
-  );
+          },
+          referralCount: { increment: 1 },
+        },
+      }),
+    ]);
+  } else {
+    result = [
+      await db.user.create({
+        data: newUserData,
+      }),
+    ];
+  }
 
   console.info('newUser', result[0]);
   console.info('referralUpdate', result[1], referrerAddress);

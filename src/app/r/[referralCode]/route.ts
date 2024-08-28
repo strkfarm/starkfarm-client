@@ -18,7 +18,7 @@ export async function GET(req: Request, context: any) {
   if (!user) {
     return NextResponse.redirect(`${protocol}://${host}/`);
   }
-  
+
   return NextResponse.redirect(
     `${protocol}://${host}/?referrer=${user.address}`,
   );
