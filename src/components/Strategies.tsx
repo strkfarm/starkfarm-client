@@ -36,7 +36,6 @@ import mixpanel from 'mixpanel-browser';
 import TVL from './TVL';
 import CONSTANTS from '@/constants';
 import { IStrategyProps, StrategyLiveStatus } from '@/strategies/IStrategy';
-import CardHeading from './CardHeader';
 
 export default function Strategies() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
@@ -166,13 +165,7 @@ export default function Strategies() {
     return (
       <>
         <Box>
-          <Tooltip
-            hasArrow
-            label={tooltipLabel}
-            bg="gray.300"
-            color="black"
-            fontFamily={'Inter'}
-          >
+          <Tooltip hasArrow label={tooltipLabel} bg="gray.300" color="black">
             <Box
               width={'100%'}
               display="flex"
@@ -249,9 +242,9 @@ export default function Strategies() {
                       <Avatar key={p.id} src={p.logo} />
                     ))}
                   </AvatarGroup>
-                  <CardHeading fontSize="xs" fontWeight={600} marginTop={'2px'}>
+                  <Heading fontSize="xs" fontWeight={600} marginTop={'2px'}>
                     {strat.name}
-                  </CardHeading>
+                  </Heading>
                   {strat.liveStatus != StrategyLiveStatus.ACTIVE && (
                     <Badge
                       ml="1"
@@ -266,7 +259,7 @@ export default function Strategies() {
                   )}
                 </HStack>
               </LinkOverlay>
-              <CardHeading
+              <Heading
                 fontSize={{ base: '12px', md: '14px' }}
                 color="grey_text"
                 marginTop="12px"
@@ -297,7 +290,7 @@ export default function Strategies() {
                     </WrapItem>
                   ))}
                 </Wrap>
-              </CardHeading>
+              </Heading>
             </Box>
           </Box>
         </LinkBox>
@@ -329,16 +322,9 @@ export default function Strategies() {
           position={'relative'}
           display={'flex'}
           flexDirection={'column'}
-          alignItems={{ base: 'left', md: 'center' }}
+          alignSelf={{ base: 'left', md: 'center' }}
           justifyContent={'flex-start'}
         >
-          <Text
-            fontSize={'14px'}
-            marginBottom={{ base: '10px', md: '16px' }}
-            fontWeight={600}
-          >
-            Safety Score
-          </Text>
           {GetRiskLevel(strat.name)}
         </Box>
         {/* <Stack direction={{base: 'column', md: 'row'}} width={{base: '50%', md: '66%'}}>
@@ -392,7 +378,6 @@ export default function Strategies() {
               bg={getStratCardBg(strat, index)}
               borderRadius={'4px'}
               color="white"
-              textStyle="custom"
               minHeight={'100px'}
               _hover={getStratCardBgHover(strat, index)}
             >
