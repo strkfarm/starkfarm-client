@@ -1,5 +1,7 @@
+import CONSTANTS from '@/constants';
 import { allPoolsAtomUnSorted } from '@/store/pools';
 import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
+import { IStrategyProps, StrategyLiveStatus } from '@/strategies/IStrategy';
 import { getUniqueById } from '@/utils';
 import { AddIcon } from '@chakra-ui/icons';
 import {
@@ -31,13 +33,11 @@ import {
   WrapItem,
 } from '@chakra-ui/react';
 import { useAtomValue } from 'jotai';
-import React from 'react';
 import mixpanel from 'mixpanel-browser';
+import React from 'react';
 import TVL from './TVL';
-import CONSTANTS from '@/constants';
-import { IStrategyProps, StrategyLiveStatus } from '@/strategies/IStrategy';
 
-export default function Strategies() {
+const Strategies: React.FC = () => {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
   const strategies = useAtomValue(strategiesAtom);
 
@@ -152,7 +152,7 @@ export default function Strategies() {
           <Box width={'100%'}>
             <Box>
               <LinkOverlay
-                href={isLive(strat) ? `/strategy?id=${strat.id}` : '#'}
+                href={isLive(strat) ? `/strategy/${strat.id}` : '#'}
                 cursor={isLive(strat) ? 'pointer' : 'default'}
               >
                 <HStack
@@ -340,4 +340,6 @@ export default function Strategies() {
       </Text>
     </Container>
   );
-}
+};
+
+export default Strategies;

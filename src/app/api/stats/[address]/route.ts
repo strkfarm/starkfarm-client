@@ -1,14 +1,10 @@
-import { NextResponse } from 'next/server';
-import { num } from 'starknet';
 import { getStrategies } from '@/store/strategies.atoms';
+import { standariseAddress } from '@/utils';
+import { NextResponse } from 'next/server';
 
 export const revalidate = 0;
 
-function standariseAddress(address: string | bigint) {
-  return num.getHexString(num.getDecimalString(address.toString()));
-}
-
-export async function GET(req: Request, context: any) {
+export async function GET(_req: Request, context: any) {
   const { params } = context;
   const addr = params.address;
 
