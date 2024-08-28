@@ -19,6 +19,7 @@ import { InjectedConnector } from 'starknetkit/injected';
 import Navbar from '@/components/Navbar';
 import { Toaster } from 'react-hot-toast';
 import { usePathname } from 'next/navigation';
+import '@fontsource/inter';
 
 // ! make page view more dynamic
 mixpanel.init('118f29da6a372f0ccb6f541079cad56b');
@@ -43,6 +44,7 @@ const theme = extendTheme({
     purple: '#6F4FF2',
     cyan: '#22F3DF',
     bg: '#1A1C26', // dark blue
+    grey_text: '#B6B6B6',
   },
   fontSizes: {
     large: '50px',
@@ -61,6 +63,12 @@ const theme = extendTheme({
   fonts: {
     heading: `'Courier New', Courier, monospace`,
     body: `'Courier New', Courier, monospace`,
+    custom: `'Inter, sans-serif'`,
+  },
+  textStyles: {
+    custom: {
+      fontFamily: 'Inter, sans-serif',
+    },
   },
 });
 

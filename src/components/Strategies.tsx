@@ -29,13 +29,34 @@ import {
   Tooltip,
   Wrap,
   WrapItem,
+  extendTheme,
+  // ChakraProvider,
 } from '@chakra-ui/react';
 import { useAtomValue } from 'jotai';
-import React from 'react';
+import React, { useState } from 'react';
 import mixpanel from 'mixpanel-browser';
 import TVL from './TVL';
 import CONSTANTS from '@/constants';
 import { IStrategyProps, StrategyLiveStatus } from '@/strategies/IStrategy';
+
+const customTheme = extendTheme({
+  components: {
+    Heading: {
+      baseStyle: {
+        fontFamily: 'Inter, sans-serif',
+      },
+    },
+    Badge: {
+      baseStyle: {
+        lineHeight: 'initial',
+        borderRadius: '4px',
+      },
+    },
+    Tooltip: {
+      fontFamily: 'Inter, sans-serif',
+    }
+  },
+});
 
 export default function Strategies() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
@@ -139,11 +160,81 @@ export default function Strategies() {
     );
   }
 
+  function GetRiskLevel(poolName: string) {
+    let color = '';
+    let count = 0;
+    let tooltipLabel = '';
+    const checkToken = (tokens: string[]) => {
+      const regex = new RegExp(tokens.join('|'), 'i');
+      return regex.test(poolName.toLowerCase());
+    };
+
+    if (checkToken(['eth', 'strk'])) {
+      color = '#FF9200';
+      count = 3;
+      tooltipLabel = 'Medium risk';
+    } else if (checkToken(['usdt', 'usdc'])) {
+      color = '#83F14D';
+      count = 5;
+      tooltipLabel = 'Low risk';
+    } else {
+      color = '#FF2020';
+      count = 1;
+      tooltipLabel = 'High risk';
+    }
+
+    return (
+      <>
+        <Box>
+          <Tooltip
+            hasArrow
+            label={tooltipLabel}
+            bg="gray.300"
+            color="black"
+            fontFamily={'Inter'}
+          >
+            <Box
+              width={'100%'}
+              display="flex"
+              alignItems="center"
+              justifyContent={{ base: 'flex-start', md: 'center' }}
+              padding={'4px'}
+              height={'100%'}
+            >
+              <Stack direction="row" spacing={1}>
+                {[...Array(5)].map((_, index) => (
+                  <Box
+                    key={index}
+                    width="4px"
+                    height="18px"
+                    borderRadius="md"
+                    bg={index < count ? color : '#29335C'}
+                  />
+                ))}
+              </Stack>
+            </Box>
+          </Tooltip>
+        </Box>
+        <Box
+          position={'absolute'}
+          backgroundColor={color}
+          opacity={0.3}
+          filter={'blur(30.549999237060547px)'}
+          right={{ base: '70%', md: '18px' }}
+          bottom={'-80px'}
+          width={'94px'}
+          height={'94px'}
+          zIndex={0}
+        />
+      </>
+    );
+  }
+
   function getStratCard(strat: StrategyInfo) {
     return (
       <Stack direction={{ base: 'column', md: 'row' }} width={'100%'}>
         <LinkBox
-          width={{ base: '100%', md: '70%' }}
+          width={{ base: '100%', md: '45%' }}
           display={{ base: 'flex', md: 'flex' }}
           onClick={() => {
             mixpanel.track('Strategy expanded', { name: strat.name });
@@ -159,10 +250,26 @@ export default function Strategies() {
                   fontSize={{ base: '25px', md: '25px' }}
                   textAlign={'left'}
                   marginBottom={'5px'}
-                  fontWeight={'bold'}
                   alignItems={'center'}
+                  spacing={'8px'}
+                  borderRadius={'4px'}
                 >
-                  <Heading size={{ base: 'sm', md: 'md' }} fontWeight={'bold'}>
+                  <AvatarGroup
+                    size="xs"
+                    max={4}
+                    marginRight={'5px'}
+                    float={'right'}
+                  >
+                    {getUniqueById(
+                      strat.actions.map((p) => ({
+                        id: p.pool.pool.name,
+                        logo: p.pool.pool.logos[0],
+                      })),
+                    ).map((p: any) => (
+                      <Avatar key={p.id} src={p.logo} />
+                    ))}
+                  </AvatarGroup>
+                  <Heading fontSize="xs" fontWeight={600} marginTop={'2px'}>
                     {strat.name}
                   </Heading>
                   {strat.liveStatus != StrategyLiveStatus.ACTIVE && (
@@ -170,7 +277,9 @@ export default function Strategies() {
                       ml="1"
                       bg="cyan"
                       fontFamily={'sans-serif'}
-                      padding="3px 5px 2px"
+                      padding="2px 8px"
+                      textTransform="capitalize"
+                      fontWeight={500}
                     >
                       {strat.liveStatus.valueOf()}
                     </Badge>
@@ -180,6 +289,7 @@ export default function Strategies() {
               <Heading
                 fontSize={{ base: '12px', md: '14px' }}
                 color="color1_light"
+                marginTop="12px"
               >
                 <Wrap>
                   {getUniqueById(
@@ -188,15 +298,21 @@ export default function Strategies() {
                       logo: p.pool.protocol.logo,
                     })),
                   ).map((p) => (
-                    <WrapItem marginRight={'10px'} key={p.id}>
+                    <WrapItem marginRight={'2px'} key={p.id}>
                       <Center>
                         <Avatar
                           size="2xs"
                           bg={'black'}
                           src={p.logo}
-                          marginRight={'2px'}
+                          marginRight={'6px'}
                         />
-                        <Text marginTop={'2px'}>{p.id}</Text>
+                        <Text
+                          marginTop={'2px'}
+                          fontWeight={300}
+                          color="grey_text"
+                        >
+                          {p.id}
+                        </Text>
                       </Center>
                     </WrapItem>
                   ))}
@@ -206,43 +322,44 @@ export default function Strategies() {
           </Box>
         </LinkBox>
         <Box
-          width={{ base: '100%', md: '30%' }}
+          width={{ base: '100%', md: '20%' }}
           marginTop={{ base: '10px', md: '0px' }}
+          display="flex"
+          flexDirection={'column'}
+          textAlign={'left'}
+          alignItems="center"
+          justifyContent="center"
         >
           <Box width={'100%'} float="left" marginBottom={'5px'}>
             <Tooltip label="Includes fees & rewards earn from tokens shown">
-              <Text
-                textAlign={'right'}
-                color="cyan"
-                fontWeight={'bold'}
-                float={{ base: 'left', md: 'right' }}
-              >
+              <Text textAlign={'left'} color="#fff" fontWeight={600}>
                 {(strat.netYield * 100).toFixed(2)}%
               </Text>
             </Tooltip>
-
-            <AvatarGroup size="xs" max={4} marginRight={'5px'} float={'right'}>
-              {getUniqueById(
-                strat.actions.map((p) => ({
-                  id: p.pool.pool.name,
-                  logo: p.pool.pool.logos[0],
-                })),
-              ).map((p: any) => (
-                <Avatar key={p.id} src={p.logo} />
-              ))}
-            </AvatarGroup>
           </Box>
           <Tooltip label="Multiplier showing the additional reward earned compared to simple deposit">
-            <Text
-              textAlign={{ base: 'left', md: 'right' }}
-              width="100%"
-              float={'left'}
-              color="#eeeeee"
-              fontWeight={'bold'}
-            >
-              {strat.leverage.toFixed(1)}x
+            <Text width="100%" color="cyan" fontWeight={600}>
+              ⚡️{strat.leverage.toFixed(1)}X
             </Text>
           </Tooltip>
+        </Box>
+        <Box
+          width={{ base: '50%', md: '15%' }}
+          marginTop={{ base: '10px', md: '0px' }}
+          position={'relative'}
+          display={'flex'}
+          flexDirection={'column'}
+          alignItems={{ base: 'left', md: 'center' }}
+          justifyContent={'flex-start'}
+        >
+          <Text
+            fontSize={'14px'}
+            marginBottom={{ base: '10px', md: '16px' }}
+            fontWeight={600}
+          >
+            Safety Score
+          </Text>
+          {GetRiskLevel(strat.name)}
         </Box>
         {/* <Stack direction={{base: 'column', md: 'row'}} width={{base: '50%', md: '66%'}}>
             {getAPRWithToolTip(pool)}
@@ -253,7 +370,13 @@ export default function Strategies() {
   }
 
   return (
-    <Container width="100%" float={'left'} padding={'0px'} marginTop={'10px'}>
+    <Container
+      theme={customTheme}
+      width="100%"
+      float={'left'}
+      padding={'0px'}
+      marginTop={'10px'}
+    >
       <TVL />
       <Text
         marginTop={'15px'}
@@ -293,10 +416,16 @@ export default function Strategies() {
               key={`${strat.name}`}
               variant={'filled'}
               bg={getStratCardBg(strat, index)}
+              borderRadius={'4px'}
               color="white"
+              textStyle="custom"
+              minHeight={'100px'}
               _hover={getStratCardBgHover(strat, index)}
             >
-              <CardBody padding={{ base: '15px', md: '20px' }}>
+              <CardBody
+                padding={{ base: '15px', md: '20px 32px' }}
+                overflowY={'hidden'}
+              >
                 <Box
                   width={'100%'}
                   padding={'0px 10px 0 0'}
