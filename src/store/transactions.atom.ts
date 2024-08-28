@@ -1,14 +1,14 @@
 // transaction history stored in local storage
 // Also handles tx status popup
 
-import { createAtomWithStorage } from './utils.atoms';
+import { TOKENS } from '@/constants';
+import { capitalize, standariseAddress } from '@/utils';
 import MyNumber from '@/utils/MyNumber';
 import { Getter, Setter, atom } from 'jotai';
-import { capitalize, standariseAddress } from '@/utils';
-import { TOKENS } from '@/constants';
-import { StrategyInfo, strategiesAtom } from './strategies.atoms';
-import { RpcProvider, TransactionExecutionStatus } from 'starknet';
 import toast from 'react-hot-toast';
+import { RpcProvider, TransactionExecutionStatus } from 'starknet';
+import { StrategyInfo, strategiesAtom } from './strategies.atoms';
+import { createAtomWithStorage } from './utils.atoms';
 
 export interface StrategyTxProps {
   strategyId: string;
@@ -27,9 +27,14 @@ export interface TransactionInfo {
 
 // in local storage, objects like Date, MyNumber are stored as strings
 // this function deserialises them back to their original types
-declare let localStorage: any;
+// declare let localStorage: any;
 async function deserialiseTxInfo(key: string, initialValue: TransactionInfo[]) {
-  const storedValue = localStorage.getItem(key);
+  let storedValue;
+
+  if (typeof window !== 'undefined') {
+    storedValue = localStorage.getItem(key);
+  }
+
   const txs: TransactionInfo[] = storedValue
     ? JSON.parse(storedValue)
     : initialValue;
