@@ -1,6 +1,8 @@
 import CONSTANTS, { LATEST_TNC_DOC_VERSION } from '@/constants';
+import { referralCodeAtom } from '@/store/referral.store';
 import { StrategyTxProps, monitorNewTxAtom } from '@/store/transactions.atom';
 import { TokenInfo } from '@/strategies/IStrategy';
+import { getReferralUrl } from '@/utils';
 import {
   Box,
   Button,
@@ -16,7 +18,7 @@ import {
 } from '@chakra-ui/react';
 import { useAccount, useContractWrite } from '@starknet-react/core';
 import axios from 'axios';
-import { useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { usePathname } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
@@ -40,6 +42,7 @@ export default function TxButton(props: TxButtonProps) {
   const monitorNewTx = useSetAtom(monitorNewTxAtom);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const pathname = usePathname();
+  const referralCode = useAtomValue(referralCodeAtom);
 
   const [showTncModal, setShowTncModal] = useState(false);
 
@@ -180,7 +183,7 @@ export default function TxButton(props: TxButtonProps) {
             >
               <TwitterShareButton
                 url={`https://www.strkfarm.xyz${pathname}`}
-                title={`I just invested my ${props.selectedMarket?.name ?? ''} token in ${props.strategyName ?? ''} in @strkfarm. \n\nHere's the strategy:`}
+                title={`I just invested my ${props.selectedMarket?.name ?? ''} token in the high yield  "${props.strategyName ?? ''}" strategy at @strkfarm. \n\nHere's my link to join: ${getReferralUrl(referralCode)}`}
                 related={['strkfarm']}
                 style={{
                   display: 'flex',

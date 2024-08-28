@@ -1,6 +1,8 @@
+import { addressAtom } from '@/store/claims.atoms';
 import { referralCodeAtom } from '@/store/referral.store';
 import { strategiesAtom } from '@/store/strategies.atoms';
 import { dAppStatsAtom, userStatsAtom } from '@/store/utils.atoms';
+import { getReferralUrl } from '@/utils';
 import { CopyIcon } from '@chakra-ui/icons';
 import {
   Box,
@@ -24,7 +26,24 @@ const TVL: React.FC = () => {
   const { data: userData, isPending: userStatsPending } =
     useAtomValue(userStatsAtom);
 
+  const address = useAtomValue(addressAtom);
   const referralCode = useAtomValue(referralCodeAtom);
+
+  function copyReferralLink() {
+    if (window.location.origin.includes('app.strkfarm.xyz')) {
+      navigator.clipboard.writeText(
+        `https://strkfarm.xyz/r/${referralCode}`,
+      );
+    } else {
+      navigator.clipboard.writeText(
+        getReferralUrl(referralCode),
+      );
+    }
+
+    toast.success('Referral link copied to clipboard', {
+      position: 'bottom-right'
+    });
+  }
 
   return (
     <Grid
@@ -69,46 +88,44 @@ const TVL: React.FC = () => {
       <GridItem display="flex">
         <Card width="100%" padding={'15px 30px'} color="white" bg="purple">
           <Stat>
-            <StatLabel>
+            <StatLabel fontWeight={'bold'}>
               Your referral link{' '}
-              <Tooltip label="docs">
+              <Tooltip label="Learn more">
                 {/* TODO: update the url */}
-                <Link href="#">(?)</Link>
+                <Link href="#">(i)</Link>
               </Tooltip>
             </StatLabel>
             <Box
               display="flex"
               justifyContent="space-between"
               alignItems="center"
-            >
-              {!referralCode ? (
+            > 
+              {address ? (
+                !referralCode ? (
                 <Spinner size="sm" color="white" marginTop={'8px'} />
               ) : (
                 <StatNumber
                   fontSize="1.5rem"
                   textDecoration="underline"
                   fontWeight="600"
+                  cursor={'pointer'}
+                  onClick={copyReferralLink}
                 >
                   {referralCode}
                 </StatNumber>
+              )) : (
+                <Tooltip label="Connect wallet"><StatNumber
+                  fontSize="1.5rem"
+                  fontWeight="600"
+                >
+                  -
+                </StatNumber></Tooltip>
               )}
 
-              <CopyIcon
+              {address && <CopyIcon
                 cursor="pointer"
-                onClick={() => {
-                  if (window.location.origin.includes('app.strkfarm.xyz')) {
-                    navigator.clipboard.writeText(
-                      `https://strkfarm.xyz/r/${referralCode}`,
-                    );
-                  } else {
-                    navigator.clipboard.writeText(
-                      `${window.location.origin}/r/${referralCode}`,
-                    );
-                  }
-
-                  toast.success('Referral link copied to clipboard');
-                }}
-              />
+                onClick={copyReferralLink}
+              />}
             </Box>
           </Stat>
         </Card>
