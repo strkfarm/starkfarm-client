@@ -90,3 +90,7 @@ export function generateReferralCode() {
   const code = Math.random().toString(36).slice(2, 8);
   return code;
 }
+
+export function getReferralUrl(referralCode: string) {
+  return `${window.location.origin}/r/${referralCode}`;
+}
