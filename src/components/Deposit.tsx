@@ -1,3 +1,9 @@
+import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
+import { StrategyInfo } from '@/store/strategies.atoms';
+import { StrategyTxProps } from '@/store/transactions.atom';
+import { IStrategyActionHook, TokenInfo } from '@/strategies/IStrategy';
+import { MyMenuItemProps, MyMenuListProps } from '@/utils';
+import MyNumber from '@/utils/MyNumber';
 import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
   Box,
@@ -21,19 +27,13 @@ import {
   Text,
   Tooltip,
 } from '@chakra-ui/react';
-import LoadingWrap from './LoadingWrap';
-import { IStrategyActionHook, TokenInfo } from '@/strategies/IStrategy';
-import { StrategyInfo } from '@/store/strategies.atoms';
-import { useMemo, useState } from 'react';
-import MyNumber from '@/utils/MyNumber';
-import TxButton from './TxButton';
-import { MyMenuItemProps, MyMenuListProps } from '@/utils';
 import { useAccount, useProvider } from '@starknet-react/core';
-import { ProviderInterface } from 'starknet';
-import mixpanel from 'mixpanel-browser';
-import { StrategyTxProps } from '@/store/transactions.atom';
 import { useAtomValue } from 'jotai';
-import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
+import mixpanel from 'mixpanel-browser';
+import { useMemo, useState } from 'react';
+import { ProviderInterface } from 'starknet';
+import LoadingWrap from './LoadingWrap';
+import TxButton from './TxButton';
 
 interface DepositProps {
   strategy: StrategyInfo;
@@ -72,7 +72,7 @@ export default function Deposit(props: DepositProps) {
   const txInfo: StrategyTxProps = useMemo(() => {
     return {
       strategyId: props.strategy.id,
-      actionType: props.buttonText == 'Deposit' ? 'deposit' : 'withdraw',
+      actionType: props.buttonText === 'Deposit' ? 'deposit' : 'withdraw',
       amount,
       tokenAddr: selectedMarket.token,
     };
@@ -165,7 +165,8 @@ export default function Deposit(props: DepositProps) {
               setAmount(maxAmount);
               setRawAmount(maxAmount.toEtherStr());
               mixpanel.track('Chose max amount', {
-                strategy: props.strategy.name,
+                strategyId: props.strategy.id,
+                strategyName: props.strategy.name,
                 buttonText: props.buttonText,
                 amount: amount.toEtherStr(),
                 token: selectedMarket.name,
@@ -259,7 +260,8 @@ export default function Deposit(props: DepositProps) {
           setRawAmount(value);
           setDirty(true);
           mixpanel.track('Enter amount', {
-            strategy: props.strategy.name,
+            strategyId: props.strategy.id,
+            strategyName: props.strategy.name,
             buttonText: props.buttonText,
             amount: amount.toEtherStr(),
             token: selectedMarket.name,
@@ -297,12 +299,15 @@ export default function Deposit(props: DepositProps) {
       <Center marginTop={'10px'}>
         <TxButton
           txInfo={txInfo}
+          buttonText={props.buttonText}
           text={`${props.buttonText}: ${amount.toEtherToFixedDecimals(2)} ${selectedMarket.name}`}
           calls={calls}
           buttonProps={{
             isDisabled:
               amount.isZero() || amount.compare(maxAmount.toEtherStr(), 'gt'),
           }}
+          selectedMarket={selectedMarket}
+          strategyName={props.strategy.name}
         />
       </Center>
 

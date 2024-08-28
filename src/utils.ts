@@ -32,7 +32,15 @@ export function capitalize(str: string) {
 
 export function shortAddress(_address: string) {
   const x = num.toHex(num.getDecimalString(_address));
-  return `${x.slice(0, 4)}...${x.slice(x.length - 4, x.length)}`;
+  return truncate(x, 4, 4);
+}
+
+export function truncate(str: string, startChars: number, endChars: number) {
+  if (str.length <= startChars + endChars) {
+    return str;
+  }
+
+  return `${str.slice(0, startChars)}...${str.slice(str.length - endChars, str.length)}`;
 }
 
 export function standariseAddress(address: string | bigint) {
@@ -76,4 +84,13 @@ export function getTokenInfoFromName(tokenName: string) {
     throw new Error('Token not found');
   }
   return info;
+}
+
+export function generateReferralCode() {
+  const code = Math.random().toString(36).slice(2, 8);
+  return code;
+}
+
+export function getReferralUrl(referralCode: string) {
+  return `${window.location.origin}/r/${referralCode}`;
 }

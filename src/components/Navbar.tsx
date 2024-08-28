@@ -18,16 +18,33 @@ import {
 import { useAtom, useSetAtom } from 'jotai';
 import { useStarknetkitConnectModal } from 'starknetkit';
 
+import { CONNECTOR_NAMES, MYCONNECTORS } from '@/app/template';
 import tg from '@/assets/tg.svg';
-import fulllogo from '@public/fulllogo.png';
 import CONSTANTS from '@/constants';
+import { getERC20Balance } from '@/store/balance.atoms';
 import { addressAtom } from '@/store/claims.atoms';
-import { MyMenuItemProps, MyMenuListProps, shortAddress } from '@/utils';
+import { referralCodeAtom } from '@/store/referral.store';
 import { useEffect } from 'react';
 import { lastWalletAtom } from '@/store/utils.atoms';
-import { useAccount, useConnect, useDisconnect } from '@starknet-react/core';
-import { CONNECTOR_NAMES, MYCONNECTORS } from '@/app/template';
+import {
+  generateReferralCode,
+  getTokenInfoFromName,
+  MyMenuItemProps,
+  MyMenuListProps,
+  truncate,
+  shortAddress,
+} from '@/utils';
+import fulllogo from '@public/fulllogo.png';
+import {
+  useAccount,
+  useConnect,
+  useDisconnect,
+  useStarkProfile,
+} from '@starknet-react/core';
+import axios from 'axios';
+import mixpanel from 'mixpanel-browser';
 import { isMobile } from 'react-device-detect';
+import { useSearchParams } from 'next/navigation';
 
 interface NavbarProps {
   hideTg?: boolean;
@@ -37,8 +54,14 @@ interface NavbarProps {
 export default function Navbar(props: NavbarProps) {
   const { address, connector } = useAccount();
   const { connect, connectors } = useConnect();
+  const searchParams = useSearchParams();
   const { disconnectAsync } = useDisconnect();
+  const setReferralCode = useSetAtom(referralCodeAtom);
   const setAddress = useSetAtom(addressAtom);
+  const { data: starkProfile } = useStarkProfile({
+    address,
+    useDefaultPfp: true,
+  });
   const [lastWallet, setLastWallet] = useAtom(lastWalletAtom);
   const { starknetkitConnectModal: starknetkitConnectModal1 } =
     useStarknetkitConnectModal({
@@ -55,16 +78,37 @@ export default function Navbar(props: NavbarProps) {
       connectors: MYCONNECTORS,
     });
 
+  const getTokenBalance = async (token: string, address: string) => {
+    const tokenInfo = getTokenInfoFromName(token);
+    const balance = await getERC20Balance(tokenInfo, address);
+
+    return balance.amount.toEtherToFixedDecimals(6);
+  };
+
+  useEffect(() => {
+    (async () => {
+      if (address) {
+        mixpanel.track('wallet connect trigger', {
+          address,
+          ethAmount: await getTokenBalance('ETH', address),
+          usdcAmount: await getTokenBalance('USDC', address),
+          strkAmount: await getTokenBalance('STRK', address),
+        });
+      }
+    })();
+  }, [address]);
+
   // Connect wallet using starknetkit
   const connectWallet = async () => {
     try {
       const result = await starknetkitConnectModal1();
-      await connect({ connector: result.connector });
+
+      connect({ connector: result.connector });
     } catch (error) {
       console.warn('connectWallet error', error);
       try {
         const result = await starknetkitConnectModal2();
-        await connect({ connector: result.connector });
+        connect({ connector: result.connector });
       } catch (error) {
         console.error('connectWallet error', error);
         alert('Error connecting wallet');
@@ -111,6 +155,46 @@ export default function Navbar(props: NavbarProps) {
     setAddress(address);
   }, [address]);
 
+  useEffect(() => {
+    (async () => {
+      if (address) {
+        try {
+          const { data } = await axios.post('/api/tnc/getUser', {
+            address,
+          });
+
+          if (data.success && data.user) {
+            setReferralCode(data.user.referralCode);
+          }
+
+          if (!data.success) {
+            try {
+              let referrer = searchParams.get('referrer');
+
+              if (address && referrer && address === referrer) {
+                referrer = null;
+              }
+
+              const res = await axios.post('/api/referral/createUser', {
+                address,
+                myReferralCode: generateReferralCode(),
+                referrerAddress: referrer,
+              });
+
+              if (res.data.success && res.data.user) {
+                setReferralCode(res.data.user.referralCode);
+              }
+            } catch (error) {
+              console.error('Error while creating user', error);
+            }
+          }
+        } catch (error) {
+          console.error('Error while getting signed user', error);
+        }
+      }
+    })();
+  }, [address]);
+
   return (
     <Container
       width={'100%'}
@@ -118,7 +202,7 @@ export default function Navbar(props: NavbarProps) {
       borderBottom={'1px solid var(--chakra-colors-color2)'}
       position={'fixed'}
       bg="bg"
-      zIndex={10000}
+      zIndex={999}
       top="0"
     >
       <Center bg="highlight" color="orange" padding={0}>
@@ -241,7 +325,26 @@ export default function Navbar(props: NavbarProps) {
                 onClick={address ? undefined : connectWallet}
                 size="xs"
               >
-                <Center>{address ? shortAddress(address) : 'Connect'}</Center>
+                <Center>
+                  {address ? (
+                    <Center display="flex" alignItems="center" gap=".5rem">
+                      <Image
+                        src={starkProfile?.profilePicture}
+                        alt="pfp"
+                        width={30}
+                        height={30}
+                        rounded="full"
+                      />{' '}
+                      <Text as="h3" marginTop={'3px !important'}>
+                        {starkProfile && starkProfile.name
+                          ? truncate(starkProfile.name, 6, 6)
+                          : shortAddress(address)}
+                      </Text>
+                    </Center>
+                  ) : (
+                    'Connect'
+                  )}
+                </Center>
               </MenuButton>
               <MenuList {...MyMenuListProps}>
                 {address && (
