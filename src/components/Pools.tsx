@@ -156,7 +156,7 @@ export default function Pools() {
           marginRight={'0px'}
           marginLeft={{ base: 'auto', md: '0px' }}
           display={'flex'}
-          justifyContent={{ base: 'flex-end', md: 'center'}}
+          justifyContent={{ base: 'flex-end', md: 'center' }}
         >
           {pool.isLoading && <Spinner />}
           {!pool.isLoading && (
@@ -337,7 +337,10 @@ export default function Pools() {
                           </Heading>
                         </LinkOverlay>
                       </Box>
-                      <Box width={'20%'} display={{ base: 'none', md: 'block' }}>
+                      <Box
+                        width={'20%'}
+                        display={{ base: 'none', md: 'block' }}
+                      >
                         {getAPRWithToolTip(pool)}
                       </Box>
                       <Box
@@ -358,7 +361,11 @@ export default function Pools() {
                       alignItems={{ base: 'flex-start', md: 'center' }}
                       justifyContent={'space-between'}
                     >
-                      <Box width={'100%'} display={{ base: 'block', md: 'none' }} justifyContent={'flex-end'}>
+                      <Box
+                        width={'100%'}
+                        display={{ base: 'block', md: 'none' }}
+                        justifyContent={'flex-end'}
+                      >
                         {getAPRWithToolTip(pool)}
                       </Box>
                       <Box
