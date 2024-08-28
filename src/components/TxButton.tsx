@@ -182,8 +182,8 @@ export default function TxButton(props: TxButtonProps) {
               fontWeight="bold"
             >
               <TwitterShareButton
-                url={`https://www.strkfarm.xyz${pathname}`}
-                title={`I just invested my ${props.selectedMarket?.name ?? ''} token in the high yield  "${props.strategyName ?? ''}" strategy at @strkfarm. \n\nHere's my link to join: ${getReferralUrl(referralCode)}`}
+                url={`${getReferralUrl(referralCode)}`}
+                title={`I just invested my ${props.selectedMarket?.name ?? ''} token in the high yield  "${props.strategyName ?? ''}" strategy at @strkfarm. \n\nHere's my link to join: `}
                 related={['strkfarm']}
                 style={{
                   display: 'flex',
