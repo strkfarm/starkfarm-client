@@ -89,7 +89,7 @@ export class DeltaNeutralMM extends IStrategy {
         filter: [this.filterMainToken],
       },
       {
-        name: `Re-invest your STRK Rewards every 14 days (Compound)`,
+        name: `Re-invest your STRK Rewards every 7 days (Compound)`,
         optimizer: this.compounder,
         filter: [this.filterStrkzkLend],
       },
@@ -214,7 +214,7 @@ export class DeltaNeutralMM extends IStrategy {
     }, 0);
     const amountIn = Number(this.actions[0].amount);
     const baseApr = amountWeights / amountIn;
-    const compoundingApr = (1 + baseApr / 26) ** 26 - 1;
+    const compoundingApr = (1 + baseApr / 52) ** 52 - 1;
     console.log(
       'compounder',
       amountIn,

@@ -74,7 +74,7 @@ export class AutoTokenStrategy extends IStrategy {
         filter: [this.filterStrkzkLend],
       },
       {
-        name: `Re-invest your STRK Rewards every 14 days`,
+        name: `Re-invest your STRK Rewards every 7 days`,
         optimizer: this.compounder,
         filter: [this.filterStrkzkLend],
       },
@@ -104,7 +104,7 @@ export class AutoTokenStrategy extends IStrategy {
     actions: StrategyAction[],
   ): StrategyAction[] {
     const baseApr = actions[0].pool.apr;
-    const compoundingApr = (1 + baseApr / 26) ** 26 - 1;
+    const compoundingApr = (1 + baseApr / 52) ** 52 - 1;
     return [
       ...actions,
       {

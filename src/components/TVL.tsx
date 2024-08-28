@@ -31,17 +31,13 @@ const TVL: React.FC = () => {
 
   function copyReferralLink() {
     if (window.location.origin.includes('app.strkfarm.xyz')) {
-      navigator.clipboard.writeText(
-        `https://strkfarm.xyz/r/${referralCode}`,
-      );
+      navigator.clipboard.writeText(`https://strkfarm.xyz/r/${referralCode}`);
     } else {
-      navigator.clipboard.writeText(
-        getReferralUrl(referralCode),
-      );
+      navigator.clipboard.writeText(getReferralUrl(referralCode));
     }
 
     toast.success('Referral link copied to clipboard', {
-      position: 'bottom-right'
+      position: 'bottom-right',
     });
   }
 
@@ -99,33 +95,32 @@ const TVL: React.FC = () => {
               display="flex"
               justifyContent="space-between"
               alignItems="center"
-            > 
+            >
               {address ? (
                 !referralCode ? (
-                <Spinner size="sm" color="white" marginTop={'8px'} />
+                  <Spinner size="sm" color="white" marginTop={'8px'} />
+                ) : (
+                  <StatNumber
+                    fontSize="1.5rem"
+                    textDecoration="underline"
+                    fontWeight="600"
+                    cursor={'pointer'}
+                    onClick={copyReferralLink}
+                  >
+                    {referralCode}
+                  </StatNumber>
+                )
               ) : (
-                <StatNumber
-                  fontSize="1.5rem"
-                  textDecoration="underline"
-                  fontWeight="600"
-                  cursor={'pointer'}
-                  onClick={copyReferralLink}
-                >
-                  {referralCode}
-                </StatNumber>
-              )) : (
-                <Tooltip label="Connect wallet"><StatNumber
-                  fontSize="1.5rem"
-                  fontWeight="600"
-                >
-                  -
-                </StatNumber></Tooltip>
+                <Tooltip label="Connect wallet">
+                  <StatNumber fontSize="1.5rem" fontWeight="600">
+                    -
+                  </StatNumber>
+                </Tooltip>
               )}
 
-              {address && <CopyIcon
-                cursor="pointer"
-                onClick={copyReferralLink}
-              />}
+              {address && (
+                <CopyIcon cursor="pointer" onClick={copyReferralLink} />
+              )}
             </Box>
           </Stat>
         </Card>

@@ -92,5 +92,5 @@ export function generateReferralCode() {
 }
 
 export function getReferralUrl(referralCode: string) {
-  return `${window.location.origin}/r/${referralCode}`
+  return `${window.location.origin}/r/${referralCode}`;
 }
