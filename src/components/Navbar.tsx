@@ -252,20 +252,20 @@ export default function Navbar(props: NavbarProps) {
               >
                 <Center>
                   {address ? (
-                    starkProfile ? (
-                      <Box display="flex" alignItems="center" gap=".5rem">
-                        <Image
-                          src={starkProfile?.profilePicture}
-                          alt="pfp"
-                          width={30}
-                          height={30}
-                          rounded="full"
-                        />{' '}
-                        <h3>{starkProfile?.name}</h3>
-                      </Box>
-                    ) : (
-                      shortAddress(address)
-                    )
+                    <Box display="flex" alignItems="center" gap=".5rem">
+                      <Image
+                        src={starkProfile?.profilePicture}
+                        alt="pfp"
+                        width={30}
+                        height={30}
+                        rounded="full"
+                      />{' '}
+                      <h3>
+                        {starkProfile && starkProfile.name
+                          ? starkProfile.name
+                          : shortAddress(address)}
+                      </h3>
+                    </Box>
                   ) : (
                     'Connect'
                   )}
