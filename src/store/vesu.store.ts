@@ -1,11 +1,10 @@
+import vesuAbi from '@/abi/vesu.abi.json';
+import vesuInterestRateAbi from '@/abi/vesuInterestRate.abi.json';
 import CONSTANTS, { TokenName } from '@/constants';
-import { Category, PoolType } from './pools';
 import { atom } from 'jotai';
-import { PoolInfo, ProtocolAtoms } from './pools';
-import { Jediswap } from './jedi.store';
 import { Contract, RpcProvider } from 'starknet';
-import vesuAbi from './vesu.abi.json';
-import vesuInterestRateAbi from './vesuInterestRate.abi.json';
+import { Jediswap } from './jedi.store';
+import { Category, PoolInfo, PoolType, ProtocolAtoms } from './pools';
 
 // Initialize the provider
 const provider = new RpcProvider({ nodeUrl: process.env.NEXT_PUBLIC_RPC_URL });
@@ -25,10 +24,13 @@ const getUtilisation = async (poolId: string, tokenAddress: string) => {
   const contract = new Contract(
     VesuAbi,
     '0x02545b2e5d519fc230e9cd781046d3a64e092114f07e44771e0d719d148725ef',
-    provider
+    provider,
   );
   const poolidHex = toBigIntHex(poolId);
-  const res: any = await contract.call('utilization_unsafe', [poolidHex, tokenAddress]);
+  const res: any = await contract.call('utilization_unsafe', [
+    poolidHex,
+    tokenAddress,
+  ]);
   return res;
 };
 
@@ -37,11 +39,14 @@ const getAssetInfo = async (poolId: string, tokenAddress: string) => {
   const contract = new Contract(
     VesuAbi,
     '0x02545b2e5d519fc230e9cd781046d3a64e092114f07e44771e0d719d148725ef',
-    provider
+    provider,
   );
 
   const poolidHex = toBigIntHex(poolId);
-  const res: any = await contract.call('asset_config_unsafe', [poolidHex, tokenAddress]);
+  const res: any = await contract.call('asset_config_unsafe', [
+    poolidHex,
+    tokenAddress,
+  ]);
   return res[0];
 };
 
@@ -50,24 +55,24 @@ const getBaseApy = async (poolId: string, tokenAddress: string) => {
   const contract = new Contract(
     VesuInterestRateAbi,
     '0x002334189e831d804d4a11d3f71d4a982ec82614ac12ed2e9ca2f8da4e6374fa',
-    provider
+    provider,
   );
 
-  const poolidHex = toBigIntHex(poolId);
   const utilization = await getUtilisation(poolId, tokenAddress);
   const assetInfo = await getAssetInfo(poolId, tokenAddress);
-  const res: any = await contract.call('interest_rate', [
-    poolidHex,
+
+  const interestRate = await contract.call('interest_rate', [
+    poolId,
     tokenAddress,
     utilization,
     assetInfo.last_updated,
     assetInfo.last_full_utilization_rate,
   ]);
-  const interestRate = res[0];
+
   const apy =
     (Number(utilization) / 10 ** 18) *
     ((1 + Number(interestRate) / 10 ** 18) ** (360 * 86400) - 1);
-  console.log(apy);
+
   return apy;
 };
 
@@ -77,8 +82,10 @@ const poolsData = [
     id: 'ETH',
     isVesu: true,
     tokenA: 'ETH',
-    poolId: '2198503327643286920898110335698706244522220458610657370981979460625005526824',
-    tokenAddress: '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
+    poolId:
+      '2198503327643286920898110335698706244522220458610657370981979460625005526824',
+    tokenAddress:
+      '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
     rewardApr: '0.09',
     baseApr: '0',
     tvl: '1000000',
@@ -87,8 +94,10 @@ const poolsData = [
     id: 'STRK',
     isVesu: true,
     tokenA: 'STRK',
-    poolId: '2198503327643286920898110335698706244522220458610657370981979460625005526824',
-    tokenAddress: '0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
+    poolId:
+      '2198503327643286920898110335698706244522220458610657370981979460625005526824',
+    tokenAddress:
+      '0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
     rewardApr: '0.13',
     baseApr: '0',
     tvl: '2000000',
@@ -97,8 +106,10 @@ const poolsData = [
     id: 'USDC',
     isVesu: true,
     tokenA: 'USDC',
-    poolId: '2198503327643286920898110335698706244522220458610657370981979460625005526824',
-    tokenAddress: '0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8',
+    poolId:
+      '2198503327643286920898110335698706244522220458610657370981979460625005526824',
+    tokenAddress:
+      '0x053c91253bc9682c04929ca02ed00b3e423f6710d2ee7e0d5ebb06f3ecf368a8',
     rewardApr: '0.10',
     baseApr: '0',
     tvl: '2000000',
@@ -107,8 +118,10 @@ const poolsData = [
     id: 'USDT',
     isVesu: true,
     tokenA: 'USDT',
-    poolId: '2198503327643286920898110335698706244522220458610657370981979460625005526824',
-    tokenAddress: '0x068f5c6a61780768455de69077e07e89787839bf8166decfbf92b645209c0fb8',
+    poolId:
+      '2198503327643286920898110335698706244522220458610657370981979460625005526824',
+    tokenAddress:
+      '0x068f5c6a61780768455de69077e07e89787839bf8166decfbf92b645209c0fb8',
     rewardApr: '0.10',
     baseApr: '0',
     tvl: '2000000',
@@ -120,17 +133,13 @@ async function fetchAndUpdatePoolsData() {
   for (const pool of poolsData) {
     const res = await getBaseApy(pool.poolId, pool.tokenAddress);
     pool.baseApr = res.toString();
-    console.log(`pool base apr ${  pool.baseApr}`);
+    console.log(res, pool.id, 'pool-res');
   }
 }
 
-(async function fetchAndInitializePoolsData() {
-  const res = await fetchAndUpdatePoolsData();
-  console.log(res);
-  return res;
-}()).catch((err) => {
-  console.error("Error fetching and updating pools data:", err);
-});
+fetchAndUpdatePoolsData();
+
+console.log(poolsData, 'updated-pool-data');
 
 export class Vesu extends Jediswap {
   name = 'Vesu.xyz';
