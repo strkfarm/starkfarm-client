@@ -35,6 +35,7 @@ import {
   PaginationPageGroup,
 } from '@ajna/pagination';
 import Filters from '@/components/Filters';
+import CardHeading from './CardHeader';
 
 export default function Pools() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
@@ -292,9 +293,9 @@ export default function Pools() {
                               <Avatar key={logo} src={logo} />
                             ))}
                           </AvatarGroup>
-                          <Heading size="xs">{pool.pool.name}</Heading>
+                          <CardHeading size="xs">{pool.pool.name}</CardHeading>
                         </Flex>
-                        <Heading
+                        <CardHeading
                           size="xs"
                           marginTop={'12px'}
                           color="color1_light"
@@ -310,7 +311,7 @@ export default function Pools() {
                           <Text fontWeight={300} color="grey_text">
                             {pool.protocol.name}
                           </Text>
-                        </Heading>
+                        </CardHeading>
                       </LinkOverlay>
                     </Box>
                     <Box width={{ base: '50%', md: '20%' }}>
