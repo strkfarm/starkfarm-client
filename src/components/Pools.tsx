@@ -34,7 +34,6 @@ import {
   PaginationPage,
   PaginationPageGroup,
 } from '@ajna/pagination';
-import CONSTANTS from '@/constants';
 import Filters from '@/components/Filters';
 
 export default function Pools() {

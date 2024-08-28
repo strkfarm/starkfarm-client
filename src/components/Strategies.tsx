@@ -33,7 +33,7 @@ import {
   // ChakraProvider,
 } from '@chakra-ui/react';
 import { useAtomValue } from 'jotai';
-import React, { useState } from 'react';
+import React from 'react';
 import mixpanel from 'mixpanel-browser';
 import TVL from './TVL';
 import CONSTANTS from '@/constants';
@@ -54,7 +54,7 @@ const customTheme = extendTheme({
     },
     Tooltip: {
       fontFamily: 'Inter, sans-serif',
-    }
+    },
   },
 });
 
