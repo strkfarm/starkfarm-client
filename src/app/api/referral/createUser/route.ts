@@ -9,7 +9,15 @@ function isSixDigitAlphanumeric(str: string) {
 }
 
 export async function POST(req: Request) {
-  const { address, myReferralCode, referrerAddress } = await req.json();
+  const {
+    address,
+    myReferralCode,
+    referrerAddress: _referrerAddress,
+  } = await req.json();
+  let referrerAddress: string | null = null;
+  if (_referrerAddress) {
+    referrerAddress = standariseAddress(_referrerAddress);
+  }
 
   // todo: Ask user to sign with the referrer address as input and send the signed msg
   // verify the signature is signed by address and contains the referrer address
@@ -33,33 +41,43 @@ export async function POST(req: Request) {
   // standardised address
   const parsedAddress = standariseAddress(address);
 
+  // do referrer validations
+  if (referrerAddress) {
+    const referrer = await db.user.findFirst({
+      where: {
+        address: referrerAddress,
+      },
+    });
+
+    if (!referrer) {
+      // ensures referrer is valid
+      referrerAddress = null;
+    }
+
+    // if they are trying to refer themselves, means no referrer
+    if (referrerAddress === parsedAddress) {
+      referrerAddress = null;
+    }
+  }
+
+  // ensure user doesnt exist
+  const user = await db.user.findFirst({
+    where: {
+      address: standariseAddress(address),
+    },
+  });
+
+  if (user) {
+    return NextResponse.json({
+      success: false,
+      message: 'User already exists',
+    });
+  }
+
   const newUserData = {
     address: parsedAddress,
     referralCode: myReferralCode,
   };
-
-  const dbActions = [
-    db.user.create({
-      data: newUserData,
-    }),
-  ];
-  if (referrerAddress) {
-    dbActions.push(
-      db.user.update({
-        where: {
-          address: standariseAddress(referrerAddress),
-        },
-        data: {
-          referrals: {
-            create: {
-              refreeAddress: parsedAddress,
-            },
-          },
-          referralCount: { increment: 1 },
-        },
-      }),
-    );
-  }
 
   let result = [];
   if (referrerAddress) {
