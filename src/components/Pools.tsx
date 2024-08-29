@@ -163,10 +163,9 @@ export default function Pools() {
             <>
               <Text
                 textAlign={{ base: 'right', md: 'center' }}
-                color="#fff"
-                fontSize={'14px'}
-                marginTop={{ base: '10px', md: '0' }}
-                fontWeight={600}
+                color="cyan"
+                fontSize={'20px'}
+                fontWeight={'bolder'}
               >
                 {(pool.apr * 100).toFixed(2)}%
               </Text>
@@ -232,14 +231,6 @@ export default function Pools() {
                   display={{ base: 'none', md: 'block' }}
                 >
                   STRK APY(%)
-                </Heading>
-                <Heading
-                  width={'100%'}
-                  size="md"
-                  textAlign={'left'}
-                  display={{ base: 'block', md: 'none' }}
-                >
-                  SAFETY SCORE
                 </Heading>
               </Stack>
               <Stack
@@ -331,7 +322,7 @@ export default function Pools() {
                               src={pool.protocol.logo}
                               marginRight={'6px'}
                             />
-                            <Text fontWeight={500} color="grey_text">
+                            <Text fontWeight={600} color="grey_text">
                               {pool.protocol.name}
                             </Text>
                           </Heading>
@@ -342,17 +333,6 @@ export default function Pools() {
                         display={{ base: 'none', md: 'block' }}
                       >
                         {getAPRWithToolTip(pool)}
-                      </Box>
-                      <Box
-                        width={'100%'}
-                        marginTop={'10px'}
-                        position={'relative'}
-                        display={{ base: 'flex', md: 'none' }}
-                        flexDirection={'column'}
-                        alignItems={'flex-start'}
-                        justifyContent={'flex-start'}
-                      >
-                        {GetRiskLevel(pool.pool.name)}
                       </Box>
                     </Stack>
                     <Stack
