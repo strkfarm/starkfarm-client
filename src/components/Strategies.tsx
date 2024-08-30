@@ -1,7 +1,5 @@
-import CONSTANTS from '@/constants';
 import { allPoolsAtomUnSorted } from '@/store/pools';
 import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
-import { IStrategyProps, StrategyLiveStatus } from '@/strategies/IStrategy';
 import { getUniqueById } from '@/utils';
 import { AddIcon } from '@chakra-ui/icons';
 import {
@@ -34,16 +32,15 @@ import {
   WrapItem,
 } from '@chakra-ui/react';
 import { useAtomValue } from 'jotai';
-import mixpanel from 'mixpanel-browser';
 import React from 'react';
+import mixpanel from 'mixpanel-browser';
 import TVL from './TVL';
 import CONSTANTS from '@/constants';
 import { IStrategyProps, StrategyLiveStatus } from '@/strategies/IStrategy';
 import shield from '@/assets/shield.svg';
 import { userStatsAtom } from '@/store/utils.atoms';
 
-
-const Strategies: React.FC = () => {
+export default function Strategies() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
   const strategies = useAtomValue(strategiesAtom);
   const { data: userData, isPending: userStatsPending } =
@@ -545,6 +542,4 @@ const Strategies: React.FC = () => {
       </Text>
     </Container>
   );
-};
-
-export default Strategies;
+}

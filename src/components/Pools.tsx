@@ -35,7 +35,6 @@ import {
   PaginationPageGroup,
 } from '@ajna/pagination';
 import Filters from '@/components/Filters';
-import mixpanel from 'mixpanel-browser';
 
 export default function Pools() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
