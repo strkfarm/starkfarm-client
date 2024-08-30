@@ -87,38 +87,49 @@ export default function Pools() {
         <Box>
           <Tooltip hasArrow label={tooltipLabel} bg="gray.300" color="black">
             <Box
-              width={'100%'}
-              display="flex"
-              alignItems="center"
-              justifyContent={{ base: 'flex-end', md: 'center' }}
-              padding={'4px'}
-              height={'100%'}
+              width={'50%'}
+              marginTop={'0px'}
+              position={'relative'}
+              display={{ base: 'none', md: 'flex' }}
+              flexDirection={'column'}
+              alignItems={'center'}
+              justifyContent={'flex-start'}
             >
-              <Stack direction="row" spacing={1}>
-                {[...Array(5)].map((_, index) => (
-                  <Box
-                    key={index}
-                    width="4px"
-                    height="18px"
-                    borderRadius="md"
-                    bg={index < count ? color : '#29335C'}
-                  />
-                ))}
-              </Stack>
+              <Box
+                width={'100%'}
+                display="flex"
+                alignItems="center"
+                justifyContent={{ base: 'flex-start', md: 'center' }}
+                padding={'4px'}
+                height={'100%'}
+                position={'relative'}
+              >
+                <Stack direction="row" spacing={1}>
+                  {[...Array(5)].map((_, index) => (
+                    <Box
+                      key={index}
+                      width="4px"
+                      height="18px"
+                      borderRadius="md"
+                      bg={index < count ? color : '#29335C'}
+                    />
+                  ))}
+                </Stack>
+              </Box>
+              <Box
+                position={'absolute'}
+                backgroundColor={color}
+                opacity={0.3}
+                filter={'blur(30.549999237060547px)'}
+                right={{ base: '-50', md: '-37px' }}
+                bottom={'-80px'}
+                width={'94px'}
+                height={'94px'}
+                zIndex={0}
+              />
             </Box>
           </Tooltip>
         </Box>
-        <Box
-          position={'absolute'}
-          backgroundColor={color}
-          opacity={0.3}
-          filter={'blur(30.549999237060547px)'}
-          right={{ base: '70%', md: '35px' }}
-          bottom={'-80px'}
-          width={'94px'}
-          height={'94px'}
-          zIndex={0}
-        />
       </>
     );
   }
@@ -285,6 +296,7 @@ export default function Pools() {
                   <HStack
                     width={'100%'}
                     alignItems={{ base: 'flex-start', md: 'center' }}
+                    justifyContent={'space-between'}
                   >
                     <Stack
                       direction={{ base: 'column', md: 'row' }}
@@ -337,7 +349,7 @@ export default function Pools() {
                     </Stack>
                     <Stack
                       direction={{ base: 'column', md: 'row' }}
-                      width={{ base: '50%', md: '40%' }}
+                      width={{ base: '50%', md: '30%' }}
                       alignItems={{ base: 'flex-start', md: 'center' }}
                       justifyContent={'space-between'}
                     >
@@ -348,17 +360,7 @@ export default function Pools() {
                       >
                         {getAPRWithToolTip(pool)}
                       </Box>
-                      <Box
-                        width={'50%'}
-                        marginTop={'0px'}
-                        position={'relative'}
-                        display={{ base: 'none', md: 'flex' }}
-                        flexDirection={'column'}
-                        alignItems={'center'}
-                        justifyContent={'flex-start'}
-                      >
-                        {GetRiskLevel(pool.pool.name)}
-                      </Box>
+                      {GetRiskLevel(pool.pool.name)}
                       <Text
                         width={{ base: '100%', md: '50%' }}
                         textAlign={'right'}

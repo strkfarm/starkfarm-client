@@ -181,38 +181,49 @@ export default function Strategies() {
         <Box>
           <Tooltip hasArrow label={tooltipLabel} bg="gray.300" color="black">
             <Box
-              width={'100%'}
-              display="flex"
-              alignItems="center"
-              justifyContent={{ base: 'flex-start', md: 'center' }}
-              padding={'4px'}
-              height={'100%'}
+              width={{ base: '50%', md: '40%' }}
+              marginTop={{ base: '10px', md: '0px' }}
+              position={'relative'}
+              display={'flex'}
+              flexDirection={'column'}
+              alignSelf={{ base: 'left', md: 'center' }}
+              justifyContent={'flex-start'}
             >
-              <Stack direction="row" spacing={1}>
-                {[...Array(5)].map((_, index) => (
-                  <Box
-                    key={index}
-                    width="4px"
-                    height="18px"
-                    borderRadius="md"
-                    bg={index < count ? color : '#29335C'}
-                  />
-                ))}
-              </Stack>
+              <Box
+                width={'100%'}
+                display="flex"
+                alignItems="center"
+                justifyContent={{ base: 'flex-start', md: 'center' }}
+                padding={'4px'}
+                height={'100%'}
+                position={'relative'}
+              >
+                <Stack direction="row" spacing={1}>
+                  {[...Array(5)].map((_, index) => (
+                    <Box
+                      key={index}
+                      width="4px"
+                      height="18px"
+                      borderRadius="md"
+                      bg={index < count ? color : '#29335C'}
+                    />
+                  ))}
+                </Stack>
+              </Box>
+              <Box
+                position={'absolute'}
+                backgroundColor={color}
+                opacity={0.3}
+                filter={'blur(30.549999237060547px)'}
+                right={{ base: '-50', md: '-37px' }}
+                bottom={'-80px'}
+                width={'94px'}
+                height={'94px'}
+                zIndex={0}
+              />
             </Box>
           </Tooltip>
         </Box>
-        <Box
-          position={'absolute'}
-          backgroundColor={color}
-          opacity={0.3}
-          filter={'blur(30.549999237060547px)'}
-          right={{ base: '70%', md: '18px' }}
-          bottom={'-80px'}
-          width={'94px'}
-          height={'94px'}
-          zIndex={0}
-        />
       </>
     );
   }
@@ -228,6 +239,7 @@ export default function Strategies() {
         width={'100%'}
         direction={{ base: 'column', md: 'row' }}
         alignItems={{ base: 'flex-start', md: 'center' }}
+        justifyContent={'space-between'}
       >
         <HStack
           width={{ base: '100%', md: '60%' }}
@@ -360,21 +372,11 @@ export default function Strategies() {
           </Box>
         </HStack>
         <HStack
-          width={{ base: '100%', md: '40%' }}
+          width={{ base: '100%', md: '30%' }}
           alignItems={{ base: 'flex-start', md: 'center' }}
           justifyContent={'space-between'}
         >
-          <Box
-            width={{ base: '50%', md: '40%' }}
-            marginTop={{ base: '10px', md: '0px' }}
-            position={'relative'}
-            display={'flex'}
-            flexDirection={'column'}
-            alignSelf={{ base: 'left', md: 'center' }}
-            justifyContent={'flex-start'}
-          >
-            {GetRiskLevel(strat.name)}
-          </Box>
+          {GetRiskLevel(strat.name)}
           <Box
             width={{ base: '50%', md: '60%' }}
             textAlign={'right'}
@@ -429,23 +431,49 @@ export default function Strategies() {
         yield. We currently have one High yield low risk strategy, and adding
         more as you read this.
       </Text>
-      <Card
-        variant={'filled'}
-        bg="opacity_50p"
-        color={'purple'}
-        display={{ base: 'none', md: 'visible' }}
-      >
+      <Card variant={'filled'} bg="opacity_50p" color={'purple'}>
         <CardBody paddingTop={'5px'} paddingBottom={'5px'}>
-          <HStack width={'100%'}>
-            <Heading width={{ base: '70%' }} size="md">
-              Strategy
-            </Heading>
-            <Stack direction={{ base: 'column' }} width={{ base: '30%' }}>
-              <Heading width={{ base: '100%' }} size="sm" textAlign={'right'}>
-                APR(%)/Leverage
+          <Stack
+            width={'100%'}
+            direction={{ base: 'column', md: 'row' }}
+            alignItems={{ base: 'flex-start', md: 'center' }}
+            justifyContent={'space-between'}
+          >
+            <HStack
+              width={{ base: '100%', md: '55%' }}
+              alignItems={{ base: 'flex-start', md: 'center' }}
+            >
+              <Heading width={{ base: '50%', md: '70%' }} size="md">
+                Strategy Name
               </Heading>
-            </Stack>
-          </HStack>
+              <Heading
+                width={{ base: '50%', md: '33%' }}
+                size="md"
+                textAlign={{ base: 'right', md: 'center' }}
+              >
+                APY/Leverage
+              </Heading>
+            </HStack>
+            <HStack
+              width={{ base: '100%', md: '40%' }}
+              alignItems={{ base: 'flex-start', md: 'center' }}
+            >
+              <Heading
+                width={{ base: '70%', md: '50%' }}
+                size="md"
+                textAlign={{ base: 'left', md: 'center' }}
+              >
+                SAFETY SCORE
+              </Heading>
+              <Heading
+                width={{ base: '30%', md: '50%' }}
+                size="sm"
+                textAlign={'right'}
+              >
+                TVL($)
+              </Heading>
+            </HStack>
+          </Stack>
         </CardBody>
       </Card>
       {allPools.length && strategies.length > 0 && (
