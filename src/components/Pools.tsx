@@ -314,12 +314,12 @@ export default function Pools() {
                           borderWidth={'0px'}
                           target="_blank"
                           onClick={() => {
-                          mixpanel.track('Pool clicked', {
-                            pool: pool.pool.name,
-                            protocol: pool.protocol.name,
-                            yield: pool.apr,
-                          });
-                        }}
+                            mixpanel.track('Pool clicked', {
+                              pool: pool.pool.name,
+                              protocol: pool.protocol.name,
+                              yield: pool.apr,
+                            });
+                          }}
                         >
                           <Flex alignItems={'center'}>
                             <AvatarGroup size="xs" max={2} marginRight={'10px'}>
