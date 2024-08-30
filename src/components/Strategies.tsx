@@ -35,12 +35,12 @@ import { useAtomValue } from 'jotai';
 import React from 'react';
 import mixpanel from 'mixpanel-browser';
 import TVL from './TVL';
-import CONSTANTS from '@/constants';
-import { IStrategyProps, StrategyLiveStatus } from '@/strategies/IStrategy';
 import shield from '@/assets/shield.svg';
 import { userStatsAtom } from '@/store/utils.atoms';
+import { IStrategyProps, StrategyLiveStatus } from '@/strategies/IStrategy';
+import CONSTANTS from '@/constants';
 
-export default function Strategies() {
+export const Strategies: React.FC = () => {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
   const strategies = useAtomValue(strategiesAtom);
   const { data: userData, isPending: userStatsPending } =
@@ -252,19 +252,11 @@ export default function Strategies() {
               mixpanel.track('Strategy expanded', { name: strat.name });
             }}
           >
-          <Box width={'100%'}>
-            <Box>
-              <LinkOverlay
-                href={isLive(strat) ? `/strategy/${strat.id}` : '#'}
-                cursor={isLive(strat) ? 'pointer' : 'default'}
-              >
-                <HStack
-                  fontSize={{ base: '25px', md: '25px' }}
-                  textAlign={'left'}
-                  marginBottom={'5px'}
-                  fontWeight={'bold'}
-                  alignItems={'center'}
-
+            <Box width={'100%'}>
+              <Box>
+                <LinkOverlay
+                  href={isLive(strat) ? `/strategy/${strat.id}` : '#'}
+                  cursor={isLive(strat) ? 'pointer' : 'default'}
                 >
                   <HStack
                     fontSize={{ base: '25px', md: '25px' }}
@@ -542,4 +534,4 @@ export default function Strategies() {
       </Text>
     </Container>
   );
-}
+};
