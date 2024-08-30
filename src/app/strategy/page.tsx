@@ -1,39 +1,24 @@
-import { Container } from '@chakra-ui/react';
+import { NextPage } from 'next';
+import { redirect } from 'next/navigation';
 
-import Strategy from './components/Strategy';
-import { getStrategies } from '@/store/strategies.atoms';
-
-type Props = {
-  params: { name: string };
+interface StrategyPage {
   searchParams?: { [key: string]: string | string[] | undefined };
-};
+}
 
-export async function generateMetadata({ searchParams }: Props) {
-  const strategies = getStrategies();
-  const strategy = strategies.find((s) => s.id === searchParams?.id);
-  if (strategy) {
-    return {
-      title: `${strategy.name} | STRKFarm`,
-      description: strategy.description,
-    };
+const StrategyPage: NextPage<StrategyPage> = ({ searchParams }) => {
+  if (searchParams?.id === 'strk_sensei') {
+    redirect('/strategy/strk_sensei');
+  } else if (searchParams?.id === 'usdc_sensei') {
+    redirect('/strategy/usdc_sensei');
+  } else if (searchParams?.id === 'eth_sensei') {
+    redirect('/strategy/eth_sensei');
+  } else if (searchParams?.id === 'auto_token_strk') {
+    redirect('/strategy/auto_token_strk');
+  } else if (searchParams?.id === 'auto_token_usdc') {
+    redirect('/strategy/auto_token_usdc');
   }
 
-  return {
-    title: 'Yield Strategy | STRKFarm',
-    description:
-      "STRKFarm's yield strategies are designed to maximize your yield farming returns. Stake your assets in our strategies to earn passive income while we take care of the rest.",
-  };
-}
+  return <div>Page not found</div>;
+};
 
-export default function StrategyPage() {
-  return (
-    <Container
-      maxWidth={'1000px'}
-      margin={'0 auto'}
-      padding="30px 10px"
-      fontFamily={'sans-serif'}
-    >
-      <Strategy />
-    </Container>
-  );
-}
+export default StrategyPage;

@@ -1,5 +1,6 @@
 'use client';
 
+import Navbar from '@/components/Navbar';
 import {
   Center,
   ChakraBaseProvider,
@@ -12,15 +13,13 @@ import { StarknetConfig, jsonRpcProvider } from '@starknet-react/core';
 import { Provider as JotaiProvider } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import Image from 'next/image';
+import { usePathname } from 'next/navigation';
 import * as React from 'react';
+import { Toaster } from 'react-hot-toast';
 import { RpcProviderOptions, constants } from 'starknet';
 import { ArgentMobileConnector } from 'starknetkit/argentMobile';
 import { InjectedConnector } from 'starknetkit/injected';
-import Navbar from '@/components/Navbar';
-import { Toaster } from 'react-hot-toast';
-import { usePathname } from 'next/navigation';
 
-// ! make page view more dynamic
 mixpanel.init('118f29da6a372f0ccb6f541079cad56b');
 
 const theme = extendTheme({
@@ -80,7 +79,7 @@ export const MYCONNECTORS = [
 export default function Template({ children }: { children: React.ReactNode }) {
   const chains = [mainnet];
   const provider = jsonRpcProvider({
-    rpc: (chain) => {
+    rpc: (_chain) => {
       const args: RpcProviderOptions = {
         nodeUrl:
           'https://rpc.nethermind.io/mainnet-juno?apikey=t1HPjhplOyEQpxqVMhpwLGuwmOlbXN0XivWUiPAxIBs0kHVK',
@@ -91,7 +90,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
   });
   const pathname = usePathname();
 
-  function getIconNode(icon: typeof import('*.svg'), alt: string) {
+  function _getIconNode(icon: typeof import('*.svg'), alt: string) {
     return (
       <Center className="my-menu-button" width="100%" marginLeft={'-20px'}>
         <Image src={icon} alt={alt} />

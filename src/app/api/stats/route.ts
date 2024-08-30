@@ -1,11 +1,13 @@
-import { NextResponse } from 'next/server';
 import { getStrategies } from '@/store/strategies.atoms';
+import { NextResponse } from 'next/server';
 
 export const revalidate = 60;
 
-export async function GET(req: Request) {
+export async function GET(_req: Request) {
   const strategies = getStrategies();
+
   console.log('strategies', strategies.length);
+
   const values = strategies.map(async (strategy, index) => {
     let retry = 0;
     while (retry < 3) {
@@ -25,6 +27,7 @@ export async function GET(req: Request) {
   });
 
   const result = await Promise.all(values);
+
   return NextResponse.json({
     tvl: result.reduce((a, b) => a + b, 0),
   });
