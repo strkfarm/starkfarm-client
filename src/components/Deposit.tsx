@@ -104,14 +104,16 @@ export default function Deposit(props: DepositProps) {
     );
     let reducedBalance = balance;
 
-    if (selectedMarket.name === 'STRK') {
-      reducedBalance = balance.subtract(
-        MyNumber.fromEther('1.5', selectedMarket.decimals),
-      );
-    } else if (selectedMarket.name === 'ETH') {
-      reducedBalance = balance.subtract(
-        MyNumber.fromEther('0.001', selectedMarket.decimals),
-      );
+    if (props.buttonText === 'Deposit') {
+      if (selectedMarket.name === 'STRK') {
+        reducedBalance = balance.subtract(
+          MyNumber.fromEther('1.5', selectedMarket.decimals),
+        );
+      } else if (selectedMarket.name === 'ETH') {
+        reducedBalance = balance.subtract(
+          MyNumber.fromEther('0.001', selectedMarket.decimals),
+        );
+      }
     }
     console.log('Deposit:: reducedBalance2', reducedBalance.toEtherStr());
     const min = MyNumber.min(reducedBalance, adjustedMaxAllowed);
