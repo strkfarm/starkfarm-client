@@ -40,11 +40,10 @@ import { userStatsAtom } from '@/store/utils.atoms';
 import { IStrategyProps, StrategyLiveStatus } from '@/strategies/IStrategy';
 import CONSTANTS from '@/constants';
 
-export const Strategies: React.FC = () => {
+export default function Strategies() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
   const strategies = useAtomValue(strategiesAtom);
-  const { data: userData, isPending: userStatsPending } =
-    useAtomValue(userStatsAtom);
+  const { data: userData } = useAtomValue(userStatsAtom);
 
   function getStratCardBg(strat: IStrategyProps, index: number) {
     if (
@@ -534,4 +533,4 @@ export const Strategies: React.FC = () => {
       </Text>
     </Container>
   );
-};
+}
