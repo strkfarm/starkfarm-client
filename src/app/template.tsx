@@ -44,6 +44,7 @@ const theme = extendTheme({
     cyan: '#22F3DF',
     bg: '#1A1C26', // dark blue
     grey_text: '#B6B6B6',
+    yellow: '#EFDB72',
   },
   fontSizes: {
     large: '50px',
