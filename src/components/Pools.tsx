@@ -12,12 +12,11 @@ import {
   Box,
   Card,
   CardBody,
-  Center,
   Container,
   Flex,
   HStack,
   Heading,
-  Link,
+  LinkOverlay,
   Skeleton,
   Spinner,
   Stack,
@@ -35,7 +34,6 @@ import {
   PaginationPage,
   PaginationPageGroup,
 } from '@ajna/pagination';
-import CONSTANTS from '@/constants';
 import Filters from '@/components/Filters';
 import mixpanel from 'mixpanel-browser';
 
@@ -62,6 +60,81 @@ export default function Pools() {
     console.log('pages', currentPage, setCurrentPage, pagesCount, pages);
   }, [currentPage, setCurrentPage, pagesCount, pages]);
 
+  function GetRiskLevel(poolName: string) {
+    let color = '';
+    let count = 0;
+    let tooltipLabel = '';
+    const checkToken = (tokens: string[]) => {
+      const regex = new RegExp(tokens.join('|'), 'i');
+      return regex.test(poolName.toLowerCase());
+    };
+
+    if (checkToken(['eth', 'strk'])) {
+      color = '#FF9200';
+      count = 3;
+      tooltipLabel = 'Medium risk';
+    } else if (checkToken(['usdt', 'usdc'])) {
+      color = '#83F14D';
+      count = 5;
+      tooltipLabel = 'Low risk';
+    } else {
+      color = '#FF2020';
+      count = 1;
+      tooltipLabel = 'High risk';
+    }
+
+    return (
+      <>
+        <Box>
+          <Tooltip hasArrow label={tooltipLabel} bg="gray.300" color="black">
+            <Box
+              width={'50%'}
+              marginTop={'0px'}
+              position={'relative'}
+              display={{ base: 'none', md: 'flex' }}
+              flexDirection={'column'}
+              alignItems={'center'}
+              justifyContent={'flex-start'}
+            >
+              <Box
+                width={'100%'}
+                display="flex"
+                alignItems="center"
+                justifyContent={{ base: 'flex-start', md: 'center' }}
+                padding={'4px'}
+                height={'100%'}
+                position={'relative'}
+              >
+                <Stack direction="row" spacing={1}>
+                  {[...Array(5)].map((_, index) => (
+                    <Box
+                      key={index}
+                      width="4px"
+                      height="18px"
+                      borderRadius="md"
+                      bg={index < count ? color : '#29335C'}
+                    />
+                  ))}
+                </Stack>
+              </Box>
+              <Box
+                position={'absolute'}
+                backgroundColor={color}
+                opacity={0.3}
+                filter={'blur(30.549999237060547px)'}
+                right={{ base: '-50', md: '-37px' }}
+                bottom={'-80px'}
+                width={'94px'}
+                height={'94px'}
+                zIndex={0}
+              />
+            </Box>
+          </Tooltip>
+        </Box>
+      </>
+    );
+  }
+
   function getAPRWithToolTip(pool: PoolInfo) {
     const tip = (
       <Box width={'300px'}>
@@ -79,7 +152,7 @@ export default function Pools() {
                 {split.title}{' '}
                 {split.description ? `(${split.description})` : ''}
               </Text>
-              <Text width={'30%'} textAlign={'right'} key="2">
+              <Text fontSize={'xs'} width={'30%'} textAlign={'right'} key="2">
                 {split.apr === 'Err' ? split.apr : (split.apr * 100).toFixed(2)}
                 %
               </Text>
@@ -90,32 +163,27 @@ export default function Pools() {
     );
     return (
       <Tooltip hasArrow label={tip} bg="gray.300" color="black">
-        <Center
-          width={{ base: 'auto', md: '50%' }}
+        <Box
+          width={{ base: '100%', md: '50%' }}
           marginRight={'0px'}
           marginLeft={{ base: 'auto', md: '0px' }}
           display={'flex'}
+          justifyContent={{ base: 'flex-end', md: 'center' }}
         >
           {pool.isLoading && <Spinner />}
           {!pool.isLoading && (
             <>
-              <Avatar
-                size="xs"
-                bg={'black'}
-                src={CONSTANTS.LOGOS.STRK}
-                marginRight={'2px'}
-                alignContent={'right'}
-              />
               <Text
                 textAlign={{ base: 'right', md: 'center' }}
                 color="cyan"
                 fontSize={'20px'}
+                fontWeight={'bolder'}
               >
-                <b>{(pool.apr * 100).toFixed(2)}%</b>
+                {(pool.apr * 100).toFixed(2)}%
               </Text>
             </>
           )}
-        </Center>
+        </Box>
       </Tooltip>
     );
   }
@@ -161,19 +229,41 @@ export default function Pools() {
         <Card variant={'filled'} bg="opacity_50p" color={'purple'}>
           <CardBody paddingTop={'5px'} paddingBottom={'5px'}>
             <HStack width={'100%'}>
-              <Heading width={{ base: '50%', md: '33%' }} size="md">
-                Pool
-              </Heading>
               <Stack
                 direction={{ base: 'column', md: 'row' }}
-                width={{ base: '50%', md: '66%' }}
+                width={{ base: '50%', md: '60%' }}
               >
+                <Heading width={{ base: '50%', md: '33%' }} size="md">
+                  Pool
+                </Heading>
                 <Heading
-                  width={{ base: '100%', md: '50%' }}
+                  width={'50%'}
                   size="md"
-                  textAlign={{ base: 'right', md: 'center' }}
+                  textAlign={'center'}
+                  display={{ base: 'none', md: 'block' }}
                 >
                   STRK APY(%)
+                </Heading>
+              </Stack>
+              <Stack
+                direction={{ base: 'column', md: 'row' }}
+                width={{ base: '50%', md: '40%' }}
+              >
+                <Heading
+                  width={'100%'}
+                  size="md"
+                  textAlign={'right'}
+                  display={{ base: 'block', md: 'none' }}
+                >
+                  STRK APY(%)
+                </Heading>
+                <Heading
+                  width={'50%'}
+                  size="md"
+                  textAlign={'center'}
+                  display={{ base: 'none', md: 'block' }}
+                >
+                  SAFETY SCORE
                 </Heading>
                 <Heading
                   width={{ base: '100%', md: '50%' }}
@@ -187,66 +277,108 @@ export default function Pools() {
           </CardBody>
         </Card>
         {pools.length > 0 && (
-          <Stack spacing="4">
+          <Stack spacing="4" position={'relative'}>
             {pools.map((pool, index) => (
               <Card
                 key={`${pool.pool.name}_${pool.protocol.name}`}
                 variant={'filled'}
+                borderRadius={'4px'}
+                textStyle="custom"
+                overflowY={'hidden'}
                 bg={index % 2 === 0 ? 'color1_50p' : 'color2_50p'}
                 color="white"
               >
-                <Link
-                  href={pool.protocol.link}
-                  width={'100%'}
-                  borderWidth={'0px'}
-                  target="_blank"
-                  onClick={() => {
-                    mixpanel.track('Pool clicked', {
-                      pool: pool.pool.name,
-                      protocol: pool.protocol.name,
-                      yield: pool.apr,
-                    });
-                  }}
+                <CardBody
+                  padding={{ base: '15px', md: '20px 32px' }}
+                  minHeight={'100px'}
+                  display={'flex'}
+                  alignItems={'center'}
                 >
-                  <CardBody>
-                    <HStack width={'100%'}>
-                      <Box width={{ base: '50%', md: '33%' }}>
-                        <Flex>
-                          <AvatarGroup size="xs" max={2} marginRight={'5px'}>
-                            {pool.pool.logos.map((logo) => (
-                              <Avatar key={logo} src={logo} />
-                            ))}
-                          </AvatarGroup>
-                          <Box>
-                            <Heading size="md">{pool.pool.name}</Heading>
-                            <Heading size="xs">
-                              <Avatar
-                                size="2xs"
-                                bg={'black'}
-                                name="Dan Abrahmov"
-                                src={pool.protocol.logo}
-                                marginRight={'2px'}
-                              />
+                  <HStack
+                    width={'100%'}
+                    alignItems={{ base: 'flex-start', md: 'center' }}
+                    justifyContent={'space-between'}
+                  >
+                    <Stack
+                      direction={{ base: 'column', md: 'row' }}
+                      width={{ base: '50%', md: '60%' }}
+                      alignItems={{ base: 'flex-start', md: 'center' }}
+                    >
+                      <Box
+                        width={{ base: '100%', md: '50%' }}
+                        position={'relative'}
+                      >
+                        <LinkOverlay
+                          href={pool.protocol.link}
+                          width={'100%'}
+                          borderWidth={'0px'}
+                          target="_blank"
+                          onClick={() => {
+                          mixpanel.track('Pool clicked', {
+                            pool: pool.pool.name,
+                            protocol: pool.protocol.name,
+                            yield: pool.apr,
+                          });
+                        }}
+                        >
+                          <Flex alignItems={'center'}>
+                            <AvatarGroup size="xs" max={2} marginRight={'10px'}>
+                              {pool.pool.logos.map((logo) => (
+                                <Avatar key={logo} src={logo} />
+                              ))}
+                            </AvatarGroup>
+                            <Heading size="xs">{pool.pool.name}</Heading>
+                          </Flex>
+                          <Heading
+                            size="xs"
+                            marginTop={'12px'}
+                            color="color1_light"
+                            display={'flex'}
+                          >
+                            <Avatar
+                              size="2xs"
+                              bg={'black'}
+                              name="Dan Abrahmov"
+                              src={pool.protocol.logo}
+                              marginRight={'6px'}
+                            />
+                            <Text fontWeight={600} color="grey_text">
                               {pool.protocol.name}
-                            </Heading>
-                          </Box>
-                        </Flex>
+                            </Text>
+                          </Heading>
+                        </LinkOverlay>
                       </Box>
-                      <Stack
-                        direction={{ base: 'column', md: 'row' }}
-                        width={{ base: '50%', md: '66%' }}
+                      <Box
+                        width={'20%'}
+                        display={{ base: 'none', md: 'block' }}
                       >
                         {getAPRWithToolTip(pool)}
-                        <Text
-                          width={{ base: '100%', md: '50%' }}
-                          textAlign={'right'}
-                        >
-                          ${Math.round(pool.tvl).toLocaleString()}
-                        </Text>
-                      </Stack>
-                    </HStack>
-                  </CardBody>
-                </Link>
+                      </Box>
+                    </Stack>
+                    <Stack
+                      direction={{ base: 'column', md: 'row' }}
+                      width={{ base: '50%', md: '30%' }}
+                      alignItems={{ base: 'flex-start', md: 'center' }}
+                      justifyContent={'space-between'}
+                    >
+                      <Box
+                        width={'100%'}
+                        display={{ base: 'block', md: 'none' }}
+                        justifyContent={'flex-end'}
+                      >
+                        {getAPRWithToolTip(pool)}
+                      </Box>
+                      {GetRiskLevel(pool.pool.name)}
+                      <Text
+                        width={{ base: '100%', md: '50%' }}
+                        textAlign={'right'}
+                        fontWeight={600}
+                      >
+                        ${Math.round(pool.tvl).toLocaleString()}
+                      </Text>
+                    </Stack>
+                  </HStack>
+                </CardBody>
               </Card>
             ))}
           </Stack>

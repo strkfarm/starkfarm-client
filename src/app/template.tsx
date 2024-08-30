@@ -42,6 +42,8 @@ const theme = extendTheme({
     purple: '#6F4FF2',
     cyan: '#22F3DF',
     bg: '#1A1C26', // dark blue
+    grey_text: '#B6B6B6',
+    yellow: '#EFDB72',
   },
   fontSizes: {
     large: '50px',
@@ -55,6 +57,12 @@ const theme = extendTheme({
   components: {
     MenuItem: {
       bg: 'highlight',
+    },
+    Badge: {
+      baseStyle: {
+        lineHeight: 'initial',
+        borderRadius: '4px',
+      },
     },
   },
   fonts: {

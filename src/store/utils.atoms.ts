@@ -76,8 +76,15 @@ export const dAppStatsAtom = atomWithQuery((get) => ({
   },
 }));
 
+interface StrategyWise {
+  id: string;
+  usdValue: number;
+  amount: string;
+}
+
 interface UserStats {
   holdingsUSD: number;
+  strategyWise: StrategyWise[];
 }
 
 export const userStatsAtom = atomWithQuery((get) => ({
