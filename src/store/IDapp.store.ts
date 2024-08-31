@@ -2,6 +2,7 @@ import { AtomWithQueryResult } from 'jotai-tanstack-query';
 import { APRSplit, PoolInfo, PoolMetadata } from './pools';
 import { TokenName } from '@/constants';
 import { StrategyAction } from '@/strategies/IStrategy';
+import { CustomAtomWithQueryResult } from '@/utils/customAtomWithQuery';
 
 export interface APRInfo {
   asset: TokenName;
@@ -20,7 +21,7 @@ export class IDapp<BaseAPYT> {
 
   addBaseAPYs<BaseAPYT>(
     pools: PoolInfo[],
-    data: AtomWithQueryResult<BaseAPYT, Error>,
+    data: CustomAtomWithQueryResult<BaseAPYT, Error>,
   ): PoolInfo[] {
     console.log(`lending: ${this.name}`, data);
     if (data.isError) {

@@ -15,6 +15,8 @@ import StarkDefiAtoms, { starkDefi } from './starkdefi.store';
 import TenkSwapAtoms, { tenkswap } from './tenkswap.store';
 import ZkLendAtoms, { zkLend } from './zklend.store';
 import CarmineAtoms, { carmine } from './carmine.store';
+import { customAtomWithQuery, CustomAtomWithQueryResult } from '@/utils/customAtomWithQuery';
+import { customAtomWithFetch } from '@/utils/customAtomWithFetch';
 
 export enum Category {
   Stable = 'Stable Pools',
@@ -67,6 +69,11 @@ export interface PoolInfo extends PoolMetadata {
 export interface ProtocolAtoms {
   pools: Atom<PoolInfo[]>;
   baseAPRs?: Atom<AtomWithQueryResult<any, Error>>;
+}
+
+export interface ProtocolAtoms2 {
+  pools: Atom<PoolInfo[]>;
+  baseAPRs?: Atom<CustomAtomWithQueryResult<any, Error>>;
 }
 
 export const PROTOCOLS = [
@@ -142,15 +149,20 @@ export const PROTOCOLS = [
   },
 ];
 
-export const StrkDexIncentivesAtom = atomWithQuery((get) => ({
-  queryKey: ['strk_dex_incentives'],
-  queryFn: async ({ queryKey }) => {
-    const res = await fetch(CONSTANTS.DEX_INCENTIVE_URL); // common for all
-    let data = await res.text();
+const _StrkDexIncentivesAtom = customAtomWithFetch({
+  queryKey: 'strk_dex_incentives',
+  url: CONSTANTS.DEX_INCENTIVE_URL,
+});
+
+export const StrkDexIncentivesAtom = atom((get) => {
+  const _data = get(_StrkDexIncentivesAtom);
+  if (_data.data) {
+    let data = JSON.stringify(_data.data);
     data = data.replaceAll('NaN', '0');
-    return JSON.parse(data);
-  },
-}));
+    _data.data = JSON.parse(data);
+  }
+  return _data;
+});
 
 export const StrkIncentivesAtom = atomWithQuery((get) => ({
   queryKey: get(StrkIncentivesQueryKeyAtom),
@@ -176,15 +188,20 @@ export const StrkIncentivesQueryKeyAtom = atom([
   'isNostraDegen',
 ]);
 
-export const StrkLendingIncentivesAtom = atomWithQuery((get) => ({
-  queryKey: ['strk_lending_incentives'],
-  queryFn: async ({ queryKey }) => {
-    const res = await fetch(CONSTANTS.LENDING_INCENTIVES_URL); // common for all
-    let data = await res.text();
+const _StrkLendingIncentivesAtom = customAtomWithFetch({
+  queryKey: 'strk_lending_incentives',
+  url: CONSTANTS.LENDING_INCENTIVES_URL,
+});
+
+export const StrkLendingIncentivesAtom = atom((get) => {
+  const _data = get(_StrkLendingIncentivesAtom);
+  if (_data.data) {
+    let data = JSON.stringify(_data.data);
     data = data.replaceAll('NaN', '0');
-    return JSON.parse(data);
-  },
-}));
+    _data.data = JSON.parse(data);
+  }
+  return _data;
+});
 
 export const ALL_FILTER = 'All';
 export const filters = {

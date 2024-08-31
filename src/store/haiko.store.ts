@@ -1,5 +1,3 @@
-'use client';
-
 import CONSTANTS, { TokenName } from '@/constants';
 import {
   APRSplit,
