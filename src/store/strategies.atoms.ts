@@ -1,5 +1,4 @@
 import { atom } from 'jotai';
-import { allPoolsAtomUnSorted } from './pools';
 import { AutoTokenStrategy } from '@/strategies/auto_strk.strat';
 import {
   IStrategy,
@@ -10,6 +9,7 @@ import CONSTANTS from '@/constants';
 import { DeltaNeutralMM } from '@/strategies/delta_neutral_mm';
 import Mustache from 'mustache';
 import { getTokenInfoFromName } from '@/utils';
+import { allPoolsAtomUnSorted } from './protocols';
 
 export interface StrategyInfo extends IStrategyProps {
   name: string;

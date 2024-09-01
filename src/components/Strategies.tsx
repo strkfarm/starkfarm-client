@@ -1,5 +1,4 @@
 import CONSTANTS from '@/constants';
-import { allPoolsAtomUnSorted } from '@/store/pools';
 import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
 import { IStrategyProps, StrategyLiveStatus } from '@/strategies/IStrategy';
 import { getUniqueById } from '@/utils';
@@ -36,6 +35,7 @@ import { useAtomValue } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import React from 'react';
 import TVL from './TVL';
+import { allPoolsAtomUnSorted } from '@/store/protocols';
 
 const Strategies: React.FC = () => {
   const allPools = useAtomValue(allPoolsAtomUnSorted);

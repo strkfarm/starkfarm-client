@@ -1,6 +1,5 @@
 import React from 'react';
 import Select, { StylesConfig } from 'react-select';
-import { ALL_FILTER, filters, updateFiltersAtom } from '@/store/pools';
 import * as chroma from 'chroma.ts';
 import { useSetAtom } from 'jotai';
 import {
@@ -13,6 +12,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { HamburgerIcon } from '@chakra-ui/icons';
+import { ALL_FILTER, filters, updateFiltersAtom } from '@/store/protocols';
 
 export interface Option {
   readonly value: string;
