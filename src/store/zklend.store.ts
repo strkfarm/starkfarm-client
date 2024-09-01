@@ -1,12 +1,11 @@
-'use client';
-
 import CONSTANTS from '@/constants';
-import { PoolInfo, ProtocolAtoms, StrkLendingIncentivesAtom } from './pools';
+import { PoolInfo, ProtocolAtoms2, StrkLendingIncentivesAtom } from './pools';
 import { atom } from 'jotai';
-import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
+import { AtomWithQueryResult } from 'jotai-tanstack-query';
 import { IDapp } from './IDapp.store';
 import { StrategyAction } from '@/strategies/IStrategy';
 import { LendingSpace } from './lending.base';
+import { customAtomWithFetch } from '@/utils/customAtomWithFetch';
 const fetcher = (...args: any[]) => {
   return fetch(args[0], args[1]).then((res) => res.json());
 };
@@ -67,14 +66,11 @@ export class ZkLend extends IDapp<LendingSpace.MyBaseAprDoc[]> {
 }
 
 export const zkLend = new ZkLend();
-const ZkLendAtoms: ProtocolAtoms = {
-  baseAPRs: atomWithQuery((get) => ({
-    queryKey: ['zklend_lending_base_aprs'],
-    queryFn: async ({ queryKey }) => {
-      const res = await fetch(CONSTANTS.ZKLEND.BASE_APR_API);
-      return res.json();
-    },
-  })),
+const ZkLendAtoms: ProtocolAtoms2 = {
+  baseAPRs: customAtomWithFetch({
+    url: CONSTANTS.ZKLEND.BASE_APR_API,
+    queryKey: 'zklend_lending_base_aprs',
+  }),
   pools: atom((get) => {
     const poolsInfo = get(StrkLendingIncentivesAtom);
     const empty: PoolInfo[] = [];

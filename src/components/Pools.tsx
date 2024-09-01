@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  PoolInfo,
-  allPoolsAtomUnSorted,
-  filteredPools,
-  sortPoolsAtom,
-} from '@/store/pools';
+import { PoolInfo } from '@/store/pools';
 import {
   Avatar,
   AvatarGroup,
@@ -38,6 +33,11 @@ import {
 import CONSTANTS from '@/constants';
 import Filters from '@/components/Filters';
 import mixpanel from 'mixpanel-browser';
+import {
+  allPoolsAtomUnSorted,
+  filteredPools,
+  sortPoolsAtom,
+} from '@/store/protocols';
 
 export default function Pools() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
