@@ -15,7 +15,7 @@ import StarkDefiAtoms, { starkDefi } from './starkdefi.store';
 import TenkSwapAtoms, { tenkswap } from './tenkswap.store';
 import ZkLendAtoms, { zkLend } from './zklend.store';
 import CarmineAtoms, { carmine } from './carmine.store';
-import VesuAtoms, { Vesu, vesu } from './vesu.store';
+import VesuAtoms, { vesu } from './vesu.store';
 
 export enum Category {
   Stable = 'Stable Pools',
