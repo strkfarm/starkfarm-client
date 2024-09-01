@@ -88,7 +88,12 @@ const TVL: React.FC = () => {
               Your referral link{' '}
               <Tooltip label="Learn more">
                 {/* TODO: update the url */}
-                <Link href="https://docs.strkfarm.xyz/p/community/referral-campaign" target='_blank'>(i)</Link>
+                <Link
+                  href="https://docs.strkfarm.xyz/p/community/referral-campaign"
+                  target="_blank"
+                >
+                  (i)
+                </Link>
               </Tooltip>
             </StatLabel>
             <Box
