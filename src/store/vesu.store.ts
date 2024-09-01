@@ -142,7 +142,7 @@ fetchAndUpdatePoolsData();
 console.log(poolsData, 'updated-pool-data');
 
 export class Vesu extends Jediswap {
-  name = 'Vesu.xyz';
+  name = 'Vesu';
   link = 'https://www.vesu.xyz/markets';
   logo =
     'https://github.com/vesuxyz/assets/blob/main/logo/logo_hi-res_light-mode.png';
