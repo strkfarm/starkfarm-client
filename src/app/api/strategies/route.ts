@@ -1,18 +1,25 @@
-import { getStrategies } from '@/store/strategies.atoms';
 import { NextResponse } from 'next/server';
-import { atom, ExtractAtomArgs } from 'jotai';
-import { allPoolsAtomUnSorted, PoolInfo } from '@/store/pools';
+import { atom } from 'jotai';
 import ZkLendAtoms from '@/store/zklend.store';
-import { MY_STORE } from '@/store';
+import { PoolInfo } from '@/store/pools';
 import NostraLendingAtoms from '@/store/nostralending.store';
 import { RpcProvider } from 'starknet';
+import { getStrategies } from '@/store/strategies.atoms';
+import { MY_STORE } from '@/store';
 import MyNumber from '@/utils/MyNumber';
 import { NFTInfo, TokenInfo } from '@/strategies/IStrategy';
 
 export const revalidate = 3600; // 1 hr
 
+const allPoolsAtom = atom<PoolInfo[]>((get) => {
+  const pools: PoolInfo[] = [];
+  const poolAtoms = [ZkLendAtoms, NostraLendingAtoms];
+  return poolAtoms.reduce((_pools, p) => _pools.concat(get(p.pools)), pools);
+  return [];
+});
+
 async function getPools(store: any, retry = 0) {
-  const allPools = await store.get(allPoolsAtom);
+  const allPools = store.get(allPoolsAtom);
   if (!allPools.length && retry < 10) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     return getPools(store, retry + 1);
@@ -23,17 +30,10 @@ async function getPools(store: any, retry = 0) {
   return allPools;
 }
 
-export const allPoolsAtom = atom((get) => {
-  const pools: PoolInfo[] = [];
-  return [ZkLendAtoms, NostraLendingAtoms].reduce(
-    (_pools, p) => _pools.concat(get(p.pools)),
-    pools,
-  );
+const provider = new RpcProvider({
+  nodeUrl: process.env.RPC_URL || 'https://starknet-mainnet.public.blastapi.io',
 });
 
-const provider = new RpcProvider({
-  nodeUrl: process.env.RPC_URL || "https://starknet-mainnet.public.blastapi.io"
-})
 export async function GET(req: Request) {
   const allPools = await getPools(MY_STORE);
   const strategies = getStrategies();
@@ -49,13 +49,19 @@ export async function GET(req: Request) {
           name: s.name,
           id: s.id,
           apy: s.netYield,
-          depositToken: s.depositMethods(MyNumber.fromZero(), "", provider).map((t) => t.tokenInfo.token),
+          depositToken: s
+            .depositMethods(MyNumber.fromZero(), '', provider)
+            .map((t) => t.tokenInfo.token),
           leverage: s.leverage,
-          contract: s.holdingTokens.map((t) => ({name: t.name, address: (
-            <any>t).token ? (<TokenInfo>t).token : (<NFTInfo>t).address})),
+          contract: s.holdingTokens.map((t) => ({
+            name: t.name,
+            address: (<any>t).token
+              ? (<TokenInfo>t).token
+              : (<NFTInfo>t).address,
+          })),
           status: s.liveStatus,
-        }
-      })
+        };
+      }),
     });
   } catch (err) {
     console.error('Error /api/strategies', err);

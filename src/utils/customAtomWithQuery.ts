@@ -1,5 +1,5 @@
 import { MY_STORE } from '@/store';
-import { Atom, atom, PrimitiveAtom, WritableAtom } from 'jotai';
+import { atom, PrimitiveAtom } from 'jotai';
 
 // Cache storage
 const cache = new Map<string, { data: any; expiry: number }>();
@@ -16,9 +16,9 @@ export type CustomAtomWithQueryResult<TData, TError> = {
 
 // Custom atomWithQuery function with proper result type
 export const customAtomWithQuery = <TData, TError = Error>(args: {
-  queryFn: () => Promise<TData>,
-  queryKey: string,
-  ttl?: number // Time-to-live in ms
+  queryFn: () => Promise<TData>;
+  queryKey: string;
+  ttl?: number; // Time-to-live in ms
 }): PrimitiveAtom<CustomAtomWithQueryResult<TData, TError>> => {
   // Base atom which handles the actual fetching logic
 
@@ -36,7 +36,7 @@ export const customAtomWithQuery = <TData, TError = Error>(args: {
         isLoading: false,
         isSuccess: true,
         isError: false,
-        refetch: refetch, // Placeholder
+        refetch, // Placeholder
       };
     }
 
@@ -47,9 +47,9 @@ export const customAtomWithQuery = <TData, TError = Error>(args: {
       isLoading: true,
       isSuccess: false,
       isError: false,
-      refetch: refetch, // Placeholder
+      refetch, // Placeholder
     };
-  }
+  };
 
   const baseAtom = atom(getDataFromCache());
 
@@ -59,39 +59,36 @@ export const customAtomWithQuery = <TData, TError = Error>(args: {
   }
 
   // Async read and mutation of the atom state
-  const asyncAtom = atom(
-    null,
-    async (get, set) => {
-      try {
-        console.log('Fetching', queryKey);
-        const result = await queryFn();
-        // Cache the result
-        const now = Date.now();
-        cache.set(queryKey, { data: result, expiry: now + ttl });
+  const asyncAtom = atom(null, async (get, set) => {
+    try {
+      console.log('Fetching', queryKey);
+      const result = await queryFn();
+      // Cache the result
+      const now = Date.now();
+      cache.set(queryKey, { data: result, expiry: now + ttl });
 
-        // Update atom state
-        console.log('Setting', queryKey);
-        set(baseAtom, {
-          data: result,
-          error: null,
-          isLoading: false,
-          isSuccess: true,
-          isError: false,
-          refetch: refetch, // Placeholder, will be defined later
-        });
-      } catch (error: any) {
-        // Handle error state
-        set(baseAtom, {
-          data: null,
-          error: error,
-          isLoading: false,
-          isSuccess: false,
-          isError: true,
-          refetch: refetch, // Placeholder, will be defined later
-        });
-      }
-    },
-  );
+      // Update atom state
+      console.log('Setting', queryKey);
+      set(baseAtom, {
+        data: result,
+        error: null,
+        isLoading: false,
+        isSuccess: true,
+        isError: false,
+        refetch, // Placeholder, will be defined later
+      });
+    } catch (error: any) {
+      // Handle error state
+      set(baseAtom, {
+        data: null,
+        error,
+        isLoading: false,
+        isSuccess: false,
+        isError: true,
+        refetch, // Placeholder, will be defined later
+      });
+    }
+  });
 
   refetch();
 

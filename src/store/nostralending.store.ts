@@ -3,12 +3,11 @@ import {
   APRSplit,
   PoolInfo,
   PoolMetadata,
-  ProtocolAtoms,
   ProtocolAtoms2,
   StrkLendingIncentivesAtom,
 } from './pools';
 import { atom } from 'jotai';
-import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
+import { AtomWithQueryResult } from 'jotai-tanstack-query';
 import { LendingSpace } from './lending.base';
 import { IDapp } from './IDapp.store';
 import { customAtomWithFetch } from '@/utils/customAtomWithFetch';
@@ -124,7 +123,7 @@ export const nostraLending = new NostraLending();
 const NostraLendingAtoms: ProtocolAtoms2 = {
   baseAPRs: customAtomWithFetch({
     queryKey: 'nostra_lending_base_aprs',
-    url: CONSTANTS.NOSTRA.LENDING_GRAPH_URL, 
+    url: CONSTANTS.NOSTRA.LENDING_GRAPH_URL,
     fetchOptions: {
       method: 'POST',
       headers: {
@@ -138,7 +137,7 @@ const NostraLendingAtoms: ProtocolAtoms2 = {
         filter: { timestamp: { $gte: 1697500800 } },
         sort: { timestamp: -1 },
       }),
-    }
+    },
   }),
   pools: atom((get) => {
     const poolsInfo = get(StrkLendingIncentivesAtom);
