@@ -309,7 +309,7 @@ export default function Deposit(props: DepositProps) {
               amount.isZero() || amount.compare(maxAmount.toEtherStr(), 'gt'),
           }}
           selectedMarket={selectedMarket}
-          strategyName={props.strategy.name}
+          strategy={props.strategy}
         />
       </Center>
 
