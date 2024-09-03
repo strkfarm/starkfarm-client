@@ -128,7 +128,7 @@ export default function Home() {
                       : banner.mobile
                   }
                   height={'auto'}
-                  boxShadow={'0px 0px 2px #484848'}
+                  boxShadow={'none'}
                   width="100%"
                   alt="Banner"
                   style={{ objectFit: 'cover', borderRadius: '10px' }}

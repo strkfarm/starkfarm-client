@@ -216,21 +216,19 @@ const Strategies: React.FC = () => {
                 color="cyan"
                 fontWeight={'bold'}
                 float={{ base: 'left', md: 'right' }}
+                fontSize={'20px'}
               >
                 {(strat.netYield * 100).toFixed(2)}%
               </Text>
             </Tooltip>
 
-            <AvatarGroup size="xs" max={4} marginRight={'5px'} float={'right'}>
-              {getUniqueById(
-                strat.actions.map((p) => ({
-                  id: p.pool.pool.name,
-                  logo: p.pool.pool.logos[0],
-                })),
-              ).map((p: any) => (
-                <Avatar key={p.id} src={p.logo} />
-              ))}
-            </AvatarGroup>
+            <Avatar
+              size={'xs'}
+              marginTop={'2px'}
+              float={'right'}
+              marginRight={'2px'}
+              src={strat?.holdingTokens[0].logo}
+            />
           </Box>
           <Tooltip label="Multiplier showing the additional reward earned compared to simple deposit">
             <Text
