@@ -158,7 +158,7 @@ export default function Pools() {
       }
 
       <Container width="100%" float={'left'} padding={'0px'} marginTop={'10px'}>
-        <Card variant={'filled'} bg="opacity_50p" color={'purple'}>
+        <Card variant={'filled'} bg="opacity_50p" color={'color2'}>
           <CardBody paddingTop={'5px'} paddingBottom={'5px'}>
             <HStack width={'100%'}>
               <Heading width={{ base: '50%', md: '33%' }} size="md">

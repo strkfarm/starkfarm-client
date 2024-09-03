@@ -151,7 +151,7 @@ export default function Deposit(props: DepositProps) {
           <Button
             size={'sm'}
             marginLeft={'5px'}
-            color="purple"
+            color="color2"
             bg="highlight"
             padding="0"
             maxHeight={'25px'}
@@ -196,7 +196,7 @@ export default function Deposit(props: DepositProps) {
               bgColor={'highlight'}
               borderColor={'bg'}
               borderWidth={'1px'}
-              color="color2Text"
+              color="color2"
               _hover={{
                 bg: 'bg',
               }}
@@ -324,10 +324,10 @@ export default function Deposit(props: DepositProps) {
 
       <Box width="100%" marginTop={'15px'}>
         <Flex justifyContent="space-between">
-          <Text fontSize={'12px'} color="color2Text" fontWeight={'bold'}>
+          <Text fontSize={'12px'} color="color2" fontWeight={'bold'}>
             Current TVL Limit:
           </Text>
-          <Text fontSize={'12px'} color="color2Text">
+          <Text fontSize={'12px'} color="color2">
             {!tvlInfo || !tvlInfo?.data ? (
               <Spinner size="2xs" />
             ) : (
@@ -339,7 +339,7 @@ export default function Deposit(props: DepositProps) {
           </Text>
         </Flex>
         <Progress
-          colorScheme="green"
+          colorScheme="gray"
           bg="bg"
           value={
             (100 *
