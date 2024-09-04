@@ -85,7 +85,6 @@ const Strategies: React.FC = () => {
           width={{ base: 'calc(100% - 40px)', md: 'calc(100% - 80px)' }}
           opacity={'0.5'}
           fontSize={'15px'}
-          fontFamily={'arial'}
         >
           {strat.description}
         </Box>
@@ -169,7 +168,6 @@ const Strategies: React.FC = () => {
                     <Badge
                       ml="1"
                       bg="cyan"
-                      fontFamily={'sans-serif'}
                       padding="3px 5px 2px"
                     >
                       {strat.liveStatus.valueOf()}
@@ -258,12 +256,10 @@ const Strategies: React.FC = () => {
         color="light_grey"
         fontSize={'15px'}
         marginBottom={'15px'}
-        fontFamily={'arial'}
       >
         <b>What are strategies?</b> Strategies are combination of investment
         steps that combine various pools and risk combinations to maximize
-        yield. We currently have one High yield low risk strategy, and adding
-        more as you read this.
+        yield.
       </Text>
       <Card
         variant={'filled'}
@@ -324,7 +320,7 @@ const Strategies: React.FC = () => {
         </Stack>
       )}
       <Text
-        color="color2Text"
+        color="color2"
         textAlign={'center'}
         width={'100%'}
         margin="15px 0"

@@ -204,13 +204,12 @@ export default function Navbar(props: NavbarProps) {
       zIndex={999}
       top="0"
     >
-      <Center bg="color2" color="black" padding={0}>
+      <Center bg="bg" color="gray" padding={0}>
         <Link href={CONSTANTS.COMMUNITY_TG} target="_blank">
           <Text
             fontSize="12px"
             textAlign={'center'}
             padding="0px 5px"
-            fontFamily={'serif'}
           >
             {''}
             <b>Report bugs & share feedback in our Telegram group.</b>

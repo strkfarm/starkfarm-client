@@ -126,3 +126,9 @@ body {
   width: 95%;
   flex: 0 0 100%;
 }
+
+.theme-gradient-text {
+  background: linear-gradient(to right, var(--chakra-colors-purple) 10%, var(--chakra-colors-cyan) 50%, var(--chakra-colors-cyan) 100%);
+  -webkit-background-clip: text;
+  color: transparent;
+}

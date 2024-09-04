@@ -134,7 +134,7 @@ export default function Pools() {
             }}
           >
             <PaginationContainer align="right" float={'right'} p={4}>
-              <PaginationPrevious marginRight="4px" bg="highlight" color="cyan">
+              <PaginationPrevious marginRight="4px" bg="highlight" color="purple">
                 <Text>{'<'}</Text>
               </PaginationPrevious>
               <PaginationPageGroup>
@@ -145,11 +145,11 @@ export default function Pools() {
                     padding={'2px 10px'}
                     isDisabled={page === currentPage}
                     bg="highlight"
-                    color="cyan"
+                    color="purple"
                   />
                 ))}
               </PaginationPageGroup>
-              <PaginationNext marginLeft="4px" bg="highlight" color="cyan">
+              <PaginationNext marginLeft="4px" bg="highlight" color="purple">
                 <Text>{'>'}</Text>
               </PaginationNext>
             </PaginationContainer>
