@@ -94,10 +94,9 @@ export default function Home() {
           fontSize={{ base: '28px', md: '35px' }}
           lineHeight={'30px'}
           marginBottom={'10px'}
-          color={'cyan'}
           textAlign={'center'}
         >
-          <b>Starknet&apos;s Yield Powerhouse🚀</b>
+          <b className="theme-gradient-text">Starknet&apos;s Yield Powerhouse</b>🚀
         </Text>
         <Text
           color="color2"
@@ -128,7 +127,7 @@ export default function Home() {
                       : banner.mobile
                   }
                   height={'auto'}
-                  boxShadow={'0px 0px 2px #484848'}
+                  boxShadow={'none'}
                   width="100%"
                   alt="Banner"
                   style={{ objectFit: 'cover', borderRadius: '10px' }}
@@ -180,7 +179,7 @@ export default function Home() {
         <TabList>
           <Tab
             color="light_grey"
-            _selected={{ color: 'color2Text' }}
+            _selected={{ color: 'purple' }}
             onClick={() => {
               mixpanel.track('Strategies opened');
             }}
@@ -189,7 +188,7 @@ export default function Home() {
           </Tab>
           <Tab
             color="light_grey"
-            _selected={{ color: 'color2Text' }}
+            _selected={{ color: 'purple' }}
             onClick={() => {
               mixpanel.track('All pools clicked');
             }}
@@ -200,7 +199,7 @@ export default function Home() {
         <TabIndicator
           mt="-1.5px"
           height="2px"
-          bg="color2Text"
+          bg="purple"
           color="color1"
           borderRadius="1px"
         />

@@ -1,6 +1,5 @@
 import React from 'react';
 import Select, { StylesConfig } from 'react-select';
-import { ALL_FILTER, filters, updateFiltersAtom } from '@/store/pools';
 import * as chroma from 'chroma.ts';
 import { useSetAtom } from 'jotai';
 import {
@@ -13,6 +12,7 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { HamburgerIcon } from '@chakra-ui/icons';
+import { ALL_FILTER, filters, updateFiltersAtom } from '@/store/protocols';
 
 export interface Option {
   readonly value: string;
@@ -62,19 +62,19 @@ const colourStyles: StylesConfig<Option, true> = {
   dropdownIndicator: (styles) => {
     return {
       ...styles,
-      color: 'var(--chakra-colors-color2Text)',
+      color: 'var(--chakra-colors-purple)',
     };
   },
   clearIndicator: (styles) => {
     return {
       ...styles,
-      color: 'var(--chakra-colors-color2Text)',
+      color: 'var(--chakra-colors-purple)',
     };
   },
   indicatorSeparator: (styles) => {
     return {
       ...styles,
-      backgroundColor: 'var(--chakra-colors-color2Text)',
+      backgroundColor: 'var(--chakra-colors-purple)',
     };
   },
   menu: (styles) => {
@@ -112,7 +112,7 @@ export default function Filters() {
   // const colors: readonly string[] = ['#00B8D9', '#407cd5', '#7967e5', '#FF5630',
   // '#FF8B00','#FFC400', '#36B37E', '#00875A', '#253858', '#666666']
 
-  const colors = ['rgba(86, 118, 254, 1)', 'rgb(127 73 229)'];
+  const colors = ['rgba(132, 132, 195, 1)'];
   const updateFilters = useSetAtom(updateFiltersAtom);
 
   const protocolOptions: readonly Option[] = filters.protocols.map(
@@ -137,16 +137,16 @@ export default function Filters() {
               as="span"
               flex="1"
               textAlign="right"
-              color="color2Text"
+              color="purple"
               marginRight="10px"
             >
               Filters
             </Box>
-            <HamburgerIcon color="color2Text" />
+            <HamburgerIcon color="purple" />
           </AccordionButton>
         </h2>
         <AccordionPanel pb={4} bg="highlight" overflow={'visible'}>
-          <Text color="light_grey" fontSize={'14px'} width="100%">
+          <Text color="purple" fontSize={'14px'} width="100%">
             Protocols:
           </Text>
           <Select
@@ -171,7 +171,7 @@ export default function Filters() {
 
           <Stack marginTop={'5px'} direction={{ base: 'column', md: 'row' }}>
             <Box width={{ base: '100%', md: '50%' }}>
-              <Text color="light_grey" fontSize={'14px'} width="100%">
+              <Text color="purple" fontSize={'14px'} width="100%">
                 Categories:
               </Text>
               <Select
@@ -191,7 +191,7 @@ export default function Filters() {
               />
             </Box>
             <Box width={{ base: '100%', md: '50%' }}>
-              <Text color="light_grey" fontSize={'14px'} width="100%">
+              <Text color="purple" fontSize={'14px'} width="100%">
                 Protocol types:
               </Text>
               <Select

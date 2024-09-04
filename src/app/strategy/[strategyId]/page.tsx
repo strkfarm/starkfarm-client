@@ -31,7 +31,6 @@ export default function StrategyPage({ params }: StrategyParams) {
       maxWidth={'1000px'}
       margin={'0 auto'}
       padding="30px 10px"
-      fontFamily={'sans-serif'}
     >
       <Strategy params={params} />
     </Container>

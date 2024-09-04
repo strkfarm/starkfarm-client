@@ -13,16 +13,18 @@ const LOGOS = {
 export type TokenName = 'USDT' | 'USDC' | 'ETH' | 'STRK' | 'WBTC' | 'DAI';
 
 const CONSTANTS = {
-  DEX_INCENTIVE_URL: '/strk-incentives/fetchFile?file=strk_grant.json',
+  DEX_INCENTIVE_URL:
+    'https://kx58j6x5me.execute-api.us-east-1.amazonaws.com/starknet/fetchFile?file=strk_grant.json',
   NOSTRA_DEGEN_INCENTIVE_URL: 'https://api.nostra.finance/query/pool_aprs',
   CARMINE_INCENTIVES_URL: '/carmine/api/v1/mainnet/defispring',
   CARMINE_URL: '/carmine/api/v2/mainnet',
   LENDING_INCENTIVES_URL:
-    '/strk-incentives/fetchFile?file=prod-api/lending/lending_strk_grant.json',
+    'https://kx58j6x5me.execute-api.us-east-1.amazonaws.com/starknet/fetchFile?file=prod-api/lending/lending_strk_grant.json',
   LOGOS,
   COMMUNITY_TG: 'https://t.me/+HQ_eHaXmF-1lZDc1',
   NOSTRA: {
-    LENDING_GRAPH_URL: '/nostra/app/data-yqlpb/endpoint/data/v1/action/find',
+    LENDING_GRAPH_URL:
+      'https://us-east-2.aws.data.mongodb-api.com/app/data-yqlpb/endpoint/data/v1/action/find',
   },
   ZKLEND: {
     BASE_APR_API: '/zklend/api/pools',

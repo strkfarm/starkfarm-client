@@ -1,7 +1,7 @@
 import CONSTANTS, { LATEST_TNC_DOC_VERSION } from '@/constants';
 import { referralCodeAtom } from '@/store/referral.store';
 import { StrategyTxProps, monitorNewTxAtom } from '@/store/transactions.atom';
-import { TokenInfo } from '@/strategies/IStrategy';
+import { IStrategyProps, TokenInfo } from '@/strategies/IStrategy';
 import { getReferralUrl } from '@/utils';
 import {
   Box,
@@ -34,7 +34,7 @@ interface TxButtonProps {
   buttonProps: ButtonProps;
   justDisableIfNoWalletConnect?: boolean;
   selectedMarket?: TokenInfo;
-  strategyName?: string;
+  strategy?: IStrategyProps;
 }
 
 export default function TxButton(props: TxButtonProps) {
@@ -149,10 +149,10 @@ export default function TxButton(props: TxButtonProps) {
         <ModalContent borderRadius=".5rem" maxW="32rem">
           <ModalCloseButton color="white" />
           <ModalBody
-            backgroundColor="#7E49E5"
+            backgroundColor={"var(--chakra-colors-highlight)"}
             pt="4rem"
             pb="3rem"
-            border="1px solid white"
+            border="1px solid var(--chakra-colors-color2_65p)"
             borderRadius=".5rem"
             color="white"
             display="flex"
@@ -183,7 +183,7 @@ export default function TxButton(props: TxButtonProps) {
             >
               <TwitterShareButton
                 url={`${getReferralUrl(referralCode)}`}
-                title={`I just invested my ${props.selectedMarket?.name ?? ''} token in the high yield  "${props.strategyName ?? ''}" strategy at @strkfarm. \n\nHere's my link to join: `}
+                title={`🚀I just invested my ${props.selectedMarket?.name ?? ''} in the high-yield  "${props.strategy?.name ?? ''}" strategy at @strkfarm, earning an impressive ${((props.strategy?.netYield || 0) * 100).toFixed(2)}% yield! 💸. \n\nWant in? Join me and start earning: `}
                 related={['strkfarm']}
                 style={{
                   display: 'flex',

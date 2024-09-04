@@ -104,14 +104,16 @@ export default function Deposit(props: DepositProps) {
     );
     let reducedBalance = balance;
 
-    if (selectedMarket.name === 'STRK') {
-      reducedBalance = balance.subtract(
-        MyNumber.fromEther('1.5', selectedMarket.decimals),
-      );
-    } else if (selectedMarket.name === 'ETH') {
-      reducedBalance = balance.subtract(
-        MyNumber.fromEther('0.001', selectedMarket.decimals),
-      );
+    if (props.buttonText === 'Deposit') {
+      if (selectedMarket.name === 'STRK') {
+        reducedBalance = balance.subtract(
+          MyNumber.fromEther('1.5', selectedMarket.decimals),
+        );
+      } else if (selectedMarket.name === 'ETH') {
+        reducedBalance = balance.subtract(
+          MyNumber.fromEther('0.001', selectedMarket.decimals),
+        );
+      }
     }
     console.log('Deposit:: reducedBalance2', reducedBalance.toEtherStr());
     const min = MyNumber.min(reducedBalance, adjustedMaxAllowed);
@@ -149,7 +151,7 @@ export default function Deposit(props: DepositProps) {
           <Button
             size={'sm'}
             marginLeft={'5px'}
-            color="purple"
+            color="color2"
             bg="highlight"
             padding="0"
             maxHeight={'25px'}
@@ -194,7 +196,7 @@ export default function Deposit(props: DepositProps) {
               bgColor={'highlight'}
               borderColor={'bg'}
               borderWidth={'1px'}
-              color="color2Text"
+              color="color2"
               _hover={{
                 bg: 'bg',
               }}
@@ -307,7 +309,7 @@ export default function Deposit(props: DepositProps) {
               amount.isZero() || amount.compare(maxAmount.toEtherStr(), 'gt'),
           }}
           selectedMarket={selectedMarket}
-          strategyName={props.strategy.name}
+          strategy={props.strategy}
         />
       </Center>
 
@@ -322,10 +324,10 @@ export default function Deposit(props: DepositProps) {
 
       <Box width="100%" marginTop={'15px'}>
         <Flex justifyContent="space-between">
-          <Text fontSize={'12px'} color="color2Text" fontWeight={'bold'}>
+          <Text fontSize={'12px'} color="color2" fontWeight={'bold'}>
             Current TVL Limit:
           </Text>
-          <Text fontSize={'12px'} color="color2Text">
+          <Text fontSize={'12px'} color="color2">
             {!tvlInfo || !tvlInfo?.data ? (
               <Spinner size="2xs" />
             ) : (
@@ -337,7 +339,7 @@ export default function Deposit(props: DepositProps) {
           </Text>
         </Flex>
         <Progress
-          colorScheme="green"
+          colorScheme="gray"
           bg="bg"
           value={
             (100 *

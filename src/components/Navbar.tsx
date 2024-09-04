@@ -199,18 +199,23 @@ export default function Navbar(props: NavbarProps) {
     <Container
       width={'100%'}
       padding={'0'}
-      borderBottom={'1px solid var(--chakra-colors-color2)'}
       position={'fixed'}
-      bg="bg"
+      bg="black"
       zIndex={999}
       top="0"
     >
-      <Center bg="highlight" color="orange" padding={0}>
-        <Text fontSize="12px" textAlign={'center'} padding="0px 5px">
-          {''}
-          <b>Report bugs & share feedback in our Telegram group.</b>
-          {''}
-        </Text>
+      <Center bg="bg" color="gray" padding={0}>
+        <Link href={CONSTANTS.COMMUNITY_TG} target="_blank">
+          <Text
+            fontSize="12px"
+            textAlign={'center'}
+            padding="0px 5px"
+          >
+            {''}
+            <b>Report bugs & share feedback in our Telegram group.</b>
+            {''}
+          </Text>
+        </Link>
       </Center>
       <Box
         width={'100%'}

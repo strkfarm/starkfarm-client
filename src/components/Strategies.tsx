@@ -1,4 +1,5 @@
 import { allPoolsAtomUnSorted } from '@/store/pools';
+import CONSTANTS from '@/constants';
 import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
 import { getUniqueById } from '@/utils';
 import { AddIcon } from '@chakra-ui/icons';
@@ -38,7 +39,6 @@ import TVL from './TVL';
 import shield from '@/assets/shield.svg';
 import { userStatsAtom } from '@/store/utils.atoms';
 import { IStrategyProps, StrategyLiveStatus } from '@/strategies/IStrategy';
-import CONSTANTS from '@/constants';
 
 export default function Strategies() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
@@ -98,7 +98,6 @@ export default function Strategies() {
           width={{ base: 'calc(100% - 40px)', md: 'calc(100% - 80px)' }}
           opacity={'0.5'}
           fontSize={'15px'}
-          fontFamily={'arial'}
         >
           {strat.description}
         </Box>
@@ -423,12 +422,10 @@ export default function Strategies() {
         color="light_grey"
         fontSize={'15px'}
         marginBottom={'15px'}
-        fontFamily={'arial'}
       >
         <b>What are strategies?</b> Strategies are combination of investment
         steps that combine various pools and risk combinations to maximize
-        yield. We currently have one High yield low risk strategy, and adding
-        more as you read this.
+        yield.
       </Text>
       <Card variant={'filled'} bg="opacity_50p" color={'purple'}>
         <CardBody paddingTop={'5px'} paddingBottom={'5px'}>
@@ -519,7 +516,7 @@ export default function Strategies() {
         </Stack>
       )}
       <Text
-        color="color2Text"
+        color="color2"
         textAlign={'center'}
         width={'100%'}
         margin="15px 0"

@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  PoolInfo,
-  allPoolsAtomUnSorted,
-  filteredPools,
-  sortPoolsAtom,
-} from '@/store/pools';
+import { PoolInfo } from '@/store/pools';
 import {
   Avatar,
   AvatarGroup,
@@ -36,6 +31,11 @@ import {
 } from '@ajna/pagination';
 import Filters from '@/components/Filters';
 import mixpanel from 'mixpanel-browser';
+import {
+  allPoolsAtomUnSorted,
+  filteredPools,
+  sortPoolsAtom,
+} from '@/store/protocols';
 
 export default function Pools() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
@@ -202,7 +202,7 @@ export default function Pools() {
             }}
           >
             <PaginationContainer align="right" float={'right'} p={4}>
-              <PaginationPrevious marginRight="4px" bg="highlight" color="cyan">
+              <PaginationPrevious marginRight="4px" bg="highlight" color="purple">
                 <Text>{'<'}</Text>
               </PaginationPrevious>
               <PaginationPageGroup>
@@ -213,11 +213,11 @@ export default function Pools() {
                     padding={'2px 10px'}
                     isDisabled={page === currentPage}
                     bg="highlight"
-                    color="cyan"
+                    color="purple"
                   />
                 ))}
               </PaginationPageGroup>
-              <PaginationNext marginLeft="4px" bg="highlight" color="cyan">
+              <PaginationNext marginLeft="4px" bg="highlight" color="purple">
                 <Text>{'>'}</Text>
               </PaginationNext>
             </PaginationContainer>
@@ -226,7 +226,7 @@ export default function Pools() {
       }
 
       <Container width="100%" float={'left'} padding={'0px'} marginTop={'10px'}>
-        <Card variant={'filled'} bg="opacity_50p" color={'purple'}>
+        <Card variant={'filled'} bg="opacity_50p" color={'color2'}>
           <CardBody paddingTop={'5px'} paddingBottom={'5px'}>
             <HStack width={'100%'}>
               <Stack
