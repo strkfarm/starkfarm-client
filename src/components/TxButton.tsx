@@ -71,7 +71,7 @@ export default function TxButton(props: TxButtonProps) {
     }
 
     if (isSuccess && data && data.transaction_hash) {
-      props.resetDepositForm()
+      props.resetDepositForm();
       mixpanel.track('Transaction success', {
         strategyId: props.txInfo.strategyId,
         actionType: props.txInfo.actionType,

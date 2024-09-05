@@ -78,13 +78,12 @@ export default function Deposit(props: DepositProps) {
     };
   }, [amount, props]);
 
-    // Function to reset the input fields to their initial state
-    const resetDepositForm = () => {
-      setAmount(MyNumber.fromEther('0', selectedMarket.decimals));
-      setRawAmount('');
-      setDirty(false);
-    };
-  
+  // Function to reset the input fields to their initial state
+  const resetDepositForm = () => {
+    setAmount(MyNumber.fromEther('0', selectedMarket.decimals));
+    setRawAmount('');
+    setDirty(false);
+  };
 
   // constructs tx calls
   const { calls, actions } = useMemo(() => {
