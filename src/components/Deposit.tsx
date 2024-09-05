@@ -331,7 +331,7 @@ export default function Deposit(props: DepositProps) {
             {!tvlInfo || !tvlInfo?.data ? (
               <Spinner size="2xs" />
             ) : (
-              Number(tvlInfo.data?.amount.toFixedStr(0)).toLocaleString()
+              Number(tvlInfo.data?.amount.toFixedStr(2)).toLocaleString()
             )}
             {' / '}
             {props.strategy.settings.maxTVL.toLocaleString()}{' '}
