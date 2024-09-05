@@ -376,6 +376,7 @@ export class DeltaNeutralMM extends IStrategy {
     const call = strategyContract.populate('withdraw', [
       uint256.bnToUint256(amount.toString()),
       address,
+      500, // 5% max slippage
     ]);
 
     const calls: Call[] = [call];
