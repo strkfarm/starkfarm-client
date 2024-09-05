@@ -11,6 +11,7 @@ import {
   CardBody,
   Center,
   Container,
+  Flex,
   Grid,
   GridItem,
   HStack,
@@ -26,8 +27,14 @@ import {
   PopoverTrigger,
   Skeleton,
   Stack,
+  Table,
+  Tbody,
+  Td,
   Text,
+  Th,
+  Thead,
   Tooltip,
+  Tr,
   Wrap,
   WrapItem,
 } from '@chakra-ui/react';
@@ -40,11 +47,13 @@ import { userStatsAtom } from '@/store/utils.atoms';
 import { IStrategyProps, StrategyLiveStatus } from '@/strategies/IStrategy';
 import { allPoolsAtomUnSorted } from '@/store/protocols';
 import { FaWallet } from 'react-icons/fa';
+import { addressAtom } from '@/store/claims.atoms';
 
 export default function Strategies() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
   const strategies = useAtomValue(strategiesAtom);
   const { data: userData } = useAtomValue(userStatsAtom);
+  const address = useAtomValue(addressAtom);
 
   function getStratCardBg(strat: IStrategyProps, index: number) {
     if (
@@ -161,7 +170,6 @@ export default function Strategies() {
       >
         <Tooltip hasArrow label={tooltipLabel} bg="gray.300" color="black">
           <Box
-            marginTop={{ base: '10px', md: '0px' }}
             position={'relative'}
             display={'flex'}
             flexDirection={'column'}
@@ -173,7 +181,7 @@ export default function Strategies() {
               display="flex"
               alignItems="center"
               justifyContent={{ base: 'flex-start', md: 'center' }}
-              padding={'4px'}
+              padding={'4px 0px'}
               height={'100%'}
               position={'relative'}
             >
@@ -184,7 +192,7 @@ export default function Strategies() {
                     width="4px"
                     height="18px"
                     borderRadius="md"
-                    bg={index < count ? color : '#29335C'}
+                    bg={index < count ? color : "var(--chakra-colors-opacity_50p)"}
                   />
                 ))}
               </Stack>
@@ -211,176 +219,160 @@ export default function Strategies() {
     return amount?.usdValue ? amount?.usdValue : 0;
   }
 
-  function StrategyCard(props: { strat: StrategyInfo }) {
+  function StrategyCard(props: { strat: StrategyInfo, index: number }) {
+    const { strat, index } = props;
+
+    return (
+      <Tr color={'white'} bg={index % 2 == 0 ? "color1_50p": "color2_50p"} display={{base: 'none', md: 'table-row'}}>
+        <Td>
+          <StrategyInfo strat={strat}/>
+        </Td>
+        <Td>
+          <StrategyAPY strat={strat}/>
+        </Td>
+        <Td>{GetRiskLevel(strat.riskFactor)}</Td>
+        <Td>
+          <StrategyTVL strat={strat}/>
+        </Td>
+      </Tr>
+    );
+  }
+
+  function StrategyInfo(props: { strat: IStrategyProps }) {
+    const { strat } = props;
+    return <HStack spacing={2}>
+      <Avatar size={'xs'} src={strat.holdingTokens[0].logo} />
+      <Heading size="sm" marginTop={'2px'}>
+        {strat.name}
+      </Heading>
+      {strat.liveStatus != StrategyLiveStatus.ACTIVE && (
+        <Badge
+          ml="1"
+          bg={getStratCardBadgeBg(strat)}
+          fontFamily={'sans-serif'}
+          padding="2px 8px"
+          textTransform="capitalize"
+          fontWeight={500}
+        >
+          {strat.liveStatus.valueOf()}
+        </Badge>
+      )}
+      {strat.isLive() && (
+        <Tooltip label="Audited smart contract. Click to view the audit report.">
+          <Link href={CONSTANTS.AUDIT_REPORT} target="_blank">
+            <Box
+              width={'24px'}
+              height={'24px'}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
+              backgroundColor={'rgba(0, 0, 0, 0.2)'}
+              borderRadius={'50%'}
+            >
+              <Image src={shield.src} alt="badge" />
+            </Box>
+          </Link>
+        </Tooltip>
+      )}
+    </HStack>
+  }
+
+  function StrategyAPY(props: { strat: IStrategyProps }) {
+    const { strat } = props;
+    return <Box width={'100%'} marginBottom={'5px'}>
+      <Tooltip label="Includes fees & rewards earning potential">
+        <Text textAlign={'right'} color="#fff" fontWeight={600}>
+          {(strat.netYield * 100).toFixed(2)}%
+        </Text>
+      </Tooltip>
+      <Tooltip label="Shows the increased capital efficiency of investments compared to direct deposit in popular lending protocols">
+        <Box width={'100%'}>
+          <Box float={'right'} display={'flex'} fontSize={'13px'}>
+            <Text color="#FCC01E" textAlign={'right'}>⚡</Text>
+            <Text width="100%" color="cyan" textAlign={'right'} fontWeight={600}>
+              {strat.leverage.toFixed(1)}X
+            </Text>
+          </Box>
+        </Box>
+      </Tooltip>
+    </Box>
+  }
+
+  function StrategyTVL(props: { strat: IStrategyProps }) {
     const { strat } = props;
     const tvlInfo = useAtomValue(props.strat.tvlAtom);
 
-    return (
-      <Grid
-        width={'100%'}
-        templateRows="repeat(6, 1fr)"
-        templateColumns="repeat(10, 1fr)"
-      >
-        {/* Strategy name, logo and protocols */}
-        <GridItem colSpan={{ base: 7, md: 4 }} rowSpan={{ base: 6, md: 6 }}>
-          <Box width={'100%'}>
-            <Box>
-              <HStack
-                fontSize={{ base: '25px', md: '25px' }}
-                textAlign={'left'}
-                marginBottom={'5px'}
-                alignItems={'center'}
-                spacing={'8px'}
-                borderRadius={'4px'}
-              >
-                <Avatar size={'xs'} src={strat.holdingTokens[0].logo} />
-                <Heading size="xs" marginTop={'2px'}>
-                  {strat.name}
-                </Heading>
-                {strat.liveStatus != StrategyLiveStatus.ACTIVE && (
-                  <Badge
-                    ml="1"
-                    bg={getStratCardBadgeBg(strat)}
-                    fontFamily={'sans-serif'}
-                    padding="2px 8px"
-                    textTransform="capitalize"
-                    fontWeight={500}
-                  >
-                    {strat.liveStatus.valueOf()}
-                  </Badge>
-                )}
-                {strat.isLive() && (
-                  <Tooltip label="Audited smart contract. Click to view the audit report.">
-                    <Link href={CONSTANTS.AUDIT_REPORT} target="_blank">
-                      <Box
-                        width={'24px'}
-                        height={'24px'}
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                        backgroundColor={'rgba(0, 0, 0, 0.2)'}
-                        borderRadius={'50%'}
-                      >
-                        <Image src={shield.src} alt="badge" />
-                      </Box>
-                    </Link>
-                  </Tooltip>
-                )}
-              </HStack>
-              <Heading
-                fontSize={{ base: '12px', md: '14px' }}
-                color="grey_text"
-                marginTop="12px"
-              >
-                <Wrap>
-                  {getUniqueById(
-                    strat.actions.map((p) => ({
-                      id: p.pool.protocol.name,
-                      logo: p.pool.protocol.logo,
-                    })),
-                  ).map((p) => (
-                    <WrapItem marginRight={'2px'} key={p.id}>
-                      <Center>
-                        <Avatar
-                          size="2xs"
-                          bg={'black'}
-                          src={p.logo}
-                          marginRight={'6px'}
-                        />
-                        <Text marginTop={'2px'} color="grey_text">
-                          {p.id}
-                        </Text>
-                      </Center>
-                    </WrapItem>
-                  ))}
-                </Wrap>
-              </Heading>
-            </Box>
-          </Box>
-        </GridItem>
-
-        {/* APY, boost */}
-        <GridItem colSpan={{ base: 3, md: 2 }} rowSpan={{ base: 4, md: 6 }}>
-          <Box
-            width={'100%'}
-            display="flex"
-            flexDirection={'column'}
-            textAlign={'left'}
-            alignItems={{ base: 'flex-end', md: 'flex-end' }}
-            justifyContent="center"
-          >
-            <Box width={'100%'} marginBottom={'5px'}>
-              <Tooltip label="Includes fees & rewards earning potential">
-                <Text textAlign={'right'} color="#fff" fontWeight={600}>
-                  {(strat.netYield * 100).toFixed(2)}%
-                </Text>
-              </Tooltip>
-            </Box>
-            <Tooltip label="Shows the increased capital efficiency of investments compared to direct deposit in popular lending protocols">
-              <Box display={'flex'} justifyContent={'flex-end'}>
-                <Text color="#FCC01E">⚡</Text>
-                <Text width="100%" color="cyan" fontWeight={600}>
-                  {strat.leverage.toFixed(1)}X
-                </Text>
-              </Box>
-            </Tooltip>
-          </Box>
-        </GridItem>
-
-        {/* Risk factor */}
-        <GridItem
-          colSpan={{ base: 3, md: 2 }}
-          rowSpan={{ base: 3, md: 6 }}
-          display={{ base: 'none', md: 'block' }}
+    return <Box
+      width={'100%'}
+      textAlign={'right'}
+      fontWeight={600}
+      display={'flex'}
+      flexDirection={'column'}
+      justifyContent={'center'}
+      alignItems={'flex-end'}
+    >
+      {strat.isLive() && (
+        <Text>
+          ${getDisplayCurrencyAmount(tvlInfo.data?.usdValue || 0, 0)}
+        </Text>
+      )}
+      {!strat.isLive() && <Text>-</Text>}
+      {address && strat.isLive() && (
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          borderRadius={'20px'}
+          color="grey_text"
+          fontSize={'12px'}
         >
+          <>
+            <Tooltip label="Your deposits">
+              <Text width={'100%'} textAlign={'right'} fontWeight={600}>
+                <Icon
+                  as={FaWallet}
+                  marginRight={'5px'}
+                  marginTop={'-2px'}
+                />
+                $
+                {Math.round(
+                  getStrategyWiseInfo(strat.id),
+                ).toLocaleString()}
+              </Text>
+            </Tooltip>
+          </>
+        </Box>
+      )}
+    </Box>
+  }
+
+  function StrategyMobileCard(props: { strat: StrategyInfo, index: number }) {
+    const { strat, index } = props;
+    return (
+      <Grid 
+        color={'white'} 
+        bg={index % 2 == 0 ? "color1_50p": "color2_50p"}
+        templateColumns={'repeat(3, 1fr)'}
+        templateRows={'repeat(3, 1fr)'}
+        display={{base: 'grid', md: 'none'}}
+        padding={'20px'}
+        gap={2}
+        borderBottom={'1px solid var(--chakra-colors-bg)'}
+      >
+        <GridItem colSpan={3}>
+          <StrategyInfo strat={strat}/>
+        </GridItem>
+        <GridItem colSpan={1} rowSpan={2}>
+          <Text textAlign={'right'} color={'color2'} fontWeight={'bold'} fontSize={'13px'}>APY</Text>
+          <StrategyAPY strat={strat}/>
+        </GridItem>
+        <GridItem colSpan={1} rowSpan={2}>
+          <Text textAlign={'right'} color={'color2'} fontWeight={'bold'} fontSize={'13px'}>RISK</Text>
           {GetRiskLevel(strat.riskFactor)}
         </GridItem>
-
-        {/* TVL, my deposits */}
-        <GridItem colSpan={{ base: 10, md: 2 }} rowSpan={{ base: 2, md: 6 }}>
-          <Box
-            width={'100%'}
-            textAlign={'right'}
-            fontWeight={600}
-            display={'flex'}
-            flexDirection={'column'}
-            justifyContent={'center'}
-            alignItems={'flex-end'}
-          >
-            {strat.isLive() && (
-              <Text>
-                ${getDisplayCurrencyAmount(tvlInfo.data?.usdValue || 0, 0)}
-              </Text>
-            )}
-            {!strat.isLive() && <Text>-</Text>}
-            {strat.isLive() && (
-              <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                marginTop={'5px'}
-                borderRadius={'20px'}
-                color="grey_text"
-                fontSize={'12px'}
-              >
-                <>
-                  <Tooltip label="Your deposits">
-                    <Text width={'100%'} textAlign={'right'} fontWeight={600}>
-                      <Icon
-                        as={FaWallet}
-                        marginRight={'5px'}
-                        marginTop={'-2px'}
-                      />
-                      $
-                      {Math.round(
-                        getStrategyWiseInfo(strat.id),
-                      ).toLocaleString()}
-                    </Text>
-                  </Tooltip>
-                </>
-              </Box>
-            )}
-          </Box>
+        <GridItem colSpan={1} rowSpan={2}>
+          <Text textAlign={'right'} color={'color2'} fontWeight={'bold'} fontSize={'13px'}>TVL</Text>
+          <StrategyTVL strat={strat}/>
         </GridItem>
       </Grid>
     );
@@ -399,77 +391,25 @@ export default function Strategies() {
         steps that combine various pools and risk combinations to maximize
         yield.
       </Text>
-      <Card variant={'filled'} bg="opacity_50p" color={'purple'}>
-        <CardBody paddingTop={'5px'} paddingBottom={'5px'}>
-          <Grid templateRows="repeat(6, 1fr)" templateColumns="repeat(10, 1fr)">
-            <GridItem colSpan={{ base: 7, md: 4 }} rowSpan={{ base: 6, md: 6 }}>
-              <Heading size={{ base: 'xs', md: 'md' }} textAlign="left">
-                Strategy
-              </Heading>
-            </GridItem>
-            <GridItem colSpan={{ base: 3, md: 2 }} rowSpan={{ base: 4, md: 6 }}>
-              <Heading size={{ base: 'xs', md: 'md' }} textAlign="right">
-                APY & Boost
-              </Heading>
-            </GridItem>
-            <GridItem
-              colSpan={{ base: 3, md: 2 }}
-              rowSpan={{ base: 3, md: 6 }}
-              display={{ base: 'none', md: 'block' }}
-            >
-              <Heading size={{ base: 'xs', md: 'md' }} textAlign="right">
-                Risk
-              </Heading>
-            </GridItem>
-            <GridItem
-              colSpan={{ base: 10, md: 2 }}
-              rowSpan={{ base: 2, md: 6 }}
-            >
-              <Heading size={{ base: 'xs', md: 'md' }} textAlign="right">
-                TVL ($)
-              </Heading>
-            </GridItem>
-          </Grid>
-        </CardBody>
-      </Card>
-      {allPools.length && strategies.length > 0 && (
-        <Stack spacing="4">
-          {strategies.map((strat, index) => (
-            <Card
-              key={`${strat.name}`}
-              variant={'filled'}
-              bg={getStratCardBg(strat, index)}
-              borderRadius={'4px'}
-              color="white"
-              minHeight={'100px'}
-              _hover={getStratCardBgHover(strat, index)}
-            >
-              <CardBody
-                padding={{ base: '15px', md: '20px' }}
-                overflowY={'hidden'}
-              >
-                <Box
-                  width={'100%'}
-                  pointerEvents={strat.isLive() ? 'auto' : 'none'}
-                >
-                  <Link
-                    _active={{
-                      textDecoration: 'none !important',
-                    }}
-                    _hover={{
-                      textDecoration: 'none !important',
-                    }}
-                    href={`/strategy/${strat.id}`}
-                  >
-                    <StrategyCard strat={strat} />
-                  </Link>
-                </Box>
-                {/* {DepositButton(strat)} */}
-              </CardBody>
-            </Card>
-          ))}
-        </Stack>
-      )}
+      <Table variant='simple'>
+        <Thead display={{base: 'none', md: 'table-header-group'}}>
+          <Tr fontSize={'18px'} color={'white'} bg='bg'>
+            <Th>Strategy name</Th>
+            <Th textAlign={'right'}>APY</Th>
+            <Th textAlign={'right'}>Risk</Th>
+            <Th textAlign={'right'}>TVL</Th>
+          </Tr>
+        </Thead>
+      <Tbody>
+        {allPools.length > 0 && strategies.length > 0 &&
+            <>{strategies.map((strat, index) => (
+              <>
+                <StrategyCard strat={strat} index={index}/>
+                <StrategyMobileCard strat={strat} index={index}/>
+              </>
+            ))}</>}
+      </Tbody>
+      </Table>
       {allPools.length > 0 && strategies.length === 0 && (
         <Box padding="10px 0" width={'100%'} float={'left'}>
           <Text color="light_grey" textAlign={'center'}>

@@ -218,7 +218,7 @@ export default function Home() {
       {/* <hr style={{width: '100%', borderColor: '#5f5f5f', float: 'left', margin: '20px 0'}}/> */}
       <Center padding="10px 0" width={'100%'} float={'left'}>
         <Link href={CONSTANTS.COMMUNITY_TG} isExternal>
-          <ChakraImage src={tg.src} width="50" margin="0 auto" />
+          <ChakraImage src={tg.src} width="20" margin="0 auto" />
         </Link>
       </Center>
       <Center width={'100%'} float="left">
