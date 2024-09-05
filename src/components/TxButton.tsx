@@ -35,6 +35,7 @@ interface TxButtonProps {
   justDisableIfNoWalletConnect?: boolean;
   selectedMarket?: TokenInfo;
   strategy?: IStrategyProps;
+  resetDepositForm: () => void;
 }
 
 export default function TxButton(props: TxButtonProps) {
@@ -70,6 +71,7 @@ export default function TxButton(props: TxButtonProps) {
     }
 
     if (isSuccess && data && data.transaction_hash) {
+      props.resetDepositForm()
       mixpanel.track('Transaction success', {
         strategyId: props.txInfo.strategyId,
         actionType: props.txInfo.actionType,
