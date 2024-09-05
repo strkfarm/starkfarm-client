@@ -101,10 +101,18 @@ export class IStrategyProps {
   readonly balanceAtom: Atom<AtomWithQueryResult<BalanceResult, Error>>;
   readonly tvlAtom: Atom<AtomWithQueryResult<AmountInfo, Error>>;
 
+  riskFactor: number = 5;
   risks: string[] = [
     'The strategy involves exposure to smart contracts, which inherently carry risks like hacks, albeit relatively low',
     'APYs shown are just indicative and do not promise exact returns',
   ];
+
+  getSafetyFactorLine() {
+    let factorLevel = 'Low';
+    if (this.riskFactor > 2) factorLevel = 'Medium';
+    if (this.riskFactor >= 4) factorLevel = 'High';
+    return `Risk factor: ${this.riskFactor}/5 (${factorLevel} risk)`;
+  }
 
   depositMethods = (
     amount: MyNumber,
