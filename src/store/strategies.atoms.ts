@@ -62,7 +62,7 @@ export function getStrategies() {
     [1, 0.609886, 1, 0.920975, 0.510078], // precomputed factors based on strategy math
     StrategyLiveStatus.NEW,
     {
-      maxTVL: 20,
+      maxTVL: 100,
     },
   );
   const deltaNeutralMMSTRKETH = new DeltaNeutralMM(

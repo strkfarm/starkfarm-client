@@ -55,7 +55,7 @@ const CONSTANTS = {
     DeltaNeutralMMSTRKETH:
       '0x20d5fc4c9df4f943ebb36078e703369c04176ed00accf290e8295b659d2cea6',
     DeltaNeutralMMETHUSDC:
-      '0x04937b58e05a3a2477402d1f74e66686f58a61a5070fcc6f694fb9a0b3bae422',
+      '0x9d23d9b1fa0db8c9d75a1df924c3820e594fc4ab1475695889286f3f6df250',
   },
   MOBILE_MSG: 'Desktop/Tablet only',
 };
@@ -92,6 +92,17 @@ export const TOKENS: TokenInfo[] = [
     minAmount: MyNumber.fromEther('10', 18),
     maxAmount: MyNumber.fromEther('10000', 18),
     stepAmount: MyNumber.fromEther('10', 18),
+    isERC4626: false,
+  },
+  {
+    token: '0x1b5bd713e72fdc5d63ffd83762f81297f6175a5e0a4771cdadbc1dd5fe72cb1',
+    name: 'zETH',
+    decimals: 18,
+    displayDecimals: 2,
+    logo: CONSTANTS.LOGOS.ETH,
+    minAmount: MyNumber.fromEther('0.001', 18),
+    maxAmount: MyNumber.fromEther('10000', 18),
+    stepAmount: MyNumber.fromEther('0.0001', 18),
     isERC4626: false,
   },
   {
