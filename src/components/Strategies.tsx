@@ -1,17 +1,13 @@
 import CONSTANTS from '@/constants';
 import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
-import { getDisplayCurrencyAmount, getUniqueById } from '@/utils';
+import { getDisplayCurrencyAmount } from '@/utils';
 import { AddIcon } from '@chakra-ui/icons';
 import {
   Avatar,
   Badge,
   Box,
   Button,
-  Card,
-  CardBody,
-  Center,
   Container,
-  Flex,
   Grid,
   GridItem,
   HStack,
@@ -35,8 +31,6 @@ import {
   Thead,
   Tooltip,
   Tr,
-  Wrap,
-  WrapItem,
 } from '@chakra-ui/react';
 import { useAtomValue } from 'jotai';
 import React from 'react';
@@ -192,7 +186,9 @@ export default function Strategies() {
                     width="4px"
                     height="18px"
                     borderRadius="md"
-                    bg={index < count ? color : "var(--chakra-colors-opacity_50p)"}
+                    bg={
+                      index < count ? color : 'var(--chakra-colors-opacity_50p)'
+                    }
                   />
                 ))}
               </Stack>
@@ -219,20 +215,24 @@ export default function Strategies() {
     return amount?.usdValue ? amount?.usdValue : 0;
   }
 
-  function StrategyCard(props: { strat: StrategyInfo, index: number }) {
+  function StrategyCard(props: { strat: StrategyInfo; index: number }) {
     const { strat, index } = props;
 
     return (
-      <Tr color={'white'} bg={index % 2 == 0 ? "color1_50p": "color2_50p"} display={{base: 'none', md: 'table-row'}}>
+      <Tr
+        color={'white'}
+        bg={index % 2 == 0 ? 'color1_50p' : 'color2_50p'}
+        display={{ base: 'none', md: 'table-row' }}
+      >
         <Td>
-          <StrategyInfo strat={strat}/>
+          <StrategyInfo strat={strat} />
         </Td>
         <Td>
-          <StrategyAPY strat={strat}/>
+          <StrategyAPY strat={strat} />
         </Td>
         <Td>{GetRiskLevel(strat.riskFactor)}</Td>
         <Td>
-          <StrategyTVL strat={strat}/>
+          <StrategyTVL strat={strat} />
         </Td>
       </Tr>
     );
@@ -240,139 +240,166 @@ export default function Strategies() {
 
   function StrategyInfo(props: { strat: IStrategyProps }) {
     const { strat } = props;
-    return <HStack spacing={2}>
-      <Avatar size={'xs'} src={strat.holdingTokens[0].logo} />
-      <Heading size="sm" marginTop={'2px'}>
-        {strat.name}
-      </Heading>
-      {strat.liveStatus != StrategyLiveStatus.ACTIVE && (
-        <Badge
-          ml="1"
-          bg={getStratCardBadgeBg(strat)}
-          fontFamily={'sans-serif'}
-          padding="2px 8px"
-          textTransform="capitalize"
-          fontWeight={500}
-        >
-          {strat.liveStatus.valueOf()}
-        </Badge>
-      )}
-      {strat.isLive() && (
-        <Tooltip label="Audited smart contract. Click to view the audit report.">
-          <Link href={CONSTANTS.AUDIT_REPORT} target="_blank">
-            <Box
-              width={'24px'}
-              height={'24px'}
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              backgroundColor={'rgba(0, 0, 0, 0.2)'}
-              borderRadius={'50%'}
-            >
-              <Image src={shield.src} alt="badge" />
-            </Box>
-          </Link>
-        </Tooltip>
-      )}
-    </HStack>
+    return (
+      <HStack spacing={2}>
+        <Avatar size={'xs'} src={strat.holdingTokens[0].logo} />
+        <Heading size="sm" marginTop={'2px'}>
+          {strat.name}
+        </Heading>
+        {strat.liveStatus != StrategyLiveStatus.ACTIVE && (
+          <Badge
+            ml="1"
+            bg={getStratCardBadgeBg(strat)}
+            fontFamily={'sans-serif'}
+            padding="2px 8px"
+            textTransform="capitalize"
+            fontWeight={500}
+          >
+            {strat.liveStatus.valueOf()}
+          </Badge>
+        )}
+        {strat.isLive() && (
+          <Tooltip label="Audited smart contract. Click to view the audit report.">
+            <Link href={CONSTANTS.AUDIT_REPORT} target="_blank">
+              <Box
+                width={'24px'}
+                height={'24px'}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                backgroundColor={'rgba(0, 0, 0, 0.2)'}
+                borderRadius={'50%'}
+              >
+                <Image src={shield.src} alt="badge" />
+              </Box>
+            </Link>
+          </Tooltip>
+        )}
+      </HStack>
+    );
   }
 
   function StrategyAPY(props: { strat: IStrategyProps }) {
     const { strat } = props;
-    return <Box width={'100%'} marginBottom={'5px'}>
-      <Tooltip label="Includes fees & rewards earning potential">
-        <Text textAlign={'right'} color="#fff" fontWeight={600}>
-          {(strat.netYield * 100).toFixed(2)}%
-        </Text>
-      </Tooltip>
-      <Tooltip label="Shows the increased capital efficiency of investments compared to direct deposit in popular lending protocols">
-        <Box width={'100%'}>
-          <Box float={'right'} display={'flex'} fontSize={'13px'}>
-            <Text color="#FCC01E" textAlign={'right'}>⚡</Text>
-            <Text width="100%" color="cyan" textAlign={'right'} fontWeight={600}>
-              {strat.leverage.toFixed(1)}X
-            </Text>
+    return (
+      <Box width={'100%'} marginBottom={'5px'}>
+        <Tooltip label="Includes fees & rewards earning potential">
+          <Text textAlign={'right'} color="#fff" fontWeight={600}>
+            {(strat.netYield * 100).toFixed(2)}%
+          </Text>
+        </Tooltip>
+        <Tooltip label="Shows the increased capital efficiency of investments compared to direct deposit in popular lending protocols">
+          <Box width={'100%'}>
+            <Box float={'right'} display={'flex'} fontSize={'13px'}>
+              <Text color="#FCC01E" textAlign={'right'}>
+                ⚡
+              </Text>
+              <Text
+                width="100%"
+                color="cyan"
+                textAlign={'right'}
+                fontWeight={600}
+              >
+                {strat.leverage.toFixed(1)}X
+              </Text>
+            </Box>
           </Box>
-        </Box>
-      </Tooltip>
-    </Box>
+        </Tooltip>
+      </Box>
+    );
   }
 
   function StrategyTVL(props: { strat: IStrategyProps }) {
     const { strat } = props;
     const tvlInfo = useAtomValue(props.strat.tvlAtom);
 
-    return <Box
-      width={'100%'}
-      textAlign={'right'}
-      fontWeight={600}
-      display={'flex'}
-      flexDirection={'column'}
-      justifyContent={'center'}
-      alignItems={'flex-end'}
-    >
-      {strat.isLive() && (
-        <Text>
-          ${getDisplayCurrencyAmount(tvlInfo.data?.usdValue || 0, 0)}
-        </Text>
-      )}
-      {!strat.isLive() && <Text>-</Text>}
-      {address && strat.isLive() && (
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="center"
-          borderRadius={'20px'}
-          color="grey_text"
-          fontSize={'12px'}
-        >
-          <>
-            <Tooltip label="Your deposits">
-              <Text width={'100%'} textAlign={'right'} fontWeight={600}>
-                <Icon
-                  as={FaWallet}
-                  marginRight={'5px'}
-                  marginTop={'-2px'}
-                />
-                $
-                {Math.round(
-                  getStrategyWiseInfo(strat.id),
-                ).toLocaleString()}
-              </Text>
-            </Tooltip>
-          </>
-        </Box>
-      )}
-    </Box>
+    return (
+      <Box
+        width={'100%'}
+        textAlign={'right'}
+        fontWeight={600}
+        display={'flex'}
+        flexDirection={'column'}
+        justifyContent={'center'}
+        alignItems={'flex-end'}
+      >
+        {strat.isLive() && (
+          <Text>
+            ${getDisplayCurrencyAmount(tvlInfo.data?.usdValue || 0, 0)}
+          </Text>
+        )}
+        {!strat.isLive() && <Text>-</Text>}
+        {address && strat.isLive() && (
+          <Box
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+            borderRadius={'20px'}
+            color="grey_text"
+            fontSize={'12px'}
+          >
+            <>
+              <Tooltip label="Your deposits">
+                <Text width={'100%'} textAlign={'right'} fontWeight={600}>
+                  <Icon as={FaWallet} marginRight={'5px'} marginTop={'-2px'} />$
+                  {Math.round(getStrategyWiseInfo(strat.id)).toLocaleString()}
+                </Text>
+              </Tooltip>
+            </>
+          </Box>
+        )}
+      </Box>
+    );
   }
 
-  function StrategyMobileCard(props: { strat: StrategyInfo, index: number }) {
+  function StrategyMobileCard(props: { strat: StrategyInfo; index: number }) {
     const { strat, index } = props;
     return (
-      <Grid 
-        color={'white'} 
-        bg={index % 2 == 0 ? "color1_50p": "color2_50p"}
+      <Grid
+        color={'white'}
+        bg={index % 2 == 0 ? 'color1_50p' : 'color2_50p'}
         templateColumns={'repeat(3, 1fr)'}
         templateRows={'repeat(3, 1fr)'}
-        display={{base: 'grid', md: 'none'}}
+        display={{ base: 'grid', md: 'none' }}
         padding={'20px'}
         gap={2}
         borderBottom={'1px solid var(--chakra-colors-bg)'}
       >
         <GridItem colSpan={3}>
-          <StrategyInfo strat={strat}/>
+          <StrategyInfo strat={strat} />
         </GridItem>
         <GridItem colSpan={1} rowSpan={2}>
-          <Text textAlign={'right'} color={'color2'} fontWeight={'bold'} fontSize={'13px'}>APY</Text>
-          <StrategyAPY strat={strat}/>
+          <Text
+            textAlign={'right'}
+            color={'color2'}
+            fontWeight={'bold'}
+            fontSize={'13px'}
+          >
+            APY
+          </Text>
+          <StrategyAPY strat={strat} />
         </GridItem>
         <GridItem colSpan={1} rowSpan={2}>
-          <Text textAlign={'right'} color={'color2'} fontWeight={'bold'} fontSize={'13px'}>RISK</Text>
+          <Text
+            textAlign={'right'}
+            color={'color2'}
+            fontWeight={'bold'}
+            fontSize={'13px'}
+          >
+            RISK
+          </Text>
           {GetRiskLevel(strat.riskFactor)}
         </GridItem>
         <GridItem colSpan={1} rowSpan={2}>
-          <Text textAlign={'right'} color={'color2'} fontWeight={'bold'} fontSize={'13px'}>TVL</Text>
-          <StrategyTVL strat={strat}/>
+          <Text
+            textAlign={'right'}
+            color={'color2'}
+            fontWeight={'bold'}
+            fontSize={'13px'}
+          >
+            TVL
+          </Text>
+          <StrategyTVL strat={strat} />
         </GridItem>
       </Grid>
     );
@@ -391,24 +418,27 @@ export default function Strategies() {
         steps that combine various pools and risk combinations to maximize
         yield.
       </Text>
-      <Table variant='simple'>
-        <Thead display={{base: 'none', md: 'table-header-group'}}>
-          <Tr fontSize={'18px'} color={'white'} bg='bg'>
+      <Table variant="simple">
+        <Thead display={{ base: 'none', md: 'table-header-group' }}>
+          <Tr fontSize={'18px'} color={'white'} bg="bg">
             <Th>Strategy name</Th>
             <Th textAlign={'right'}>APY</Th>
             <Th textAlign={'right'}>Risk</Th>
             <Th textAlign={'right'}>TVL</Th>
           </Tr>
         </Thead>
-      <Tbody>
-        {allPools.length > 0 && strategies.length > 0 &&
-            <>{strategies.map((strat, index) => (
-              <>
-                <StrategyCard strat={strat} index={index}/>
-                <StrategyMobileCard strat={strat} index={index}/>
-              </>
-            ))}</>}
-      </Tbody>
+        <Tbody>
+          {allPools.length > 0 && strategies.length > 0 && (
+            <>
+              {strategies.map((strat, index) => (
+                <>
+                  <StrategyCard strat={strat} index={index} />
+                  <StrategyMobileCard strat={strat} index={index} />
+                </>
+              ))}
+            </>
+          )}
+        </Tbody>
       </Table>
       {allPools.length > 0 && strategies.length === 0 && (
         <Box padding="10px 0" width={'100%'} float={'left'}>

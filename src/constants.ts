@@ -22,7 +22,8 @@ const CONSTANTS = {
     'https://kx58j6x5me.execute-api.us-east-1.amazonaws.com/starknet/fetchFile?file=prod-api/lending/lending_strk_grant.json',
   LOGOS,
   COMMUNITY_TG: 'https://t.me/+HQ_eHaXmF-1lZDc1',
-  AUDIT_REPORT: 'https://static-assets-8zct.onrender.com/strkfarm/audit_report.pdf',
+  AUDIT_REPORT:
+    'https://static-assets-8zct.onrender.com/strkfarm/audit_report.pdf',
   NOSTRA: {
     LENDING_GRAPH_URL:
       'https://us-east-2.aws.data.mongodb-api.com/app/data-yqlpb/endpoint/data/v1/action/find',
