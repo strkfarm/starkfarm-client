@@ -353,7 +353,7 @@ export default function Strategies() {
               </Text>
             )}
             {!strat.isLive() && <Text>-</Text>}
-            {getStrategyWiseInfo(strat.id) !== 0 && strat.isLive() && (
+            {strat.isLive() && (
               <Box
                 display="flex"
                 alignItems="center"
