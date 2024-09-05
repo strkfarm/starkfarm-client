@@ -70,7 +70,7 @@ const theme = extendTheme({
     },
   },
   fonts: {
-    heading: `'Courier New', Courier, monospace`,
+    heading: inter.style.fontFamily,
     body: inter.style.fontFamily,
   },
 });
