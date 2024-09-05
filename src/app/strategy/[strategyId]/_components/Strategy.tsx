@@ -101,9 +101,9 @@ const Strategy = ({ params }: StrategyParams) => {
         <Avatar marginRight={'5px'} src={strategy?.holdingTokens[0].logo} />
         <Text
           marginTop={'6px'}
-          color="white"
           fontSize={{ base: '18px', md: '25px' }}
           fontWeight={'bold'}
+          color="white"
         >
           {strategy ? strategy.name : 'Strategy Not found'}
         </Text>
@@ -220,7 +220,7 @@ const Strategy = ({ params }: StrategyParams) => {
                   <TabList>
                     <Tab
                       color="light_grey"
-                      _selected={{ color: 'color2Text' }}
+                      _selected={{ color: 'purple' }}
                       onClick={() => {
                         // mixpanel.track('All pools clicked')
                       }}
@@ -229,7 +229,7 @@ const Strategy = ({ params }: StrategyParams) => {
                     </Tab>
                     <Tab
                       color="light_grey"
-                      _selected={{ color: 'color2Text' }}
+                      _selected={{ color: 'purple' }}
                       onClick={() => {
                         // mixpanel.track('Strategies opened')
                       }}
@@ -240,7 +240,7 @@ const Strategy = ({ params }: StrategyParams) => {
                   <TabIndicator
                     mt="-1.5px"
                     height="2px"
-                    bg="color2Text"
+                    bg="purple"
                     color="color1"
                     borderRadius="1px"
                   />

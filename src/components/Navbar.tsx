@@ -159,9 +159,7 @@ export default function Navbar(props: NavbarProps) {
     (async () => {
       if (address) {
         try {
-          const { data } = await axios.post('/api/tnc/getUser', {
-            address,
-          });
+          const { data } = await axios.get(`/api/tnc/getUser/${address}`);
 
           if (data.success && data.user) {
             setReferralCode(data.user.referralCode);
@@ -204,14 +202,9 @@ export default function Navbar(props: NavbarProps) {
       zIndex={999}
       top="0"
     >
-      <Center bg="color2" color="black" padding={0}>
+      <Center bg="bg" color="gray" padding={0}>
         <Link href={CONSTANTS.COMMUNITY_TG} target="_blank">
-          <Text
-            fontSize="12px"
-            textAlign={'center'}
-            padding="0px 5px"
-            fontFamily={'serif'}
-          >
+          <Text fontSize="12px" textAlign={'center'} padding="0px 5px">
             {''}
             <b>Report bugs & share feedback in our Telegram group.</b>
             {''}
@@ -335,7 +328,10 @@ export default function Navbar(props: NavbarProps) {
                   {address ? (
                     <Center display="flex" alignItems="center" gap=".5rem">
                       <Image
-                        src={starkProfile?.profilePicture}
+                        src={
+                          starkProfile?.profilePicture ||
+                          'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQa5dG19ABS0ge6iFAgpsvE_ULDUa4fJyT7hg&s'
+                        }
                         alt="pfp"
                         width={30}
                         height={30}

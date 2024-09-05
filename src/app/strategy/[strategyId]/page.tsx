@@ -27,12 +27,7 @@ export async function generateMetadata({ params }: StrategyParams) {
 
 export default function StrategyPage({ params }: StrategyParams) {
   return (
-    <Container
-      maxWidth={'1000px'}
-      margin={'0 auto'}
-      padding="30px 10px"
-      fontFamily={'sans-serif'}
-    >
+    <Container maxWidth={'1000px'} margin={'0 auto'} padding="30px 10px">
       <Strategy params={params} />
     </Container>
   );

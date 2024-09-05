@@ -20,6 +20,9 @@ import { Toaster } from 'react-hot-toast';
 import { RpcProviderOptions, constants } from 'starknet';
 import { ArgentMobileConnector } from 'starknetkit/argentMobile';
 import { InjectedConnector } from 'starknetkit/injected';
+import { Inter } from 'next/font/google';
+
+const inter = Inter({ subsets: ['latin'] });
 
 mixpanel.init('118f29da6a372f0ccb6f541079cad56b');
 
@@ -40,9 +43,11 @@ const theme = extendTheme({
     light_grey: '#9d9d9d',
     disabled_text: '#818181',
     disabled_bg: '#5f5f5f',
-    purple: '#2F2D5C',
+    purple: '#6e53dc',
     cyan: '#7DFACB',
     bg: '#111119', // dark blue
+    grey_text: '#B6B6B6',
+    yellow: '#EFDB72',
   },
   fontSizes: {
     large: '50px',
@@ -57,10 +62,16 @@ const theme = extendTheme({
     MenuItem: {
       bg: 'highlight',
     },
+    Badge: {
+      baseStyle: {
+        lineHeight: 'initial',
+        borderRadius: '4px',
+      },
+    },
   },
   fonts: {
-    heading: `'Courier New', Courier, monospace`,
-    body: `'Courier New', Courier, monospace`,
+    heading: inter.style.fontFamily,
+    body: inter.style.fontFamily,
   },
 });
 

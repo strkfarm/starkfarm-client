@@ -94,3 +94,10 @@ export function generateReferralCode() {
 export function getReferralUrl(referralCode: string) {
   return `${window.location.origin}/r/${referralCode}`;
 }
+
+export function getDisplayCurrencyAmount(
+  amount: string | number,
+  decimals: number,
+) {
+  return Number(Number(amount).toFixed(decimals)).toLocaleString();
+}
