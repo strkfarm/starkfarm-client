@@ -103,7 +103,7 @@ const Strategy = ({ params }: StrategyParams) => {
           marginTop={'6px'}
           fontSize={{ base: '18px', md: '25px' }}
           fontWeight={'bold'}
-          color='white'
+          color="white"
         >
           {strategy ? strategy.name : 'Strategy Not found'}
         </Text>

@@ -3,8 +3,9 @@ import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { standariseAddress } from '@/utils';
 
-export async function POST(req: Request) {
-  const { address } = await req.json();
+export async function GET(_req: Request, context: any) {
+  const { params } = context;
+  const address = params.address;
 
   if (!address) {
     return NextResponse.json({

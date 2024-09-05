@@ -20,9 +20,9 @@ import { Toaster } from 'react-hot-toast';
 import { RpcProviderOptions, constants } from 'starknet';
 import { ArgentMobileConnector } from 'starknetkit/argentMobile';
 import { InjectedConnector } from 'starknetkit/injected';
-import { Inter } from 'next/font/google'
+import { Inter } from 'next/font/google';
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'] });
 
 mixpanel.init('118f29da6a372f0ccb6f541079cad56b');
 
@@ -47,7 +47,7 @@ const theme = extendTheme({
     cyan: '#7DFACB',
     bg: '#111119', // dark blue
     grey_text: '#B6B6B6',
-    yellow: '#EFDB72'
+    yellow: '#EFDB72',
   },
   fontSizes: {
     large: '50px',

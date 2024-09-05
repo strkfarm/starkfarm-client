@@ -66,7 +66,7 @@ const TVL: React.FC = () => {
       <GridItem display="flex">
         <Card width="100%" padding={'15px 30px'} color="white" bg="bg">
           <Stat>
-            <StatLabel>Your holdings ($)</StatLabel>
+            <StatLabel>Your holdings</StatLabel>
             <StatNumber>
               $
               {userStatsPending ? (

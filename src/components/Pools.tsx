@@ -62,6 +62,7 @@ export default function Pools() {
 
   function GetRiskLevel(poolName: string) {
     let color = '';
+    let bgColor = '';
     let count = 0;
     let tooltipLabel = '';
     const checkToken = (tokens: string[]) => {
@@ -70,16 +71,19 @@ export default function Pools() {
     };
 
     if (checkToken(['eth', 'strk'])) {
-      color = '#FF9200';
+      color = 'rgba(255, 146, 0, 1)';
+      bgColor = 'rgba(255, 146, 0, 0.3)';
       count = 3;
       tooltipLabel = 'Medium risk';
     } else if (checkToken(['usdt', 'usdc'])) {
-      color = '#83F14D';
-      count = 5;
+      color = 'rgba(131, 241, 77, 1)';
+      bgColor = 'rgba(131, 241, 77, 0.3)';
+      count = 1;
       tooltipLabel = 'Low risk';
     } else {
-      color = '#FF2020';
-      count = 1;
+      color = 'rgba(255, 32, 32, 1)';
+      bgColor = 'rgba(255, 32, 32, 0.3)';
+      count = 5;
       tooltipLabel = 'High risk';
     }
 
@@ -119,7 +123,7 @@ export default function Pools() {
               </Box>
               <Box
                 position={'absolute'}
-                backgroundColor={color}
+                backgroundColor={bgColor}
                 opacity={0.3}
                 filter={'blur(30.549999237060547px)'}
                 right={{ base: '-50', md: '-37px' }}
@@ -202,7 +206,11 @@ export default function Pools() {
             }}
           >
             <PaginationContainer align="right" float={'right'} p={4}>
-              <PaginationPrevious marginRight="4px" bg="highlight" color="purple">
+              <PaginationPrevious
+                marginRight="4px"
+                bg="highlight"
+                color="purple"
+              >
                 <Text>{'<'}</Text>
               </PaginationPrevious>
               <PaginationPageGroup>
@@ -233,7 +241,10 @@ export default function Pools() {
                 direction={{ base: 'column', md: 'row' }}
                 width={{ base: '50%', md: '60%' }}
               >
-                <Heading width={{ base: '50%', md: '33%' }} size="md">
+                <Heading
+                  width={{ base: '50%', md: '33%' }}
+                  size={{ base: 'xs', md: 'md' }}
+                >
                   Pool
                 </Heading>
                 <Heading
@@ -251,7 +262,7 @@ export default function Pools() {
               >
                 <Heading
                   width={'100%'}
-                  size="md"
+                  size="xs"
                   textAlign={'right'}
                   display={{ base: 'block', md: 'none' }}
                 >
@@ -263,11 +274,11 @@ export default function Pools() {
                   textAlign={'center'}
                   display={{ base: 'none', md: 'block' }}
                 >
-                  SAFETY SCORE
+                  Risk
                 </Heading>
                 <Heading
                   width={{ base: '100%', md: '50%' }}
-                  size="sm"
+                  size={{ base: 'xs', md: 'md' }}
                   textAlign={'right'}
                 >
                   TVL($)

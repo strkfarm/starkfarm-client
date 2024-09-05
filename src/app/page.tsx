@@ -96,7 +96,10 @@ export default function Home() {
           marginBottom={'10px'}
           textAlign={'center'}
         >
-          <b className="theme-gradient-text">Starknet&apos;s Yield Powerhouse</b>🚀
+          <b className="theme-gradient-text">
+            Starknet&apos;s Yield Powerhouse
+          </b>
+          🚀
         </Text>
         <Text
           color="color2"

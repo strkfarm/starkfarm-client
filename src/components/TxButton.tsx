@@ -125,9 +125,7 @@ export default function TxButton(props: TxButtonProps) {
 
   const getUser = async () => {
     if (props.buttonText === 'Deposit') {
-      const data = await axios.post('/api/tnc/getUser', {
-        address,
-      });
+      const data = await axios.get(`/api/tnc/getUser/${address}`);
 
       if (
         (data.data.user.isTncSigned &&
@@ -149,7 +147,7 @@ export default function TxButton(props: TxButtonProps) {
         <ModalContent borderRadius=".5rem" maxW="32rem">
           <ModalCloseButton color="white" />
           <ModalBody
-            backgroundColor={"var(--chakra-colors-highlight)"}
+            backgroundColor={'var(--chakra-colors-highlight)'}
             pt="4rem"
             pb="3rem"
             border="1px solid var(--chakra-colors-color2_65p)"
@@ -167,7 +165,7 @@ export default function TxButton(props: TxButtonProps) {
 
             <Text textAlign="center" fontWeight="500">
               While your deposit is being processed, if you like STRKFarm, do
-              you mind sharing on X (Twitter)
+              you mind sharing on X/Twitter?
             </Text>
 
             <Box

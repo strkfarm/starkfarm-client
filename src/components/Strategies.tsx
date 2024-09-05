@@ -1,10 +1,9 @@
 import CONSTANTS from '@/constants';
 import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
-import { getUniqueById } from '@/utils';
+import { getDisplayCurrencyAmount, getUniqueById } from '@/utils';
 import { AddIcon } from '@chakra-ui/icons';
 import {
   Avatar,
-  AvatarGroup,
   Badge,
   Box,
   Button,
@@ -16,10 +15,9 @@ import {
   GridItem,
   HStack,
   Heading,
+  Icon,
   Image,
   Link,
-  LinkBox,
-  LinkOverlay,
   Popover,
   PopoverArrow,
   PopoverBody,
@@ -41,6 +39,7 @@ import shield from '@/assets/shield.svg';
 import { userStatsAtom } from '@/store/utils.atoms';
 import { IStrategyProps, StrategyLiveStatus } from '@/strategies/IStrategy';
 import { allPoolsAtomUnSorted } from '@/store/protocols';
+import { FaWallet } from 'react-icons/fa';
 
 export default function Strategies() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
@@ -77,7 +76,7 @@ export default function Strategies() {
     // const { isOpen, onOpen, onClose } = useDisclosure()
     return (
       <Box>
-        <Avatar size='xs' src={strat.holdingTokens[0].logo} />
+        <Avatar size="xs" src={strat.holdingTokens[0].logo} />
         <Box
           float={'left'}
           marginTop={{ base: '7px', md: '15px' }}
@@ -130,33 +129,22 @@ export default function Strategies() {
     );
   }
 
-  function isLive(strat: StrategyInfo) {
-    return (
-      strat.liveStatus === StrategyLiveStatus.ACTIVE ||
-      strat.liveStatus === StrategyLiveStatus.NEW
-    );
-  }
-
-  function GetRiskLevel(poolName: string) {
+  function GetRiskLevel(riskFactor: number) {
     let color = '';
     let bgColor = '';
     let count = 0;
     let tooltipLabel = '';
-    const checkToken = (tokens: string[]) => {
-      const regex = new RegExp(tokens.join('|'), 'i');
-      return regex.test(poolName.toLowerCase());
-    };
 
-    if (checkToken(['eth', 'strk'])) {
-      color = 'rgba(255, 146, 0, 1)';
-      bgColor = 'rgba(255, 146, 0, 0.3)';
-      count = 3;
-      tooltipLabel = 'Medium risk';
-    } else if (checkToken(['usdt', 'usdc'])) {
+    if (riskFactor <= 2) {
       color = 'rgba(131, 241, 77, 1)';
       bgColor = 'rgba(131, 241, 77, 0.3)';
       count = 1;
       tooltipLabel = 'Low risk';
+    } else if (riskFactor < 4) {
+      color = 'rgba(255, 146, 0, 1)';
+      bgColor = 'rgba(255, 146, 0, 0.3)';
+      count = 3;
+      tooltipLabel = 'Medium risk';
     } else {
       color = 'rgba(255, 32, 32, 1)';
       bgColor = 'rgba(255, 32, 32, 0.3)';
@@ -165,7 +153,12 @@ export default function Strategies() {
     }
 
     return (
-      <Box width='100%' display='flex' justifyContent={'flex-end'} alignContent={'flex-end'}>
+      <Box
+        width="100%"
+        display="flex"
+        justifyContent={'flex-end'}
+        alignContent={'flex-end'}
+      >
         <Tooltip hasArrow label={tooltipLabel} bg="gray.300" color="black">
           <Box
             marginTop={{ base: '10px', md: '0px' }}
@@ -218,15 +211,18 @@ export default function Strategies() {
     return amount?.usdValue ? amount?.usdValue : 0;
   }
 
-  function getStratCard(strat: StrategyInfo) {
+  function StrategyCard(props: { strat: StrategyInfo }) {
+    const { strat } = props;
+    const tvlInfo = useAtomValue(props.strat.tvlAtom);
+
     return (
       <Grid
         width={'100%'}
-        templateRows='repeat(6, 1fr)'
-        templateColumns='repeat(10, 1fr)'
+        templateRows="repeat(6, 1fr)"
+        templateColumns="repeat(10, 1fr)"
       >
         {/* Strategy name, logo and protocols */}
-        <GridItem colSpan={{base: 7, md: 4}} rowSpan={{base: 6, md: 6}}>
+        <GridItem colSpan={{ base: 7, md: 4 }} rowSpan={{ base: 6, md: 6 }}>
           <Box width={'100%'}>
             <Box>
               <HStack
@@ -253,12 +249,9 @@ export default function Strategies() {
                     {strat.liveStatus.valueOf()}
                   </Badge>
                 )}
-                {isLive(strat) && (
-                  <Tooltip 
-                    label="Audited smart contract. Click to view the audit report."
-                    closeDelay={1000}
-                  >
-                    <Link href={CONSTANTS.AUDIT_REPORT} target='_blank'>
+                {strat.isLive() && (
+                  <Tooltip label="Audited smart contract. Click to view the audit report.">
+                    <Link href={CONSTANTS.AUDIT_REPORT} target="_blank">
                       <Box
                         width={'24px'}
                         height={'24px'}
@@ -307,7 +300,7 @@ export default function Strategies() {
         </GridItem>
 
         {/* APY, boost */}
-        <GridItem colSpan={{base: 3, md: 2}} rowSpan={{base: 4, md: 6}}>
+        <GridItem colSpan={{ base: 3, md: 2 }} rowSpan={{ base: 4, md: 6 }}>
           <Box
             width={'100%'}
             display="flex"
@@ -317,17 +310,13 @@ export default function Strategies() {
             justifyContent="center"
           >
             <Box width={'100%'} marginBottom={'5px'}>
-              <Tooltip label="Includes fees & rewards earn from tokens shown">
-                <Text
-                  textAlign={'right'}
-                  color="#fff"
-                  fontWeight={600}
-                >
+              <Tooltip label="Includes fees & rewards earning potential">
+                <Text textAlign={'right'} color="#fff" fontWeight={600}>
                   {(strat.netYield * 100).toFixed(2)}%
                 </Text>
               </Tooltip>
             </Box>
-            <Tooltip label="Multiplier showing the additional reward earned compared to simple deposit">
+            <Tooltip label="Shows the increased capital efficiency of investments compared to direct deposit in popular lending protocols">
               <Box display={'flex'} justifyContent={'flex-end'}>
                 <Text color="#FCC01E">⚡</Text>
                 <Text width="100%" color="cyan" fontWeight={600}>
@@ -339,12 +328,16 @@ export default function Strategies() {
         </GridItem>
 
         {/* Risk factor */}
-        <GridItem colSpan={{base: 3, md: 2}} rowSpan={{base: 3, md: 6}} display={{base: 'none', md: 'block'}}>
-          {GetRiskLevel(strat.name)}
+        <GridItem
+          colSpan={{ base: 3, md: 2 }}
+          rowSpan={{ base: 3, md: 6 }}
+          display={{ base: 'none', md: 'block' }}
+        >
+          {GetRiskLevel(strat.riskFactor)}
         </GridItem>
 
         {/* TVL, my deposits */}
-        <GridItem colSpan={{base: 10, md: 2}} rowSpan={{base: 2, md: 6}}>
+        <GridItem colSpan={{ base: 10, md: 2 }} rowSpan={{ base: 2, md: 6 }}>
           <Box
             width={'100%'}
             textAlign={'right'}
@@ -354,23 +347,36 @@ export default function Strategies() {
             justifyContent={'center'}
             alignItems={'flex-end'}
           >
-            <Text>0</Text>
-            {getStrategyWiseInfo(strat.id) !== 0 && (
+            {strat.isLive() && (
+              <Text>
+                ${getDisplayCurrencyAmount(tvlInfo.data?.usdValue || 0, 0)}
+              </Text>
+            )}
+            {!strat.isLive() && <Text>-</Text>}
+            {getStrategyWiseInfo(strat.id) !== 0 && strat.isLive() && (
               <Box
                 display="flex"
                 alignItems="center"
                 justifyContent="center"
-                backgroundColor={'rgba(0, 0, 0, 0.2)'}
-                padding="4px 10px"
+                marginTop={'5px'}
                 borderRadius={'20px'}
                 color="grey_text"
                 fontSize={'12px'}
               >
                 <>
-                  <Text width={'100%'} textAlign={'right'} fontWeight={600}>
-                    Your deposits $
-                    {Math.round(getStrategyWiseInfo(strat.id)).toLocaleString()}
-                  </Text>
+                  <Tooltip label="Your deposits">
+                    <Text width={'100%'} textAlign={'right'} fontWeight={600}>
+                      <Icon
+                        as={FaWallet}
+                        marginRight={'5px'}
+                        marginTop={'-2px'}
+                      />
+                      $
+                      {Math.round(
+                        getStrategyWiseInfo(strat.id),
+                      ).toLocaleString()}
+                    </Text>
+                  </Tooltip>
                 </>
               </Box>
             )}
@@ -395,27 +401,31 @@ export default function Strategies() {
       </Text>
       <Card variant={'filled'} bg="opacity_50p" color={'purple'}>
         <CardBody paddingTop={'5px'} paddingBottom={'5px'}>
-          <Grid
-            templateRows='repeat(6, 1fr)'
-            templateColumns='repeat(10, 1fr)'
-          >
-            <GridItem colSpan={{base: 7, md: 4}} rowSpan={{base: 6, md: 6}}>
-              <Heading size="md">
+          <Grid templateRows="repeat(6, 1fr)" templateColumns="repeat(10, 1fr)">
+            <GridItem colSpan={{ base: 7, md: 4 }} rowSpan={{ base: 6, md: 6 }}>
+              <Heading size={{ base: 'xs', md: 'md' }} textAlign="left">
                 Strategy
               </Heading>
             </GridItem>
-            <GridItem colSpan={{base: 3, md: 2}} rowSpan={{base: 4, md: 6}}>
-              <Heading size="md" textAlign='right'>
+            <GridItem colSpan={{ base: 3, md: 2 }} rowSpan={{ base: 4, md: 6 }}>
+              <Heading size={{ base: 'xs', md: 'md' }} textAlign="right">
                 APY & Boost
               </Heading>
             </GridItem>
-            <GridItem colSpan={{base: 3, md: 2}} rowSpan={{base: 3, md: 6}}>
-              <Heading size="md" textAlign='right'>
+            <GridItem
+              colSpan={{ base: 3, md: 2 }}
+              rowSpan={{ base: 3, md: 6 }}
+              display={{ base: 'none', md: 'block' }}
+            >
+              <Heading size={{ base: 'xs', md: 'md' }} textAlign="right">
                 Risk
               </Heading>
             </GridItem>
-            <GridItem colSpan={{base: 10, md: 2}} rowSpan={{base: 2, md: 6}}>
-              <Heading size="md" textAlign='right'>
+            <GridItem
+              colSpan={{ base: 10, md: 2 }}
+              rowSpan={{ base: 2, md: 6 }}
+            >
+              <Heading size={{ base: 'xs', md: 'md' }} textAlign="right">
                 TVL ($)
               </Heading>
             </GridItem>
@@ -440,9 +450,19 @@ export default function Strategies() {
               >
                 <Box
                   width={'100%'}
-                  pointerEvents={isLive(strat) ? 'auto' : 'none'}
+                  pointerEvents={strat.isLive() ? 'auto' : 'none'}
                 >
-                  {getStratCard(strat)}
+                  <Link
+                    _active={{
+                      textDecoration: 'none !important',
+                    }}
+                    _hover={{
+                      textDecoration: 'none !important',
+                    }}
+                    href={`/strategy/${strat.id}`}
+                  >
+                    <StrategyCard strat={strat} />
+                  </Link>
                 </Box>
                 {/* {DepositButton(strat)} */}
               </CardBody>
