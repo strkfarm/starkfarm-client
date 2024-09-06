@@ -78,6 +78,9 @@ const Strategy = ({ params }: StrategyParams) => {
     }, // Provide variables here
   });
 
+  console.log('apollo data', data);
+  console.log('appolo error', error);
+
   useEffect(() => {
     console.log('apollo data', data);
     console.log('appolo error', error);
