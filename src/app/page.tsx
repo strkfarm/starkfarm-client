@@ -65,7 +65,7 @@ export default function Home() {
   }
 
   function handleTabsChange(index: number) {
-    if (index === 1) {
+    if (index === 0) {
       setRoute('pools');
     } else {
       setRoute('strategies');
@@ -80,9 +80,9 @@ export default function Home() {
     (async () => {
       const tab = searchParams.get('tab');
       if (tab === 'pools') {
-        setTabIndex(1);
-      } else {
         setTabIndex(0);
+      } else {
+        setTabIndex(1);
       }
     })();
   }, [searchParams]);
@@ -184,19 +184,19 @@ export default function Home() {
             color="light_grey"
             _selected={{ color: 'purple' }}
             onClick={() => {
-              mixpanel.track('Strategies opened');
+              mixpanel.track('All pools clicked');
             }}
           >
-            Strategies✨
+            Find yields
           </Tab>
           <Tab
             color="light_grey"
             _selected={{ color: 'purple' }}
             onClick={() => {
-              mixpanel.track('All pools clicked');
+              mixpanel.track('Strategies opened');
             }}
           >
-            Find yields
+            Strategies✨
           </Tab>
         </TabList>
         <TabIndicator
@@ -208,10 +208,10 @@ export default function Home() {
         />
         <TabPanels>
           <TabPanel bg="highlight" width={'100%'} float={'left'}>
-            <Strategies />
+            <Pools />
           </TabPanel>
           <TabPanel bg="highlight" float={'left'} width={'100%'}>
-            <Pools />
+            <Strategies />
           </TabPanel>
         </TabPanels>
       </Tabs>

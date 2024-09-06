@@ -12,6 +12,7 @@ import { atom } from 'jotai';
 import { IDapp } from './IDapp.store';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { BlockInfo, getBlock } from './utils.atoms';
+import { StrategyLiveStatus } from '@/strategies/IStrategy';
 
 interface MyBaseAprDoc {
   id: string;
@@ -45,12 +46,12 @@ export class Jediswap extends IDapp<string> {
           const arr = myData[poolName];
           let category = Category.Others;
 
+          let riskFactor = 3;
           if (poolName === 'USDC/USDT') {
             category = Category.Stable;
+            riskFactor = 0.5;
           } else if (poolName.includes('STRK')) {
             category = Category.STRK;
-          } else if (poolName.includes('DEGEN')) {
-            category = Category.Degen;
           }
 
           const tokens: TokenName[] = <TokenName[]>poolName.split('/');
@@ -58,6 +59,7 @@ export class Jediswap extends IDapp<string> {
           const logo2 = CONSTANTS.LOGOS[tokens[1]];
           const poolInfo: PoolInfo = {
             pool: {
+              id: this.getPoolId(this.name, poolName),
               name: poolName,
               logos: [logo1, logo2],
             },
@@ -83,6 +85,11 @@ export class Jediswap extends IDapp<string> {
             borrow: {
               borrowFactor: 0,
               apr: 0,
+            },
+            additional: {
+              riskFactor,
+              tags: [StrategyLiveStatus.ACTIVE],
+              isAudited: false, // TODO: Update this
             },
           };
           pools.push(poolInfo);
