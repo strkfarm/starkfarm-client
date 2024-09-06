@@ -6,6 +6,7 @@ import Pools from '@/components/Pools';
 import Strategies from '@/components/Strategies';
 import CONSTANTS from '@/constants';
 import { useWindowSize } from '@/utils/useWindowSize';
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 
 import {
   Box,
@@ -43,6 +44,11 @@ const banner_images = [
 ];
 
 export default function Home() {
+  const apolloClient = new ApolloClient({
+    uri: 'https://indexer-graphql-api.onrender.com',
+    cache: new InMemoryCache(),
+  });
+
   const [tabIndex, setTabIndex] = useState(0);
 
   const { address } = useAccount();
@@ -88,153 +94,156 @@ export default function Home() {
   }, [searchParams]);
 
   return (
-    <Container maxWidth={'1000px'} margin={'0 auto'}>
-      <Box padding={'15px 30px'} borderRadius="10px" margin={'20px 0px 10px'}>
-        <Text
-          fontSize={{ base: '28px', md: '35px' }}
-          lineHeight={'30px'}
-          marginBottom={'10px'}
-          textAlign={'center'}
-        >
-          <b className="theme-gradient-text">
-            Starknet&apos;s Yield Powerhouse
-          </b>
-          🚀
-        </Text>
-        <Text
-          color="color2"
-          textAlign={'center'}
-          fontSize={{ base: '16px', md: '18px' }}
-          marginBottom={'0px'}
-        >
-          Identify & Invest in the best $STRK rewarding pools and maximize your
-          rewards
-        </Text>
-      </Box>
+    <ApolloProvider client={apolloClient}>
+      <Container maxWidth={'1000px'} margin={'0 auto'}>
+        <Box padding={'15px 30px'} borderRadius="10px" margin={'20px 0px 10px'}>
+          <Text
+            fontSize={{ base: '28px', md: '35px' }}
+            lineHeight={'30px'}
+            marginBottom={'10px'}
+            textAlign={'center'}
+          >
+            <b className="theme-gradient-text">
+              Starknet&apos;s Yield Powerhouse
+            </b>
+            🚀
+          </Text>
+          <Text
+            color="color2"
+            textAlign={'center'}
+            fontSize={{ base: '16px', md: '18px' }}
+            marginBottom={'0px'}
+          >
+            Identify & Invest in the best $STRK rewarding pools and maximize your
+            rewards
+          </Text>
+        </Box>
 
-      <Box className="embla" ref={emblaRef} margin={0} width={'100%'}>
-        <Box className="embla__container">
-          {banner_images.map((banner, index) => (
-            <Box
-              className="embla__slide"
-              position="relative"
-              height={'auto'}
-              key={index}
-              padding={'10px'}
+        <Box className="embla" ref={emblaRef} margin={0} width={'100%'}>
+          <Box className="embla__container">
+            {banner_images.map((banner, index) => (
+              <Box
+                className="embla__slide"
+                position="relative"
+                height={'auto'}
+                key={index}
+                padding={'10px'}
+              >
+                <Link href={banner.link} isExternal>
+                  <ChakraImage
+                    src={
+                      (!isMobile && size.width > 450) || size.width == 0
+                        ? banner.desktop
+                        : banner.mobile
+                    }
+                    height={'auto'}
+                    boxShadow={'none'}
+                    width="100%"
+                    alt="Banner"
+                    style={{ objectFit: 'cover', borderRadius: '10px' }}
+                  />
+                </Link>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+
+        <Box display="grid" justifyContent="center" gap="1.2rem" mb="1.5rem">
+          <Box
+            display="flex"
+            flexWrap="wrap"
+            justifyContent="flex-end"
+            alignItems="center"
+            marginRight="calc((2.6rem - 1.4rem) / 2 * -1)"
+            gap=".5rem"
+          >
+            {scrollSnaps.map((_, index) => (
+              <Box
+                key={index}
+                onClick={() => onDotButtonClick(index)}
+                width="0.8rem"
+                height="0.8rem"
+                borderRadius="50%"
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                cursor="pointer"
+                backgroundColor={index === selectedIndex ? '#4D59E8' : 'black'}
+                padding="0"
+                margin="0"
+                border="1px solid #373A5D"
+                textDecoration="none"
+                appearance="none"
+              />
+            ))}
+          </Box>
+        </Box>
+
+        <Tabs
+          position="relative"
+          variant="unstyled"
+          width={'100%'}
+          index={tabIndex}
+          onChange={handleTabsChange}
+        >
+          <TabList>
+            <Tab
+              color="light_grey"
+              _selected={{ color: 'purple' }}
+              onClick={() => {
+                mixpanel.track('Strategies opened');
+              }}
             >
-              <Link href={banner.link} isExternal>
-                <ChakraImage
-                  src={
-                    (!isMobile && size.width > 450) || size.width == 0
-                      ? banner.desktop
-                      : banner.mobile
-                  }
-                  height={'auto'}
-                  boxShadow={'none'}
-                  width="100%"
-                  alt="Banner"
-                  style={{ objectFit: 'cover', borderRadius: '10px' }}
-                />
-              </Link>
-            </Box>
-          ))}
-        </Box>
-      </Box>
-
-      <Box display="grid" justifyContent="center" gap="1.2rem" mb="1.5rem">
-        <Box
-          display="flex"
-          flexWrap="wrap"
-          justifyContent="flex-end"
-          alignItems="center"
-          marginRight="calc((2.6rem - 1.4rem) / 2 * -1)"
-          gap=".5rem"
-        >
-          {scrollSnaps.map((_, index) => (
-            <Box
-              key={index}
-              onClick={() => onDotButtonClick(index)}
-              width="0.8rem"
-              height="0.8rem"
-              borderRadius="50%"
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              cursor="pointer"
-              backgroundColor={index === selectedIndex ? '#4D59E8' : 'black'}
-              padding="0"
-              margin="0"
-              border="1px solid #373A5D"
-              textDecoration="none"
-              appearance="none"
-            />
-          ))}
-        </Box>
-      </Box>
-
-      <Tabs
-        position="relative"
-        variant="unstyled"
-        width={'100%'}
-        index={tabIndex}
-        onChange={handleTabsChange}
-      >
-        <TabList>
-          <Tab
-            color="light_grey"
-            _selected={{ color: 'purple' }}
-            onClick={() => {
-              mixpanel.track('Strategies opened');
-            }}
+              Strategies✨
+            </Tab>
+            <Tab
+              color="light_grey"
+              _selected={{ color: 'purple' }}
+              onClick={() => {
+                mixpanel.track('All pools clicked');
+              }}
+            >
+              Find yields
+            </Tab>
+          </TabList>
+          <TabIndicator
+            mt="-1.5px"
+            height="2px"
+            bg="purple"
+            color="color1"
+            borderRadius="1px"
+          />
+          <TabPanels>
+            <TabPanel bg="highlight" width={'100%'} float={'left'}>
+              <Strategies />
+            </TabPanel>
+            <TabPanel bg="highlight" float={'left'} width={'100%'}>
+              <Pools />
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+        {/* <hr style={{width: '100%', borderColor: '#5f5f5f', float: 'left', margin: '20px 0'}}/> */}
+        <Center padding="10px 0" width={'100%'} float={'left'}>
+          <Link href={CONSTANTS.COMMUNITY_TG} isExternal>
+            <ChakraImage src={tg.src} width="50" margin="0 auto" />
+          </Link>
+        </Center>
+        <Center width={'100%'} float="left">
+          <Box
+            width="300px"
+            maxWidth={'100%'}
+            marginTop={'20px'}
+            borderTop={'1px solid var(--chakra-colors-highlight)'}
+            textAlign={'center'}
+            textColor={'color2'}
+            padding="10px 0"
+            fontSize={'13px'}
           >
-            Strategies✨
-          </Tab>
-          <Tab
-            color="light_grey"
-            _selected={{ color: 'purple' }}
-            onClick={() => {
-              mixpanel.track('All pools clicked');
-            }}
-          >
-            Find yields
-          </Tab>
-        </TabList>
-        <TabIndicator
-          mt="-1.5px"
-          height="2px"
-          bg="purple"
-          color="color1"
-          borderRadius="1px"
-        />
-        <TabPanels>
-          <TabPanel bg="highlight" width={'100%'} float={'left'}>
-            <Strategies />
-          </TabPanel>
-          <TabPanel bg="highlight" float={'left'} width={'100%'}>
-            <Pools />
-          </TabPanel>
-        </TabPanels>
-      </Tabs>
-      {/* <hr style={{width: '100%', borderColor: '#5f5f5f', float: 'left', margin: '20px 0'}}/> */}
-      <Center padding="10px 0" width={'100%'} float={'left'}>
-        <Link href={CONSTANTS.COMMUNITY_TG} isExternal>
-          <ChakraImage src={tg.src} width="50" margin="0 auto" />
-        </Link>
-      </Center>
-      <Center width={'100%'} float="left">
-        <Box
-          width="300px"
-          maxWidth={'100%'}
-          marginTop={'20px'}
-          borderTop={'1px solid var(--chakra-colors-highlight)'}
-          textAlign={'center'}
-          textColor={'color2'}
-          padding="10px 0"
-          fontSize={'13px'}
-        >
-          Made with ❤️ on Starknet
-        </Box>
-      </Center>
-    </Container>
+            Made with ❤️ on Starknet
+          </Box>
+        </Center>
+      </Container>
+    </ApolloProvider>
+
   );
 }
