@@ -40,6 +40,7 @@ import { userStatsAtom } from '@/store/utils.atoms';
 import { IStrategyProps, StrategyLiveStatus } from '@/strategies/IStrategy';
 import { allPoolsAtomUnSorted } from '@/store/protocols';
 import { FaWallet } from 'react-icons/fa';
+import HarvestTime from './HarvestTime';
 
 export default function Strategies() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
@@ -389,6 +390,9 @@ export default function Strategies() {
   return (
     <Container width="100%" float={'left'} padding={'0px'} marginTop={'10px'}>
       <TVL />
+
+      <HarvestTime />
+
       <Text
         marginTop={'15px'}
         color="light_grey"
@@ -399,6 +403,7 @@ export default function Strategies() {
         steps that combine various pools and risk combinations to maximize
         yield.
       </Text>
+
       <Card variant={'filled'} bg="opacity_50p" color={'purple'}>
         <CardBody paddingTop={'5px'} paddingBottom={'5px'}>
           <Grid templateRows="repeat(6, 1fr)" templateColumns="repeat(10, 1fr)">
