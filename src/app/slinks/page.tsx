@@ -52,8 +52,8 @@ function GetCardSimple(strat: StrategyInfo) {
     return balance;
   }, [balance]);
 
-   // Function to reset the input fields to their initial state
-   const resetDepositForm = () => {
+  // Function to reset the input fields to their initial state
+  const resetDepositForm = () => {
     setAmount(MyNumber.fromZero());
   };
 
