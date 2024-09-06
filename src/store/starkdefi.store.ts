@@ -5,7 +5,8 @@ import { Jediswap } from './jedi.store';
 export class StarkDefi extends Jediswap {
   name = 'StarkDefi';
   link = 'https://app.starkdefi.com/#/pool';
-  logo = 'https://app.starkdefi.com/favicon.png';
+  logo =
+    'https://static-assets-8zct.onrender.com/integrations/starkdefi/starkdefi.png';
 
   incentiveDataKey = 'StarkDefi';
 }

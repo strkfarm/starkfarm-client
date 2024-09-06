@@ -15,13 +15,8 @@ import {
 } from '@chakra-ui/react';
 import { useAtomValue } from 'jotai';
 import React, { useMemo } from 'react';
-import TVL from './TVL';
 import { userStatsAtom } from '@/store/utils.atoms';
-import {
-  allPoolsAtomUnSorted,
-  filteredPools,
-  sortPoolsAtom,
-} from '@/store/protocols';
+import { allPoolsAtomUnSorted, filteredPools } from '@/store/protocols';
 import { addressAtom } from '@/store/claims.atoms';
 import { usePagination } from '@ajna/pagination';
 import { YieldStrategyCard } from './YieldCard';
@@ -44,11 +39,8 @@ export default function Strategies() {
     return _filteredPools.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   }, [_filteredPools, currentPage]);
 
-  const sortedPools = useAtomValue(sortPoolsAtom);
-
   return (
     <Container width="100%" float={'left'} padding={'0px'} marginTop={'10px'}>
-      <TVL />
       <Text
         marginTop={'15px'}
         color="light_grey"

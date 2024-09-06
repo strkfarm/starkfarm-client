@@ -24,11 +24,7 @@ import {
   PaginationPageGroup,
 } from '@ajna/pagination';
 import { CategoryFilters, ProtocolFilters } from '@/components/Filters';
-import {
-  allPoolsAtomUnSorted,
-  filteredPools,
-  sortPoolsAtom,
-} from '@/store/protocols';
+import { allPoolsAtomUnSorted, filteredPools } from '@/store/protocols';
 import YieldCard from './YieldCard';
 
 export default function Pools() {
@@ -45,7 +41,7 @@ export default function Pools() {
     return _filteredPools.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   }, [_filteredPools, currentPage]);
 
-  const sortedPools = useAtomValue(sortPoolsAtom);
+  // const setSortingOption = useSetAtom(sortAtom);
 
   return (
     <Box float="left" width={'100%'}>
@@ -100,7 +96,16 @@ export default function Pools() {
           <Thead display={{ base: 'none', md: 'table-header-group' }}>
             <Tr fontSize={'18px'} color={'white'} bg="bg">
               <Th>Pool name</Th>
-              <Th textAlign={'right'}>APY</Th>
+              <Th textAlign={'right'}>
+                {/* <HeaderSorter 
+                  heading='APY' 
+                  mainColor='color2Text' inActiveColor='#d9d9f726'
+                  onClick={(order: 'asc' | 'desc') => {
+                    setSortingOption({field: 'APR', order});
+                  }}
+                /> */}
+                APY
+              </Th>
               <Th textAlign={'right'}>Risk</Th>
               <Th textAlign={'right'}>TVL</Th>
             </Tr>

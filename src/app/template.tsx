@@ -36,7 +36,7 @@ const theme = extendTheme({
     color1_35p: 'rgba(53, 60, 79, 0.35)',
     color1_light: '#bcc9ff80',
     color2: 'rgba(132, 132, 195, 1)',
-    color2Text: '#7DFACB',
+    color2Text: 'rgb(184 184 239)',
     color2_65p: 'rgba(132, 132, 195, 0.65)',
     color2_50p: 'rgba(132, 132, 195, 0.15)',
     highlight: '#1a1a27', // light grey

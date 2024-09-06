@@ -4,6 +4,7 @@ import tg from '@/assets/tg.svg';
 import { useDotButton } from '@/components/EmblaCarouselDotButton';
 import Pools from '@/components/Pools';
 import Strategies from '@/components/Strategies';
+import TVL from '@/components/TVL';
 import CONSTANTS from '@/constants';
 import { useWindowSize } from '@/utils/useWindowSize';
 
@@ -79,10 +80,10 @@ export default function Home() {
   useEffect(() => {
     (async () => {
       const tab = searchParams.get('tab');
-      if (tab === 'pools') {
-        setTabIndex(0);
-      } else {
+      if (tab === 'strategies') {
         setTabIndex(1);
+      } else {
+        setTabIndex(0);
       }
     })();
   }, [searchParams]);
@@ -172,12 +173,15 @@ export default function Home() {
         </Box>
       </Box>
 
+      <TVL />
+
       <Tabs
         position="relative"
         variant="unstyled"
         width={'100%'}
         index={tabIndex}
         onChange={handleTabsChange}
+        marginTop={'10px'}
       >
         <TabList>
           <Tab
