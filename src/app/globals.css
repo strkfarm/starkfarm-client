@@ -135,4 +135,5 @@ body {
 
 td, th {
   border-color: var(--chakra-colors-bg) !important;
+  vertical-align: top;
 }

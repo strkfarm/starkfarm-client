@@ -3,11 +3,11 @@ import { Atom, atom } from 'jotai';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { CustomAtomWithQueryResult } from '@/utils/customAtomWithQuery';
 import { customAtomWithFetch } from '@/utils/customAtomWithFetch';
+import { StrategyLiveStatus } from '@/strategies/IStrategy';
 
 export enum Category {
   Stable = 'Stable Pools',
   STRK = 'STRK Pools',
-  Degen = 'MetaStable Pools',
   Others = 'Others',
 }
 
@@ -36,6 +36,7 @@ export interface PoolMetadata {
 
 export interface PoolInfo extends PoolMetadata {
   pool: {
+    id: string;
     name: string;
     logos: string[];
   };
@@ -50,6 +51,12 @@ export interface PoolInfo extends PoolMetadata {
   category: Category;
   type: PoolType;
   isLoading?: boolean;
+  additional: {
+    leverage?: number;
+    riskFactor: number;
+    tags: StrategyLiveStatus[];
+    isAudited: boolean;
+  };
 }
 
 export interface ProtocolAtoms {
