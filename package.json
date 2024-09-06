@@ -20,6 +20,7 @@
   ],
   "dependencies": {
     "@ajna/pagination": "1.4.19",
+    "@apollo/client": "^3.11.8",
     "@chakra-ui/icons": "2.1.1",
     "@chakra-ui/react": "2.8.2",
     "@emotion/react": "11.11.3",
@@ -41,6 +42,7 @@
     "framer-motion": "11.0.5",
     "get-starknet": "3.0.1",
     "get-starknet-core": "3.2.0",
+    "graphql": "^16.9.0",
     "jotai": "2.6.4",
     "jotai-tanstack-query": "0.8.5",
     "mixpanel-browser": "2.49.0",
