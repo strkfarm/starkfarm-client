@@ -52,7 +52,7 @@ export function ProtocolFilters() {
             console.log('clicked', p.name);
             // generated list of protocols selected. All means array of all protocols.
             const selectedProtocols = protocolsFilter.includes(ALL_FILTER)
-              ? filters.protocols.map((p) => p.name)
+              ? []
               : protocolsFilter;
 
             let updatedProtocols = [];
@@ -93,7 +93,7 @@ export function ProtocolFilters() {
         size="lg"
         borderRadius="full"
         padding={'2px'}
-        bg="bg"
+        bg="color1"
         marginRight={'5px'}
         as="button"
         marginTop={'1px'}
@@ -198,6 +198,13 @@ export function CategoryFilters() {
     return riskLevelFilters.includes('1') || riskLevelFilters.includes('2');
   }
 
+  function getTextProps(isActive: boolean) {
+    return {
+      fontSize: '14px',
+      color: isActive ? 'bg' : 'color2Text',
+    };
+  }
+
   return (
     <Box width={'100%'}>
       {/* Stable pools */}
@@ -230,11 +237,9 @@ export function CategoryFilters() {
           />
         </AvatarGroup>
         <TagLabel
-          color={
-            categoriesFilter.includes(Category.Stable.valueOf())
-              ? 'bg'
-              : 'color2'
-          }
+          {...getTextProps(
+            categoriesFilter.includes(Category.Stable.valueOf()),
+          )}
         >
           {Category.Stable.valueOf()}
         </TagLabel>
@@ -265,9 +270,7 @@ export function CategoryFilters() {
           />
         </AvatarGroup>
         <TagLabel
-          color={
-            categoriesFilter.includes(Category.STRK.valueOf()) ? 'bg' : 'color2'
-          }
+          {...getTextProps(categoriesFilter.includes(Category.STRK.valueOf()))}
         >
           {Category.STRK.valueOf()}
         </TagLabel>
@@ -297,7 +300,7 @@ export function CategoryFilters() {
             </Avatar>
           ))}
         </AvatarGroup>
-        <TagLabel color={isLowRisk() ? 'bg' : 'color2'}>Low risk</TagLabel>
+        <TagLabel {...getTextProps(isLowRisk())}>Low risk</TagLabel>
       </Tag>
 
       {/* DEXes */}
@@ -319,12 +322,10 @@ export function CategoryFilters() {
         marginBottom={'10px'}
       >
         <TagLabel
-          color={
+          {...getTextProps(
             poolTypeFilters.includes(PoolType.DEXV2.valueOf()) ||
-            poolTypeFilters.includes(PoolType.DEXV3.valueOf())
-              ? 'bg'
-              : 'color2'
-          }
+              poolTypeFilters.includes(PoolType.DEXV3.valueOf()),
+          )}
         >
           DEX Pools
         </TagLabel>
@@ -343,9 +344,7 @@ export function CategoryFilters() {
         bg={poolTypeFilters.includes(PoolType.Lending) ? 'purple' : 'color1'}
         marginBottom={'10px'}
       >
-        <TagLabel
-          color={poolTypeFilters.includes(PoolType.Lending) ? 'bg' : 'color2'}
-        >
+        <TagLabel {...getTextProps(poolTypeFilters.includes(PoolType.Lending))}>
           Lending Pools
         </TagLabel>
       </Tag>
@@ -366,9 +365,7 @@ export function CategoryFilters() {
         marginBottom={'10px'}
       >
         <TagLabel
-          color={
-            poolTypeFilters.includes(PoolType.Derivatives) ? 'bg' : 'color2'
-          }
+          {...getTextProps(poolTypeFilters.includes(PoolType.Derivatives))}
         >
           Derivative Pools
         </TagLabel>
@@ -389,7 +386,7 @@ export function CategoryFilters() {
         }}
         marginBottom={'10px'}
       >
-        <TagLabel color={'color2'}>
+        <TagLabel {...getTextProps(false)}>
           <HStack>
             <Text>Reset</Text> <CloseIcon fontSize={'10px'} />
           </HStack>

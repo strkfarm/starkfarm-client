@@ -208,19 +208,35 @@ export const allPoolsAtomWithStrategiesUnSorted = atom((get) => {
 
 const SORT_OPTIONS = ['DEFAULT', 'APR', 'TVL', 'RISK'];
 
-export const sortAtom = atom(SORT_OPTIONS[0]);
+export const sortAtom = atom(
+  {
+    field: SORT_OPTIONS[0],
+    order: 'asc',
+    loading: false,
+  },
+  (get, set, args: { field: string; order: 'asc' | 'desc' }) => {
+    console.log('sorting', 'triggered');
+    set(sortAtom, args);
+    get(filteredPools);
+  },
+);
 
 export const sortPoolsAtom = atom((get) => {
   const pools = get(allPoolsAtomWithStrategiesUnSorted);
   console.log('pre sort', pools);
-  const sortOption = get(sortAtom);
+  const sortSettings = get(sortAtom);
+  console.log('sorting', 'initiated');
   pools.sort((a, b) => {
+    const sortOption = sortSettings.field;
+    const order = sortSettings.order;
     if (sortOption === SORT_OPTIONS[2]) {
-      return b.tvl - a.tvl;
+      return order == 'desc' ? b.tvl - a.tvl : a.tvl - b.tvl;
     } else if (sortOption === SORT_OPTIONS[3]) {
-      return b.additional.riskFactor - a.additional.riskFactor;
+      return order == 'desc'
+        ? b.additional.riskFactor - a.additional.riskFactor
+        : a.additional.riskFactor - b.additional.riskFactor;
     } else if (sortOption === SORT_OPTIONS[1]) {
-      return b.apr - a.apr;
+      return order == 'desc' ? b.apr - a.apr : a.apr - b.apr;
     }
     // sort by risk factor, then sort by apr
     // rounding to sync with risk signals shown on UI
@@ -229,44 +245,42 @@ export const sortPoolsAtom = atom((get) => {
         Math.round(b.additional.riskFactor) || b.apr - a.apr
     );
   });
+  console.log('sorting', 'done');
   return pools;
 });
 
 export const filteredPools = atom((get) => {
+  console.log(`sorting`, 'filter pools');
   const pools = get(sortPoolsAtom);
+  console.log(`sorting`, 'filter pools [2]');
   const categories = get(filterAtoms.categoriesAtom);
   const types = get(filterAtoms.typesAtom);
   const protocols = get(filterAtoms.protocolsAtom);
   const riskLevels = get(filterAtoms.riskAtom);
-  console.log(`risk_levels`, riskLevels);
-  return pools
-    .filter((pool) => {
-      // category filter
-      if (categories.includes(ALL_FILTER)) return true;
-      if (categories.includes(pool.category.valueOf())) return true;
-      return false;
-    })
-    .filter((pool) => {
-      // type filter
-      if (types.includes(ALL_FILTER)) return true;
-      if (types.includes(pool.type.valueOf())) return true;
-      return false;
-    })
-    .filter((pool) => {
-      // protocol filter
-      if (protocols.includes(ALL_FILTER)) return true;
-      if (protocols.includes(pool.protocol.name)) return true;
-      return false;
-    })
-    .filter((pool) => {
-      // risk filter
-      if (riskLevels.includes(ALL_FILTER)) return true;
-      if (
-        riskLevels.includes(
-          Math.round(pool.additional.riskFactor).toFixed(0).toString(),
-        )
+  console.log(`sorting`, 'filter pools');
+
+  return pools.filter((pool) => {
+    // category filter
+    if (categories.includes(ALL_FILTER)) return true;
+    if (categories.includes(pool.category.valueOf())) return true;
+
+    // type filter
+    if (types.includes(ALL_FILTER)) return true;
+    if (types.includes(pool.type.valueOf())) return true;
+
+    // protocol filter
+    if (protocols.includes(ALL_FILTER)) return true;
+    if (protocols.includes(pool.protocol.name)) return true;
+
+    // risk filter
+    if (riskLevels.includes(ALL_FILTER)) return true;
+    if (
+      riskLevels.includes(
+        Math.round(pool.additional.riskFactor).toFixed(0).toString(),
       )
-        return true;
-      return false;
-    });
+    ) {
+      return true;
+    }
+    return false;
+  });
 });
