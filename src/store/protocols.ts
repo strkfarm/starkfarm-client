@@ -208,18 +208,10 @@ export const allPoolsAtomWithStrategiesUnSorted = atom((get) => {
 
 const SORT_OPTIONS = ['DEFAULT', 'APR', 'TVL', 'RISK'];
 
-export const sortAtom = atom(
-  {
-    field: SORT_OPTIONS[0],
-    order: 'asc',
-    loading: false,
-  },
-  (get, set, args: { field: string; order: 'asc' | 'desc' }) => {
-    console.log('sorting', 'triggered');
-    set(sortAtom, args);
-    get(filteredPools);
-  },
-);
+export const sortAtom = atom({
+  field: SORT_OPTIONS[0],
+  order: 'asc',
+});
 
 export const sortPoolsAtom = atom((get) => {
   const pools = get(allPoolsAtomWithStrategiesUnSorted);
@@ -261,26 +253,32 @@ export const filteredPools = atom((get) => {
 
   return pools.filter((pool) => {
     // category filter
-    if (categories.includes(ALL_FILTER)) return true;
-    if (categories.includes(pool.category.valueOf())) return true;
+    if (
+      !categories.includes(ALL_FILTER) &&
+      !categories.includes(pool.category.valueOf())
+    )
+      return false;
 
     // type filter
-    if (types.includes(ALL_FILTER)) return true;
-    if (types.includes(pool.type.valueOf())) return true;
+    if (!types.includes(ALL_FILTER) && !types.includes(pool.type.valueOf()))
+      return false;
 
     // protocol filter
-    if (protocols.includes(ALL_FILTER)) return true;
-    if (protocols.includes(pool.protocol.name)) return true;
+    if (
+      !protocols.includes(ALL_FILTER) &&
+      !protocols.includes(pool.protocol.name)
+    )
+      return false;
 
     // risk filter
-    if (riskLevels.includes(ALL_FILTER)) return true;
     if (
-      riskLevels.includes(
+      !riskLevels.includes(ALL_FILTER) &&
+      !riskLevels.includes(
         Math.round(pool.additional.riskFactor).toFixed(0).toString(),
       )
     ) {
-      return true;
+      return false;
     }
-    return false;
+    return true;
   });
 });

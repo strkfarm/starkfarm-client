@@ -12,7 +12,7 @@ import {
   Thead,
   Tr,
 } from '@chakra-ui/react';
-import { useAtomValue } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import { useMemo } from 'react';
 import {
   Pagination,
@@ -24,7 +24,11 @@ import {
   PaginationPageGroup,
 } from '@ajna/pagination';
 import { CategoryFilters, ProtocolFilters } from '@/components/Filters';
-import { allPoolsAtomUnSorted, filteredPools } from '@/store/protocols';
+import {
+  allPoolsAtomUnSorted,
+  filteredPools,
+  sortAtom,
+} from '@/store/protocols';
 import YieldCard from './YieldCard';
 
 export default function Pools() {
@@ -41,7 +45,7 @@ export default function Pools() {
     return _filteredPools.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   }, [_filteredPools, currentPage]);
 
-  // const setSortingOption = useSetAtom(sortAtom);
+  const setSortingOption = useSetAtom(sortAtom);
 
   return (
     <Box float="left" width={'100%'}>
@@ -97,7 +101,7 @@ export default function Pools() {
             <Tr fontSize={'18px'} color={'white'} bg="bg">
               <Th>Pool name</Th>
               <Th textAlign={'right'}>
-                {/* <HeaderSorter 
+                {/* <HeaderSorter
                   heading='APY' 
                   mainColor='color2Text' inActiveColor='#d9d9f726'
                   onClick={(order: 'asc' | 'desc') => {

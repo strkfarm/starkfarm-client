@@ -31,6 +31,7 @@ import { UserStats, userStatsAtom } from '@/store/utils.atoms';
 import { getPoolInfoFromStrategy } from '@/store/protocols';
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons';
 import { useState } from 'react';
+import mixpanel from 'mixpanel-browser';
 
 interface YieldCardProps {
   pool: PoolInfo;
@@ -363,6 +364,8 @@ function StrategyMobileCard(props: YieldCardProps) {
       padding={'20px'}
       gap={2}
       borderBottom={'1px solid var(--chakra-colors-bg)'}
+      as={'a'}
+      {...getLinkProps(pool, props.showProtocolName)}
     >
       <GridItem colSpan={3} rowSpan={props.showProtocolName ? 2 : 1}>
         <StrategyInfo
@@ -410,6 +413,22 @@ function StrategyMobileCard(props: YieldCardProps) {
   );
 }
 
+function getLinkProps(pool: PoolInfo, showProtocolName?: boolean) {
+  return {
+    href: pool.protocol.link,
+    target: '_blank',
+    onClick: () => {
+      mixpanel.track('Pool clicked', {
+        pool: pool.pool.name,
+        protocol: pool.protocol.name,
+        yield: pool.apr,
+        risk: pool.additional.riskFactor,
+        tvl: pool.tvl,
+        showProtocolName,
+      });
+    },
+  };
+}
 export default function YieldCard(props: YieldCardProps) {
   const { pool, index } = props;
 
@@ -419,9 +438,8 @@ export default function YieldCard(props: YieldCardProps) {
         color={'white'}
         bg={index % 2 == 0 ? 'color1_50p' : 'color2_50p'}
         display={{ base: 'none', md: 'table-row' }}
-        as="a"
-        href={pool.protocol.link}
-        target="_blank"
+        as={'a'}
+        {...getLinkProps(pool, props.showProtocolName)}
       >
         <Td>
           <StrategyInfo
