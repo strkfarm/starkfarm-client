@@ -135,6 +135,7 @@ export function ProtocolFilters() {
 
 export function CategoryFilters() {
   const updateFilters = useSetAtom(updateFiltersAtom);
+  const protocolFilters = useAtomValue(filterAtoms.protocolsAtom);
   const categoriesFilter = useAtomValue(filterAtoms.categoriesAtom);
   const riskLevelFilters = useAtomValue(filterAtoms.riskAtom);
   const poolTypeFilters = useAtomValue(filterAtoms.typesAtom);
@@ -207,6 +208,11 @@ export function CategoryFilters() {
 
   return (
     <Box width={'100%'}>
+      {/* <Text color={'white'}>Protocols: {JSON.stringify(protocolFilters)}</Text>
+      <Text color={'white'}>Category: {JSON.stringify(categoriesFilter)}</Text>
+      <Text color={'white'}>Risk: {JSON.stringify(riskLevelFilters)}</Text>
+      <Text color={'white'}>Types: {JSON.stringify(poolTypeFilters)}</Text> */}
+
       {/* Stable pools */}
       <Tag
         size="lg"
