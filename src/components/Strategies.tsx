@@ -20,7 +20,6 @@ import { allPoolsAtomUnSorted, filteredPools } from '@/store/protocols';
 import { addressAtom } from '@/store/claims.atoms';
 import { usePagination } from '@ajna/pagination';
 import { YieldStrategyCard } from './YieldCard';
-
 export default function Strategies() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
   const strategies = useAtomValue(strategiesAtom);
