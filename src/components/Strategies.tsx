@@ -40,16 +40,13 @@ export default function Strategies() {
   }, [_filteredPools, currentPage]);
 
   return (
-    <Container width="100%" float={'left'} padding={'0px'} marginTop={'10px'}>
-      <Text
-        marginTop={'15px'}
-        color="light_grey"
-        fontSize={'15px'}
-        marginBottom={'15px'}
-      >
-        <b>What are strategies?</b> Strategies are combination of investment
-        steps that combine various pools and risk combinations to maximize
-        yield.
+    <Container width="100%" float={'left'} padding={'0px'} marginTop={'0px'}>
+      <Text color="color2Text" fontSize={'15px'}>
+        <b>What are strategies?</b>
+      </Text>
+      <Text color="color2Text" fontSize={'15px'} marginBottom={'15px'}>
+        Strategies are a combination of investment steps that combine various
+        pools to maximize yield.
       </Text>
       <Table variant="simple">
         <Thead display={{ base: 'none', md: 'table-header-group' }}>
