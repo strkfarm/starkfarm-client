@@ -1,31 +1,19 @@
 'use client';
 
 import {
-  PoolInfo,
-  allPoolsAtomUnSorted,
-  filteredPools,
-  sortPoolsAtom,
-} from '@/store/pools';
-import {
-  Avatar,
-  AvatarGroup,
   Box,
-  Card,
-  CardBody,
-  Center,
   Container,
-  Flex,
-  HStack,
-  Heading,
-  Link,
   Skeleton,
-  Spinner,
   Stack,
+  Table,
+  Tbody,
   Text,
-  Tooltip,
+  Th,
+  Thead,
+  Tr,
 } from '@chakra-ui/react';
-import { useAtomValue } from 'jotai';
-import { useEffect, useMemo } from 'react';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { useMemo } from 'react';
 import {
   Pagination,
   PaginationContainer,
@@ -35,9 +23,13 @@ import {
   PaginationPage,
   PaginationPageGroup,
 } from '@ajna/pagination';
-import CONSTANTS from '@/constants';
-import Filters from '@/components/Filters';
-import mixpanel from 'mixpanel-browser';
+import { CategoryFilters, ProtocolFilters } from '@/components/Filters';
+import {
+  allPoolsAtomUnSorted,
+  filteredPools,
+  sortAtom,
+} from '@/store/protocols';
+import YieldCard from './YieldCard';
 
 export default function Pools() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
@@ -53,78 +45,20 @@ export default function Pools() {
     return _filteredPools.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   }, [_filteredPools, currentPage]);
 
-  const sortedPools = useAtomValue(sortPoolsAtom);
-
-  useEffect(() => {
-    console.log('sortedPools', sortedPools);
-  }, [sortedPools]);
-  useEffect(() => {
-    console.log('pages', currentPage, setCurrentPage, pagesCount, pages);
-  }, [currentPage, setCurrentPage, pagesCount, pages]);
-
-  function getAPRWithToolTip(pool: PoolInfo) {
-    const tip = (
-      <Box width={'300px'}>
-        {pool.aprSplits.map((split) => {
-          if (split.apr === 0) {
-            return (
-              <Text key={split.title}>
-                {split.title}: {split.description}
-              </Text>
-            );
-          }
-          return (
-            <Flex width={'100%'} key={split.title}>
-              <Text key="1" width={'70%'}>
-                {split.title}{' '}
-                {split.description ? `(${split.description})` : ''}
-              </Text>
-              <Text width={'30%'} textAlign={'right'} key="2">
-                {split.apr === 'Err' ? split.apr : (split.apr * 100).toFixed(2)}
-                %
-              </Text>
-            </Flex>
-          );
-        })}
-      </Box>
-    );
-    return (
-      <Tooltip hasArrow label={tip} bg="gray.300" color="black">
-        <Center
-          width={{ base: 'auto', md: '50%' }}
-          marginRight={'0px'}
-          marginLeft={{ base: 'auto', md: '0px' }}
-          display={'flex'}
-        >
-          {pool.isLoading && <Spinner />}
-          {!pool.isLoading && (
-            <>
-              <Avatar
-                size="xs"
-                bg={'black'}
-                src={CONSTANTS.LOGOS.STRK}
-                marginRight={'2px'}
-                alignContent={'right'}
-              />
-              <Text
-                textAlign={{ base: 'right', md: 'center' }}
-                color="cyan"
-                fontSize={'20px'}
-              >
-                <b>{(pool.apr * 100).toFixed(2)}%</b>
-              </Text>
-            </>
-          )}
-        </Center>
-      </Tooltip>
-    );
-  }
+  const setSortingOption = useSetAtom(sortAtom);
 
   return (
     <Box float="left" width={'100%'}>
-      <Filters />
-      {
-        <Container width={'100%'} float={'left'} padding="0px">
+      <ProtocolFilters />
+      <Box width={'100%'} marginTop={'10px'}>
+        <Box width={{ base: '100%', md: '70%' }} float={'left'}>
+          <CategoryFilters />
+        </Box>
+        <Container
+          float={'left'}
+          padding="0px"
+          width={{ base: '100%', md: '30%' }}
+        >
           <Pagination
             pagesCount={pagesCount}
             currentPage={currentPage}
@@ -134,7 +68,11 @@ export default function Pools() {
             }}
           >
             <PaginationContainer align="right" float={'right'} p={4}>
-              <PaginationPrevious marginRight="4px" bg="highlight" color="cyan">
+              <PaginationPrevious
+                marginRight="4px"
+                bg="highlight"
+                color="purple"
+              >
                 <Text>{'<'}</Text>
               </PaginationPrevious>
               <PaginationPageGroup>
@@ -145,112 +83,54 @@ export default function Pools() {
                     padding={'2px 10px'}
                     isDisabled={page === currentPage}
                     bg="highlight"
-                    color="cyan"
+                    color="purple"
                   />
                 ))}
               </PaginationPageGroup>
-              <PaginationNext marginLeft="4px" bg="highlight" color="cyan">
+              <PaginationNext marginLeft="4px" bg="highlight" color="purple">
                 <Text>{'>'}</Text>
               </PaginationNext>
             </PaginationContainer>
           </Pagination>
         </Container>
-      }
+      </Box>
 
       <Container width="100%" float={'left'} padding={'0px'} marginTop={'10px'}>
-        <Card variant={'filled'} bg="opacity_50p" color={'purple'}>
-          <CardBody paddingTop={'5px'} paddingBottom={'5px'}>
-            <HStack width={'100%'}>
-              <Heading width={{ base: '50%', md: '33%' }} size="md">
-                Pool
-              </Heading>
-              <Stack
-                direction={{ base: 'column', md: 'row' }}
-                width={{ base: '50%', md: '66%' }}
-              >
-                <Heading
-                  width={{ base: '100%', md: '50%' }}
-                  size="md"
-                  textAlign={{ base: 'right', md: 'center' }}
-                >
-                  STRK APY(%)
-                </Heading>
-                <Heading
-                  width={{ base: '100%', md: '50%' }}
-                  size="sm"
-                  textAlign={'right'}
-                >
-                  TVL($)
-                </Heading>
-              </Stack>
-            </HStack>
-          </CardBody>
-        </Card>
-        {pools.length > 0 && (
-          <Stack spacing="4">
-            {pools.map((pool, index) => (
-              <Card
-                key={`${pool.pool.name}_${pool.protocol.name}`}
-                variant={'filled'}
-                bg={index % 2 === 0 ? 'color1_50p' : 'color2_50p'}
-                color="white"
-              >
-                <Link
-                  href={pool.protocol.link}
-                  width={'100%'}
-                  borderWidth={'0px'}
-                  target="_blank"
-                  onClick={() => {
-                    mixpanel.track('Pool clicked', {
-                      pool: pool.pool.name,
-                      protocol: pool.protocol.name,
-                      yield: pool.apr,
-                    });
+        <Table variant="simple">
+          <Thead display={{ base: 'none', md: 'table-header-group' }}>
+            <Tr fontSize={'18px'} color={'white'} bg="bg">
+              <Th>Pool name</Th>
+              <Th textAlign={'right'}>
+                {/* <HeaderSorter
+                  heading='APY' 
+                  mainColor='color2Text' inActiveColor='#d9d9f726'
+                  onClick={(order: 'asc' | 'desc') => {
+                    setSortingOption({field: 'APR', order});
                   }}
-                >
-                  <CardBody>
-                    <HStack width={'100%'}>
-                      <Box width={{ base: '50%', md: '33%' }}>
-                        <Flex>
-                          <AvatarGroup size="xs" max={2} marginRight={'5px'}>
-                            {pool.pool.logos.map((logo) => (
-                              <Avatar key={logo} src={logo} />
-                            ))}
-                          </AvatarGroup>
-                          <Box>
-                            <Heading size="md">{pool.pool.name}</Heading>
-                            <Heading size="xs">
-                              <Avatar
-                                size="2xs"
-                                bg={'black'}
-                                name="Dan Abrahmov"
-                                src={pool.protocol.logo}
-                                marginRight={'2px'}
-                              />
-                              {pool.protocol.name}
-                            </Heading>
-                          </Box>
-                        </Flex>
-                      </Box>
-                      <Stack
-                        direction={{ base: 'column', md: 'row' }}
-                        width={{ base: '50%', md: '66%' }}
-                      >
-                        {getAPRWithToolTip(pool)}
-                        <Text
-                          width={{ base: '100%', md: '50%' }}
-                          textAlign={'right'}
-                        >
-                          ${Math.round(pool.tvl).toLocaleString()}
-                        </Text>
-                      </Stack>
-                    </HStack>
-                  </CardBody>
-                </Link>
-              </Card>
-            ))}
-          </Stack>
-        )}
+                /> */}
+                APY
+              </Th>
+              <Th textAlign={'right'}>Risk</Th>
+              <Th textAlign={'right'}>TVL</Th>
+            </Tr>
+          </Thead>
+          <Tbody>
+            {allPools.length > 0 && (
+              <>
+                {pools.map((pool, index) => {
+                  return (
+                    <YieldCard
+                      key={pool.pool.id}
+                      pool={pool}
+                      index={index}
+                      showProtocolName={true}
+                    />
+                  );
+                })}
+              </>
+            )}
+          </Tbody>
+        </Table>
         {allPools.length > 0 && pools.length === 0 && (
           <Box padding="10px 0" width={'100%'} float={'left'}>
             <Text color="light_grey" textAlign={'center'}>

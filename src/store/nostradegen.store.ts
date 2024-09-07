@@ -3,9 +3,10 @@ import { Category, PoolType } from './pools';
 import { atom } from 'jotai';
 import { PoolInfo, ProtocolAtoms, StrkIncentivesAtom } from './pools';
 import { Jediswap } from './jedi.store';
+import { StrategyLiveStatus } from '@/strategies/IStrategy';
 
 export class NostraDegen extends Jediswap {
-  name = 'Nostra DEGEN';
+  name = 'Nostra';
   link = 'https://app.nostra.finance/pools';
   logo =
     'https://static-assets-8zct.onrender.com/integrations/nostra/logo_dark.jpg';
@@ -19,16 +20,20 @@ export class NostraDegen extends Jediswap {
       Object.entries(myData)
         .filter(([_, poolData]: any) => poolData.isDegen)
         .forEach(([poolName, poolData]: any) => {
-          const category = Category.Others;
           const tokens: TokenName[] = [poolData.tokenA, poolData.tokenB];
           const logo1 = CONSTANTS.LOGOS[tokens[0]];
           const logo2 = CONSTANTS.LOGOS[tokens[1]];
           const baseApr =
             poolData.baseApr === '0' ? 0.0 : parseFloat(poolData.baseApr);
           const rewardApr = parseFloat(poolData.rewardApr);
+          const isStrkPool = poolData.id.includes('STRK');
+          const category = isStrkPool ? Category.STRK : Category.Others;
+
+          const _poolName = poolData.id;
           const poolInfo: PoolInfo = {
             pool: {
-              name: poolData.id.slice(0, -6),
+              id: this.getPoolId(this.name, _poolName),
+              name: _poolName,
               logos: [logo1, logo2],
             },
             protocol: {
@@ -58,6 +63,11 @@ export class NostraDegen extends Jediswap {
             borrow: {
               borrowFactor: 0,
               apr: 0,
+            },
+            additional: {
+              tags: [StrategyLiveStatus.ACTIVE],
+              isAudited: false, // TODO: Update this
+              riskFactor: 3,
             },
           };
           pools.push(poolInfo);

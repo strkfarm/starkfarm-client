@@ -1,6 +1,7 @@
 'use client';
 
 import Navbar from '@/components/Navbar';
+import { MY_STORE } from '@/store';
 import {
   Center,
   ChakraBaseProvider,
@@ -99,7 +100,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <JotaiProvider>
+    <JotaiProvider store={MY_STORE}>
       <StarknetConfig
         chains={chains}
         provider={provider}

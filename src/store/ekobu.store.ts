@@ -1,5 +1,3 @@
-'use client';
-
 import CONSTANTS, { TokenName } from '@/constants';
 import { atom } from 'jotai';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
@@ -13,6 +11,7 @@ import {
   ProtocolAtoms,
   StrkDexIncentivesAtom,
 } from './pools';
+import { StrategyLiveStatus } from '@/strategies/IStrategy';
 
 const _fetcher = async (...args: any[]) => {
   return fetch(args[0], args[1]).then((res) => res.json());
@@ -112,8 +111,10 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
         .forEach((poolName) => {
           const arr = myData[poolName];
           let category = Category.Others;
+          let riskFactor = 3;
           if (poolName === 'USDC/USDT') {
             category = Category.Stable;
+            riskFactor = 0.5;
           } else if (poolName.includes('STRK')) {
             category = Category.STRK;
           }
@@ -124,6 +125,7 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
 
           const poolInfo: PoolInfo = {
             pool: {
+              id: this.getPoolId(this.name, poolName),
               name: poolName,
               logos: [logo1, logo2],
             },
@@ -149,6 +151,11 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
             borrow: {
               borrowFactor: 0,
               apr: 0,
+            },
+            additional: {
+              tags: [StrategyLiveStatus.ACTIVE],
+              riskFactor,
+              isAudited: false, // TODO: Update this
             },
           };
 

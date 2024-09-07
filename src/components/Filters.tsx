@@ -1,217 +1,403 @@
 import React from 'react';
-import Select, { StylesConfig } from 'react-select';
-import { ALL_FILTER, filters, updateFiltersAtom } from '@/store/pools';
-import * as chroma from 'chroma.ts';
-import { useSetAtom } from 'jotai';
+import { useAtomValue, useSetAtom } from 'jotai';
 import {
-  Accordion,
-  AccordionButton,
-  AccordionItem,
-  AccordionPanel,
+  Avatar,
+  AvatarBadge,
+  AvatarGroup,
   Box,
-  Stack,
+  HStack,
+  IconButton,
+  Tag,
+  TagLabel,
   Text,
+  Tooltip,
 } from '@chakra-ui/react';
-import { HamburgerIcon } from '@chakra-ui/icons';
+import { CheckIcon, CloseIcon } from '@chakra-ui/icons';
+import {
+  ALL_FILTER,
+  filterAtoms,
+  filters,
+  updateFiltersAtom,
+} from '@/store/protocols';
+import { getTokenInfoFromName } from '@/utils';
+import { Category, PoolType } from '@/store/pools';
 
-export interface Option {
-  readonly value: string;
-  readonly label: string;
-  readonly color: string;
-  readonly isFixed?: boolean;
-  readonly isDisabled?: boolean;
-}
+export function ProtocolFilters() {
+  const protocolsFilter = useAtomValue(filterAtoms.protocolsAtom);
 
-const colourStyles: StylesConfig<Option, true> = {
-  control: (styles) => ({
-    ...styles,
-    padding: '10px 0',
-    backgroundColor: 'var(--chakra-colors-bg)',
-    borderColor: 'var(--chakra-colors-bg)',
-  }),
-  option: (styles, { data, isDisabled, isFocused, isSelected }) => {
-    const color = chroma.color(data.color);
-    return {
-      ...styles,
-      backgroundColor: 'var(--chakra-colors-bg)',
-      color: isDisabled
-        ? '#ccc'
-        : isSelected
-          ? chroma.contrast(color, 'white') > 2
-            ? 'white'
-            : 'black'
-          : data.color,
-      cursor: isDisabled ? 'not-allowed' : 'default',
+  function isProtocolSelected(protocolName: string) {
+    return (
+      protocolsFilter.includes(ALL_FILTER) ||
+      protocolsFilter.includes(protocolName)
+    );
+  }
 
-      ':active': {
-        ...styles[':active'],
-        backgroundColor: !isDisabled
-          ? isSelected
-            ? data.color
-            : color.alpha(0.3).css()
-          : undefined,
-      },
-    };
-  },
-  container: (styles) => {
-    return {
-      ...styles,
-      width: '100%',
-    };
-  },
-  dropdownIndicator: (styles) => {
-    return {
-      ...styles,
-      color: 'var(--chakra-colors-color2Text)',
-    };
-  },
-  clearIndicator: (styles) => {
-    return {
-      ...styles,
-      color: 'var(--chakra-colors-color2Text)',
-    };
-  },
-  indicatorSeparator: (styles) => {
-    return {
-      ...styles,
-      backgroundColor: 'var(--chakra-colors-color2Text)',
-    };
-  },
-  menu: (styles) => {
-    return {
-      ...styles,
-      backgroundColor: 'var(--chakra-colors-highlight)',
-    };
-  },
-  multiValue: (styles, { data }) => {
-    const color = chroma.color(data.color);
-    return {
-      ...styles,
-      fontWeight: 'bold',
-      backgroundColor: 'none',
-      borderColor: color.alpha(0.7).css(),
-      borderWidth: '1px',
-      borderRadius: '5px',
-    };
-  },
-  multiValueLabel: (styles, { data }) => ({
-    ...styles,
-    color: data.color,
-  }),
-  multiValueRemove: (styles, { data }) => ({
-    ...styles,
-    color: data.color,
-    ':hover': {
-      backgroundColor: data.color,
-      color: 'white',
-    },
-  }),
-};
-
-export default function Filters() {
-  // const colors: readonly string[] = ['#00B8D9', '#407cd5', '#7967e5', '#FF5630',
-  // '#FF8B00','#FFC400', '#36B37E', '#00875A', '#253858', '#666666']
-
-  const colors = ['rgba(86, 118, 254, 1)', 'rgb(127 73 229)'];
+  function atleastOneProtocolSelected() {
+    return protocolsFilter.length > 0;
+  }
   const updateFilters = useSetAtom(updateFiltersAtom);
 
-  const protocolOptions: readonly Option[] = filters.protocols.map(
-    (p, index) => {
-      return { value: p, label: p, color: colors[index % colors.length] };
-    },
-  );
-
-  const categories: readonly Option[] = filters.categories.map((p, index) => {
-    return { value: p, label: p, color: colors[index % colors.length] };
-  });
-
-  const poolTypes: readonly Option[] = filters.types.map((p, index) => {
-    return { value: p, label: p, color: colors[index % colors.length] };
-  });
   return (
-    <Accordion allowToggle>
-      <AccordionItem borderTop="0px" borderBottom="1px" borderColor={'bg'}>
-        <h2>
-          <AccordionButton fontWeight={'bold'}>
-            <Box
-              as="span"
-              flex="1"
-              textAlign="right"
-              color="color2Text"
-              marginRight="10px"
-            >
-              Filters
-            </Box>
-            <HamburgerIcon color="color2Text" />
-          </AccordionButton>
-        </h2>
-        <AccordionPanel pb={4} bg="highlight" overflow={'visible'}>
-          <Text color="light_grey" fontSize={'14px'} width="100%">
-            Protocols:
-          </Text>
-          <Select
-            closeMenuOnSelect={false}
-            defaultValue={[...protocolOptions]}
-            isMulti
-            placeholder="Select Protocols"
-            options={protocolOptions}
-            styles={colourStyles}
-            onChange={(x, b) => {
-              console.log(x, Array.isArray(x), b);
-              if (filters.protocols.length === x.length) {
-                updateFilters('protocols', [ALL_FILTER]);
-              } else {
-                updateFilters(
-                  'protocols',
-                  x.map((p) => p.value),
-                );
+    <Box width={'100%'}>
+      {filters.protocols.map((p) => (
+        <Tag
+          size="lg"
+          borderRadius="full"
+          padding={'2px'}
+          bg="color1"
+          marginRight={'10px'}
+          marginBottom={'10px'}
+          as="button"
+          onClick={() => {
+            console.log('clicked', p.name);
+            // generated list of protocols selected. All means array of all protocols.
+            const selectedProtocols = protocolsFilter.includes(ALL_FILTER)
+              ? []
+              : protocolsFilter;
+
+            let updatedProtocols = [];
+            if (selectedProtocols.includes(p.name)) {
+              updatedProtocols = selectedProtocols.filter((x) => x !== p.name);
+            } else {
+              updatedProtocols = [...selectedProtocols, p.name];
+            }
+            if (updatedProtocols.length === filters.protocols.length) {
+              updatedProtocols = [ALL_FILTER];
+            }
+            console.log('updateFilters', updatedProtocols);
+            updateFilters('protocols', updatedProtocols);
+          }}
+          key={p.name}
+          _hover={{
+            boxShadow: '0px 0px 5px var(--chakra-colors-color1)',
+          }}
+        >
+          <Tooltip label={p.name}>
+            <Avatar
+              src={`${p.logo}`}
+              border={'1px solid var(--chakra-colors-bg)'}
+              size="sm"
+              name={p.name}
+              filter={
+                isProtocolSelected(p.name)
+                  ? 'none'
+                  : 'grayscale(100%) sepia(20%) hue-rotate(210deg) brightness(1.2) invert(0.2)'
               }
+            />
+          </Tooltip>
+        </Tag>
+      ))}
+
+      {/* Clear all or select all button */}
+      <Tag
+        size="lg"
+        borderRadius="full"
+        padding={'2px'}
+        bg="color1"
+        marginRight={'5px'}
+        as="button"
+        marginTop={'1px'}
+      >
+        <Tooltip
+          label={
+            atleastOneProtocolSelected()
+              ? 'Clear all DApps'
+              : 'Select all DApps'
+          }
+        >
+          <IconButton
+            isRound={true}
+            size={'sm'}
+            variant="solid"
+            bg={atleastOneProtocolSelected() ? 'bg' : 'purple'}
+            color={atleastOneProtocolSelected() ? 'purple' : 'bg'}
+            fontSize="10px"
+            aria-label={
+              atleastOneProtocolSelected() ? 'Clear all' : 'Select all'
+            }
+            icon={atleastOneProtocolSelected() ? <CloseIcon /> : <CheckIcon />}
+            onClick={() => {
+              updateFilters(
+                'protocols',
+                atleastOneProtocolSelected() ? [] : [ALL_FILTER],
+              );
+            }}
+            _hover={{
+              bg: atleastOneProtocolSelected() ? 'bg' : 'purple',
+              boxShadow: '0px 0px 5px var(--chakra-colors-color1)',
             }}
           />
+        </Tooltip>
+      </Tag>
+    </Box>
+  );
+}
 
-          <Stack marginTop={'5px'} direction={{ base: 'column', md: 'row' }}>
-            <Box width={{ base: '100%', md: '50%' }}>
-              <Text color="light_grey" fontSize={'14px'} width="100%">
-                Categories:
-              </Text>
-              <Select
-                closeMenuOnSelect={false}
-                defaultValue={[...categories]}
-                isMulti
-                placeholder="Select Categories"
-                options={categories}
-                styles={colourStyles}
-                onChange={(x, b) => {
-                  console.log(x, Array.isArray(x), b);
-                  updateFilters(
-                    'categories',
-                    x.map((p) => p.value),
-                  );
-                }}
-              />
-            </Box>
-            <Box width={{ base: '100%', md: '50%' }}>
-              <Text color="light_grey" fontSize={'14px'} width="100%">
-                Protocol types:
-              </Text>
-              <Select
-                closeMenuOnSelect={false}
-                defaultValue={[...poolTypes]}
-                isMulti
-                placeholder="Select Pool types"
-                options={poolTypes}
-                styles={colourStyles}
-                onChange={(x, b) => {
-                  updateFilters(
-                    'poolTypes',
-                    x.map((p) => p.value),
-                  );
-                }}
-              />
-            </Box>
-          </Stack>
-        </AccordionPanel>
-      </AccordionItem>
-    </Accordion>
+export function CategoryFilters() {
+  const updateFilters = useSetAtom(updateFiltersAtom);
+  const protocolFilters = useAtomValue(filterAtoms.protocolsAtom);
+  const categoriesFilter = useAtomValue(filterAtoms.categoriesAtom);
+  const riskLevelFilters = useAtomValue(filterAtoms.riskAtom);
+  const poolTypeFilters = useAtomValue(filterAtoms.typesAtom);
+
+  function updateCategory(category: Category) {
+    const existingCategories = categoriesFilter.includes(ALL_FILTER)
+      ? []
+      : categoriesFilter;
+    console.log('filter34', 'categories', existingCategories);
+    if (existingCategories.includes(category)) {
+      const newFilters = existingCategories.filter(
+        (x) => x !== category.valueOf(),
+      );
+      updateFilters(
+        'categories',
+        newFilters.length === 0 ? [ALL_FILTER] : newFilters,
+      );
+    } else {
+      updateFilters('categories', [...existingCategories, category.valueOf()]);
+    }
+  }
+
+  function updateRiskLevel(riskLevels: string[]) {
+    let existingRiskLevels = riskLevelFilters.includes(ALL_FILTER)
+      ? []
+      : riskLevelFilters;
+    console.log('filter34', 'riskLevels', existingRiskLevels);
+    riskLevels.map((riskLevel) => {
+      if (existingRiskLevels.includes(riskLevel)) {
+        const newFilters = existingRiskLevels.filter((x) => x !== riskLevel);
+        existingRiskLevels =
+          newFilters.length === 0 ? [ALL_FILTER] : newFilters;
+        updateFilters('risk', existingRiskLevels);
+      } else {
+        existingRiskLevels = [...existingRiskLevels, riskLevel];
+        updateFilters('risk', existingRiskLevels);
+      }
+    });
+  }
+
+  function updatePoolType(types: PoolType[]) {
+    let existingPoolTypes = poolTypeFilters.includes(ALL_FILTER)
+      ? []
+      : poolTypeFilters;
+    console.log('filter34', 'poolType', existingPoolTypes);
+    types.map((type) => {
+      if (existingPoolTypes.includes(type.valueOf())) {
+        const newFilters = existingPoolTypes.filter(
+          (x) => x !== type.valueOf(),
+        );
+        existingPoolTypes = newFilters.length === 0 ? [ALL_FILTER] : newFilters;
+        updateFilters('poolTypes', existingPoolTypes);
+      } else {
+        existingPoolTypes = [...existingPoolTypes, type.valueOf()];
+        updateFilters('poolTypes', existingPoolTypes);
+      }
+    });
+  }
+
+  function isLowRisk() {
+    return riskLevelFilters.includes('1') || riskLevelFilters.includes('2');
+  }
+
+  function getTextProps(isActive: boolean) {
+    return {
+      fontSize: '14px',
+      color: isActive ? 'bg' : 'color2Text',
+    };
+  }
+
+  return (
+    <Box width={'100%'}>
+      {/* <Text color={'white'}>Protocols: {JSON.stringify(protocolFilters)}</Text>
+      <Text color={'white'}>Category: {JSON.stringify(categoriesFilter)}</Text>
+      <Text color={'white'}>Risk: {JSON.stringify(riskLevelFilters)}</Text>
+      <Text color={'white'}>Types: {JSON.stringify(poolTypeFilters)}</Text> */}
+
+      {/* Stable pools */}
+      <Tag
+        size="lg"
+        borderRadius="full"
+        mr={'10px'}
+        padding={'6px 10px'}
+        as={'button'}
+        onClick={() => {
+          updateCategory(Category.Stable);
+        }}
+        bg={
+          categoriesFilter.includes(Category.Stable.valueOf())
+            ? 'purple'
+            : 'color1'
+        }
+        marginBottom={'10px'}
+      >
+        <AvatarGroup size={'xs'} spacing={'-15px'} mr={'5px'}>
+          <Avatar
+            src={getTokenInfoFromName('USDC').logo}
+            name="USDC"
+            key={'USDC'}
+          />
+          <Avatar
+            src={getTokenInfoFromName('USDT').logo}
+            name="USDC"
+            key={'USDT'}
+          />
+        </AvatarGroup>
+        <TagLabel
+          {...getTextProps(
+            categoriesFilter.includes(Category.Stable.valueOf()),
+          )}
+        >
+          {Category.Stable.valueOf()}
+        </TagLabel>
+      </Tag>
+
+      {/* STRK pools */}
+      <Tag
+        size="lg"
+        borderRadius="full"
+        mr={'10px'}
+        padding={'6px 10px'}
+        as={'button'}
+        onClick={() => {
+          updateCategory(Category.STRK);
+        }}
+        bg={
+          categoriesFilter.includes(Category.STRK.valueOf())
+            ? 'purple'
+            : 'color1'
+        }
+        marginBottom={'10px'}
+      >
+        <AvatarGroup size={'xs'} spacing={'-15px'} mr={'5px'}>
+          <Avatar
+            src={getTokenInfoFromName('STRK').logo}
+            name="STRK"
+            key={'STRK'}
+          />
+        </AvatarGroup>
+        <TagLabel
+          {...getTextProps(categoriesFilter.includes(Category.STRK.valueOf()))}
+        >
+          {Category.STRK.valueOf()}
+        </TagLabel>
+      </Tag>
+
+      {/* Low risk pools */}
+      <Tag
+        size="lg"
+        borderRadius="full"
+        mr={'10px'}
+        padding={'6px 10px'}
+        as={'button'}
+        onClick={() => {
+          updateRiskLevel(['1', '2']);
+        }}
+        bg={isLowRisk() ? 'purple' : 'color1'}
+        marginBottom={'10px'}
+      >
+        <AvatarGroup size={'xs'} spacing={'-15px'} mr={'5px'}>
+          {['USDC', 'USDT', 'STRK', 'ETH'].map((token, index) => (
+            <Avatar
+              src={getTokenInfoFromName(token).logo}
+              name={token}
+              key={token}
+            >
+              {index == 0 && <AvatarBadge boxSize="1.25em" bg="green.500" />}
+            </Avatar>
+          ))}
+        </AvatarGroup>
+        <TagLabel {...getTextProps(isLowRisk())}>Low risk</TagLabel>
+      </Tag>
+
+      {/* DEXes */}
+      <Tag
+        size="lg"
+        borderRadius="full"
+        mr={'10px'}
+        padding={'8px 10px'}
+        as={'button'}
+        onClick={() => {
+          updatePoolType([PoolType.DEXV2, PoolType.DEXV3]);
+        }}
+        bg={
+          poolTypeFilters.includes(PoolType.DEXV2.valueOf()) ||
+          poolTypeFilters.includes(PoolType.DEXV3.valueOf())
+            ? 'purple'
+            : 'color1'
+        }
+        marginBottom={'10px'}
+      >
+        <TagLabel
+          {...getTextProps(
+            poolTypeFilters.includes(PoolType.DEXV2.valueOf()) ||
+              poolTypeFilters.includes(PoolType.DEXV3.valueOf()),
+          )}
+        >
+          DEX Pools
+        </TagLabel>
+      </Tag>
+
+      {/* Lending */}
+      <Tag
+        size="lg"
+        borderRadius="full"
+        mr={'10px'}
+        padding={'8px 10px'}
+        as={'button'}
+        onClick={() => {
+          updatePoolType([PoolType.Lending]);
+        }}
+        bg={poolTypeFilters.includes(PoolType.Lending) ? 'purple' : 'color1'}
+        marginBottom={'10px'}
+      >
+        <TagLabel {...getTextProps(poolTypeFilters.includes(PoolType.Lending))}>
+          Lending Pools
+        </TagLabel>
+      </Tag>
+
+      {/* Derivatives */}
+      <Tag
+        size="lg"
+        borderRadius="full"
+        mr={'10px'}
+        padding={'8px 10px'}
+        as={'button'}
+        onClick={() => {
+          updatePoolType([PoolType.Derivatives]);
+        }}
+        bg={
+          poolTypeFilters.includes(PoolType.Derivatives) ? 'purple' : 'color1'
+        }
+        marginBottom={'10px'}
+      >
+        <TagLabel
+          {...getTextProps(poolTypeFilters.includes(PoolType.Derivatives))}
+        >
+          Derivative Pools
+        </TagLabel>
+      </Tag>
+
+      {/* Reset */}
+      <Tag
+        size="lg"
+        bg="color1"
+        borderRadius="full"
+        mr={'10px'}
+        padding={'8px 10px'}
+        as={'button'}
+        onClick={() => {
+          updateFilters('categories', [ALL_FILTER]);
+          updateFilters('risk', [ALL_FILTER]);
+          updateFilters('poolTypes', [ALL_FILTER]);
+        }}
+        marginBottom={'10px'}
+      >
+        <TagLabel {...getTextProps(false)}>
+          <HStack>
+            <Text>Reset</Text> <CloseIcon fontSize={'10px'} />
+          </HStack>
+        </TagLabel>
+      </Tag>
+    </Box>
   );
 }

@@ -1,5 +1,3 @@
-'use client';
-
 import CONSTANTS, { TokenName } from '@/constants';
 import {
   APRSplit,
@@ -13,6 +11,7 @@ import {
 import { atom } from 'jotai';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { IDapp } from './IDapp.store';
+import { StrategyLiveStatus } from '@/strategies/IStrategy';
 
 type Token = {
   address: string;
@@ -63,8 +62,10 @@ export class Haiko extends IDapp<Pool[]> {
         .forEach((poolName) => {
           const arr = myData[poolName];
           let category = Category.Others;
+          let riskFactor = 3;
           if (poolName === 'USDC/USDT') {
             category = Category.Stable;
+            riskFactor = 0.5;
           } else if (poolName.includes('STRK')) {
             category = Category.STRK;
           }
@@ -75,6 +76,7 @@ export class Haiko extends IDapp<Pool[]> {
 
           const poolInfo: PoolInfo = {
             pool: {
+              id: this.getPoolId(this.name, poolName),
               name: poolName,
               logos: [logo1, logo2],
             },
@@ -100,6 +102,11 @@ export class Haiko extends IDapp<Pool[]> {
             borrow: {
               borrowFactor: 0,
               apr: 0,
+            },
+            additional: {
+              tags: [StrategyLiveStatus.ACTIVE],
+              isAudited: false, // TODO: Update this
+              riskFactor,
             },
           };
           pools.push(poolInfo);

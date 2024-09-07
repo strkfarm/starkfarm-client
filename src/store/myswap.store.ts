@@ -1,5 +1,3 @@
-'use client';
-
 import {
   APRSplit,
   Category,
@@ -13,6 +11,7 @@ import { atom } from 'jotai';
 import { IDapp } from './IDapp.store';
 import CONSTANTS, { TokenName } from '@/constants';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
+import { StrategyLiveStatus } from '@/strategies/IStrategy';
 
 interface Token {
   symbol: string;
@@ -78,8 +77,10 @@ export class MySwap extends IDapp<IndexedPoolData> {
         .forEach((poolName) => {
           const arr = myData[poolName];
           let category = Category.Others;
+          let riskFactor = 3;
           if (poolName === 'USDC/USDT') {
             category = Category.Stable;
+            riskFactor = 0.5;
           } else if (poolName.includes('STRK')) {
             category = Category.STRK;
           }
@@ -90,6 +91,7 @@ export class MySwap extends IDapp<IndexedPoolData> {
 
           const poolInfo: PoolInfo = {
             pool: {
+              id: this.getPoolId(this.name, poolName),
               name: poolName,
               logos: [logo1, logo2],
             },
@@ -115,6 +117,11 @@ export class MySwap extends IDapp<IndexedPoolData> {
             borrow: {
               borrowFactor: 0,
               apr: 0,
+            },
+            additional: {
+              tags: [StrategyLiveStatus.ACTIVE],
+              isAudited: false, // TODO: Update this
+              riskFactor,
             },
           };
           pools.push(poolInfo);

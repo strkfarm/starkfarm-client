@@ -25,6 +25,7 @@ import { atom } from 'jotai';
 import axios from 'axios';
 
 export class DeltaNeutralMM extends IStrategy {
+  riskFactor = 0.75;
   token: TokenInfo;
   readonly secondaryToken: string;
   readonly strategyAddress: string;
@@ -104,11 +105,11 @@ export class DeltaNeutralMM extends IStrategy {
 
     const _risks = [...this.risks];
     this.risks = [
-      `Safety score: 4.25/5`,
+      this.getSafetyFactorLine(),
       `For upto 2 weeks, your position value may reduce due to high borrow APR. This will be compensated by STRK rewards.`,
       `Your original investment is safe. If you deposit 100 tokens, you will always get at least 100 tokens back, unless due to below reasons.`,
       `Technical failures in rebalancing positions to maintain healthy health factor may result in liquidations.`,
-      ..._risks,
+      ..._risks.slice(1),
     ];
     this.secondaryToken = secondaryTokenName;
     this.strategyAddress = strategyAddress;
@@ -375,6 +376,7 @@ export class DeltaNeutralMM extends IStrategy {
     const call = strategyContract.populate('withdraw', [
       uint256.bnToUint256(amount.toString()),
       address,
+      500, // 5% max slippage
     ]);
 
     const calls: Call[] = [call];

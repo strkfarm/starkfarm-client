@@ -1,7 +1,8 @@
 import CONSTANTS, { TokenName } from '@/constants';
 import { APRSplit, Category, PoolInfo, PoolMetadata, PoolType } from './pools';
 import { AtomWithQueryResult } from 'jotai-tanstack-query';
-import { StrategyAction } from '@/strategies/IStrategy';
+import { StrategyAction, StrategyLiveStatus } from '@/strategies/IStrategy';
+import { getPoolId } from './IDapp.store';
 
 export namespace LendingSpace {
   export interface MyBaseAprDoc {
@@ -66,6 +67,7 @@ export namespace LendingSpace {
 
         const poolInfo: PoolInfo = {
           pool: {
+            id: getPoolId(info.name, poolName),
             name: poolName,
             logos: [logo1],
           },
@@ -91,6 +93,11 @@ export namespace LendingSpace {
           },
           lending: {
             collateralFactor: 0,
+          },
+          additional: {
+            tags: [StrategyLiveStatus.ACTIVE],
+            isAudited: false, // TODO: Update this
+            riskFactor: 0.5,
           },
         };
         pools.push(poolInfo);

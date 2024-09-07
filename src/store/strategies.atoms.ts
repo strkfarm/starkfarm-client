@@ -1,5 +1,4 @@
 import { atom } from 'jotai';
-import { allPoolsAtomUnSorted } from './pools';
 import { AutoTokenStrategy } from '@/strategies/auto_strk.strat';
 import {
   IStrategy,
@@ -10,6 +9,7 @@ import CONSTANTS from '@/constants';
 import { DeltaNeutralMM } from '@/strategies/delta_neutral_mm';
 import Mustache from 'mustache';
 import { getTokenInfoFromName } from '@/utils';
+import { allPoolsAtomUnSorted } from './protocols';
 
 export interface StrategyInfo extends IStrategyProps {
   name: string;
@@ -34,7 +34,7 @@ export function getStrategies() {
     'zUSDC',
     CONSTANTS.CONTRACTS.AutoUsdcFarm,
     {
-      maxTVL: 50000,
+      maxTVL: 500000,
     },
   );
 
@@ -49,7 +49,7 @@ export function getStrategies() {
     [1, 0.615384615, 1, 0.584615385, 0.552509024], // precomputed factors based on strategy math
     StrategyLiveStatus.NEW,
     {
-      maxTVL: 50000,
+      maxTVL: 500000,
     },
   );
 
@@ -58,12 +58,11 @@ export function getStrategies() {
     'ETH Sensei',
     Mustache.render(DNMMDescription, { token1: 'ETH', token2: 'USDC' }),
     'USDC',
-    // ! change this later
-    CONSTANTS.CONTRACTS.DeltaNeutralMMUSDCETH,
-    [1, 0.608, 1, 0.552509, 0.552509], // precomputed factors based on strategy math
-    StrategyLiveStatus.COMING_SOON,
+    CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDC,
+    [1, 0.609886, 1, 0.920975, 0.510078], // precomputed factors based on strategy math
+    StrategyLiveStatus.NEW,
     {
-      maxTVL: 50000,
+      maxTVL: 100,
     },
   );
   const deltaNeutralMMSTRKETH = new DeltaNeutralMM(
@@ -71,12 +70,11 @@ export function getStrategies() {
     'STRK Sensei',
     Mustache.render(DNMMDescription, { token1: 'STRK', token2: 'ETH' }),
     'ETH',
-    // ! change this later
     CONSTANTS.CONTRACTS.DeltaNeutralMMSTRKETH,
     [1, 0.384615, 1, 0.492308, 0.233276], // precomputed factors based on strategy math, last is the excess deposit1 that is happening
     StrategyLiveStatus.NEW,
     {
-      maxTVL: 250000,
+      maxTVL: 500000,
     },
   );
 
@@ -96,14 +94,12 @@ export const STRATEGIES_INFO = getStrategies();
 export const strategiesAtom = atom<StrategyInfo[]>((get) => {
   const strategies = getStrategies();
   const allPools = get(allPoolsAtomUnSorted);
-  const filteredPools = allPools.filter(
-    (p) =>
-      p.protocol.name === 'zkLend' ||
-      p.protocol.name === 'Nostra Money Markets',
+  const requiredPools = allPools.filter(
+    (p) => p.protocol.name === 'zkLend' || p.protocol.name === 'Nostra',
   );
 
   for (const s of strategies) {
-    s.solve(filteredPools, '1000');
+    s.solve(requiredPools, '1000');
   }
 
   strategies.sort((a, b) => {

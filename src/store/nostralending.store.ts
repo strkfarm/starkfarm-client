@@ -3,13 +3,14 @@ import {
   APRSplit,
   PoolInfo,
   PoolMetadata,
-  ProtocolAtoms,
+  ProtocolAtoms2,
   StrkLendingIncentivesAtom,
 } from './pools';
 import { atom } from 'jotai';
-import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
+import { AtomWithQueryResult } from 'jotai-tanstack-query';
 import { LendingSpace } from './lending.base';
 import { IDapp } from './IDapp.store';
+import { customAtomWithFetch } from '@/utils/customAtomWithFetch';
 
 interface MyBaseAprDoc {
   _id: string;
@@ -63,7 +64,7 @@ const PoolAddresses: { [token: string]: NostraPoolFactor } = {
 };
 
 export class NostraLending extends IDapp<LendingSpace.MyBaseAprDoc[]> {
-  name = 'Nostra Money Markets';
+  name = 'Nostra';
   link = 'https://app.nostra.finance/';
   logo =
     'https://static-assets-8zct.onrender.com/integrations/nostra/logo_dark.jpg';
@@ -119,27 +120,25 @@ export class NostraLending extends IDapp<LendingSpace.MyBaseAprDoc[]> {
 }
 
 export const nostraLending = new NostraLending();
-const NostraLendingAtoms: ProtocolAtoms = {
-  baseAPRs: atomWithQuery((get) => ({
-    queryKey: ['nostra_lending_base_aprs'],
-    queryFn: async ({ queryKey }) => {
-      const res = await fetch(CONSTANTS.NOSTRA.LENDING_GRAPH_URL, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          dataSource: 'nostra-production',
-          database: 'prod-a-nostra-db',
-          collection: 'apyStats',
-          filter: { timestamp: { $gte: 1697500800 } },
-          sort: { timestamp: -1 },
-        }),
-      });
-      return res.json();
+const NostraLendingAtoms: ProtocolAtoms2 = {
+  baseAPRs: customAtomWithFetch({
+    queryKey: 'nostra_lending_base_aprs',
+    url: CONSTANTS.NOSTRA.LENDING_GRAPH_URL,
+    fetchOptions: {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        dataSource: 'nostra-production',
+        database: 'prod-a-nostra-db',
+        collection: 'apyStats',
+        filter: { timestamp: { $gte: 1697500800 } },
+        sort: { timestamp: -1 },
+      }),
     },
-  })),
+  }),
   pools: atom((get) => {
     const poolsInfo = get(StrkLendingIncentivesAtom);
     const empty: PoolInfo[] = [];

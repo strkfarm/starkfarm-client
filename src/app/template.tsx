@@ -1,6 +1,7 @@
 'use client';
 
 import Navbar from '@/components/Navbar';
+import { MY_STORE } from '@/store';
 import {
   Center,
   ChakraBaseProvider,
@@ -19,6 +20,9 @@ import { Toaster } from 'react-hot-toast';
 import { RpcProviderOptions, constants } from 'starknet';
 import { ArgentMobileConnector } from 'starknetkit/argentMobile';
 import { InjectedConnector } from 'starknetkit/injected';
+import { Inter } from 'next/font/google';
+
+const inter = Inter({ subsets: ['latin'] });
 
 mixpanel.init('118f29da6a372f0ccb6f541079cad56b');
 
@@ -26,22 +30,24 @@ const theme = extendTheme({
   colors: {
     transparent: 'rgba(0, 0, 0, 0)',
     opacity_50p: 'rgba(0, 0, 0, 0.5)',
-    color1: 'rgba(86, 118, 254, 1)',
-    color1_65p: 'rgba(86, 118, 254, 0.65)',
-    color1_50p: 'rgba(86, 118, 254, 0.5)',
-    color1_35p: 'rgba(86, 118, 254, 0.35)',
+    color1: 'rgba(53, 60, 79, 1)',
+    color1_65p: 'rgba(53, 60, 79, 0.65)',
+    color1_50p: 'rgba(53, 60, 79, 0.5)',
+    color1_35p: 'rgba(53, 60, 79, 0.35)',
     color1_light: '#bcc9ff80',
-    color2: 'rgb(127 73 229)',
-    color2Text: 'rgb(165 118 255)',
-    color2_65p: 'rgba(104, 51, 205, 0.65)',
-    color2_50p: 'rgba(104, 51, 205, 0.5)',
-    highlight: '#272932', // light grey
+    color2: 'rgba(132, 132, 195, 1)',
+    color2Text: 'rgb(184 184 239)',
+    color2_65p: 'rgba(132, 132, 195, 0.65)',
+    color2_50p: 'rgba(132, 132, 195, 0.15)',
+    highlight: '#1a1a27', // light grey
     light_grey: '#9d9d9d',
     disabled_text: '#818181',
     disabled_bg: '#5f5f5f',
-    purple: '#6F4FF2',
-    cyan: '#22F3DF',
-    bg: '#1A1C26', // dark blue
+    purple: '#6e53dc',
+    cyan: '#7DFACB',
+    bg: '#111119', // dark blue
+    grey_text: '#B6B6B6',
+    yellow: '#EFDB72',
   },
   fontSizes: {
     large: '50px',
@@ -56,10 +62,16 @@ const theme = extendTheme({
     MenuItem: {
       bg: 'highlight',
     },
+    Badge: {
+      baseStyle: {
+        lineHeight: 'initial',
+        borderRadius: '4px',
+      },
+    },
   },
   fonts: {
-    heading: `'Courier New', Courier, monospace`,
-    body: `'Courier New', Courier, monospace`,
+    heading: inter.style.fontFamily,
+    body: inter.style.fontFamily,
   },
 });
 
@@ -99,7 +111,7 @@ export default function Template({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <JotaiProvider>
+    <JotaiProvider store={MY_STORE}>
       <StarknetConfig
         chains={chains}
         provider={provider}
