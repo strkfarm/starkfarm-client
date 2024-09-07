@@ -4,6 +4,7 @@ import { atom } from 'jotai';
 import { PoolInfo, ProtocolAtoms } from './pools';
 import { Jediswap } from './jedi.store';
 import { atomWithQuery } from 'jotai-tanstack-query';
+import { StrategyLiveStatus } from '@/strategies/IStrategy';
 
 const poolConfigs = [
   { name: 'STRK/USDC Call Pool (STRK)', tokenA: 'STRK', tokenB: 'USDC' },
@@ -34,6 +35,7 @@ export class Carmine extends Jediswap {
         if (!poolData || !poolData.data) return;
 
         let category: Category;
+        const riskFactor = 3;
         if (config.name.endsWith('(USDC)')) {
           category = Category.Stable;
         } else if (config.name.endsWith('(STRK)')) {
@@ -55,6 +57,7 @@ export class Carmine extends Jediswap {
 
         const poolInfo: PoolInfo = {
           pool: {
+            id: this.getPoolId(this.name, config.name),
             name: config.name,
             logos: [logo1, logo2],
           },
@@ -85,6 +88,11 @@ export class Carmine extends Jediswap {
           borrow: {
             borrowFactor: 0,
             apr: 0,
+          },
+          additional: {
+            tags: [StrategyLiveStatus.ACTIVE],
+            isAudited: false, // TODO: Update this
+            riskFactor,
           },
         };
         pools.push(poolInfo);

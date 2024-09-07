@@ -94,14 +94,12 @@ export const STRATEGIES_INFO = getStrategies();
 export const strategiesAtom = atom<StrategyInfo[]>((get) => {
   const strategies = getStrategies();
   const allPools = get(allPoolsAtomUnSorted);
-  const filteredPools = allPools.filter(
-    (p) =>
-      p.protocol.name === 'zkLend' ||
-      p.protocol.name === 'Nostra Money Markets',
+  const requiredPools = allPools.filter(
+    (p) => p.protocol.name === 'zkLend' || p.protocol.name === 'Nostra',
   );
 
   for (const s of strategies) {
-    s.solve(filteredPools, '1000');
+    s.solve(requiredPools, '1000');
   }
 
   strategies.sort((a, b) => {

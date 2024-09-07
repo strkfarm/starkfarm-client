@@ -4,6 +4,7 @@ import tg from '@/assets/tg.svg';
 import { useDotButton } from '@/components/EmblaCarouselDotButton';
 import Pools from '@/components/Pools';
 import Strategies from '@/components/Strategies';
+import TVL from '@/components/TVL';
 import CONSTANTS from '@/constants';
 import { useWindowSize } from '@/utils/useWindowSize';
 
@@ -65,7 +66,7 @@ export default function Home() {
   }
 
   function handleTabsChange(index: number) {
-    if (index === 1) {
+    if (index === 0) {
       setRoute('pools');
     } else {
       setRoute('strategies');
@@ -79,7 +80,7 @@ export default function Home() {
   useEffect(() => {
     (async () => {
       const tab = searchParams.get('tab');
-      if (tab === 'pools') {
+      if (tab === 'strategies') {
         setTabIndex(1);
       } else {
         setTabIndex(0);
@@ -172,23 +173,17 @@ export default function Home() {
         </Box>
       </Box>
 
+      <TVL />
+
       <Tabs
         position="relative"
         variant="unstyled"
         width={'100%'}
         index={tabIndex}
         onChange={handleTabsChange}
+        marginTop={'10px'}
       >
         <TabList>
-          <Tab
-            color="light_grey"
-            _selected={{ color: 'purple' }}
-            onClick={() => {
-              mixpanel.track('Strategies opened');
-            }}
-          >
-            Strategies✨
-          </Tab>
           <Tab
             color="light_grey"
             _selected={{ color: 'purple' }}
@@ -197,6 +192,15 @@ export default function Home() {
             }}
           >
             Find yields
+          </Tab>
+          <Tab
+            color="light_grey"
+            _selected={{ color: 'purple' }}
+            onClick={() => {
+              mixpanel.track('Strategies opened');
+            }}
+          >
+            Strategies✨
           </Tab>
         </TabList>
         <TabIndicator
@@ -208,17 +212,17 @@ export default function Home() {
         />
         <TabPanels>
           <TabPanel bg="highlight" width={'100%'} float={'left'}>
-            <Strategies />
+            <Pools />
           </TabPanel>
           <TabPanel bg="highlight" float={'left'} width={'100%'}>
-            <Pools />
+            <Strategies />
           </TabPanel>
         </TabPanels>
       </Tabs>
       {/* <hr style={{width: '100%', borderColor: '#5f5f5f', float: 'left', margin: '20px 0'}}/> */}
       <Center padding="10px 0" width={'100%'} float={'left'}>
         <Link href={CONSTANTS.COMMUNITY_TG} isExternal>
-          <ChakraImage src={tg.src} width="50" margin="0 auto" />
+          <ChakraImage src={tg.src} width="20" margin="0 auto" />
         </Link>
       </Center>
       <Center width={'100%'} float="left">

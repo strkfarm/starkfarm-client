@@ -64,7 +64,7 @@ const PoolAddresses: { [token: string]: NostraPoolFactor } = {
 };
 
 export class NostraLending extends IDapp<LendingSpace.MyBaseAprDoc[]> {
-  name = 'Nostra Money Markets';
+  name = 'Nostra';
   link = 'https://app.nostra.finance/';
   logo =
     'https://static-assets-8zct.onrender.com/integrations/nostra/logo_dark.jpg';

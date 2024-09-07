@@ -3,9 +3,10 @@ import { Category, PoolType } from './pools';
 import { atom } from 'jotai';
 import { PoolInfo, ProtocolAtoms, StrkIncentivesAtom } from './pools';
 import { Jediswap } from './jedi.store';
+import { StrategyLiveStatus } from '@/strategies/IStrategy';
 
 export class NostraDex extends Jediswap {
-  name = 'Nostra DEX';
+  name = 'Nostra';
   link = 'https://app.nostra.finance/pools';
   logo =
     'https://static-assets-8zct.onrender.com/integrations/nostra/logo_dark.jpg';
@@ -17,22 +18,32 @@ export class NostraDex extends Jediswap {
       if (!myData) return [];
       const pools: PoolInfo[] = [];
 
+      const supportedPools = ['ETH-USDC', 'STRK-ETH', 'STRK-USDC', 'USDC-USDT'];
       // Filter and map only the required pools
       Object.values(myData)
         .filter((poolData: any) => {
           const id = poolData.id;
-          return id === 'ETH-USDC' || id === 'STRK-ETH' || id === 'STRK-USDC';
+          return supportedPools.includes(id);
         })
         .forEach((poolData: any) => {
-          const category = Category.Others;
           const tokens: TokenName[] = [poolData.tokenA, poolData.tokenB];
           const logo1 = CONSTANTS.LOGOS[tokens[0]];
           const logo2 = CONSTANTS.LOGOS[tokens[1]];
           const baseApr =
             poolData.baseApr === '0' ? 0.0 : parseFloat(poolData.baseApr);
           const rewardApr = parseFloat(poolData.rewardApr);
+
+          let category = Category.Others;
+          let riskFactor = 3;
+          if (poolData.id === 'USDC-USDT') {
+            category = Category.Stable;
+            riskFactor = 0.5;
+          } else if (poolData.id.includes('STRK')) {
+            category = Category.STRK;
+          }
           const poolInfo: PoolInfo = {
             pool: {
+              id: this.getPoolId(this.name, poolData.id.slice(0, -6)),
               name: poolData.id,
               logos: [logo1, logo2],
             },
@@ -63,6 +74,11 @@ export class NostraDex extends Jediswap {
             borrow: {
               borrowFactor: 0,
               apr: 0,
+            },
+            additional: {
+              riskFactor,
+              tags: [StrategyLiveStatus.ACTIVE],
+              isAudited: false, // TODO: Update this
             },
           };
           pools.push(poolInfo);
