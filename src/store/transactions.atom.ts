@@ -9,6 +9,8 @@ import toast from 'react-hot-toast';
 import { RpcProvider, TransactionExecutionStatus } from 'starknet';
 import { StrategyInfo, strategiesAtom } from './strategies.atoms';
 import { createAtomWithStorage } from './utils.atoms';
+import { gql } from '@apollo/client';
+import apolloClient from '@/utils/apolloClient';
 
 export interface StrategyTxProps {
   strategyId: string;
@@ -47,6 +49,28 @@ async function deserialiseTxInfo(key: string, initialValue: TransactionInfo[]) {
     }
     tx.createdAt = new Date(tx.createdAt);
   });
+
+  // TODO: fix graphql query
+  try {
+    const { data } = await apolloClient.query({
+      query: gql`
+        query GetExampleData {
+          exampleData {
+            id
+            name
+            description
+          }
+        }
+      `,
+    });
+
+    console.log('apollo data', data);
+  } catch (error) {
+    console.error('GraphQL Error:', error);
+  }
+
+  // console.log('apollo data', data);
+
   return txs;
 }
 

@@ -43,60 +43,12 @@ import {
 } from '@/store/transactions.atom';
 import { getUniqueById, shortAddress } from '@/utils';
 import { StrategyParams } from '../page';
-import { gql, useQuery } from '@apollo/client';
 
 const Strategy = ({ params }: StrategyParams) => {
   const { address } = useAccount();
   const strategies = useAtomValue(strategiesAtom);
   const transactions = useAtomValue(transactionsAtom);
   const [isMounted, setIsMounted] = useState(false);
-
-  // const query = gql`
-  //   query Query($where: Investment_flowsWhereInput, $skip: Int, $take: Int) {
-  //     findManyInvestment_flows(where: $where, skip: $skip, take: $take) {
-  //       amount
-  //       timestamp
-  //       type
-  //       txHash
-  //     }
-  //   }
-  // `;
-
-  const query = gql`
-    query Query {
-      findManyInvestment_flows {
-        amount
-        timestamp
-        type
-        txHash
-      }
-    }
-  `;
-
-  const { loading, error, data } = useQuery(query, {
-    // variables: {
-    //   where: {
-    //     contract: {
-    //       equals:
-    //         '0x4937b58e05a3a2477402d1f74e66686f58a61a5070fcc6f694fb9a0b3bae422',
-    //     },
-    //     owner: {
-    //       equals:
-    //         '0x55741fd3ec832f7b9500e24a885b8729f213357be4a8e209c4bca1f3b909ae',
-    //     },
-    //   },
-    //   skip: 0,
-    //   take: 10,
-    // },
-  });
-
-  console.log('apollo data', data);
-  console.log('appolo error', error);
-
-  useEffect(() => {
-    console.log('apollo data', data);
-    console.log('appolo error', error);
-  }, [data, error]);
 
   useEffect(() => {
     console.log('txs', transactions);
