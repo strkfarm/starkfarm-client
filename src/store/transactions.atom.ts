@@ -27,6 +27,59 @@ export interface TransactionInfo {
   createdAt: Date;
 }
 
+export interface TransactionHistory {
+  amount: string;
+  timestamp: number;
+  txHash: string;
+  type: 'deposit' | 'withdraw';
+}
+
+async function getTxHistory(
+  contract: string,
+  owner: string,
+): Promise<TransactionHistory[]> {
+  let txHistory: TransactionHistory[] = [];
+
+  try {
+    const { data } = await apolloClient.query({
+      query: gql`
+        query Query(
+          $where: Investment_flowsWhereInput
+          $skip: Int
+          $take: Int
+        ) {
+          findManyInvestment_flows(where: $where, skip: $skip, take: $take) {
+            amount
+            timestamp
+            type
+            txHash
+          }
+        }
+      `,
+      variables: {
+        where: {
+          contract: {
+            equals: contract,
+          },
+          owner: {
+            equals: owner,
+          },
+        },
+        skip: 0,
+        take: 10,
+      },
+    });
+
+    if (data) {
+      txHistory = data.findManyInvestment_flows;
+    }
+  } catch (error) {
+    console.error('GraphQL Error:', error);
+  }
+
+  return txHistory;
+}
+
 // in local storage, objects like Date, MyNumber are stored as strings
 // this function deserialises them back to their original types
 // declare let localStorage: any;
@@ -49,28 +102,6 @@ async function deserialiseTxInfo(key: string, initialValue: TransactionInfo[]) {
     }
     tx.createdAt = new Date(tx.createdAt);
   });
-
-  // TODO: fix graphql query
-  try {
-    const { data } = await apolloClient.query({
-      query: gql`
-        query GetExampleData {
-          exampleData {
-            id
-            name
-            description
-          }
-        }
-      `,
-    });
-
-    console.log('apollo data', data);
-  } catch (error) {
-    console.error('GraphQL Error:', error);
-  }
-
-  // console.log('apollo data', data);
-
   return txs;
 }
 
