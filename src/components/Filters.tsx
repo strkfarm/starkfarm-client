@@ -22,7 +22,6 @@ import {
 import { getTokenInfoFromName } from '@/utils';
 import { Category, PoolType } from '@/store/pools';
 import mixpanel from 'mixpanel-browser';
-import { mix } from 'framer-motion';
 
 export function ProtocolFilters() {
   const protocolsFilter = useAtomValue(filterAtoms.protocolsAtom);
@@ -69,7 +68,9 @@ export function ProtocolFilters() {
             console.log('updateFilters', updatedProtocols);
             mixpanel.track('Protocol Filter', {
               protocol: p.name,
-              selected: updatedProtocols.includes(p.name) || updatedProtocols.includes(ALL_FILTER),
+              selected:
+                updatedProtocols.includes(p.name) ||
+                updatedProtocols.includes(ALL_FILTER),
               updatedProtocols: JSON.stringify(updatedProtocols),
             });
             updateFilters('protocols', updatedProtocols);
@@ -172,7 +173,6 @@ export function CategoryFilters() {
       category: category.valueOf(),
       selected: isCategoryAdded,
     });
-        
   }
 
   function updateRiskLevel(riskLevels: string[], riskLevel = 'low') {
@@ -196,7 +196,7 @@ export function CategoryFilters() {
     });
 
     mixpanel.track('Risk Filter', {
-      riskLevel: riskLevel,
+      riskLevel,
       selected: isSelected,
     });
   }
