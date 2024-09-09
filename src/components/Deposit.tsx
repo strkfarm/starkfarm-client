@@ -33,6 +33,7 @@ import mixpanel from 'mixpanel-browser';
 import { useMemo, useState } from 'react';
 import { ProviderInterface } from 'starknet';
 import { BigNumber } from '@ethersproject/bignumber';
+import { constants, uint256 } from 'starknet';
 
 import LoadingWrap from './LoadingWrap';
 import TxButton from './TxButton';
@@ -98,11 +99,8 @@ export default function Deposit(props: DepositProps) {
   // const { balance, isLoading, isError } = useERC20Balance(selectedMarket);
   const maxAmount: MyNumber = useMemo(() => {
     if (props.buttonText === 'Redeem') {
-      // For withdrawals, use the maximum possible value
-      return MyNumber.fromEther(
-        BigNumber.from(2).pow(256).sub(1).toString(),
-        selectedMarket.decimals
-      );
+      // For withdrawals, use a large value (but not the maximum uint256)
+      return MyNumber.fromEther('1000000000000000000000000000', selectedMarket.decimals);
     }
 
     const currentTVl = tvlInfo.data?.amount || MyNumber.fromZero();
@@ -174,15 +172,21 @@ export default function Deposit(props: DepositProps) {
               color: 'color_50p',
             }}
             onClick={() => {
-              setAmount(maxAmount);
-              setRawAmount(maxAmount.toEtherStr());
+              let maxValue;
+              if (props.buttonText === 'Redeem') {
+                maxValue = balance; // Use actual balance for max withdrawal
+              } else {
+                maxValue = maxAmount;
+              }
+              setAmount(maxValue);
+              setRawAmount(maxValue.toEtherStr());
               mixpanel.track('Chose max amount', {
                 strategyId: props.strategy.id,
                 strategyName: props.strategy.name,
                 buttonText: props.buttonText,
-                amount: amount.toEtherStr(),
+                amount: maxValue.toEtherStr(),
                 token: selectedMarket.name,
-                maxAmount: maxAmount.toEtherStr(),
+                maxAmount: maxValue.toEtherStr(),
                 address,
               });
             }}
@@ -258,7 +262,11 @@ export default function Deposit(props: DepositProps) {
       {/* add min max validations and show err */}
       <NumberInput
         min={0}
-        max={props.buttonText === 'Redeem' ? undefined : parseFloat(maxAmount.toEtherStr())}
+        max={
+          props.buttonText === 'Redeem'
+            ? undefined
+            : parseFloat(maxAmount.toEtherStr())
+        }
         step={parseFloat(selectedMarket.stepAmount.toEtherStr())}
         color={'white'}
         bg={'bg'}
@@ -302,11 +310,17 @@ export default function Deposit(props: DepositProps) {
           Require amount {'>'} 0
         </Text>
       )}
-      {props.buttonText === 'Deposit' && amount.compare(maxAmount.toEtherStr(), 'gt') && (
-        <Text marginTop="2px" marginLeft={'7px'} color="red" fontSize={'13px'}>
-          Amount to be less than {maxAmount.toEtherToFixedDecimals(2)}
-        </Text>
-      )}
+      {props.buttonText === 'Deposit' &&
+        amount.compare(maxAmount.toEtherStr(), 'gt') && (
+          <Text
+            marginTop="2px"
+            marginLeft={'7px'}
+            color="red"
+            fontSize={'13px'}
+          >
+            Amount to be less than {maxAmount.toEtherToFixedDecimals(2)}
+          </Text>
+        )}
 
       <Center marginTop={'10px'}>
         <TxButton
