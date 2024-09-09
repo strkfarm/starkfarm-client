@@ -21,6 +21,7 @@ import {
 } from '@/store/protocols';
 import { getTokenInfoFromName } from '@/utils';
 import { Category, PoolType } from '@/store/pools';
+import mixpanel from 'mixpanel-browser';
 
 export function ProtocolFilters() {
   const protocolsFilter = useAtomValue(filterAtoms.protocolsAtom);
@@ -65,6 +66,13 @@ export function ProtocolFilters() {
               updatedProtocols = [ALL_FILTER];
             }
             console.log('updateFilters', updatedProtocols);
+            mixpanel.track('Protocol Filter', {
+              protocol: p.name,
+              selected:
+                updatedProtocols.includes(p.name) ||
+                updatedProtocols.includes(ALL_FILTER),
+              updatedProtocols: JSON.stringify(updatedProtocols),
+            });
             updateFilters('protocols', updatedProtocols);
           }}
           key={p.name}
@@ -121,6 +129,9 @@ export function ProtocolFilters() {
                 'protocols',
                 atleastOneProtocolSelected() ? [] : [ALL_FILTER],
               );
+              mixpanel.track('Clear/Select all protocols', {
+                atleastOneProtocolSelected: atleastOneProtocolSelected(),
+              });
             }}
             _hover={{
               bg: atleastOneProtocolSelected() ? 'bg' : 'purple',
@@ -144,6 +155,7 @@ export function CategoryFilters() {
     const existingCategories = categoriesFilter.includes(ALL_FILTER)
       ? []
       : categoriesFilter;
+    let isCategoryAdded = false;
     console.log('filter34', 'categories', existingCategories);
     if (existingCategories.includes(category)) {
       const newFilters = existingCategories.filter(
@@ -155,13 +167,20 @@ export function CategoryFilters() {
       );
     } else {
       updateFilters('categories', [...existingCategories, category.valueOf()]);
+      isCategoryAdded = true;
     }
+    mixpanel.track('Category Filter', {
+      category: category.valueOf(),
+      selected: isCategoryAdded,
+    });
   }
 
-  function updateRiskLevel(riskLevels: string[]) {
+  function updateRiskLevel(riskLevels: string[], riskLevel = 'low') {
     let existingRiskLevels = riskLevelFilters.includes(ALL_FILTER)
       ? []
       : riskLevelFilters;
+
+    let isSelected = false;
     console.log('filter34', 'riskLevels', existingRiskLevels);
     riskLevels.map((riskLevel) => {
       if (existingRiskLevels.includes(riskLevel)) {
@@ -171,16 +190,23 @@ export function CategoryFilters() {
         updateFilters('risk', existingRiskLevels);
       } else {
         existingRiskLevels = [...existingRiskLevels, riskLevel];
+        isSelected = true;
         updateFilters('risk', existingRiskLevels);
       }
     });
+
+    mixpanel.track('Risk Filter', {
+      riskLevel,
+      selected: isSelected,
+    });
   }
 
-  function updatePoolType(types: PoolType[]) {
+  function updatePoolType(types: PoolType[], name: string) {
     let existingPoolTypes = poolTypeFilters.includes(ALL_FILTER)
       ? []
       : poolTypeFilters;
     console.log('filter34', 'poolType', existingPoolTypes);
+    let isSelected = false;
     types.map((type) => {
       if (existingPoolTypes.includes(type.valueOf())) {
         const newFilters = existingPoolTypes.filter(
@@ -190,8 +216,13 @@ export function CategoryFilters() {
         updateFilters('poolTypes', existingPoolTypes);
       } else {
         existingPoolTypes = [...existingPoolTypes, type.valueOf()];
+        isSelected = true;
         updateFilters('poolTypes', existingPoolTypes);
       }
+    });
+    mixpanel.track('Pool Type Filter', {
+      poolType: name,
+      selected: isSelected,
     });
   }
 
@@ -317,7 +348,7 @@ export function CategoryFilters() {
         padding={'8px 10px'}
         as={'button'}
         onClick={() => {
-          updatePoolType([PoolType.DEXV2, PoolType.DEXV3]);
+          updatePoolType([PoolType.DEXV2, PoolType.DEXV3], 'DEX');
         }}
         bg={
           poolTypeFilters.includes(PoolType.DEXV2.valueOf()) ||
@@ -345,7 +376,7 @@ export function CategoryFilters() {
         padding={'8px 10px'}
         as={'button'}
         onClick={() => {
-          updatePoolType([PoolType.Lending]);
+          updatePoolType([PoolType.Lending], 'Lending');
         }}
         bg={poolTypeFilters.includes(PoolType.Lending) ? 'purple' : 'color1'}
         marginBottom={'10px'}
@@ -363,7 +394,7 @@ export function CategoryFilters() {
         padding={'8px 10px'}
         as={'button'}
         onClick={() => {
-          updatePoolType([PoolType.Derivatives]);
+          updatePoolType([PoolType.Derivatives], 'Derivatives');
         }}
         bg={
           poolTypeFilters.includes(PoolType.Derivatives) ? 'purple' : 'color1'
@@ -389,6 +420,7 @@ export function CategoryFilters() {
           updateFilters('categories', [ALL_FILTER]);
           updateFilters('risk', [ALL_FILTER]);
           updateFilters('poolTypes', [ALL_FILTER]);
+          mixpanel.track('Reset Filters');
         }}
         marginBottom={'10px'}
       >
