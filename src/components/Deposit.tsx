@@ -32,6 +32,7 @@ import { useAtomValue } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useMemo, useState } from 'react';
 import { ProviderInterface } from 'starknet';
+import { BigNumber } from 'ethers';
 import LoadingWrap from './LoadingWrap';
 import TxButton from './TxButton';
 
@@ -95,6 +96,14 @@ export default function Deposit(props: DepositProps) {
   }, [balData]);
   // const { balance, isLoading, isError } = useERC20Balance(selectedMarket);
   const maxAmount: MyNumber = useMemo(() => {
+    if (props.buttonText === 'Redeem') {
+      // For withdrawals, use the maximum possible value
+      return MyNumber.fromEther(
+        BigNumber.from(2).pow(256).sub(1).toString(),
+        selectedMarket.decimals
+      );
+    }
+
     const currentTVl = tvlInfo.data?.amount || MyNumber.fromZero();
     const maxAllowed =
       props.strategy.settings.maxTVL - Number(currentTVl.toEtherStr());
@@ -118,7 +127,7 @@ export default function Deposit(props: DepositProps) {
     console.log('Deposit:: reducedBalance2', reducedBalance.toEtherStr());
     const min = MyNumber.min(reducedBalance, adjustedMaxAllowed);
     return MyNumber.max(min, MyNumber.fromEther('0', selectedMarket.decimals));
-  }, [balance, props.strategy, selectedMarket]);
+  }, [balance, props.strategy, selectedMarket, props.buttonText]);
 
   function BalanceComponent(props: {
     token: TokenInfo;
@@ -248,7 +257,7 @@ export default function Deposit(props: DepositProps) {
       {/* add min max validations and show err */}
       <NumberInput
         min={0}
-        max={parseFloat(maxAmount.toEtherStr())}
+        max={props.buttonText === 'Redeem' ? undefined : parseFloat(maxAmount.toEtherStr())}
         step={parseFloat(selectedMarket.stepAmount.toEtherStr())}
         color={'white'}
         bg={'bg'}
@@ -292,7 +301,7 @@ export default function Deposit(props: DepositProps) {
           Require amount {'>'} 0
         </Text>
       )}
-      {amount.compare(maxAmount.toEtherStr(), 'gt') && (
+      {props.buttonText === 'Deposit' && amount.compare(maxAmount.toEtherStr(), 'gt') && (
         <Text marginTop="2px" marginLeft={'7px'} color="red" fontSize={'13px'}>
           Amount to be less than {maxAmount.toEtherToFixedDecimals(2)}
         </Text>
