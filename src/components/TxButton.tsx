@@ -61,6 +61,7 @@ export default function TxButton(props: TxButtonProps) {
 
   useEffect(() => {
     if (data && data.transaction_hash) {
+      props.resetDepositForm();
       // initiates a toast and adds the tx to tx history if successful
       monitorNewTx({
         txHash: data.transaction_hash,
@@ -71,7 +72,6 @@ export default function TxButton(props: TxButtonProps) {
     }
 
     if (isSuccess && data && data.transaction_hash) {
-      props.resetDepositForm();
       mixpanel.track('Transaction success', {
         strategyId: props.txInfo.strategyId,
         actionType: props.txInfo.actionType,
