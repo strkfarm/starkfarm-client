@@ -32,9 +32,10 @@ import { useAtomValue } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useMemo, useState } from 'react';
 import { ProviderInterface } from 'starknet';
-import { BigNumber } from 'ethers';
+import { uint256 } from 'starknet';
 import LoadingWrap from './LoadingWrap';
 import TxButton from './TxButton';
+import { constants } from 'starknet';
 
 interface DepositProps {
   strategy: StrategyInfo;
@@ -98,10 +99,10 @@ export default function Deposit(props: DepositProps) {
   const maxAmount: MyNumber = useMemo(() => {
     if (props.buttonText === 'Redeem') {
       // For withdrawals, use the maximum possible value
-      return MyNumber.fromEther(
-        BigNumber.from(2).pow(256).sub(1).toString(),
-        selectedMarket.decimals
+      const maxUint256 = uint256.bnToUint256(
+        '115792089237316195423570985008687907853269984665640564039457584007913129639935'
       );
+      return MyNumber.from(maxUint256, selectedMarket.decimals);
     }
 
     const currentTVl = tvlInfo.data?.amount || MyNumber.fromZero();
