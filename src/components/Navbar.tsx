@@ -33,6 +33,7 @@ import {
   MyMenuListProps,
   truncate,
   shortAddress,
+  standariseAddress,
 } from '@/utils';
 import fulllogo from '@public/fulllogo.png';
 import {
@@ -88,12 +89,16 @@ export default function Navbar(props: NavbarProps) {
   useEffect(() => {
     (async () => {
       if (address) {
-        mixpanel.track('wallet connect trigger', {
-          address,
+        const standardAddr = standariseAddress(address);
+        const userProps = {
+          address: standardAddr,
           ethAmount: await getTokenBalance('ETH', address),
           usdcAmount: await getTokenBalance('USDC', address),
           strkAmount: await getTokenBalance('STRK', address),
-        });
+        };
+        mixpanel.track('wallet connect trigger', userProps);
+        mixpanel.identify(standariseAddress(standardAddr));
+        mixpanel.people.set(userProps);
       }
     })();
   }, [address]);

@@ -245,7 +245,9 @@ export default function TxButton(props: TxButtonProps) {
               mixpanel.track('Submitted tx', {
                 strategyId: props.txInfo.strategyId,
                 txHash: tx.transaction_hash,
+                text: props.text,
                 address,
+                buttonText: props.buttonText,
               });
             });
             // }
