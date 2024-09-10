@@ -47,6 +47,8 @@ interface DepositProps {
   ) => IStrategyActionHook[];
 }
 
+//max amount is not working
+
 export default function Deposit(props: DepositProps) {
   const { address } = useAccount();
   const { provider } = useProvider();
@@ -104,16 +106,17 @@ export default function Deposit(props: DepositProps) {
     );
     let reducedBalance = balance;
 
-    if (selectedMarket.name === 'STRK') {
-      reducedBalance = balance.subtract(
-        MyNumber.fromEther('1.5', selectedMarket.decimals),
-      );
-    } else if (selectedMarket.name === 'ETH') {
-      reducedBalance = balance.subtract(
-        MyNumber.fromEther('0.001', selectedMarket.decimals),
-      );
+    if (props.buttonText === 'Deposit') {
+      if (selectedMarket.name === 'STRK') {
+        reducedBalance = balance.subtract(
+          MyNumber.fromEther('1.5', selectedMarket.decimals),
+        );
+      } else if (selectedMarket.name === 'ETH') {
+        reducedBalance = balance.subtract(
+          MyNumber.fromEther('0.001', selectedMarket.decimals),
+        );
+      }
     }
-
     console.log('Deposit:: reducedBalance2', reducedBalance.toEtherStr());
     const min = MyNumber.min(reducedBalance, adjustedMaxAllowed);
     return MyNumber.max(min, MyNumber.fromEther('0', selectedMarket.decimals));
@@ -163,15 +166,13 @@ export default function Deposit(props: DepositProps) {
               color: 'color_50p',
             }}
             onClick={() => {
-              const maxAmountToSet =
-                props.buttonText === 'Redeem' ? balance : maxAmount;
-              setAmount(maxAmountToSet);
-              setRawAmount(maxAmountToSet.toEtherStr());
+              setAmount(maxAmount);
+              setRawAmount(maxAmount.toEtherStr());
               mixpanel.track('Chose max amount', {
                 strategyId: props.strategy.id,
                 strategyName: props.strategy.name,
                 buttonText: props.buttonText,
-                amount: maxAmountToSet.toEtherStr(),
+                amount: amount.toEtherStr(),
                 token: selectedMarket.name,
                 maxAmount: maxAmount.toEtherStr(),
                 address,
@@ -295,8 +296,7 @@ export default function Deposit(props: DepositProps) {
       )}
       {amount.compare(maxAmount.toEtherStr(), 'gt') && (
         <Text marginTop="2px" marginLeft={'7px'} color="red" fontSize={'13px'}>
-          Amount to be less than or equal to{' '}
-          {maxAmount.toEtherToFixedDecimals(2)}
+          Amount to be less than {maxAmount.toEtherToFixedDecimals(2)}
         </Text>
       )}
 
