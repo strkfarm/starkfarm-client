@@ -215,8 +215,8 @@ export default function Navbar(props: NavbarProps) {
           color="#a5a5d9"
         >
           <b>
-            STRKFarm just got <Text color="orange">audited</Text> by one of the top auditors in the
-            ecosystem.
+            STRKFarm just got <span className="orange">audited</span> by one of
+            the top auditors in the ecosystem.
             <Link
               target="_blank"
               href="https://x.com/strkfarm/status/1833071604856987678"

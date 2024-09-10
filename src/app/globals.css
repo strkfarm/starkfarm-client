@@ -141,3 +141,7 @@ td, th {
 th {
   color: var(--chakra-colors-color2Text) !important;
 }
+
+.orange {
+  color: orange;
+}
