@@ -7,7 +7,7 @@ import { RpcProvider } from 'starknet';
 import { getStrategies } from '@/store/strategies.atoms';
 import { MY_STORE } from '@/store';
 import MyNumber from '@/utils/MyNumber';
-import { NFTInfo, TokenInfo } from '@/strategies/IStrategy';
+import { IStrategy, NFTInfo, TokenInfo } from '@/strategies/IStrategy';
 
 export const revalidate = 3600; // 1 hr
 
@@ -34,6 +34,26 @@ const provider = new RpcProvider({
   nodeUrl: process.env.RPC_URL || 'https://starknet-mainnet.public.blastapi.io',
 });
 
+async function getStrategyInfo(strategy: IStrategy) {
+  const tvl = await strategy.getTVL();
+
+  return {
+    name: strategy.name,
+    id: strategy.id,
+    apy: strategy.netYield,
+    depositToken: strategy
+      .depositMethods(MyNumber.fromZero(), '', provider)
+      .map((t) => t.tokenInfo.token),
+    leverage: strategy.leverage,
+    contract: strategy.holdingTokens.map((t) => ({
+      name: t.name,
+      address: (<any>t).token ? (<TokenInfo>t).token : (<NFTInfo>t).address,
+    })),
+    tvlUsd: tvl.usdValue || 0,
+    status: strategy.liveStatus,
+  };
+}
+
 export async function GET(req: Request) {
   const allPools = await getPools(MY_STORE);
   const strategies = getStrategies();
@@ -41,27 +61,17 @@ export async function GET(req: Request) {
     strategy.solve(allPools, '1000');
   });
 
+  const stratsDataProms: any[] = [];
+  for (let i = 0; i < strategies.length; i++) {
+    stratsDataProms.push(getStrategyInfo(strategies[i]));
+  }
+
+  const stratsData = await Promise.all(stratsDataProms);
+
   try {
     return NextResponse.json({
       status: true,
-      strategies: strategies.map((s) => {
-        return {
-          name: s.name,
-          id: s.id,
-          apy: s.netYield,
-          depositToken: s
-            .depositMethods(MyNumber.fromZero(), '', provider)
-            .map((t) => t.tokenInfo.token),
-          leverage: s.leverage,
-          contract: s.holdingTokens.map((t) => ({
-            name: t.name,
-            address: (<any>t).token
-              ? (<TokenInfo>t).token
-              : (<NFTInfo>t).address,
-          })),
-          status: s.liveStatus,
-        };
-      }),
+      strategies: stratsData,
     });
   } catch (err) {
     console.error('Error /api/strategies', err);
