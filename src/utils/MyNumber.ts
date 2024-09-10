@@ -32,23 +32,14 @@ export default class MyNumber {
   }
 
   toEtherStr() {
-    if (this.isMaxUint256()) {
-      return 'MAX';
-    }
     return ethers.formatUnits(this.bigNumber.toFixed(), this.decimals);
   }
 
   toFixedStr(decimals: number) {
-    if (this.isMaxUint256()) {
-      return 'MAX';
-    }
     return Number(this.toEtherStr()).toFixed(decimals);
   }
 
   toEtherToFixedDecimals(decimals: number) {
-    if (this.isMaxUint256()) {
-      return 'MAX';
-    }
     // rounding down
     return (
       Math.floor(parseFloat(this.toEtherStr()) * 10 ** decimals) /
@@ -60,10 +51,6 @@ export default class MyNumber {
     return this.bigNumber.eq('0');
   }
 
-  eq(other: MyNumber) {
-    return this.bigNumber.eq(other.bigNumber);
-  }
-
   /**
    *
    * @param amountEther in token terms without decimal e.g. 1 for 1 STRK
@@ -72,20 +59,17 @@ export default class MyNumber {
    * @dev Add more commands as needed
    */
   compare(amountEther: string, command: 'gte' | 'gt' | 'lt') {
-    if (this.isMaxUint256()) {
-      return command === 'lt'; // MAX is never less than any value
-    }
-    if (amountEther === 'MAX') {
-      return this.bigNumber[command](MyNumber.MAX_UINT256.bigNumber);
-    }
     const fullNum = new BigNumber(
       ethers.parseUnits(amountEther, this.decimals).toString(),
     );
     return this.bigNumber[command](fullNum);
   }
 
-  operate(command: 'div' | 'plus', value: string | number) {
+  operate(command: 'div' | 'plus' | 'times', value: string | number) {
     const bn = new BigNumber(Number(value).toFixed(6));
+    if (command === 'times') {
+      return new MyNumber(this.bigNumber.times(bn).toFixed(0), this.decimals);
+    }
     return new MyNumber(this.bigNumber[command](bn).toFixed(0), this.decimals);
   }
 
@@ -124,15 +108,6 @@ export default class MyNumber {
       bn.toString(),
       a.decimals > b.decimals ? a.decimals : b.decimals,
     );
-  }
-
-  static MAX_UINT256 = new MyNumber(
-    '115792089237316195423570985008687907853269984665640564039457584007913129639935',
-    0,
-  );
-
-  isMaxUint256() {
-    return this.eq(MyNumber.MAX_UINT256);
   }
 
   [customInspectSymbol](depth: any, inspectOptions: any, inspect: any) {

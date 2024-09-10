@@ -30,7 +30,7 @@ import {
 import { useAccount, useProvider } from '@starknet-react/core';
 import { useAtomValue } from 'jotai';
 import mixpanel from 'mixpanel-browser';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { ProviderInterface } from 'starknet';
 import LoadingWrap from './LoadingWrap';
 import TxButton from './TxButton';
@@ -46,13 +46,13 @@ interface DepositProps {
     provider: ProviderInterface,
   ) => IStrategyActionHook[];
 }
-
-//max amount is not working
+//fix max amount
 
 export default function Deposit(props: DepositProps) {
   const { address } = useAccount();
   const { provider } = useProvider();
   const [dirty, setDirty] = useState(false);
+  const [maxClicked, setMaxClicked] = useState(false);
 
   const tvlInfo = useAtomValue(props.strategy.tvlAtom);
 
@@ -119,8 +119,16 @@ export default function Deposit(props: DepositProps) {
     }
     console.log('Deposit:: reducedBalance2', reducedBalance.toEtherStr());
     const min = MyNumber.min(reducedBalance, adjustedMaxAllowed);
-    return MyNumber.max(min, MyNumber.fromEther('0', selectedMarket.decimals));
-  }, [balance, props.strategy, selectedMarket]);
+    const maxWithBuffer = min.operate('times', 0.9999); // Use 99.99% of max
+    return MyNumber.max(maxWithBuffer, MyNumber.fromEther('0', selectedMarket.decimals));
+  }, [balance, props.strategy, selectedMarket, tvlInfo.data?.amount]);
+
+  useEffect(() => {
+    if (maxClicked) {
+      setAmount(maxAmount);
+      setRawAmount(maxAmount.toEtherStr());
+    }
+  }, [maxAmount, maxClicked]);
 
   function BalanceComponent(props: {
     token: TokenInfo;
@@ -168,6 +176,7 @@ export default function Deposit(props: DepositProps) {
             onClick={() => {
               setAmount(maxAmount);
               setRawAmount(maxAmount.toEtherStr());
+              setMaxClicked(true);
               mixpanel.track('Chose max amount', {
                 strategyId: props.strategy.id,
                 strategyName: props.strategy.name,
@@ -256,6 +265,7 @@ export default function Deposit(props: DepositProps) {
         bg={'bg'}
         borderRadius={'10px'}
         onChange={(value) => {
+          setMaxClicked(false);
           if (value && Number(value) > 0)
             setAmount(MyNumber.fromEther(value, selectedMarket.decimals));
           else {

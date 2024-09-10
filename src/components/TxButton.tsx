@@ -25,6 +25,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { TwitterShareButton } from 'react-share';
 import { Call } from 'starknet';
+import { ethers } from 'ethers';
 
 interface TxButtonProps {
   txInfo: StrategyTxProps;
@@ -55,7 +56,17 @@ export default function TxButton(props: TxButtonProps) {
 
   const { writeAsync, data, status, isSuccess, isPending, error, isError } =
     useContractWrite({
-      calls: props.calls,
+      calls: useMemo(() => {
+        if (props.buttonText === 'Redeem') {
+          return props.calls.map(call => ({
+            ...call,
+            calldata: call.calldata 
+              ? [ethers.MaxUint256.toString(), ...call.calldata.slice(1)]
+              : undefined
+          }));
+        }
+        return props.calls;
+      }, [props.calls, props.buttonText]),
     });
 
   useEffect(() => {
