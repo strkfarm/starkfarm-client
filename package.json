@@ -7,6 +7,7 @@
     "start": "next start",
     "lint": "next lint",
     "build": "next build",
+    "build:prod": "yarn lint:fix && yarn format:fix && yarn build",
     "lint:check": "eslint --config .eslintrc.json .",
     "lint:fix": "eslint --config .eslintrc.json . --fix",
     "format:check": "prettier --check \"**/*.{ts,tsx,json}\"",
