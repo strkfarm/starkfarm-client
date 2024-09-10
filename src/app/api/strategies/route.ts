@@ -7,7 +7,7 @@ import { RpcProvider } from 'starknet';
 import { getStrategies } from '@/store/strategies.atoms';
 import { MY_STORE } from '@/store';
 import MyNumber from '@/utils/MyNumber';
-import { AmountInfo, IStrategy, NFTInfo, TokenInfo } from '@/strategies/IStrategy';
+import { IStrategy, NFTInfo, TokenInfo } from '@/strategies/IStrategy';
 
 export const revalidate = 3600; // 1 hr
 
@@ -35,7 +35,7 @@ const provider = new RpcProvider({
 });
 
 async function getStrategyInfo(strategy: IStrategy) {
-  let tvl = await strategy.getTVL();
+  const tvl = await strategy.getTVL();
 
   return {
     name: strategy.name,
@@ -47,13 +47,11 @@ async function getStrategyInfo(strategy: IStrategy) {
     leverage: strategy.leverage,
     contract: strategy.holdingTokens.map((t) => ({
       name: t.name,
-      address: (<any>t).token
-        ? (<TokenInfo>t).token
-        : (<NFTInfo>t).address,
+      address: (<any>t).token ? (<TokenInfo>t).token : (<NFTInfo>t).address,
     })),
     tvlUsd: tvl.usdValue || 0,
     status: strategy.liveStatus,
-  }
+  };
 }
 
 export async function GET(req: Request) {
@@ -62,14 +60,13 @@ export async function GET(req: Request) {
   strategies.forEach((strategy) => {
     strategy.solve(allPools, '1000');
   });
-  
+
   const stratsDataProms: any[] = [];
   for (let i = 0; i < strategies.length; i++) {
     stratsDataProms.push(getStrategyInfo(strategies[i]));
   }
 
   const stratsData = await Promise.all(stratsDataProms);
-
 
   try {
     return NextResponse.json({
