@@ -305,6 +305,7 @@ export default function Deposit(props: DepositProps) {
           Amount to be less than {maxAmount.toEtherToFixedDecimals(2)}
         </Text>
       )}
+
       <Center marginTop={'10px'}>
         <TxButton
           txInfo={txInfo}
