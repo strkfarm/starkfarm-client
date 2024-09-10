@@ -24,16 +24,15 @@ import CONSTANTS from '@/constants';
 import { getERC20Balance } from '@/store/balance.atoms';
 import { addressAtom } from '@/store/claims.atoms';
 import { referralCodeAtom } from '@/store/referral.store';
-import { useEffect } from 'react';
 import { lastWalletAtom } from '@/store/utils.atoms';
 import {
   generateReferralCode,
   getTokenInfoFromName,
   MyMenuItemProps,
   MyMenuListProps,
-  truncate,
   shortAddress,
   standariseAddress,
+  truncate,
 } from '@/utils';
 import fulllogo from '@public/fulllogo.png';
 import {
@@ -44,8 +43,9 @@ import {
 } from '@starknet-react/core';
 import axios from 'axios';
 import mixpanel from 'mixpanel-browser';
-import { isMobile } from 'react-device-detect';
 import { useSearchParams } from 'next/navigation';
+import { useEffect } from 'react';
+import { isMobile } from 'react-device-detect';
 
 interface NavbarProps {
   hideTg?: boolean;
@@ -208,13 +208,25 @@ export default function Navbar(props: NavbarProps) {
       top="0"
     >
       <Center bg="bg" color="gray" padding={0}>
-        <Link href={CONSTANTS.COMMUNITY_TG} target="_blank">
-          <Text fontSize="12px" textAlign={'center'} padding="0px 5px">
-            {''}
-            <b>Report bugs & share feedback in our Telegram group.</b>
-            {''}
-          </Text>
-        </Link>
+        <Text
+          fontSize="12px"
+          textAlign={'center'}
+          padding="6px 5px"
+          color="#a5a5d9"
+        >
+          <b>
+            STRKFarm just got <Text color="orange">audited</Text> by one of the top auditors in the
+            ecosystem.
+            <Link
+              target="_blank"
+              href="https://x.com/strkfarm/status/1833071604856987678"
+              color="orange"
+            >
+              {' '}
+              Read more
+            </Link>
+          </b>
+        </Text>
       </Center>
       <Box
         width={'100%'}
