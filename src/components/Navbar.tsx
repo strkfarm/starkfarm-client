@@ -212,15 +212,15 @@ export default function Navbar(props: NavbarProps) {
           fontSize="12px"
           textAlign={'center'}
           padding="6px 5px"
-          color="orange"
+          color="#a5a5d9"
         >
           <b>
-            STRKFarm just got audited by one of the top auditors in the
+            STRKFarm just got <Text color="orange">audited</Text> by one of the top auditors in the
             ecosystem.
             <Link
               target="_blank"
               href="https://x.com/strkfarm/status/1833071604856987678"
-              color="#fff"
+              color="orange"
             >
               {' '}
               Read more
