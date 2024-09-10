@@ -212,7 +212,7 @@ export default function Navbar(props: NavbarProps) {
           fontSize="12px"
           textAlign={'center'}
           padding="6px 5px"
-          color="#8484C2"
+          color="orange"
         >
           <b>
             STRKFarm just got audited by one of the top auditors in the
