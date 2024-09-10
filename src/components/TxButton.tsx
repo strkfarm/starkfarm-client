@@ -1,4 +1,3 @@
-
 import CONSTANTS, { LATEST_TNC_DOC_VERSION } from '@/constants';
 import { referralCodeAtom } from '@/store/referral.store';
 import { StrategyTxProps, monitorNewTxAtom } from '@/store/transactions.atom';
