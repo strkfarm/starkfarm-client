@@ -96,7 +96,7 @@ export default function Deposit(props: DepositProps) {
   // const { balance, isLoading, isError } = useERC20Balance(selectedMarket);
   const maxAmount: MyNumber = useMemo(() => {
     if (props.buttonText === 'Redeem') {
-      return balance; // Use the actual balance for Redeem
+      return balance;
     }
 
     const currentTVl = tvlInfo.data?.amount || MyNumber.fromZero();
@@ -167,7 +167,8 @@ export default function Deposit(props: DepositProps) {
               color: 'color_50p',
             }}
             onClick={() => {
-              const maxAmountToSet = props.buttonText === 'Redeem' ? balance : maxAmount;
+              const maxAmountToSet =
+                props.buttonText === 'Redeem' ? balance : maxAmount;
               setAmount(maxAmountToSet);
               setRawAmount(maxAmountToSet.toEtherStr());
               mixpanel.track('Chose max amount', {
@@ -298,7 +299,8 @@ export default function Deposit(props: DepositProps) {
       )}
       {amount.compare(maxAmount.toEtherStr(), 'gt') && (
         <Text marginTop="2px" marginLeft={'7px'} color="red" fontSize={'13px'}>
-          Amount to be less than or equal to {maxAmount.toEtherToFixedDecimals(2)}
+          Amount to be less than or equal to{' '}
+          {maxAmount.toEtherToFixedDecimals(2)}
         </Text>
       )}
 
