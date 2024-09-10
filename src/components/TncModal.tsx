@@ -52,13 +52,50 @@ const exampleData = {
   },
 };
 
+const signingData = {
+  types: {
+    StarkNetDomain: [
+      { name: 'name', type: 'felt' },
+      { name: 'version', type: 'felt' },
+      { name: 'chainId', type: 'felt' },
+    ],
+    Person: [
+      { name: 'name', type: 'felt' },
+      { name: 'wallet', type: 'felt' },
+    ],
+    Felt: [
+      { name: 'from', type: 'Person' },
+      { name: 'to', type: 'Person' },
+      { name: 'contents', type: 'felt' },
+    ],
+  },
+  primaryType: 'felt',
+  domain: {
+    name: 'STRKFarm',
+    version: '1',
+    chainId: '0x534e5f4d41494e',
+  },
+  message: {
+    from: {
+      name: 'Test1',
+      wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+    },
+    to: {
+      name: 'Test2',
+      wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+    },
+    contents:
+      'You confirm that you have read and agree to our Terms & Conditions, which can be found at https://github.com/strkfarm/static-assets/src/tnc.md.\n\nPlease note, this message is solely for verifying your agreement to our T&C and does not authorize any transaction or movement of your assets.',
+  },
+};
+
 interface TncModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
 const TncModal: React.FC<TncModalProps> = ({ isOpen, onClose }) => {
-  const { signTypedDataAsync } = useSignTypedData(exampleData);
+  const { signTypedDataAsync } = useSignTypedData(signingData);
   const { address } = useAccount();
 
   const handleSign = async () => {
@@ -68,7 +105,7 @@ const TncModal: React.FC<TncModalProps> = ({ isOpen, onClose }) => {
       onClose();
       await axios.post('/api/tnc/signUser', {
         address,
-        message: 'I agree to the terms and conditions',
+        message: res?.toString(),
       });
     }
   };
