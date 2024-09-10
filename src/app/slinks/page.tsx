@@ -52,6 +52,11 @@ function GetCardSimple(strat: StrategyInfo) {
     return balance;
   }, [balance]);
 
+  // Function to reset the input fields to their initial state
+  const resetDepositForm = () => {
+    setAmount(MyNumber.fromZero());
+  };
+
   return (
     <Card
       key={strat.id}
@@ -111,6 +116,7 @@ function GetCardSimple(strat: StrategyInfo) {
               isDisabled:
                 amount.isZero() || amount.compare(maxAmount.toEtherStr(), 'gt'),
             }}
+            resetDepositForm={resetDepositForm}
           />
         </Box>
       </Flex>
