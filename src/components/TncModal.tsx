@@ -55,9 +55,9 @@ const exampleData = {
 const signingData = {
   types: {
     StarkNetDomain: [
-      { name: "name", type: "felt" },
-      { name: "version", type: "felt" },
-      { name: "chainId", type: "felt" },
+      { name: 'name', type: 'felt' },
+      { name: 'version', type: 'felt' },
+      { name: 'chainId', type: 'felt' },
     ],
     Person: [
       { name: 'name', type: 'felt' },
@@ -71,9 +71,9 @@ const signingData = {
   },
   primaryType: 'felt',
   domain: {
-    name: "STRKFarm",
-    version: "1",
-    chainId: "0x534e5f4d41494e",
+    name: 'STRKFarm',
+    version: '1',
+    chainId: '0x534e5f4d41494e',
   },
   message: {
     from: {
@@ -84,7 +84,8 @@ const signingData = {
       name: 'Test2',
       wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
     },
-    contents: 'You confirm that you have read and agree to our Terms & Conditions, which can be found at https://github.com/strkfarm/static-assets/src/tnc.md.\n\nPlease note, this message is solely for verifying your agreement to our T&C and does not authorize any transaction or movement of your assets.',
+    contents:
+      'You confirm that you have read and agree to our Terms & Conditions, which can be found at https://github.com/strkfarm/static-assets/src/tnc.md.\n\nPlease note, this message is solely for verifying your agreement to our T&C and does not authorize any transaction or movement of your assets.',
   },
 };
 

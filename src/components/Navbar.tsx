@@ -208,14 +208,25 @@ export default function Navbar(props: NavbarProps) {
       top="0"
     >
       <Center bg="bg" color="gray" padding={0}>
-        <Text fontSize="12px" textAlign={'center'} padding="6px 5px" color='#8484C2'>
-          <b>STRKFarm just got audited by one of the top auditors in the ecosystem.
-            <Link target='_blank' href='https://x.com/strkfarm/status/1833071604856987678' color='#fff'>
-              {" "}Read more
+        <Text
+          fontSize="12px"
+          textAlign={'center'}
+          padding="6px 5px"
+          color="#8484C2"
+        >
+          <b>
+            STRKFarm just got audited by one of the top auditors in the
+            ecosystem.
+            <Link
+              target="_blank"
+              href="https://x.com/strkfarm/status/1833071604856987678"
+              color="#fff"
+            >
+              {' '}
+              Read more
             </Link>
           </b>
         </Text>
-
       </Center>
       <Box
         width={'100%'}
