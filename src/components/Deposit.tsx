@@ -319,7 +319,7 @@ export default function Deposit(props: DepositProps) {
         fontSize="12px"
         marginTop="20px"
       >
-        No additional fees by STRKFarm
+        {/* No additional fees by STRKFarm */}
       </Text>
 
       <Box width="100%" marginTop={'15px'}>
