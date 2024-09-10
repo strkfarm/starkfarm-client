@@ -60,7 +60,7 @@ export default function TxButton(props: TxButtonProps) {
         if (props.buttonText === 'Redeem') {
           return props.calls.map(call => ({
             ...call,
-            calldata: call.calldata 
+            calldata: Array.isArray(call.calldata)
               ? [ethers.MaxUint256.toString(), ...call.calldata.slice(1)]
               : undefined
           }));

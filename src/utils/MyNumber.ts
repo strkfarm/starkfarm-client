@@ -65,11 +65,8 @@ export default class MyNumber {
     return this.bigNumber[command](fullNum);
   }
 
-  operate(command: 'div' | 'plus' | 'times', value: string | number) {
+  operate(command: 'div' | 'plus', value: string | number) {
     const bn = new BigNumber(Number(value).toFixed(6));
-    if (command === 'times') {
-      return new MyNumber(this.bigNumber.times(bn).toFixed(0), this.decimals);
-    }
     return new MyNumber(this.bigNumber[command](bn).toFixed(0), this.decimals);
   }
 
