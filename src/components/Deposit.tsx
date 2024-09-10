@@ -48,7 +48,6 @@ interface DepositProps {
 }
 //Update withdraw max amount
 
-
 export default function Deposit(props: DepositProps) {
   const { address } = useAccount();
   const { provider } = useProvider();
