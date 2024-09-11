@@ -4,7 +4,7 @@ import { atom } from 'jotai';
 import { PoolInfo, ProtocolAtoms, StrkIncentivesAtom } from './pools';
 import { Jediswap } from './jedi.store';
 import { StrategyLiveStatus } from '@/strategies/IStrategy';
-
+import { IStrategy } from '@/strategies/IStrategy';
 export class NostraDex extends Jediswap {
   name = 'Nostra';
   link = 'https://app.nostra.finance/pools';
@@ -42,6 +42,7 @@ export class NostraDex extends Jediswap {
             category = Category.STRK;
           }
           const poolInfo: PoolInfo = {
+            strategy: IStrategy, 
             pool: {
               id: this.getPoolId(this.name, poolData.id.slice(0, -6)),
               name: poolData.id,

@@ -12,7 +12,7 @@ import { atom } from 'jotai';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { IDapp } from './IDapp.store';
 import { StrategyLiveStatus } from '@/strategies/IStrategy';
-
+import { IStrategy } from '@/strategies/IStrategy';
 type Token = {
   address: string;
   name: string;
@@ -75,6 +75,7 @@ export class Haiko extends IDapp<Pool[]> {
           const logo2 = CONSTANTS.LOGOS[tokens[1]];
 
           const poolInfo: PoolInfo = {
+            strategy: IStrategy,
             pool: {
               id: this.getPoolId(this.name, poolName),
               name: poolName,

@@ -30,7 +30,7 @@ import {
 import { useAccount, useProvider } from '@starknet-react/core';
 import { useAtomValue } from 'jotai';
 import mixpanel from 'mixpanel-browser';
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ProviderInterface } from 'starknet';
 import LoadingWrap from './LoadingWrap';
 import TxButton from './TxButton';
@@ -46,12 +46,12 @@ interface DepositProps {
     provider: ProviderInterface,
   ) => IStrategyActionHook[];
 }
+//Update withdraw max amount
 
 export default function Deposit(props: DepositProps) {
   const { address } = useAccount();
   const { provider } = useProvider();
   const [dirty, setDirty] = useState(false);
-  const [isMaxClicked, setIsMaxClicked] = useState(false);
 
   const tvlInfo = useAtomValue(props.strategy.tvlAtom);
 
@@ -79,13 +79,6 @@ export default function Deposit(props: DepositProps) {
     };
   }, [amount, props]);
 
-  // Function to reset the input fields to their initial state
-  const resetDepositForm = () => {
-    setAmount(MyNumber.fromEther('0', selectedMarket.decimals));
-    setRawAmount('');
-    setDirty(false);
-  };
-
   // constructs tx calls
   const { calls, actions } = useMemo(() => {
     const actions = props.callsInfo(amount, address || '0x0', provider);
@@ -111,6 +104,7 @@ export default function Deposit(props: DepositProps) {
       selectedMarket.decimals,
     );
     let reducedBalance = balance;
+
     if (props.buttonText === 'Deposit') {
       if (selectedMarket.name === 'STRK') {
         reducedBalance = balance.subtract(
@@ -126,13 +120,6 @@ export default function Deposit(props: DepositProps) {
     const min = MyNumber.min(reducedBalance, adjustedMaxAllowed);
     return MyNumber.max(min, MyNumber.fromEther('0', selectedMarket.decimals));
   }, [balance, props.strategy, selectedMarket]);
-
-  useEffect(() => {
-    if (isMaxClicked) {
-      setRawAmount(maxAmount.toEtherStr());
-      setAmount(maxAmount);
-    }
-  }, [maxAmount, isMaxClicked]);
 
   function BalanceComponent(props: {
     token: TokenInfo;
@@ -180,7 +167,6 @@ export default function Deposit(props: DepositProps) {
             onClick={() => {
               setAmount(maxAmount);
               setRawAmount(maxAmount.toEtherStr());
-              setIsMaxClicked(true);
               mixpanel.track('Chose max amount', {
                 strategyId: props.strategy.id,
                 strategyName: props.strategy.name,
@@ -198,6 +184,7 @@ export default function Deposit(props: DepositProps) {
       </Box>
     );
   }
+
   return (
     <Box>
       <Grid templateColumns="repeat(5, 1fr)" gap={6}>
@@ -273,7 +260,6 @@ export default function Deposit(props: DepositProps) {
           else {
             setAmount(new MyNumber('0', selectedMarket.decimals));
           }
-          setIsMaxClicked(false);
           setRawAmount(value);
           setDirty(true);
           mixpanel.track('Enter amount', {
@@ -320,13 +306,12 @@ export default function Deposit(props: DepositProps) {
           text={`${props.buttonText}: ${amount.toEtherToFixedDecimals(2)} ${selectedMarket.name}`}
           calls={calls}
           buttonProps={{
-            isDisabled:
-              amount.isZero() || amount.compare(maxAmount.toEtherStr(), 'gt'),
+            isDisabled: amount.isZero() || amount.compare(maxAmount.toEtherStr(), 'gt'),
           }}
           selectedMarket={selectedMarket}
-          strategy={props.strategy}
-          resetDepositForm={resetDepositForm}
-        />
+          strategy={props.strategy} resetDepositForm={function (): void {
+            throw new Error('Function not implemented.');
+          } }        />
       </Center>
 
       <Text
@@ -335,7 +320,7 @@ export default function Deposit(props: DepositProps) {
         fontSize="12px"
         marginTop="20px"
       >
-        {/* No additional fees by STRKFarm */}
+        No additional fees by STRKFarm
       </Text>
 
       <Box width="100%" marginTop={'15px'}>

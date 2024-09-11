@@ -3,7 +3,7 @@ import { APRSplit, Category, PoolInfo, PoolMetadata, PoolType } from './pools';
 import { AtomWithQueryResult } from 'jotai-tanstack-query';
 import { StrategyAction, StrategyLiveStatus } from '@/strategies/IStrategy';
 import { getPoolId } from './IDapp.store';
-
+import { IStrategy } from '@/strategies/IStrategy';
 export namespace LendingSpace {
   export interface MyBaseAprDoc {
     token: {
@@ -66,6 +66,7 @@ export namespace LendingSpace {
         const logo1 = CONSTANTS.LOGOS[<TokenName>poolName];
 
         const poolInfo: PoolInfo = {
+          strategy: IStrategy,
           pool: {
             id: getPoolId(info.name, poolName),
             name: poolName,

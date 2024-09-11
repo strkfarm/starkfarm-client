@@ -13,7 +13,7 @@ import { IDapp } from './IDapp.store';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { BlockInfo, getBlock } from './utils.atoms';
 import { StrategyLiveStatus } from '@/strategies/IStrategy';
-
+import { IStrategy } from '@/strategies/IStrategy';
 interface MyBaseAprDoc {
   id: string;
   apr: number;
@@ -58,6 +58,7 @@ export class Jediswap extends IDapp<string> {
           const logo1 = CONSTANTS.LOGOS[tokens[0]];
           const logo2 = CONSTANTS.LOGOS[tokens[1]];
           const poolInfo: PoolInfo = {
+            strategy: IStrategy,
             pool: {
               id: this.getPoolId(this.name, poolName),
               name: poolName,

@@ -40,7 +40,7 @@ export interface PoolInfo extends PoolMetadata {
     id: string;
     name: string;
     logos: string[];
-  };
+  }
   protocol: {
     name: string;
     link: string;

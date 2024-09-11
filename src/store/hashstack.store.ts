@@ -11,6 +11,7 @@ import { IDapp } from './IDapp.store';
 import { LendingSpace } from './lending.base';
 import { AtomWithQueryResult } from 'jotai-tanstack-query';
 import { StrategyLiveStatus } from '@/strategies/IStrategy';
+import { IStrategy } from '@/strategies/IStrategy';
 
 export class Hashstack extends IDapp<LendingSpace.MyBaseAprDoc[]> {
   name = 'Hashstack';
@@ -39,6 +40,7 @@ export class Hashstack extends IDapp<LendingSpace.MyBaseAprDoc[]> {
         const logo1 = CONSTANTS.LOGOS[<TokenName>poolName];
 
         const poolInfo: PoolInfo = {
+          strategy: IStrategy,
           pool: {
             id: this.getPoolId(this.name, poolName),
             name: poolName,

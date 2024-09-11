@@ -12,7 +12,7 @@ import { IDapp } from './IDapp.store';
 import CONSTANTS, { TokenName } from '@/constants';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { StrategyLiveStatus } from '@/strategies/IStrategy';
-
+import { IStrategy } from '@/strategies/IStrategy';
 interface Token {
   symbol: string;
   address: string;
@@ -90,6 +90,7 @@ export class MySwap extends IDapp<IndexedPoolData> {
           const logo2 = CONSTANTS.LOGOS[tokens[1]];
 
           const poolInfo: PoolInfo = {
+            strategy: IStrategy,
             pool: {
               id: this.getPoolId(this.name, poolName),
               name: poolName,

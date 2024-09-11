@@ -16,7 +16,7 @@ import { Category, PoolInfo, PoolType } from './pools';
 import { strategiesAtom } from './strategies.atoms';
 import strkfarmLogo from '@public/logo.png';
 import { IStrategyProps } from '@/strategies/IStrategy';
-
+import { IStrategy } from '@/strategies/IStrategy';
 export const PROTOCOLS = [
   {
     name: ekubo.name,
@@ -157,6 +157,7 @@ export function getPoolInfoFromStrategy(
     category = Category.Stable;
   }
   return {
+    strategy: IStrategy,
     pool: {
       id: strat.id,
       name: strat.name,

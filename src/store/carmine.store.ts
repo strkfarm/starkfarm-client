@@ -5,6 +5,7 @@ import { PoolInfo, ProtocolAtoms } from './pools';
 import { Jediswap } from './jedi.store';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import { StrategyLiveStatus } from '@/strategies/IStrategy';
+import { IStrategy } from '@/strategies/IStrategy';
 
 const poolConfigs = [
   { name: 'STRK/USDC Call Pool (STRK)', tokenA: 'STRK', tokenB: 'USDC' },
@@ -56,6 +57,7 @@ export class Carmine extends Jediswap {
         const rewardApr = parseFloat(poolData.rewardApr) || 0;
 
         const poolInfo: PoolInfo = {
+          strategy: IStrategy,
           pool: {
             id: this.getPoolId(this.name, config.name),
             name: config.name,

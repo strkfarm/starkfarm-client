@@ -12,6 +12,7 @@ import {
   StrkDexIncentivesAtom,
 } from './pools';
 import { StrategyLiveStatus } from '@/strategies/IStrategy';
+import { IStrategy } from '@/strategies/IStrategy';
 
 const _fetcher = async (...args: any[]) => {
   return fetch(args[0], args[1]).then((res) => res.json());
@@ -124,6 +125,7 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
           const logo2 = CONSTANTS.LOGOS[tokens[1]];
 
           const poolInfo: PoolInfo = {
+            strategy: IStrategy,
             pool: {
               id: this.getPoolId(this.name, poolName),
               name: poolName,
