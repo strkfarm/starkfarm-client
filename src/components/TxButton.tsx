@@ -35,6 +35,7 @@ interface TxButtonProps {
   justDisableIfNoWalletConnect?: boolean;
   selectedMarket?: TokenInfo;
   strategy?: IStrategyProps;
+  resetDepositForm: () => void;
 }
 
 export default function TxButton(props: TxButtonProps) {
@@ -60,6 +61,7 @@ export default function TxButton(props: TxButtonProps) {
 
   useEffect(() => {
     if (data && data.transaction_hash) {
+      props.resetDepositForm();
       // initiates a toast and adds the tx to tx history if successful
       monitorNewTx({
         txHash: data.transaction_hash,
