@@ -35,6 +35,7 @@ export interface PoolMetadata {
 }
 
 export interface PoolInfo extends PoolMetadata {
+  strategy: typeof import('@/strategies/IStrategy').IStrategy;
   pool: {
     id: string;
     name: string;

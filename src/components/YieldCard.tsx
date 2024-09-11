@@ -32,6 +32,7 @@ import { getPoolInfoFromStrategy } from '@/store/protocols';
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons';
 import { useState } from 'react';
 import mixpanel from 'mixpanel-browser';
+import { IStrategy } from '@/strategies/IStrategy';
 
 interface YieldCardProps {
   pool: PoolInfo;
@@ -143,8 +144,17 @@ function getAPRWithToolTip(pool: PoolInfo) {
           </Flex>
         );
       })}
+      <Text fontSize={'xs'} fontWeight={'bold'} mt={2}>
+        Includes 10% fee on harvested amount
+      </Text>
     </Box>
   );
+
+  const effectiveYield =
+    pool.strategy instanceof IStrategy
+      ? pool.strategy.calculateEffectiveYield(100)
+      : pool.apr;
+
   return (
     <Tooltip hasArrow label={tip} bg="gray.300" color="black">
       <Box
@@ -163,7 +173,7 @@ function getAPRWithToolTip(pool: PoolInfo) {
               fontSize={'16px'}
               fontWeight={'bolder'}
             >
-              {(pool.apr * 100).toFixed(2)}%
+              {(effectiveYield * 100).toFixed(2)}%
             </Text>
           </>
         )}

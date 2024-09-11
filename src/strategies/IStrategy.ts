@@ -335,4 +335,12 @@ export class IStrategy extends IStrategyProps {
   isSolving() {
     return this.status === StrategyStatus.SOLVING;
   }
+
+  calculateEffectiveYield(initialInvestment: number): number {
+    const harvestedAmount = initialInvestment * this.netYield;
+    const fee = harvestedAmount * 0.1;
+    const totalAmount = harvestedAmount - fee;
+    const effectiveYield = totalAmount / initialInvestment - 1;
+    return effectiveYield;
+  }
 }
