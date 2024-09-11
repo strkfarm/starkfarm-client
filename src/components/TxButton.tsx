@@ -25,6 +25,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { TwitterShareButton } from 'react-share';
 import { Call } from 'starknet';
+import TncModal from './TncModal';
 
 interface TxButtonProps {
   txInfo: StrategyTxProps;
@@ -211,12 +212,12 @@ export default function TxButton(props: TxButtonProps) {
         </ModalContent>
       </Modal>
 
-      {/* {showTncModal && (
+      {showTncModal && (
         <TncModal
           isOpen={showTncModal}
           onClose={() => setShowTncModal(false)}
         />
-      )} */}
+      )}
 
       <Box width={'100%'} textAlign={'center'}>
         <Button
@@ -237,20 +238,20 @@ export default function TxButton(props: TxButtonProps) {
               address,
             });
 
-            // const res = await getUser();
+            const res = await getUser();
 
-            // if (!res) {
-            writeAsync().then((tx) => {
-              if (props.buttonText === 'Deposit') onOpen();
-              mixpanel.track('Submitted tx', {
-                strategyId: props.txInfo.strategyId,
-                txHash: tx.transaction_hash,
-                text: props.text,
-                address,
-                buttonText: props.buttonText,
+            if (!res) {
+              writeAsync().then((tx) => {
+                if (props.buttonText === 'Deposit') onOpen();
+                mixpanel.track('Submitted tx', {
+                  strategyId: props.txInfo.strategyId,
+                  txHash: tx.transaction_hash,
+                  text: props.text,
+                  address,
+                  buttonText: props.buttonText,
+                });
               });
-            });
-            // }
+            }
           }}
           {...props.buttonProps}
         >

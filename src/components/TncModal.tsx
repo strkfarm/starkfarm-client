@@ -1,7 +1,5 @@
 'use client';
 
-import React from 'react';
-
 import {
   Button,
   Link,
@@ -13,81 +11,10 @@ import {
   Text,
 } from '@chakra-ui/react';
 import { useAccount, useSignTypedData } from '@starknet-react/core';
-
 import axios from 'axios';
+import React from 'react';
 
-const exampleData = {
-  types: {
-    StarkNetDomain: [
-      { name: 'name', type: 'felt' },
-      { name: 'version', type: 'felt' },
-      { name: 'chainId', type: 'felt' },
-    ],
-    Person: [
-      { name: 'name', type: 'felt' },
-      { name: 'wallet', type: 'felt' },
-    ],
-    Mail: [
-      { name: 'from', type: 'Person' },
-      { name: 'to', type: 'Person' },
-      { name: 'contents', type: 'felt' },
-    ],
-  },
-  primaryType: 'Mail',
-  domain: {
-    name: 'Starknet Mail',
-    version: '1',
-    chainId: 1,
-  },
-  message: {
-    from: {
-      name: 'Cow',
-      wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-    },
-    to: {
-      name: 'Bob',
-      wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-    },
-    contents: 'Hello, Bob!',
-  },
-};
-
-const signingData = {
-  types: {
-    StarkNetDomain: [
-      { name: 'name', type: 'felt' },
-      { name: 'version', type: 'felt' },
-      { name: 'chainId', type: 'felt' },
-    ],
-    Person: [
-      { name: 'name', type: 'felt' },
-      { name: 'wallet', type: 'felt' },
-    ],
-    Felt: [
-      { name: 'from', type: 'Person' },
-      { name: 'to', type: 'Person' },
-      { name: 'contents', type: 'felt' },
-    ],
-  },
-  primaryType: 'felt',
-  domain: {
-    name: 'STRKFarm',
-    version: '1',
-    chainId: '0x534e5f4d41494e',
-  },
-  message: {
-    from: {
-      name: 'Test1',
-      wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-    },
-    to: {
-      name: 'Test2',
-      wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-    },
-    contents:
-      'You confirm that you have read and agree to our Terms & Conditions, which can be found at https://github.com/strkfarm/static-assets/src/tnc.md.\n\nPlease note, this message is solely for verifying your agreement to our T&C and does not authorize any transaction or movement of your assets.',
-  },
-};
+import { SIGNING_DATA } from '@/constants';
 
 interface TncModalProps {
   isOpen: boolean;
@@ -95,7 +22,7 @@ interface TncModalProps {
 }
 
 const TncModal: React.FC<TncModalProps> = ({ isOpen, onClose }) => {
-  const { signTypedDataAsync } = useSignTypedData(signingData);
+  const { signTypedDataAsync } = useSignTypedData(SIGNING_DATA);
   const { address } = useAccount();
 
   const handleSign = async () => {
@@ -135,7 +62,7 @@ const TncModal: React.FC<TncModalProps> = ({ isOpen, onClose }) => {
           <Text textAlign="center">
             You agree to STRKFarm terms and conditions as stated in{' '}
             <Link href="#" color="purple" _hover={{ textDecor: 'underline' }}>
-              githublink
+              github link
             </Link>
           </Text>
 

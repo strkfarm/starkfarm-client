@@ -191,6 +191,30 @@ export const NFTS: NFTInfo[] = [
   },
 ];
 
+export const SIGNING_DATA = {
+  types: {
+    StarkNetDomain: [
+      { name: 'name', type: 'felt' },
+      { name: 'version', type: 'felt' },
+      { name: 'chainId', type: 'felt' },
+    ],
+    Tnc: [
+      { name: 'message', type: 'felt' },
+      { name: 'document', type: 'felt' },
+    ],
+  },
+  primaryType: 'Tnc',
+  domain: {
+    name: 'STRKFarm',
+    version: '1',
+    chainId: '0x534e5f4d41494e',
+  },
+  message: {
+    message: 'Read and Agree T&C',
+    document: 'github.com/strkfarm/tncdoc',
+  },
+};
+
 export const LATEST_TNC_DOC_VERSION = '1.0';
 
 export default CONSTANTS;
