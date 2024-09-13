@@ -274,7 +274,9 @@ export default function TxButton(props: TxButtonProps) {
           }}
           {...props.buttonProps}
         >
-          {(isPending || isSigningPending) && <Spinner size={'sm'} marginRight={'5px'} />}{' '}
+          {(isPending || isSigningPending) && (
+            <Spinner size={'sm'} marginRight={'5px'} />
+          )}{' '}
           {props.text}
         </Button>
       </Box>

@@ -23,7 +23,12 @@ interface TncModalProps {
   onClose: () => void;
 }
 
-const TncModal: React.FC<TncModalProps> = ({ isOpen, onClose, setIsTncSigned, setIsSigningPending }) => {
+const TncModal: React.FC<TncModalProps> = ({
+  isOpen,
+  onClose,
+  setIsTncSigned,
+  setIsSigningPending,
+}) => {
   const { signTypedDataAsync } = useSignTypedData(SIGNING_DATA);
   const { address } = useAccount();
 
