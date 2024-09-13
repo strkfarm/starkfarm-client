@@ -12,29 +12,46 @@ import {
 } from '@chakra-ui/react';
 import { useAccount, useSignTypedData } from '@starknet-react/core';
 import axios from 'axios';
-import React from 'react';
+import React, { SetStateAction } from 'react';
 
 import { SIGNING_DATA } from '@/constants';
 
 interface TncModalProps {
   isOpen: boolean;
+  setIsTncSigned: React.Dispatch<SetStateAction<boolean>>;
+  setIsSigningPending: React.Dispatch<SetStateAction<boolean>>;
   onClose: () => void;
 }
 
-const TncModal: React.FC<TncModalProps> = ({ isOpen, onClose }) => {
+const TncModal: React.FC<TncModalProps> = ({ isOpen, onClose, setIsTncSigned, setIsSigningPending }) => {
   const { signTypedDataAsync } = useSignTypedData(SIGNING_DATA);
   const { address } = useAccount();
 
   const handleSign = async () => {
+    setIsSigningPending(true);
+
     const res = await signTypedDataAsync();
 
     if (res && res?.toString().length > 0) {
-      onClose();
-      await axios.post('/api/tnc/signUser', {
-        address,
-        message: res?.toString(),
-      });
+      try {
+        const res2 = await axios.post('/api/tnc/signUser', {
+          address,
+          message: res?.toString(),
+        });
+
+        if (res2.data?.success) {
+          onClose();
+          setIsTncSigned(true);
+        }
+      } catch (error) {
+        console.error(error);
+        setIsSigningPending(false);
+      } finally {
+        setIsSigningPending(false);
+      }
     }
+
+    setIsSigningPending(false);
   };
 
   return (

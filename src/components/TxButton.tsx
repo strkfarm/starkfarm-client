@@ -20,7 +20,6 @@ import { useAccount, useContractWrite } from '@starknet-react/core';
 import axios from 'axios';
 import { useAtomValue, useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
-import { usePathname } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 import { TwitterShareButton } from 'react-share';
@@ -43,10 +42,11 @@ export default function TxButton(props: TxButtonProps) {
   const { address } = useAccount();
   const monitorNewTx = useSetAtom(monitorNewTxAtom);
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const pathname = usePathname();
   const referralCode = useAtomValue(referralCodeAtom);
 
   const [showTncModal, setShowTncModal] = useState(false);
+  const [isTncSigned, setIsTncSigned] = useState(false);
+  const [isSigningPending, setIsSigningPending] = useState(false);
 
   const disabledStyle = {
     bg: 'var(--chakra-colors-disabled_bg)',
@@ -104,6 +104,21 @@ export default function TxButton(props: TxButtonProps) {
     if (!address) return 'Wallet not connected';
     return '';
   }, [isMobile, address, props]);
+
+  useEffect(() => {
+    if (isTncSigned) {
+      writeAsync().then((tx) => {
+        if (props.buttonText === 'Deposit') onOpen();
+        mixpanel.track('Submitted tx', {
+          strategyId: props.txInfo.strategyId,
+          txHash: tx.transaction_hash,
+          text: props.text,
+          address,
+          buttonText: props.buttonText,
+        });
+      });
+    }
+  }, [isTncSigned]);
 
   if (disabledText) {
     return (
@@ -217,6 +232,8 @@ export default function TxButton(props: TxButtonProps) {
       {showTncModal && (
         <TncModal
           isOpen={showTncModal}
+          setIsTncSigned={setIsTncSigned}
+          setIsSigningPending={setIsSigningPending}
           onClose={() => setShowTncModal(false)}
         />
       )}
@@ -257,7 +274,7 @@ export default function TxButton(props: TxButtonProps) {
           }}
           {...props.buttonProps}
         >
-          {isPending && <Spinner size={'sm'} marginRight={'5px'} />}{' '}
+          {(isPending || isSigningPending) && <Spinner size={'sm'} marginRight={'5px'} />}{' '}
           {props.text}
         </Button>
       </Box>
