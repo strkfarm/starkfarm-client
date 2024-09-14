@@ -23,6 +23,7 @@ import {
   TabPanels,
   Tabs,
   Text,
+  Tooltip,
   VStack,
   Wrap,
   WrapItem,
@@ -159,12 +160,14 @@ const Strategy = ({ params }: StrategyParams) => {
                       <StatLabel textAlign={{ base: 'left', md: 'right' }}>
                         APY
                       </StatLabel>
-                      <StatNumber
-                        color="cyan"
-                        textAlign={{ base: 'left', md: 'right' }}
-                      >
-                        {(strategy.netYield * 100).toFixed(2)}%
-                      </StatNumber>
+                      <Tooltip label="Effective APY after removing fees. We charge a 10% performance fee on the rewards generated.">
+                        <StatNumber
+                          color="cyan"
+                          textAlign={{ base: 'left', md: 'right' }}
+                        >
+                          {(strategy.netYield * 100).toFixed(2)}%
+                        </StatNumber>
+                      </Tooltip>
                       <StatHelpText textAlign={{ base: 'left', md: 'right' }}>
                         {strategy.leverage.toFixed(2)}x boosted
                       </StatHelpText>
