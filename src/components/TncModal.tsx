@@ -15,6 +15,7 @@ import {
 import { useAccount, useSignTypedData } from '@starknet-react/core';
 
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const exampleData = {
   types: {
@@ -103,10 +104,15 @@ const TncModal: React.FC<TncModalProps> = ({ isOpen, onClose }) => {
 
     if (res && res?.toString().length > 0) {
       onClose();
-      await axios.post('/api/tnc/signUser', {
+      try {
+        await axios.post('/api/tnc/signUser', {
         address,
         message: res?.toString(),
-      });
+        });
+      } catch (error: any) {
+        console.error('Error signing user: ', error);
+        toast.error('Error signing user: ', error.message);
+      }
     }
   };
 

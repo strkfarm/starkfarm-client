@@ -290,24 +290,35 @@ export class DeltaNeutralMM extends IStrategy {
         usdValue: 0,
         tokenInfo: this.token,
       };
-    const balanceInfo = await getBalance(this.holdingTokens[0], user);
-    if (!balanceInfo.tokenInfo) {
+
+    try {
+      const balanceInfo = await getBalance(this.holdingTokens[0], user);
+      if (!balanceInfo.tokenInfo) {
+        return {
+          amount: MyNumber.fromEther('0', this.token.decimals),
+          usdValue: 0,
+          tokenInfo: this.token,
+        };
+      }
+
+      const priceInfo = await axios.get(
+        `https://api.coinbase.com/v2/prices/${balanceInfo.tokenInfo.name}-USDT/spot`,
+      );
+      const price = Number(priceInfo.data.data.amount);
+      console.log('getUserTVL dnmm', price, balanceInfo.amount.toEtherStr());
+      return {
+        amount: balanceInfo.amount,
+        usdValue: Number(balanceInfo.amount.toEtherStr()) * price,
+        tokenInfo: balanceInfo.tokenInfo,
+      };
+    } catch (error) {
+      console.error('Error fetching user TVL:', error);
       return {
         amount: MyNumber.fromEther('0', this.token.decimals),
         usdValue: 0,
         tokenInfo: this.token,
       };
     }
-    const priceInfo = await axios.get(
-      `https://api.coinbase.com/v2/prices/${balanceInfo.tokenInfo.name}-USDT/spot`,
-    );
-    const price = Number(priceInfo.data.data.amount);
-    console.log('getUserTVL dnmm', price, balanceInfo.amount.toEtherStr());
-    return {
-      amount: balanceInfo.amount,
-      usdValue: Number(balanceInfo.amount.toEtherStr()) * price,
-      tokenInfo: balanceInfo.tokenInfo,
-    };
   };
 
   getTVL = async () => {
@@ -328,6 +339,7 @@ export class DeltaNeutralMM extends IStrategy {
       const discountFactor = this.stepAmountFactors[4];
       const amount = bal.amount.operate('div', 1 + discountFactor);
       console.log('getTVL1', amount.toString());
+
       const priceInfo = await axios.get(
         `https://api.coinbase.com/v2/prices/${mainTokenName}-USDT/spot`,
       );
@@ -338,9 +350,13 @@ export class DeltaNeutralMM extends IStrategy {
         usdValue: Number(amount.toEtherStr()) * price,
         tokenInfo: this.token,
       };
-    } catch (e) {
-      console.log('getTVL err', e);
-      throw e;
+    } catch (error) {
+      console.error('Error fetching TVL:', error);
+      return {
+        amount: MyNumber.fromEther('0', this.token.decimals),
+        usdValue: 0,
+        tokenInfo: this.token,
+      };
     }
   };
 

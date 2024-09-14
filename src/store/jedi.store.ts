@@ -147,15 +147,20 @@ async function getVolumes(block: number) {
     variables: {},
   });
 
-  const res = await fetch(CONSTANTS.JEDI.BASE_API, {
-    method: 'POST',
+  try{
+    const res = await fetch(CONSTANTS.JEDI.BASE_API, {
+      method: 'POST',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
-    body: data,
-  });
-  return res.json();
+      body: data,
+    });
+    return res.json();
+  } catch (error) {
+    console.error('Error fetching jedi volumes: ', error);
+    return { data: { pairs: [] } };
+  }
 }
 
 export const jedi = new Jediswap();

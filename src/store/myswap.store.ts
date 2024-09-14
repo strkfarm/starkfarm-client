@@ -181,10 +181,15 @@ export class MySwap extends IDapp<IndexedPoolData> {
   }
 }
 
-const fetch_pools = async () => {
-  const response = await fetch(`${CONSTANTS.MY_SWAP.POOLS_API}`);
-  const data = await response.json();
-  return data;
+const fetch_pools = async (): Promise<Pools> => {
+  try {
+    const response = await fetch(`${CONSTANTS.MY_SWAP.POOLS_API}`);
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching myswap pools: ', error);
+    return { pools: [] };
+  }
 };
 
 const getPoolKeys = (pools: Pools, poolNames: string[]): IndexedPools => {
@@ -213,14 +218,19 @@ const fetchAprData = async (
       if (pool_keys.length) {
         const pools = await Promise.all(
           pool_keys.map(async (pool_key) => {
-            const response = await fetch(
-              `${CONSTANTS.MY_SWAP.BASE_APR_API}/${pool_key}/overview.json`,
-            );
+            try {
+              const response = await fetch(
+                `${CONSTANTS.MY_SWAP.BASE_APR_API}/${pool_key}/overview.json`,
+              );
 
-            const data = await response.json();
-            return data;
+              const data = await response.json();
+              return data;
+            } catch (error) {
+              console.error('Error fetching apr data: ', error);
+              return null;
+            }
           }),
-        );
+        ).then((results) => results.filter((result) => result !== null));
 
         return [pool_name, pools];
       }

@@ -71,8 +71,13 @@ interface DAppStats {
 export const dAppStatsAtom = atomWithQuery((get) => ({
   queryKey: ['stats'],
   queryFn: async (): Promise<DAppStats> => {
-    const res = await axios.get('/api/stats');
-    return res.data;
+    try {
+      const res = await axios.get('/api/stats');
+      return res.data;
+    } catch (error) {
+      console.error('Error fetching dApp stats: ', error);
+      return { tvl: 0 };
+    }
   },
 }));
 
@@ -95,8 +100,13 @@ export const userStatsAtom = atomWithQuery((get) => ({
     if (!addr) {
       return null;
     }
-    const res = await axios.get(`/api/stats/${addr}`);
-    return res.data;
+    try {
+      const res = await axios.get(`/api/stats/${addr}`);
+      return res.data;
+    } catch (error) {
+      console.error('Error fetching user stats: ', error);
+      return null;
+    }
   },
 }));
 
@@ -164,16 +174,22 @@ export const blockInfoMinus1DAtom = atomWithQuery((get) => ({
       variables: {},
     });
     console.log('jedi base', 'data', data);
+    
+    try {
     const res = await fetch(CONSTANTS.JEDI.BASE_API, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: data,
-    });
-    console.log('jedi base', 'data2', res.json());
-    return res.json();
+          'Content-Type': 'application/json',
+        },
+        body: data,
+      });
+      console.log('jedi base', 'data2', res.json());
+      return res.json();
+    } catch (error) {
+      console.error('Error fetching block minus 1d: ', error);
+      return { data: { blocks: [] } };
+    }
   },
 }));
 

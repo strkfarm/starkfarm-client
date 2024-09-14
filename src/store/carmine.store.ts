@@ -6,6 +6,19 @@ import { Jediswap } from './jedi.store';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import { StrategyLiveStatus } from '@/strategies/IStrategy';
 
+type CarminePoolData = {
+  week: number;
+  week_annualized: number;
+  launch: number;
+  launch_annualized: number;
+};
+
+type CarmineAPRData = {
+  tvl: number;
+  allocation: number;
+  apy: number;
+};
+
 const poolConfigs = [
   { name: 'STRK/USDC Call Pool (STRK)', tokenA: 'STRK', tokenB: 'USDC' },
   { name: 'STRK/USDC Put Pool (USDC)', tokenA: 'STRK', tokenB: 'USDC' },
@@ -122,18 +135,28 @@ const poolEndpoints = [
 export const CarmineAtom = atomWithQuery((get) => ({
   queryKey: ['isCarmine'],
   queryFn: async ({ queryKey }) => {
-    const fetchPool = async (endpoint: any) => {
-      const res = await fetch(`${CONSTANTS.CARMINE_URL}/${endpoint}/apy`);
-      let data = await res.text();
-      data = data.replaceAll('NaN', '0');
-      return JSON.parse(data);
+    const fetchPool = async (endpoint: string): Promise<{data: CarminePoolData}> => {
+      try {
+        const res = await fetch(`${CONSTANTS.CARMINE_URL}/${endpoint}/apy`);
+        let data = await res.text();
+        data = data.replaceAll('NaN', '0');
+        return JSON.parse(data);
+      } catch (error) {
+        console.error(`Error fetching pool data for endpoint ${endpoint}:`, error);
+        return { data: { week_annualized: 0, week: 0, launch_annualized: 0, launch: 0 } };
+      }
     };
 
-    const fetchRewardApr = async () => {
-      const res = await fetch(CONSTANTS.CARMINE_INCENTIVES_URL);
-      let data = await res.text();
-      data = data.replaceAll('NaN', '0');
-      return JSON.parse(data);
+    const fetchRewardApr = async (): Promise<{data: CarmineAPRData}> => {
+      try {
+        const res = await fetch(CONSTANTS.CARMINE_INCENTIVES_URL);
+        let data = await res.text();
+        data = data.replaceAll('NaN', '0');
+        return JSON.parse(data);
+      } catch (error) {
+        console.error('Error fetching reward APR data:', error);
+        return { data: { apy: 0, tvl: 0, allocation: 0 } };
+      }
     };
 
     const rewardAprData = await fetchRewardApr();

@@ -23,6 +23,7 @@ import mixpanel from 'mixpanel-browser';
 import { usePathname } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
+import toast from 'react-hot-toast';
 import { TwitterShareButton } from 'react-share';
 import { Call } from 'starknet';
 
@@ -127,7 +128,8 @@ export default function TxButton(props: TxButtonProps) {
 
   const getUser = async () => {
     if (props.buttonText === 'Deposit') {
-      const data = await axios.get(`/api/tnc/getUser/${address}`);
+      try {
+        const data = await axios.get(`/api/tnc/getUser/${address}`);
 
       if (
         (data.data.user.isTncSigned &&
@@ -138,7 +140,12 @@ export default function TxButton(props: TxButtonProps) {
         return true;
       }
 
-      return false;
+        return false;
+      } catch (error: any) {
+        console.error('Error fetching user: ', error);
+        toast.error('Error fetching user: ', error.message);
+        return false;
+      }
     }
   };
 

@@ -124,25 +124,35 @@ export class AutoTokenStrategy extends IStrategy {
         tokenInfo: this.token,
       };
 
-    // returns zToken
-    const balanceInfo = await getBalance(this.holdingTokens[0], user);
-    if (!balanceInfo.tokenInfo) {
+    try {
+      // returns zToken
+      const balanceInfo = await getBalance(this.holdingTokens[0], user);
+      if (!balanceInfo.tokenInfo) {
+        return {
+          amount: MyNumber.fromEther('0', this.token.decimals),
+          usdValue: 0,
+          tokenInfo: this.token,
+        };
+      }
+
+      const priceInfo = await axios.get(
+        `https://api.coinbase.com/v2/prices/${this.token.name}-USDT/spot`,
+      );
+      const price = Number(priceInfo.data.data.amount);
+      console.log('getUserTVL autoc', price, balanceInfo.amount.toEtherStr());
+      return {
+        amount: balanceInfo.amount,
+        usdValue: Number(balanceInfo.amount.toEtherStr()) * price,
+        tokenInfo: balanceInfo.tokenInfo,
+      };
+    } catch (error) {
+      console.error('Error fetching user TVL:', error);
       return {
         amount: MyNumber.fromEther('0', this.token.decimals),
         usdValue: 0,
         tokenInfo: this.token,
       };
     }
-    const priceInfo = await axios.get(
-      `https://api.coinbase.com/v2/prices/${this.token.name}-USDT/spot`,
-    );
-    const price = Number(priceInfo.data.data.amount);
-    console.log('getUserTVL autoc', price, balanceInfo.amount.toEtherStr());
-    return {
-      amount: balanceInfo.amount,
-      usdValue: Number(balanceInfo.amount.toEtherStr()) * price,
-      tokenInfo: balanceInfo.tokenInfo,
-    };
   };
 
   getTVL = async () => {
@@ -153,17 +163,28 @@ export class AutoTokenStrategy extends IStrategy {
         tokenInfo: this.token,
       };
 
-    const zTokenInfo = getTokenInfoFromName(this.lpTokenName);
-    const bal = await getERC20Balance(zTokenInfo, this.strategyAddress);
-    const priceInfo = await axios.get(
-      `https://api.coinbase.com/v2/prices/${this.token.name}-USDT/spot`,
-    );
-    const price = Number(priceInfo.data.data.amount);
-    return {
-      amount: bal.amount,
-      usdValue: Number(bal.amount.toEtherStr()) * price,
-      tokenInfo: this.token,
-    };
+    try {
+      const zTokenInfo = getTokenInfoFromName(this.lpTokenName);
+      const bal = await getERC20Balance(zTokenInfo, this.strategyAddress);
+      
+      const priceInfo = await axios.get(
+        `https://api.coinbase.com/v2/prices/${this.token.name}-USDT/spot`,
+      );
+      const price = Number(priceInfo.data.data.amount);
+      
+      return {
+        amount: bal.amount,
+        usdValue: Number(bal.amount.toEtherStr()) * price,
+        tokenInfo: this.token,
+      };
+    } catch (error) {
+      console.error('Error fetching TVL:', error);
+      return {
+        amount: MyNumber.fromEther('0', this.token.decimals),
+        usdValue: 0,
+        tokenInfo: this.token,
+      };
+    }
   };
 
   // postSolve() {
