@@ -1,15 +1,10 @@
-import { ChevronDownIcon, HamburgerIcon } from '@chakra-ui/icons';
+import { ChevronDownIcon } from '@chakra-ui/icons';
 import {
   Avatar,
   Box,
   Button,
   Center,
   Container,
-  Drawer,
-  DrawerBody,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay,
   Flex,
   IconButton,
   Image,
@@ -19,7 +14,6 @@ import {
   MenuItem,
   MenuList,
   Text,
-  useDisclosure,
 } from '@chakra-ui/react';
 import { useAtom, useSetAtom } from 'jotai';
 import { useStarknetkitConnectModal } from 'starknetkit';
@@ -204,8 +198,6 @@ export default function Navbar(props: NavbarProps) {
     })();
   }, [address]);
 
-  const { isOpen, onOpen, onClose } = useDisclosure();
-
   return (
     <Container
       width={'100%'}
@@ -274,22 +266,6 @@ export default function Navbar(props: NavbarProps) {
               Claims
             </Button>
           </Link> */}
-
-          <Link href="/community" margin="0 auto 0 0">
-            <Button
-              bg="transparent"
-              color="color2"
-              variant="outline"
-              border="none"
-              _hover={{
-                bg: 'color2_50p',
-              }}
-              display={{ base: 'none !important', md: 'flex !important' }}
-            >
-              Community
-            </Button>
-          </Link>
-
           {!props.hideTg && (
             <Link href={CONSTANTS.COMMUNITY_TG} isExternal>
               <Button
@@ -335,7 +311,6 @@ export default function Navbar(props: NavbarProps) {
               />
             </Link>
           )}
-
           {(!isMobile || props.forceShowConnect) && (
             <Menu>
               <MenuButton
@@ -407,41 +382,6 @@ export default function Navbar(props: NavbarProps) {
               </MenuList>
             </Menu>
           )}
-
-          {isMobile && (
-            <IconButton
-              aria-label="Open menu"
-              icon={<HamburgerIcon color="color2" height="30px" width="30px" />}
-              background="transparent"
-              display={{ base: 'flex', md: 'none' }}
-              onClick={onOpen}
-              _focus={{
-                bg: 'none',
-              }}
-            />
-          )}
-
-          <Drawer placement="right" onClose={onClose} isOpen={isOpen}>
-            <DrawerOverlay />
-            <DrawerContent background="bg">
-              <DrawerHeader color="color1_light">Menu</DrawerHeader>
-              <DrawerBody>
-                <Flex direction="column">
-                  <Link href="/" color="color1_light" onClick={onClose}>
-                    Home
-                  </Link>
-                  <Link
-                    href="/community"
-                    color="color1_light"
-                    onClick={onClose}
-                    mt={4}
-                  >
-                    Community
-                  </Link>
-                </Flex>
-              </DrawerBody>
-            </DrawerContent>
-          </Drawer>
         </Flex>
       </Box>
     </Container>
