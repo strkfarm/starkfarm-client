@@ -37,11 +37,7 @@ import Deposit from '@/components/Deposit';
 import CONSTANTS, { TOKENS } from '@/constants';
 import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
 import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
-import {
-  StrategyTxPropsToMessageWithStrategies,
-  transactionsAtom,
-  TxHistoryAtom,
-} from '@/store/transactions.atom';
+import { transactionsAtom, TxHistoryAtom } from '@/store/transactions.atom';
 import { capitalize, getUniqueById, shortAddress } from '@/utils';
 import { StrategyParams } from '../page';
 import MyNumber from '@/utils/MyNumber';
