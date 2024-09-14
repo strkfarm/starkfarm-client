@@ -90,25 +90,7 @@ const CommunityPage: NextPage<CommunityPage> = () => {
                 padding={{ base: '0px 10px', md: '0px 10px' }}
                 border="1px"
                 borderRadius="5px"
-                zIndex={1}
-                _before={{
-                  content: `""`,
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  bottom: 0,
-                  borderRadius: 'inherit',
-                  padding: '1.5px',
-                  background:
-                    'linear-gradient(90deg, #6F4FF2 0%, #61FCAE 100%)',
-                  WebkitMask:
-                    'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                  mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                  WebkitMaskComposite: 'destination-out',
-                  maskComposite: 'exclude',
-                  zIndex: -1,
-                }}
+                borderColor="#3B4A3E"
               >
                 <Text color="white" fontSize={{ base: '8px', md: '12px' }}>
                   https://strkfarm.xyz/?referralCode+undefined&refer....
@@ -130,8 +112,8 @@ const CommunityPage: NextPage<CommunityPage> = () => {
                 display="flex"
                 alignItems="center"
                 padding={{ base: '5px', md: '10px' }}
-                border="2px"
-                borderColor="#61FCAE"
+                border="1px"
+                borderColor="#3B4A3E"
                 borderRadius="5px"
                 _hover={{
                   bg: 'color2_50p',
@@ -160,7 +142,7 @@ const CommunityPage: NextPage<CommunityPage> = () => {
           width="100%"
           justifyContent="space-between"
           alignItems="center"
-          padding="10px 15px"
+          padding="15px 15px"
           border="none"
           borderRadius="5px"
           zIndex={1}
@@ -173,7 +155,8 @@ const CommunityPage: NextPage<CommunityPage> = () => {
             bottom: 0,
             borderRadius: 'inherit',
             padding: '1.5px',
-            background: 'linear-gradient(90deg, #61FCAE 0%, #6F4FF2 100%)',
+            background:
+              'linear-gradient(90deg, rgba(111, 79, 242, 0.2) 0%, rgba(97, 252, 174, 0.2) 100%)',
             WebkitMask:
               'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
             mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
@@ -186,7 +169,11 @@ const CommunityPage: NextPage<CommunityPage> = () => {
             Coming soon
           </Text>
         </Box>
-        <Text color="white" fontSize={{ base: '14px', md: '12px' }}>
+        <Text
+          color="white"
+          fontSize={{ base: '14px', md: '12px' }}
+          marginBottom="30px"
+        >
           You will be able to check your points and claim your NFTs here soon.
         </Text>
       </Box>
