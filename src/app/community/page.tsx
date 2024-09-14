@@ -1,7 +1,10 @@
+'use client';
+
 import { NextPage } from 'next';
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import x from '@/assets/x.svg';
 import illustration from '@/assets/illustration.svg';
+import NFTAbi from '../../abi/nft.abi.json';
 
 import {
   Box,
@@ -10,11 +13,77 @@ import {
   Container,
   Link,
   Text,
+  Flex,
+  Spinner,
 } from '@chakra-ui/react';
+import { atomWithQuery } from 'jotai-tanstack-query';
+import { addressAtom } from '@/store/claims.atoms';
+import { useAtomValue } from 'jotai';
+import {
+  useContractRead,
+  useContractWrite,
+  useProvider,
+} from '@starknet-react/core';
+import { Contract } from 'starknet';
 
 interface CommunityPage {}
 
+interface OGNFTUserData {
+  address: string;
+  hash: string;
+  isOgNFTUser: boolean;
+  sig: string[];
+  totalOgNFTUsers: number;
+}
+const isOGNFTEligibleAtom = atomWithQuery((get) => {
+  return {
+    queryKey: ['isOGNFTEligibleAtom'],
+    queryFn: async ({ queryKey }: any): Promise<OGNFTUserData | null> => {
+      const address = get(addressAtom);
+      if (!address) return null;
+      const data = await fetch(`/api/users/ognft/${address}`);
+      return data.json();
+    },
+    refetchInterval: 5000,
+  };
+});
+
 const CommunityPage: NextPage<CommunityPage> = () => {
+  const isOGNFTEligible = useAtomValue(isOGNFTEligibleAtom);
+  const address = useAtomValue(addressAtom);
+  const { provider } = useProvider();
+  const isOGNFTLoading = useMemo(() => {
+    return isOGNFTEligible.isLoading || isOGNFTEligible.isError;
+  }, [isOGNFTEligible.isLoading, isOGNFTEligible.isError]);
+
+  const ogNFTContract = new Contract(
+    NFTAbi,
+    process.env.NEXT_PUBLIC_OG_NFT_CONTRACT || '',
+    provider,
+  );
+  const { writeAsync: claimOGNFT } = useContractWrite({
+    calls: [
+      ogNFTContract.populate('mint', {
+        nftId: 1,
+        rewardEarned: 0,
+        hash: isOGNFTEligible.data?.hash || '0',
+        signature: isOGNFTEligible.data?.sig || [],
+      }),
+    ],
+  });
+
+  const { data: ogNFTBalance } = useContractRead({
+    abi: NFTAbi,
+    address: process.env.NEXT_PUBLIC_OG_NFT_CONTRACT || '0',
+    functionName: 'balanceOf',
+    args: [address || '0x0'],
+  });
+
+  useEffect(() => {
+    console.log('ogNFTBalance', ogNFTBalance);
+    console.log('isOGNFTEligible', isOGNFTEligible);
+  }, [ogNFTBalance, isOGNFTEligible]);
+
   return (
     <Container maxWidth="1000px" margin="0 auto" padding="30px 10px">
       <Box
@@ -153,7 +222,7 @@ const CommunityPage: NextPage<CommunityPage> = () => {
         <Text color="white">
           <b>Your Stats</b>
         </Text>
-        <Box
+        <Flex
           position="relative"
           width="100%"
           justifyContent="space-between"
@@ -180,10 +249,32 @@ const CommunityPage: NextPage<CommunityPage> = () => {
             zIndex: -1,
           }}
         >
-          <Text color="white" fontSize={{ base: '14px', md: '16px' }}>
+          <Text
+            color="white"
+            fontSize={{ base: '14px', md: '16px' }}
+            width={'40%'}
+          >
             Coming soon
           </Text>
-        </Box>
+          <Box>
+            <ChakraImage
+              width={'150px'}
+              src="https://defispring.starknet.io/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fnft1.6e2c09ab.png&w=1080&q=75"
+            />
+            <Button
+              onClick={() => claimOGNFT()}
+              isDisabled={!isOGNFTEligible.data?.isOgNFTUser}
+            >
+              {isOGNFTLoading ? <Spinner /> : <></>} Claim
+            </Button>
+            <Text as="pre">
+              Debug info: | isOGNFTEligible:{' '}
+              {isOGNFTEligible.data?.isOgNFTUser ? 'true' : 'false'} |
+              totalOgNFTUsers: {isOGNFTEligible.data?.totalOgNFTUsers} | sig:{' '}
+              {JSON.stringify(isOGNFTEligible.data?.sig)}
+            </Text>
+          </Box>
+        </Flex>
         <Text color="white" fontSize={{ base: '14px', md: '12px' }}>
           You will be able to check your points and claim your NFTs here soon.
         </Text>
