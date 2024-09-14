@@ -42,35 +42,37 @@ const CommunityPage: NextPage<CommunityPage> = () => {
             These NFTs unlock future rewards and exclusive incentives.
           </Text>
 
-          <Button
-            margin="auto auto 0 0"
-            variant="outline"
-            border="1px"
-            borderRadius="5px"
-            zIndex={1}
-            _before={{
-              content: `""`,
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              borderRadius: 'inherit',
-              padding: '1.5px',
-              background: 'linear-gradient(90deg, #6F4FF2 0%, #61FCAE 100%)',
-              WebkitMask:
-                'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-              mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-              WebkitMaskComposite: 'destination-out',
-              maskComposite: 'exclude',
-              zIndex: -1,
-            }}
-            _hover={{
-              bg: 'color2_50p',
-            }}
-          >
-            <Text className="theme-gradient-text">Know more</Text>
-          </Button>
+          <Link href="https://docs.strkfarm.xyz/p/community" isExternal={true}>
+            <Button
+              margin="auto auto 0 0"
+              variant="outline"
+              border="1px"
+              borderRadius="5px"
+              zIndex={1}
+              _before={{
+                content: `""`,
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                borderRadius: 'inherit',
+                padding: '1.5px',
+                background: 'linear-gradient(90deg, #6F4FF2 0%, #61FCAE 100%)',
+                WebkitMask:
+                  'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                WebkitMaskComposite: 'destination-out',
+                maskComposite: 'exclude',
+                zIndex: -1,
+              }}
+              _hover={{
+                bg: 'color2_50p',
+              }}
+            >
+              <Text className="theme-gradient-text">Know more</Text>
+            </Button>
+          </Link>
         </Box>
 
         <Box display="flex" flexDirection="column" flex="3" borderRadius="10px">
