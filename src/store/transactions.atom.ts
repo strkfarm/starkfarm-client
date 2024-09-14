@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import { RpcProvider, TransactionExecutionStatus } from 'starknet';
 import { StrategyInfo, strategiesAtom } from './strategies.atoms';
 import { createAtomWithStorage } from './utils.atoms';
+import { atomWithQuery } from 'jotai-tanstack-query';
 import { gql } from '@apollo/client';
 import apolloClient from '@/utils/apolloClient';
 
@@ -27,19 +28,21 @@ export interface TransactionInfo {
   createdAt: Date;
 }
 
-export interface TransactionHistory {
-  amount: string;
-  timestamp: number;
-  txHash: string;
-  type: 'deposit' | 'withdraw';
+export interface TxHistory {
+  findManyInvestment_flows: {
+    amount: string;
+    timestamp: number;
+    type: string;
+    txHash: string;
+    asset: string;
+    __typename: 'Investment_flows';
+  }[];
 }
 
 async function getTxHistory(
   contract: string,
   owner: string,
-): Promise<TransactionHistory[]> {
-  let txHistory: TransactionHistory[] = [];
-
+): Promise<TxHistory> {
   try {
     const { data } = await apolloClient.query({
       query: gql`
@@ -53,6 +56,7 @@ async function getTxHistory(
             timestamp
             type
             txHash
+            asset
           }
         }
       `,
@@ -70,15 +74,22 @@ async function getTxHistory(
       },
     });
 
-    if (data) {
-      txHistory = data.findManyInvestment_flows;
-    }
+    return data;
   } catch (error) {
     console.error('GraphQL Error:', error);
+    throw error;
   }
-
-  return txHistory;
 }
+
+export const TxHistoryAtom = (contract: string, owner: string) =>
+  atomWithQuery((post) => ({
+    queryKey: ['tx_history', { contract, owner }],
+    queryFn: async ({ queryKey }: any): Promise<TxHistory> => {
+      const [, { contract, owner }] = queryKey;
+      const res = await getTxHistory(contract, owner);
+      return res;
+    },
+  }));
 
 // in local storage, objects like Date, MyNumber are stored as strings
 // this function deserialises them back to their original types

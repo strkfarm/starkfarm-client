@@ -34,21 +34,26 @@ import { useEffect, useMemo, useState } from 'react';
 import { isMobile } from 'react-device-detect';
 
 import Deposit from '@/components/Deposit';
-import CONSTANTS from '@/constants';
+import CONSTANTS, { TOKENS } from '@/constants';
 import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
 import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
 import {
   StrategyTxPropsToMessageWithStrategies,
   transactionsAtom,
+  TxHistoryAtom,
 } from '@/store/transactions.atom';
-import { getUniqueById, shortAddress } from '@/utils';
+import { capitalize, getUniqueById, shortAddress } from '@/utils';
 import { StrategyParams } from '../page';
+import MyNumber from '@/utils/MyNumber';
 
 const Strategy = ({ params }: StrategyParams) => {
   const { address } = useAccount();
   const strategies = useAtomValue(strategiesAtom);
   const transactions = useAtomValue(transactionsAtom);
+
   const [isMounted, setIsMounted] = useState(false);
+
+  console.log('strategies', strategies);
 
   useEffect(() => {
     console.log('txs', transactions);
@@ -61,6 +66,15 @@ const Strategy = ({ params }: StrategyParams) => {
 
     return strategies.find((s) => s.id === id);
   }, [params.strategyId, strategies]);
+
+  console.log('strategy', strategy);
+
+  const txHistoryAtom = useMemo(
+    () => TxHistoryAtom(strategy!.strategyAddress, address!),
+    [address],
+  );
+  const txHistory = useAtomValue(txHistoryAtom);
+  console.log('apollo txs', txHistory);
 
   const setBalQueryEnable = useSetAtom(strategy?.balEnabled || atom(false));
 
@@ -390,9 +404,7 @@ const Strategy = ({ params }: StrategyParams) => {
               Transaction history
             </Text>
 
-            {/* If more than 1 filtered tx */}
-            {transactions.filter((tx) => tx.info.strategyId == strategy.id)
-              .length > 0 && (
+            {txHistory.isSuccess && (
               <>
                 <Text
                   fontSize={'14px'}
@@ -404,46 +416,49 @@ const Strategy = ({ params }: StrategyParams) => {
                   remove this data.
                 </Text>
 
-                {transactions
-                  .filter((tx) => tx.info.strategyId == strategy.id)
-                  .map((tx, index) => {
-                    return (
-                      <Box
-                        className="text-cell"
-                        key={index}
-                        width={'100%'}
-                        color="light_grey"
-                        fontSize={'14px'}
-                      >
-                        <Text width={'100%'} color="white" padding={'5px 10px'}>
-                          {/* The default msg contains strategy name, since this for a specific strategy, replace it */}
-                          {index + 1}){' '}
-                          {StrategyTxPropsToMessageWithStrategies(
-                            tx.info,
-                            strategies,
-                          ).replace(` in ${strategy.name}`, '')}
-                        </Text>
-                        <Text width={'100%'} padding={'5px 10px'}>
-                          {/* The default msg contains strategy name, since this for a specific strategy, replace it */}
-                          Transacted on {tx.createdAt.toLocaleDateString()} [
-                          <Link
-                            textDecoration={'underline'}
-                            href={`https://starkscan.co/tx/${tx.txHash}`}
-                            target="_blank"
-                          >
-                            {shortAddress(tx.txHash)}
-                          </Link>
-                          ]
-                        </Text>
-                      </Box>
-                    );
-                  })}
+                {txHistory.data?.findManyInvestment_flows.map((tx, index) => {
+                  const token = TOKENS.find(
+                    (token) => token.token === tx.asset,
+                  );
+                  const decimals = token?.decimals;
+
+                  return (
+                    <Box
+                      className="text-cell"
+                      key={index}
+                      width={'100%'}
+                      color="light_grey"
+                      fontSize={'14px'}
+                    >
+                      <Text width={'100%'} color="white" padding={'5px 10px'}>
+                        {/* The default msg contains strategy name, since this for a specific strategy, replace it */}
+                        {index + 1}){capitalize(tx.type)}{' '}
+                        {new MyNumber(
+                          tx.amount,
+                          decimals!,
+                        ).toEtherToFixedDecimals(4)}
+                      </Text>
+                      <Text width={'100%'} padding={'5px 10px'}>
+                        {/* The default msg contains strategy name, since this for a specific strategy, replace it */}
+                        Transacted on {new Date(tx.timestamp).toLocaleString()}{' '}
+                        [
+                        <Link
+                          textDecoration={'underline'}
+                          href={`https://starkscan.co/tx/${tx.txHash}`}
+                          target="_blank"
+                        >
+                          {shortAddress(tx.txHash)}
+                        </Link>
+                        ]
+                      </Text>
+                    </Box>
+                  );
+                })}
               </>
             )}
 
             {/* If no filtered tx */}
-            {transactions.filter((tx) => tx.info.strategyId == strategy.id)
-              .length == 0 && (
+            {txHistory.data?.findManyInvestment_flows.length === 0 && (
               <Text fontSize={'14px'} textAlign={'center'} color="light_grey">
                 No transactions recorded since this feature was added. We use
                 your {"browser's"} storage to save your transaction history.
