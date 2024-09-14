@@ -275,7 +275,7 @@ export default function Navbar(props: NavbarProps) {
             </Button>
           </Link> */}
 
-          <Link href="/community" margin="0 auto 0 0">
+          <Link href="/community" margin="0 10px 0 0">
             <Button
               bg="transparent"
               color="color2"
