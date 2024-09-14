@@ -166,12 +166,12 @@ export class AutoTokenStrategy extends IStrategy {
     try {
       const zTokenInfo = getTokenInfoFromName(this.lpTokenName);
       const bal = await getERC20Balance(zTokenInfo, this.strategyAddress);
-      
+
       const priceInfo = await axios.get(
         `https://api.coinbase.com/v2/prices/${this.token.name}-USDT/spot`,
       );
       const price = Number(priceInfo.data.data.amount);
-      
+
       return {
         amount: bal.amount,
         usdValue: Number(bal.amount.toEtherStr()) * price,

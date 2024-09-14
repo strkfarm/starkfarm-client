@@ -147,13 +147,13 @@ async function getVolumes(block: number) {
     variables: {},
   });
 
-  try{
+  try {
     const res = await fetch(CONSTANTS.JEDI.BASE_API, {
       method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
       body: data,
     });
     return res.json();

@@ -131,14 +131,14 @@ export default function TxButton(props: TxButtonProps) {
       try {
         const data = await axios.get(`/api/tnc/getUser/${address}`);
 
-      if (
-        (data.data.user.isTncSigned &&
-          data.data.user.tncDocVersion !== LATEST_TNC_DOC_VERSION) ||
-        !data.data.user.isTncSigned
-      ) {
-        setShowTncModal(true);
-        return true;
-      }
+        if (
+          (data.data.user.isTncSigned &&
+            data.data.user.tncDocVersion !== LATEST_TNC_DOC_VERSION) ||
+          !data.data.user.isTncSigned
+        ) {
+          setShowTncModal(true);
+          return true;
+        }
 
         return false;
       } catch (error: any) {

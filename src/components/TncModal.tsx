@@ -106,8 +106,8 @@ const TncModal: React.FC<TncModalProps> = ({ isOpen, onClose }) => {
       onClose();
       try {
         await axios.post('/api/tnc/signUser', {
-        address,
-        message: res?.toString(),
+          address,
+          message: res?.toString(),
         });
       } catch (error: any) {
         console.error('Error signing user: ', error);

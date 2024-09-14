@@ -135,19 +135,31 @@ const poolEndpoints = [
 export const CarmineAtom = atomWithQuery((get) => ({
   queryKey: ['isCarmine'],
   queryFn: async ({ queryKey }) => {
-    const fetchPool = async (endpoint: string): Promise<{data: CarminePoolData}> => {
+    const fetchPool = async (
+      endpoint: string,
+    ): Promise<{ data: CarminePoolData }> => {
       try {
         const res = await fetch(`${CONSTANTS.CARMINE_URL}/${endpoint}/apy`);
         let data = await res.text();
         data = data.replaceAll('NaN', '0');
         return JSON.parse(data);
       } catch (error) {
-        console.error(`Error fetching pool data for endpoint ${endpoint}:`, error);
-        return { data: { week_annualized: 0, week: 0, launch_annualized: 0, launch: 0 } };
+        console.error(
+          `Error fetching pool data for endpoint ${endpoint}:`,
+          error,
+        );
+        return {
+          data: {
+            week_annualized: 0,
+            week: 0,
+            launch_annualized: 0,
+            launch: 0,
+          },
+        };
       }
     };
 
-    const fetchRewardApr = async (): Promise<{data: CarmineAPRData}> => {
+    const fetchRewardApr = async (): Promise<{ data: CarmineAPRData }> => {
       try {
         const res = await fetch(CONSTANTS.CARMINE_INCENTIVES_URL);
         let data = await res.text();

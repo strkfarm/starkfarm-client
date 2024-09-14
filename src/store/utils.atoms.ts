@@ -174,12 +174,12 @@ export const blockInfoMinus1DAtom = atomWithQuery((get) => ({
       variables: {},
     });
     console.log('jedi base', 'data', data);
-    
+
     try {
-    const res = await fetch(CONSTANTS.JEDI.BASE_API, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
+      const res = await fetch(CONSTANTS.JEDI.BASE_API, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
           'Content-Type': 'application/json',
         },
         body: data,

@@ -343,54 +343,54 @@ const getData = async (): Promise<EkuboBaseAprDoc> => {
     priceOfStrk,
     priceOfEth,
   ] = await Promise.all([
-    fetch(`${CONSTANTS.EKUBO.BASE_API}/tokens`).then((response) =>
-      response.json(),
-    ).catch((err) => {
-      console.error('Error fetching ekubo tokens', err);
-      return [];
+    fetch(`${CONSTANTS.EKUBO.BASE_API}/tokens`)
+      .then((response) => response.json())
+      .catch((err) => {
+        console.error('Error fetching ekubo tokens', err);
+        return [];
       }),
-    fetch(`${CONSTANTS.EKUBO.BASE_API}/defi-spring-incentives`).then(
-      (response) => response.json(),
-    ).catch((err) => {
-      console.error('Error fetching ekubo defi spring incentives', err);
-      return { strkPrice: 0, totalStrk: 0, pairs: [] };
-    }),
-    fetch(`${CONSTANTS.EKUBO.BASE_API}/overview/pairs`).then((response) =>
-      response.json(),
-    ).catch(err => {
-      console.error('Error fetching ekubo pair overview: ', err)
-      return { topPairs: [] }
-    }),
-    fetch(`${CONSTANTS.EKUBO.BASE_API}/price/ETH?period=21600`).then(
-      (response) => response.json(),
-    ).catch((err) => {
-      console.error('Error fetching ETH prices', err);
-      return { timestamp: 0, prices: [] };
-    }),
-    fetch(`${CONSTANTS.EKUBO.BASE_API}/price/STRK?period=21600`).then(
-      (response) => response.json(),
-    ).catch((err) => {
-      console.error('Error fetching STRK prices', err);
-      return { timestamp: 0, prices: [] };
-    }),
-    fetch(`${CONSTANTS.EKUBO.BASE_API}/price/USDC?period=21600`).then(
-      (response) => response.json(),
-    ).catch((err) => {
-      console.error('Error fetching USDC prices', err);
-      return { timestamp: 0, prices: [] };
-    }),
-    fetch(`${CONSTANTS.EKUBO.BASE_API}/price/STRK/USDC?period=21600`).then(
-      (response) => response.json(),
-    ).catch((err) => {
-      console.error('Error fetching STRK/USDC price', err);
-      return { timestamp: 0, price: 0 };
-    }),
-    fetch(`${CONSTANTS.EKUBO.BASE_API}/price/ETH/USDC?period=21600`).then(
-      (response) => response.json(),
-    ).catch((err) => {
-      console.error('Error fetching ETH/USDC price', err);
-      return { timestamp: 0, price: 0 };
-    }),
+    fetch(`${CONSTANTS.EKUBO.BASE_API}/defi-spring-incentives`)
+      .then((response) => response.json())
+      .catch((err) => {
+        console.error('Error fetching ekubo defi spring incentives', err);
+        return { strkPrice: 0, totalStrk: 0, pairs: [] };
+      }),
+    fetch(`${CONSTANTS.EKUBO.BASE_API}/overview/pairs`)
+      .then((response) => response.json())
+      .catch((err) => {
+        console.error('Error fetching ekubo pair overview: ', err);
+        return { topPairs: [] };
+      }),
+    fetch(`${CONSTANTS.EKUBO.BASE_API}/price/ETH?period=21600`)
+      .then((response) => response.json())
+      .catch((err) => {
+        console.error('Error fetching ETH prices', err);
+        return { timestamp: 0, prices: [] };
+      }),
+    fetch(`${CONSTANTS.EKUBO.BASE_API}/price/STRK?period=21600`)
+      .then((response) => response.json())
+      .catch((err) => {
+        console.error('Error fetching STRK prices', err);
+        return { timestamp: 0, prices: [] };
+      }),
+    fetch(`${CONSTANTS.EKUBO.BASE_API}/price/USDC?period=21600`)
+      .then((response) => response.json())
+      .catch((err) => {
+        console.error('Error fetching USDC prices', err);
+        return { timestamp: 0, prices: [] };
+      }),
+    fetch(`${CONSTANTS.EKUBO.BASE_API}/price/STRK/USDC?period=21600`)
+      .then((response) => response.json())
+      .catch((err) => {
+        console.error('Error fetching STRK/USDC price', err);
+        return { timestamp: 0, price: 0 };
+      }),
+    fetch(`${CONSTANTS.EKUBO.BASE_API}/price/ETH/USDC?period=21600`)
+      .then((response) => response.json())
+      .catch((err) => {
+        console.error('Error fetching ETH/USDC price', err);
+        return { timestamp: 0, price: 0 };
+      }),
   ]);
 
   return {

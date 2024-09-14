@@ -187,19 +187,19 @@ export const haiko = new Haiko();
 const HaikoAtoms: ProtocolAtoms = {
   baseAPRs: atomWithQuery((get) => ({
     queryKey: ['haiko_base_aprs'],
-    queryFn: async ({ queryKey }): Promise<Pool[]> =>  {
-      try{
-      const response = await fetch(`${CONSTANTS.HAIKO.BASE_APR_API}`);
-      const data = await response.json();
+    queryFn: async ({ queryKey }): Promise<Pool[]> => {
+      try {
+        const response = await fetch(`${CONSTANTS.HAIKO.BASE_APR_API}`);
+        const data = await response.json();
 
-      return data;
-      } catch(error){
+        return data;
+      } catch (error) {
         console.error('Error fetching haiko pools:  ', error);
         return [];
       }
     },
   })),
-  
+
   pools: atom((get) => {
     const poolsInfo = get(StrkDexIncentivesAtom);
     const empty: PoolInfo[] = [];
