@@ -108,7 +108,8 @@ const CommunityPage: NextPage<CommunityPage> = () => {
                 </Button>
               </Box>
               <Link
-                href=""
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('Check out this awesome community program! Join using my referral link:')}%20https://docs.strkfarm.xyz/p/community/referral-campaign`}
+                isExternal={true}
                 display="flex"
                 alignItems="center"
                 padding={{ base: '5px', md: '10px' }}
