@@ -1,7 +1,11 @@
-import { NextPage } from 'next';
-import React from 'react';
+'use client';
+
 import x from '@/assets/x.svg';
 import illustration from '@/assets/illustration.svg';
+import { useAtomValue } from 'jotai';
+import { referralCodeAtom } from '@/store/referral.store';
+import toast from 'react-hot-toast';
+import { getReferralUrl } from '@/utils';
 
 import {
   Box,
@@ -12,9 +16,21 @@ import {
   Text,
 } from '@chakra-ui/react';
 
-interface CommunityPage {}
+const CommunityPage = () => {
+  const referralCode = useAtomValue(referralCodeAtom);
 
-const CommunityPage: NextPage<CommunityPage> = () => {
+  function copyReferralLink() {
+    if (window.location.origin.includes('app.strkfarm.xyz')) {
+      navigator.clipboard.writeText(`https://strkfarm.xyz/r/${referralCode}`);
+    } else {
+      navigator.clipboard.writeText(getReferralUrl(referralCode));
+    }
+
+    toast.success('Referral link copied to clipboard', {
+      position: 'bottom-right',
+    });
+  }
+
   return (
     <Container maxWidth="1000px" margin="0 auto" padding="30px 10px">
       <Box
@@ -94,7 +110,7 @@ const CommunityPage: NextPage<CommunityPage> = () => {
                 borderColor="#3B4A3E"
               >
                 <Text color="white" fontSize={{ base: '8px', md: '12px' }}>
-                  https://strkfarm.xyz/?referralCode+undefined&refer....
+                  {`https://strkfarm.xyz/r/${referralCode}`}
                 </Text>
                 <Button
                   background="transparent"
@@ -104,12 +120,13 @@ const CommunityPage: NextPage<CommunityPage> = () => {
                   _hover={{
                     bg: 'transparent',
                   }}
+                  onClick={copyReferralLink}
                 >
                   Copy link
                 </Button>
               </Box>
               <Link
-                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('Check out this awesome community program! Join using my referral link:')}%20https://docs.strkfarm.xyz/p/community/referral-campaign`}
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('I am proud to be part of @strkfarm community. They are issuing points and NFTs for their active users.\n\nJoin using my referral link:')}%20https://strkfarm.xyz/r/${referralCode}`}
                 isExternal={true}
                 display="flex"
                 alignItems="center"
