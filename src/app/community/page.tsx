@@ -110,8 +110,11 @@ const CommunityPage = () => {
                 borderColor="#3B4A3E"
               >
                 <Text color="white" fontSize={{ base: '8px', md: '12px' }}>
-                  {`https://strkfarm.xyz/r/${referralCode}`}
+                  {!referralCode
+                    ? 'Referral link loading...'
+                    : `https://strkfarm.xyz/r/${referralCode}`}
                 </Text>
+
                 <Button
                   background="transparent"
                   border="none"
@@ -120,6 +123,7 @@ const CommunityPage = () => {
                   _hover={{
                     bg: 'transparent',
                   }}
+                  isDisabled={referralCode.length === 0}
                   onClick={copyReferralLink}
                 >
                   Copy link
@@ -127,18 +131,23 @@ const CommunityPage = () => {
               </Box>
               <Link
                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('I am proud to be part of @strkfarm community. They are issuing points and NFTs for their active users.\n\nJoin using my referral link:')}%20https://strkfarm.xyz/r/${referralCode}`}
-                isExternal={true}
-                display="flex"
-                alignItems="center"
-                padding={{ base: '5px', md: '10px' }}
                 border="1px"
                 borderColor="#3B4A3E"
                 borderRadius="5px"
-                _hover={{
-                  bg: 'color2_50p',
-                }}
+                isExternal={true}
               >
-                <ChakraImage src={x.src} height="25px" />
+                <Button
+                  display="flex"
+                  alignItems="center"
+                  // variant="outline"
+                  padding={{ base: '5px', md: '10px' }}
+                  _hover={{
+                    bg: 'color2_50p',
+                  }}
+                  isDisabled={referralCode.length === 0}
+                >
+                  <ChakraImage src={x.src} height="25px" />
+                </Button>
               </Link>
             </Box>
           </Box>
