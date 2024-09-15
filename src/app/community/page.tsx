@@ -131,16 +131,16 @@ const CommunityPage = () => {
               </Box>
               <Link
                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('I am proud to be part of @strkfarm community. They are issuing points and NFTs for their active users.\n\nJoin using my referral link:')}%20https://strkfarm.xyz/r/${referralCode}`}
-                border="1px"
-                borderColor="#3B4A3E"
-                borderRadius="5px"
                 isExternal={true}
               >
                 <Button
                   display="flex"
                   alignItems="center"
-                  // variant="outline"
+                  variant="outline"
                   padding={{ base: '5px', md: '10px' }}
+                  border="1px"
+                  borderColor="#3B4A3E"
+                  borderRadius="5px"
                   _hover={{
                     bg: 'color2_50p',
                   }}
