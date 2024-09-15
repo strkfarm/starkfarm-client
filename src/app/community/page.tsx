@@ -58,7 +58,8 @@ const CommunityPage: NextPage<CommunityPage> = () => {
                 bottom: 0,
                 borderRadius: 'inherit',
                 padding: '1.5px',
-                background: 'linear-gradient(90deg, #6F4FF2 0%, #61FCAE 100%)',
+                background:
+                  'linear-gradient(90deg, rgba(111, 79, 242, 0.4) 0%, rgba(97, 252, 174, 0.4) 100%)',
                 WebkitMask:
                   'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
                 mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
