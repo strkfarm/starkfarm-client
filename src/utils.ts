@@ -1,6 +1,7 @@
 import { MenuItemProps, MenuListProps } from '@chakra-ui/react';
 import { num } from 'starknet';
 import { TOKENS } from './constants';
+import toast from 'react-hot-toast';
 
 export function getUniqueStrings(arr: Array<string>) {
   const _arr: string[] = [];
@@ -92,6 +93,9 @@ export function generateReferralCode() {
 }
 
 export function getReferralUrl(referralCode: string) {
+  if (window.location.origin.includes('app.strkfarm.xyz')) {
+    return `https://strkfarm.xyz/r/${referralCode}`;
+  }
   return `${window.location.origin}/r/${referralCode}`;
 }
 
@@ -100,4 +104,12 @@ export function getDisplayCurrencyAmount(
   decimals: number,
 ) {
   return Number(Number(amount).toFixed(decimals)).toLocaleString();
+}
+
+export function copyReferralLink(refCode: string) {
+  navigator.clipboard.writeText(getReferralUrl(refCode));
+
+  toast.success('Referral link copied to clipboard', {
+    position: 'bottom-right',
+  });
 }
