@@ -10,6 +10,7 @@ import { atom } from 'jotai';
 import { IDapp } from './IDapp.store';
 import { LendingSpace } from './lending.base';
 import { AtomWithQueryResult } from 'jotai-tanstack-query';
+import { StrategyLiveStatus } from '@/strategies/IStrategy';
 
 export class Hashstack extends IDapp<LendingSpace.MyBaseAprDoc[]> {
   name = 'Hashstack';
@@ -39,6 +40,7 @@ export class Hashstack extends IDapp<LendingSpace.MyBaseAprDoc[]> {
 
         const poolInfo: PoolInfo = {
           pool: {
+            id: this.getPoolId(this.name, poolName),
             name: poolName,
             logos: [logo1],
           },
@@ -69,6 +71,11 @@ export class Hashstack extends IDapp<LendingSpace.MyBaseAprDoc[]> {
           borrow: {
             borrowFactor: 0,
             apr: 0,
+          },
+          additional: {
+            tags: [StrategyLiveStatus.ACTIVE],
+            isAudited: false, // TODO: Update this
+            riskFactor: 0.5,
           },
         };
         pools.push(poolInfo);

@@ -25,6 +25,7 @@ export interface TokenInfo {
   token: string;
   decimals: number;
   displayDecimals: number;
+  address?: string;
   name: string;
   logo: any;
   minAmount: MyNumber;

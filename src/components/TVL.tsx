@@ -48,7 +48,7 @@ const TVL: React.FC = () => {
       width="100%"
     >
       <GridItem display="flex">
-        <Card width="100%" padding={'15px 30px'} color="white" bg="bg">
+        <Card width="100%" padding={'15px 30px'} color="white" bg="color2_50p">
           <Stat>
             <StatLabel>Total Value locked (TVL)</StatLabel>
             <StatNumber>
@@ -64,7 +64,7 @@ const TVL: React.FC = () => {
       </GridItem>
 
       <GridItem display="flex">
-        <Card width="100%" padding={'15px 30px'} color="white" bg="bg">
+        <Card width="100%" padding={'15px 30px'} color="white" bg="color2_50p">
           <Stat>
             <StatLabel>Your holdings</StatLabel>
             <StatNumber>

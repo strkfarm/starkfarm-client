@@ -75,4 +75,12 @@ export class IDapp<BaseAPYT> {
     // return !poolName.includes('DAI') && !poolName.includes('WSTETH') && !poolName.includes('BTC');
     return supportedPools.includes(poolName);
   }
+
+  getPoolId(protocol: string, poolName: string) {
+    return getPoolId(protocol, poolName);
+  }
+}
+
+export function getPoolId(protocol: string, poolName: string) {
+  return `${protocol.toLowerCase().replaceAll(' ', '_')}__${poolName.toLowerCase().replaceAll(' ', '_')}`;
 }

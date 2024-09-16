@@ -43,6 +43,7 @@ import {
 } from '@/store/transactions.atom';
 import { getUniqueById, shortAddress } from '@/utils';
 import { StrategyParams } from '../page';
+import HarvestTime from '@/components/HarvestTime';
 
 const Strategy = ({ params }: StrategyParams) => {
   const { address } = useAccount();
@@ -274,6 +275,9 @@ const Strategy = ({ params }: StrategyParams) => {
               </Card>
             </GridItem>
           </Grid>
+          
+          <HarvestTime strategy={strategy} />
+
           <Card width={'100%'} color="white" bg="highlight" padding={'15px'}>
             <Text fontSize={'20px'} marginBottom={'0px'} fontWeight={'bold'}>
               Behind the scenes

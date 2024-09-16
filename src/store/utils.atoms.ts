@@ -82,7 +82,7 @@ interface StrategyWise {
   amount: string;
 }
 
-interface UserStats {
+export interface UserStats {
   holdingsUSD: number;
   strategyWise: StrategyWise[];
 }
