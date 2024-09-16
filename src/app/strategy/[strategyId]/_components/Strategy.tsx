@@ -4,18 +4,12 @@ import {
   Avatar,
   Box,
   Card,
-  Center,
   Flex,
   Grid,
   GridItem,
   Link,
   ListItem,
   OrderedList,
-  Spinner,
-  Stat,
-  StatHelpText,
-  StatLabel,
-  StatNumber,
   Tab,
   TabIndicator,
   TabList,
@@ -24,8 +18,6 @@ import {
   Tabs,
   Text,
   VStack,
-  Wrap,
-  WrapItem,
 } from '@chakra-ui/react';
 import { useAccount } from '@starknet-react/core';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
@@ -33,14 +25,13 @@ import mixpanel from 'mixpanel-browser';
 import { useEffect, useMemo, useState } from 'react';
 
 import Deposit from '@/components/Deposit';
-import CONSTANTS from '@/constants';
 import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
 import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
 import {
   StrategyTxPropsToMessageWithStrategies,
   transactionsAtom,
 } from '@/store/transactions.atom';
-import { getUniqueById, shortAddress } from '@/utils';
+import { shortAddress } from '@/utils';
 import { StrategyParams } from '../page';
 import HarvestTime from '@/components/HarvestTime';
 
@@ -109,18 +100,12 @@ const Strategy = ({ params }: StrategyParams) => {
         </Text>
       </Flex>
 
-      
       {strategy && (
         <VStack width={'100%'}>
           <Grid width={'100%'} templateColumns="repeat(5, 1fr)" gap={2}>
-
-
             <GridItem display="flex" colSpan={colSpan1}>
-            <HarvestTime strategy={strategy} balData={balData} />
-
+              <HarvestTime strategy={strategy} balData={balData} />
             </GridItem>
-
-
 
             <GridItem display="flex" colSpan={colSpan2}>
               <Card width="100%" padding={'15px'} color="white" bg="highlight">
@@ -182,7 +167,6 @@ const Strategy = ({ params }: StrategyParams) => {
               </Card>
             </GridItem>
           </Grid>
-          
 
           <Card width={'100%'} color="white" bg="highlight" padding={'15px'}>
             <Text fontSize={'20px'} marginBottom={'0px'} fontWeight={'bold'}>

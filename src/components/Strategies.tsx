@@ -40,7 +40,6 @@ export default function Strategies() {
 
   return (
     <Container width="100%" float={'left'} padding={'0px'} marginTop={'0px'}>
-      
       <Text color="color2Text" fontSize={'15px'}>
         <b>What are strategies?</b>
       </Text>
