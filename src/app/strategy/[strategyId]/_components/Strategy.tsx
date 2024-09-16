@@ -31,7 +31,6 @@ import { useAccount } from '@starknet-react/core';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useEffect, useMemo, useState } from 'react';
-import { isMobile } from 'react-device-detect';
 
 import Deposit from '@/components/Deposit';
 import CONSTANTS from '@/constants';
@@ -109,112 +108,20 @@ const Strategy = ({ params }: StrategyParams) => {
           {strategy ? strategy.name : 'Strategy Not found'}
         </Text>
       </Flex>
+
+      
       {strategy && (
         <VStack width={'100%'}>
           <Grid width={'100%'} templateColumns="repeat(5, 1fr)" gap={2}>
+
+
             <GridItem display="flex" colSpan={colSpan1}>
-              <Card width="100%" padding={'15px'} color="white" bg="highlight">
-                <Box display={{ base: 'block', md: 'flex' }}>
-                  <Box width={{ base: '100%', md: '80%' }} float={'left'}>
-                    <Text
-                      fontSize={'20px'}
-                      marginBottom={'0px'}
-                      fontWeight={'bold'}
-                    >
-                      How does it work?
-                    </Text>
-                    <Text
-                      color="light_grey"
-                      marginBottom="5px"
-                      fontSize={'15px'}
-                    >
-                      {strategy.description}
-                    </Text>
-                    <Wrap>
-                      {getUniqueById(
-                        strategy.actions.map((p) => ({
-                          id: p.pool.protocol.name,
-                          logo: p.pool.protocol.logo,
-                        })),
-                      ).map((p) => (
-                        <WrapItem marginRight={'10px'} key={p.id}>
-                          <Center>
-                            <Avatar
-                              size="2xs"
-                              bg={'black'}
-                              src={p.logo}
-                              marginRight={'2px'}
-                            />
-                            <Text marginTop={'2px'}>{p.id}</Text>
-                          </Center>
-                        </WrapItem>
-                      ))}
-                    </Wrap>
-                  </Box>
-                  <Box
-                    width={{ base: '100%', md: '20%' }}
-                    float={'left'}
-                    marginTop={{ base: '10px' }}
-                  >
-                    <Stat>
-                      <StatLabel textAlign={{ base: 'left', md: 'right' }}>
-                        APY
-                      </StatLabel>
-                      <StatNumber
-                        color="cyan"
-                        textAlign={{ base: 'left', md: 'right' }}
-                      >
-                        {(strategy.netYield * 100).toFixed(2)}%
-                      </StatNumber>
-                      <StatHelpText textAlign={{ base: 'left', md: 'right' }}>
-                        {strategy.leverage.toFixed(2)}x boosted
-                      </StatHelpText>
-                    </Stat>
-                  </Box>
-                </Box>
-                <Box
-                  padding={'10px'}
-                  borderRadius={'10px'}
-                  bg={'bg'}
-                  color="cyan"
-                  marginTop={'20px'}
-                >
-                  {!balData.isLoading &&
-                    !balData.isError &&
-                    !balData.isPending &&
-                    balData.data &&
-                    balData.data.tokenInfo && (
-                      <Text>
-                        <b>Your Holdings: </b>
-                        {address
-                          ? `${balData.data.amount.toEtherToFixedDecimals(4)} ${balData.data.tokenInfo?.name}`
-                          : isMobile
-                            ? CONSTANTS.MOBILE_MSG
-                            : 'Connect wallet'}
-                      </Text>
-                    )}
-                  {(balData.isLoading ||
-                    balData.isPending ||
-                    !balData.data?.tokenInfo) && (
-                    <Text>
-                      <b>Your Holdings: </b>
-                      {address ? (
-                        <Spinner size="sm" marginTop={'5px'} />
-                      ) : isMobile ? (
-                        CONSTANTS.MOBILE_MSG
-                      ) : (
-                        'Connect wallet'
-                      )}
-                    </Text>
-                  )}
-                  {balData.isError && (
-                    <Text>
-                      <b>Your Holdings: Error</b>
-                    </Text>
-                  )}
-                </Box>
-              </Card>
+            <HarvestTime strategy={strategy} balData={balData} />
+
             </GridItem>
+
+
+
             <GridItem display="flex" colSpan={colSpan2}>
               <Card width="100%" padding={'15px'} color="white" bg="highlight">
                 <Tabs position="relative" variant="unstyled" width={'100%'}>
@@ -276,7 +183,6 @@ const Strategy = ({ params }: StrategyParams) => {
             </GridItem>
           </Grid>
           
-          <HarvestTime strategy={strategy} />
 
           <Card width={'100%'} color="white" bg="highlight" padding={'15px'}>
             <Text fontSize={'20px'} marginBottom={'0px'} fontWeight={'bold'}>
