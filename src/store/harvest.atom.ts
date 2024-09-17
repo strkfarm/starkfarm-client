@@ -17,8 +17,8 @@ interface QueryResponse {
 // GraphQL query
 const GET_HARVESTS_QUERY = gql`
   query Query(
-    $where: HarvestsWhereInput,
-    $take: Int,
+    $where: HarvestsWhereInput
+    $take: Int
     $orderBy: [HarvestsOrderByWithRelationInput!]
   ) {
     findManyHarvests(where: $where, take: $take, orderBy: $orderBy) {
@@ -27,16 +27,14 @@ const GET_HARVESTS_QUERY = gql`
       timestamp
     }
     totalHarvests
-   
   }
 `;
-
 
 // Function to execute the query
 async function getHarvestData(
   contract: string,
   take: number = 1,
-  orderBy: any = [{ timestamp: 'desc' }] 
+  orderBy: any = [{ timestamp: 'desc' }],
 ): Promise<QueryResponse | null> {
   try {
     const { data } = await apolloClient.query<QueryResponse>({
@@ -60,12 +58,11 @@ async function getHarvestData(
   }
 }
 
-
 export const HarvestTimeAtom = (contract: string) =>
   atomWithQuery((get) => ({
     queryKey: ['harvest_data', contract],
     queryFn: async () => {
       const result = await getHarvestData(contract);
-      return result; 
+      return result;
     },
   }));

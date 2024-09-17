@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import {
   Avatar,
   Box,
@@ -14,7 +14,7 @@ import {
   WrapItem,
 } from '@chakra-ui/react';
 import { useAccount } from '@starknet-react/core';
-import { StrategyInfo } from '@/store/strategies.atoms'; 
+import { StrategyInfo } from '@/store/strategies.atoms';
 import { HarvestTimeAtom } from '@/store/harvest.atom';
 import { useAtomValue } from 'jotai';
 import { formatTimestamp, getUniqueById } from '@/utils';
@@ -51,12 +51,17 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
           <Box>
             <Stat>
               <StatLabel>APY</StatLabel>
-              <Box display="flex" alignItems="center" justifyContent="center" gap="5px">
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                gap="5px"
+              >
                 <StatNumber color="cyan">
                   {(strategy.netYield * 100).toFixed(2)}%
                 </StatNumber>
                 <StatHelpText>
-                   {strategy.leverage.toFixed(2)}x boosted
+                  {strategy.leverage.toFixed(2)}x boosted
                 </StatHelpText>
               </Box>
             </Stat>
@@ -175,8 +180,12 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
           <Text color="white" fontSize="12px" fontWeight="normal">
             Total rewards harvested:
             <Text as="span">
-            <b>{(BigInt(data?.amount.toString() ?? '') / BigInt(10 ** 18)).toString()}</b> |
-            Total number of times harvested:{' '}
+              <b>
+                {(
+                  BigInt(data?.amount.toString() ?? '') / BigInt(10 ** 18)
+                ).toString()}
+              </b>{' '}
+              | Total number of times harvested:{' '}
               <b>{harvestTime?.data?.totalHarvests}</b>
             </Text>
           </Text>
