@@ -1,11 +1,21 @@
 'use client';
 
 import x from '@/assets/x.svg';
+import og_nft from '@/assets/og_nft.jpg';
 import illustration from '@/assets/illustration.svg';
 import { useAtomValue } from 'jotai';
 import { referralCodeAtom } from '@/store/referral.store';
 import toast from 'react-hot-toast';
 import { getReferralUrl } from '@/utils';
+import {
+  useContractRead,
+  useContractWrite,
+  useProvider,
+} from '@starknet-react/core';
+import { Contract } from 'starknet';
+import NFTAbi from '../../abi/nft.abi.json';
+import { atomWithQuery } from 'jotai-tanstack-query';
+import { addressAtom } from '@/store/claims.atoms';
 
 import {
   Box,
@@ -13,11 +23,88 @@ import {
   Image as ChakraImage,
   Container,
   Link,
+  Progress,
   Text,
 } from '@chakra-ui/react';
+import { useEffect, useMemo, useState } from 'react';
+
+interface OGNFTUserData {
+  address: string;
+  hash: string;
+  isOgNFTUser: boolean;
+  sig: string[];
+  totalOgNFTUsers: number;
+}
+
+const isOGNFTEligibleAtom = atomWithQuery((get) => {
+  return {
+    queryKey: ['isOGNFTEligibleAtom'],
+    queryFn: async ({ queryKey }: any): Promise<OGNFTUserData | null> => {
+      const address = get(addressAtom);
+      if (!address) return null;
+      const data = await fetch(`/api/users/ognft/${address}`);
+      return data.json();
+    },
+    refetchInterval: 5000,
+  };
+});
 
 const CommunityPage = () => {
+  const [progress, setProgress] = useState(0);
+  const [isEligible, setIsEligible] = useState(false);
+  const [hasNFT, setHasNFT] = useState(false);
+  const [isEligibilityChecked, setIsEligibilityChecked] = useState(false);
   const referralCode = useAtomValue(referralCodeAtom);
+  const isOGNFTEligible = useAtomValue(isOGNFTEligibleAtom);
+  const address = useAtomValue(addressAtom);
+  const { provider } = useProvider();
+  const isOGNFTLoading = useMemo(() => {
+    return (
+      isOGNFTEligible.isLoading ||
+      isOGNFTEligible.isFetching ||
+      isOGNFTEligible.isError
+    );
+  }, [
+    isOGNFTEligible.isLoading,
+    isOGNFTEligible.isFetching,
+    isOGNFTEligible.isError,
+  ]);
+
+  const ogNFTContract = new Contract(
+    NFTAbi,
+    process.env.NEXT_PUBLIC_OG_NFT_CONTRACT || '',
+    provider,
+  );
+  const { writeAsync: claimOGNFT } = useContractWrite({
+    calls: [
+      ogNFTContract.populate('mint', {
+        nftId: 1,
+        rewardEarned: 0,
+        hash: isOGNFTEligible.data?.hash || '0',
+        signature: isOGNFTEligible.data?.sig || [],
+      }),
+    ],
+  });
+
+  const { data: ogNFTBalance } = useContractRead({
+    abi: NFTAbi,
+    address: process.env.NEXT_PUBLIC_OG_NFT_CONTRACT || '0',
+    functionName: 'balanceOf',
+    args: [address || '0x0', 1],
+  });
+
+  useEffect(() => {
+    if (isOGNFTEligible.isSuccess && isOGNFTEligible.data?.totalOgNFTUsers) {
+      setProgress(isOGNFTEligible.data.totalOgNFTUsers);
+    }
+
+    if (ogNFTBalance && Number(ogNFTBalance.toLocaleString()) !== 0) {
+      setHasNFT(true);
+    }
+
+    console.log('ogNFTBalance', ogNFTBalance);
+    console.log('isOGNFTEligible', isOGNFTEligible);
+  }, [ogNFTBalance, isOGNFTEligible]);
 
   function copyReferralLink() {
     if (window.location.origin.includes('app.strkfarm.xyz')) {
@@ -29,6 +116,25 @@ const CommunityPage = () => {
     toast.success('Referral link copied to clipboard', {
       position: 'bottom-right',
     });
+  }
+
+  function handleEligibility() {
+    if (!address) {
+      toast.error('Please connect wallet', {
+        position: 'bottom-right',
+      });
+      return;
+    }
+
+    if (!isEligible) {
+      if (!isOGNFTLoading && isOGNFTEligible.data?.isOgNFTUser) {
+        setIsEligible(true);
+      }
+    } else {
+      claimOGNFT();
+    }
+
+    setIsEligibilityChecked(true);
   }
 
   return (
@@ -151,6 +257,102 @@ const CommunityPage = () => {
               </Link>
             </Box>
           </Box>
+        </Box>
+      </Box>
+
+      <Box
+        display="flex"
+        margin="40px 0"
+        gap={{ base: '15px', md: '30px' }}
+        padding="20px 20px"
+        className="theme-gradient"
+        borderRadius="10px"
+      >
+        <Box display="flex" flexDirection="column" width="100%">
+          <Text
+            color="white"
+            fontSize={{ base: '14px', md: '22px' }}
+            marginBottom="20px"
+          >
+            <b>OG Farmer Limited edition NFT</b>
+          </Text>
+          <Box display="flex" flexDirection="column" marginBottom="15px">
+            <Text
+              fontSize={{ base: '12px', md: '16px' }}
+              alignSelf="flex-end"
+              color="white"
+            >
+              <b>{`${progress}/100 Selected`}</b>
+            </Text>
+
+            <Progress
+              value={progress}
+              size={{ base: 'sm', md: 'md' }}
+              bg="#E2E2E240"
+              sx={{
+                '& > div': {
+                  backgroundColor: '#795BF4',
+                },
+              }}
+            />
+          </Box>
+          <Box
+            display="flex"
+            flexDirection={{ base: 'column', md: 'row' }}
+            gap={{ base: '5px', md: '10px' }}
+            alignItems={{ md: 'center' }}
+          >
+            <Button
+              background="purple"
+              borderRadius="5px"
+              marginRight={{ base: 'auto', md: '0' }}
+              _hover={{
+                bg: 'bg',
+                borderColor: 'purple',
+                borderWidth: '1px',
+                color: 'purple',
+              }}
+              onClick={handleEligibility}
+              isDisabled={hasNFT || isOGNFTLoading || !isOGNFTEligible.data}
+            >
+              <Text fontSize={{ base: '10px', md: '14px' }} color="white">
+                {hasNFT
+                  ? 'Claimed'
+                  : !isEligible
+                    ? 'Check eligibility'
+                    : 'Claim'}
+              </Text>
+            </Button>
+
+            <Text
+              fontSize={{ base: '10px', md: '14px' }}
+              color={isEligible ? '#7DFACB' : '#FA7D7D'}
+            >
+              {!isEligible && isEligibilityChecked && (
+                <>
+                  You&apos;re not eligible, but you can still earn one.{' '}
+                  <Link
+                    href="https://docs.strkfarm.xyz/p/community/og-farmer-nft-campaign"
+                    textDecoration="underline"
+                    isExternal={true}
+                  >
+                    Learn how here
+                  </Link>
+                </>
+              )}
+              {isEligible &&
+                isEligibilityChecked &&
+                '🎉 Congratulations. You are eligible.'}
+            </Text>
+          </Box>
+        </Box>
+        <Box borderRadius="10px">
+          <ChakraImage
+            src={og_nft.src}
+            width={{ base: '200px', md: '250px' }}
+            height={{ base: '150px', md: '200px' }}
+            borderRadius="10px"
+          />
         </Box>
       </Box>
 
