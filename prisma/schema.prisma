@@ -17,7 +17,8 @@ model User {
   referrals     Referral[]
   referralCount Int?       @default(0)
 
-  createdAt DateTime @default(now())
+  createdAt    DateTime      @default(now())
+  og_nft_users og_nft_users?
 }
 
 model Referral {
@@ -29,4 +30,13 @@ model Referral {
   userId Int
 
   @@unique([userId, refreeAddress], name: "unique_referral")
+}
+
+model og_nft_users {
+  id     Int  @id @default(autoincrement())
+  userId Int  @unique
+  User   User @relation(fields: [userId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

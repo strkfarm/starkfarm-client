@@ -1,0 +1,118 @@
+[
+  {
+    "name": "name",
+    "type": "function",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::byte_array::ByteArray"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "name": "symbol",
+    "type": "function",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::byte_array::ByteArray"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "name": "mint",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "nftId",
+        "type": "core::integer::u8"
+      },
+      {
+        "name": "rewardEarned",
+        "type": "core::integer::u128"
+      },
+      {
+        "name": "hash",
+        "type": "core::felt252"
+      },
+      {
+        "name": "signature",
+        "type": "core::array::Array::<core::felt252>"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "name": "upgrade",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "newClassHash",
+        "type": "core::starknet::class_hash::ClassHash"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "name": "set_settings",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "settings",
+        "type": "defispring::nft::Settings"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "name": "get_settings",
+    "type": "function",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "defispring::nft::Settings"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "name": "set_pubkey",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "pubkey",
+        "type": "core::felt252"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  },
+  {
+    "name": "get_pubkey",
+    "type": "function",
+    "inputs": [],
+    "outputs": [
+      {
+        "type": "core::felt252"
+      }
+    ],
+    "state_mutability": "view"
+  },
+  {
+    "name": "set_token_uri",
+    "type": "function",
+    "inputs": [
+      {
+        "name": "uri",
+        "type": "core::byte_array::ByteArray"
+      }
+    ],
+    "outputs": [],
+    "state_mutability": "external"
+  }
+]
