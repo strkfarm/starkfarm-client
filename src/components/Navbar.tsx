@@ -285,8 +285,11 @@ export default function Navbar(props: NavbarProps) {
                 bg: 'color2_50p',
               }}
               display={{ base: 'none !important', md: 'flex !important' }}
+              onClick={() => {
+                mixpanel.track('community_program_click');
+              }}
             >
-              Community
+              ✨ Community Program
             </Button>
           </Link>
 
@@ -310,7 +313,6 @@ export default function Navbar(props: NavbarProps) {
                   bg: 'color2_50p',
                 }}
                 display={{ base: 'none !important', md: 'flex !important' }}
-                className="glow-button"
               >
                 Join Telegram
               </Button>
@@ -433,10 +435,13 @@ export default function Navbar(props: NavbarProps) {
                   <Link
                     href="/community"
                     color="color1_light"
-                    onClick={onClose}
+                    onClick={() => {
+                      onClose();
+                      mixpanel.track('community_program_click');
+                    }}
                     mt={4}
                   >
-                    Community
+                    ✨ Community Program
                   </Link>
                 </Flex>
               </DrawerBody>

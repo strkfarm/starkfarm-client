@@ -6,7 +6,6 @@ import illustration from '@/assets/illustration.svg';
 import { useAtomValue } from 'jotai';
 import { referralCodeAtom } from '@/store/referral.store';
 import toast from 'react-hot-toast';
-import { getReferralUrl } from '@/utils';
 import {
   useContractRead,
   useContractWrite,
@@ -16,6 +15,7 @@ import { Contract } from 'starknet';
 import NFTAbi from '../../abi/nft.abi.json';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import { addressAtom } from '@/store/claims.atoms';
+import { copyReferralLink, getReferralUrl } from '@/utils';
 
 import {
   Box,
@@ -27,6 +27,7 @@ import {
   Spinner,
   Text,
 } from '@chakra-ui/react';
+import mixpanel from 'mixpanel-browser';
 import { useEffect, useMemo, useState } from 'react';
 
 interface OGNFTUserData {
@@ -49,6 +50,7 @@ const isOGNFTEligibleAtom = atomWithQuery((get) => {
     refetchInterval: 5000,
   };
 });
+
 
 const CommunityPage = () => {
   const [progress, setProgress] = useState(0);
@@ -112,17 +114,9 @@ const CommunityPage = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [address]);
 
-  function copyReferralLink() {
-    if (window.location.origin.includes('app.strkfarm.xyz')) {
-      navigator.clipboard.writeText(`https://strkfarm.xyz/r/${referralCode}`);
-    } else {
-      navigator.clipboard.writeText(getReferralUrl(referralCode));
-    }
-
-    toast.success('Referral link copied to clipboard', {
-      position: 'bottom-right',
-    });
-  }
+  useEffect(() => {
+    mixpanel.track('Community Page open');
+  }, []);
 
   function handleEligibility() {
     if (!address) {
@@ -222,9 +216,11 @@ const CommunityPage = () => {
                 borderColor="#3B4A3E"
               >
                 <Text color="white" fontSize={{ base: '8px', md: '12px' }}>
-                  {!referralCode
-                    ? 'Referral link loading...'
-                    : `https://strkfarm.xyz/r/${referralCode}`}
+                  {!address
+                    ? 'Connect wallet for your referral link'
+                    : !referralCode
+                      ? 'Referral link loading...'
+                      : `${getReferralUrl(referralCode)}`}
                 </Text>
 
                 <Button
@@ -235,8 +231,10 @@ const CommunityPage = () => {
                   _hover={{
                     bg: 'transparent',
                   }}
-                  isDisabled={referralCode.length === 0}
-                  onClick={copyReferralLink}
+                  isDisabled={referralCode.length === 0 || !address}
+                  onClick={() => {
+                    copyReferralLink(referralCode);
+                  }}
                 >
                   Copy link
                 </Button>
