@@ -51,7 +51,6 @@ const isOGNFTEligibleAtom = atomWithQuery((get) => {
   };
 });
 
-
 const CommunityPage = () => {
   const [progress, setProgress] = useState(0);
   const [isEligible, setIsEligible] = useState(false);
@@ -124,7 +123,7 @@ const CommunityPage = () => {
       isEligible,
       isEligibilityChecked,
       isOGNFTEligible: isOGNFTEligible.data?.isOgNFTUser,
-    })
+    });
     if (!address) {
       toast.error('Please connect wallet', {
         position: 'bottom-right',
