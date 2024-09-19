@@ -20,8 +20,7 @@ import {
   getERC20Balance,
   getERC20BalanceAtom,
 } from '@/store/balance.atoms';
-import { getTokenInfoFromName } from '@/utils';
-import axios from 'axios';
+import { getPrice, getTokenInfoFromName } from '@/utils';
 
 interface Step {
   name: string;
@@ -133,10 +132,7 @@ export class AutoTokenStrategy extends IStrategy {
         tokenInfo: this.token,
       };
     }
-    const priceInfo = await axios.get(
-      `https://api.coinbase.com/v2/prices/${this.token.name}-USDT/spot`,
-    );
-    const price = Number(priceInfo.data.data.amount);
+    const price = await getPrice(this.token);
     console.log('getUserTVL autoc', price, balanceInfo.amount.toEtherStr());
     return {
       amount: balanceInfo.amount,
@@ -155,10 +151,7 @@ export class AutoTokenStrategy extends IStrategy {
 
     const zTokenInfo = getTokenInfoFromName(this.lpTokenName);
     const bal = await getERC20Balance(zTokenInfo, this.strategyAddress);
-    const priceInfo = await axios.get(
-      `https://api.coinbase.com/v2/prices/${this.token.name}-USDT/spot`,
-    );
-    const price = Number(priceInfo.data.data.amount);
+    const price = await getPrice(this.token);
     return {
       amount: bal.amount,
       usdValue: Number(bal.amount.toEtherStr()) * price,
