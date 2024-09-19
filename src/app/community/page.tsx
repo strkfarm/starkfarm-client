@@ -1,9 +1,20 @@
 'use client';
 
 import x from '@/assets/x.svg';
+import og_nft from '@/assets/og_nft.jpg';
 import illustration from '@/assets/illustration.svg';
 import { useAtomValue } from 'jotai';
 import { referralCodeAtom } from '@/store/referral.store';
+import toast from 'react-hot-toast';
+import {
+  useContractRead,
+  useContractWrite,
+  useProvider,
+} from '@starknet-react/core';
+import { Contract } from 'starknet';
+import NFTAbi from '../../abi/nft.abi.json';
+import { atomWithQuery } from 'jotai-tanstack-query';
+import { addressAtom } from '@/store/claims.atoms';
 import { copyReferralLink, getReferralUrl } from '@/utils';
 
 import {
@@ -12,19 +23,119 @@ import {
   Image as ChakraImage,
   Container,
   Link,
+  Progress,
+  Spinner,
   Text,
 } from '@chakra-ui/react';
 import mixpanel from 'mixpanel-browser';
-import { useEffect } from 'react';
-import { addressAtom } from '@/store/claims.atoms';
+import { useEffect, useMemo, useState } from 'react';
+
+interface OGNFTUserData {
+  address: string;
+  hash: string;
+  isOgNFTUser: boolean;
+  sig: string[];
+  totalOgNFTUsers: number;
+}
+
+const isOGNFTEligibleAtom = atomWithQuery((get) => {
+  return {
+    queryKey: ['isOGNFTEligibleAtom'],
+    queryFn: async ({ _queryKey }: any): Promise<OGNFTUserData | null> => {
+      const address = get(addressAtom) || '0x0';
+      if (!address) return null;
+      const data = await fetch(`/api/users/ognft/${address}`);
+      return data.json();
+    },
+    refetchInterval: 5000,
+  };
+});
+
 
 const CommunityPage = () => {
+  const [progress, setProgress] = useState(0);
+  const [isEligible, setIsEligible] = useState(false);
+  const [hasNFT, setHasNFT] = useState(false);
+  const [isEligibilityChecked, setIsEligibilityChecked] = useState(false);
   const referralCode = useAtomValue(referralCodeAtom);
+  const isOGNFTEligible = useAtomValue(isOGNFTEligibleAtom);
   const address = useAtomValue(addressAtom);
+  const { provider } = useProvider();
+  const isOGNFTLoading = useMemo(() => {
+    return (
+      isOGNFTEligible.isLoading ||
+      isOGNFTEligible.isFetching ||
+      isOGNFTEligible.isError
+    );
+  }, [
+    isOGNFTEligible.isLoading,
+    isOGNFTEligible.isFetching,
+    isOGNFTEligible.isError,
+  ]);
+
+  const ogNFTContract = new Contract(
+    NFTAbi,
+    process.env.NEXT_PUBLIC_OG_NFT_CONTRACT || '',
+    provider,
+  );
+
+  const { writeAsync: claimOGNFT } = useContractWrite({
+    calls: [
+      ogNFTContract.populate('mint', {
+        nftId: 1,
+        points: 0,
+        hash: isOGNFTEligible.data?.hash || '0',
+        signature: isOGNFTEligible.data?.sig || [],
+      }),
+    ],
+  });
+
+  const { data: ogNFTBalance } = useContractRead({
+    abi: NFTAbi,
+    address: process.env.NEXT_PUBLIC_OG_NFT_CONTRACT || '0',
+    functionName: 'balanceOf',
+    args: [address || '0x0', 1],
+  });
+
+  useEffect(() => {
+    if (isOGNFTEligible.isSuccess && isOGNFTEligible.data?.totalOgNFTUsers) {
+      setProgress(isOGNFTEligible.data.totalOgNFTUsers);
+    }
+
+    if (ogNFTBalance && Number(ogNFTBalance.toLocaleString()) !== 0) {
+      setHasNFT(true);
+    }
+  }, [ogNFTBalance, isOGNFTEligible]);
+
+  useEffect(() => {
+    if (address) {
+      isOGNFTEligible.refetch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address]);
 
   useEffect(() => {
     mixpanel.track('Community Page open');
   }, []);
+
+  function handleEligibility() {
+    if (!address) {
+      toast.error('Please connect wallet', {
+        position: 'bottom-right',
+      });
+      return;
+    }
+
+    if (!isEligible) {
+      if (!isOGNFTLoading && isOGNFTEligible.data?.isOgNFTUser) {
+        setIsEligible(true);
+      }
+    } else {
+      claimOGNFT();
+    }
+
+    setIsEligibilityChecked(true);
+  }
 
   return (
     <Container maxWidth="1000px" margin="0 auto" padding="30px 10px">
@@ -37,16 +148,16 @@ const CommunityPage = () => {
         <Box display="flex" flexDirection="column" gap="20px" flex="2">
           <Text
             fontSize={{ base: '28px', md: '48px' }}
-            lineHeight={'48px'}
-            textAlign={'left'}
-            color={'white'}
+            lineHeight="48px"
+            textAlign="left"
+            color="white"
           >
             <b className="">Community Program</b>
           </Text>
           <Text
             width="300px"
             color="white"
-            textAlign={'left'}
+            textAlign="left"
             fontSize={{ base: '16px', md: '12px' }}
           >
             Earn points to level up and collect NFTs that signal your loyalty.
@@ -155,13 +266,116 @@ const CommunityPage = () => {
 
       <Box
         display="flex"
-        flexDirection="column"
-        gap="10px"
-        padding="10px 20px"
+        margin="40px 0"
+        gap={{ base: '15px', md: '30px' }}
+        padding={{ base: '10px 10px', md: '20px 20px' }}
         className="theme-gradient"
         borderRadius="10px"
       >
-        <Text color="white">
+        <Box display="flex" flexDirection="column" width="100%">
+          <Text
+            color="white"
+            fontSize={{ base: '14px', md: '22px' }}
+            marginBottom={{ base: '10px', md: '20px' }}
+          >
+            <b>OG Farmer Limited edition NFT</b>
+          </Text>
+          <Box display="flex" flexDirection="column" marginBottom="15px">
+            <Box
+              display="flex"
+              gap="5px"
+              alignItems="center"
+              alignSelf="flex-end"
+            >
+              {isOGNFTLoading && <Spinner size="sm" color="white" />}
+              <Text fontSize={{ base: '10px', md: '16px' }} color="white">
+                <b>{`${progress}/100 Selected`}</b>
+              </Text>
+            </Box>
+
+            <Progress
+              value={progress}
+              size={{ base: 'xs', md: 'md' }}
+              bg="#E2E2E240"
+              sx={{
+                '& > div': {
+                  backgroundColor: '#795BF4',
+                },
+              }}
+            />
+          </Box>
+          <Box
+            display="flex"
+            flexDirection={{ base: 'column', md: 'row' }}
+            gap={{ base: '5px', md: '10px' }}
+            alignItems={{ md: 'center' }}
+          >
+            <Button
+              background="purple"
+              borderRadius="5px"
+              marginRight={{ base: 'auto', md: '0' }}
+              height={{ base: '30px', md: '40px' }}
+              _hover={{
+                bg: 'bg',
+                borderColor: 'purple',
+                borderWidth: '1px',
+                color: 'purple',
+              }}
+              onClick={handleEligibility}
+              isDisabled={hasNFT || isOGNFTLoading || !isOGNFTEligible.data}
+            >
+              <Text fontSize={{ base: '10px', md: '14px' }} color="white">
+                {!address
+                  ? 'Connect wallet to check eligibility'
+                  : hasNFT
+                    ? 'Claimed'
+                    : !isEligible
+                      ? 'Check eligibility'
+                      : 'Claim'}
+              </Text>
+            </Button>
+
+            <Text
+              fontSize={{ base: '10px', md: '14px' }}
+              color={isEligible ? '#7DFACB' : '#FA7D7D'}
+            >
+              {!isEligible && isEligibilityChecked && (
+                <>
+                  You&apos;re not eligible, but you can still earn one.{' '}
+                  <Link
+                    href="https://docs.strkfarm.xyz/p/community/og-farmer-nft-campaign"
+                    textDecoration="underline"
+                    isExternal={true}
+                  >
+                    Learn how here
+                  </Link>
+                </>
+              )}
+              {isEligible &&
+                isEligibilityChecked &&
+                '🎉 Congratulations. You are eligible.'}
+            </Text>
+          </Box>
+        </Box>
+        <Box borderRadius="10px">
+          <ChakraImage
+            src={og_nft.src}
+            width={{ base: '200px', md: '250px' }}
+            height={{ base: '120px', md: '200px' }}
+            borderRadius="10px"
+          />
+        </Box>
+      </Box>
+
+      <Box
+        display="flex"
+        flexDirection="column"
+        gap="10px"
+        padding={{ base: '10px 10px', md: '20px 20px' }}
+        className="theme-gradient"
+        borderRadius="10px"
+      >
+        <Text color="white" fontSize={{ base: '14px', md: '22px' }}>
           <b>Your Stats</b>
         </Text>
         <Box
@@ -192,13 +406,13 @@ const CommunityPage = () => {
             zIndex: -1,
           }}
         >
-          <Text color="white" fontSize={{ base: '14px', md: '16px' }}>
+          <Text color="white" fontSize={{ base: '12px', md: '16px' }}>
             Coming soon
           </Text>
         </Box>
         <Text
           color="white"
-          fontSize={{ base: '14px', md: '12px' }}
+          fontSize={{ base: '12px', md: '12px' }}
           marginBottom="30px"
         >
           You will be able to check your points and claim your NFTs here soon.
