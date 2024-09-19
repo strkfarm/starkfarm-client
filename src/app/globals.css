@@ -168,9 +168,8 @@ body {
 .theme-gradient {
   background: linear-gradient(
     to right,
-    var(--chakra-colors-purple) 10%,
-    var(--chakra-colors-cyan) 50%,
-    var(--chakra-colors-cyan) 100%
+    rgba(111, 79, 242, 0.3) 0%,
+    rgba(97, 252, 174, 0.3) 100%
   );
 }
 
