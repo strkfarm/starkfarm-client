@@ -24,6 +24,7 @@ import {
   Container,
   Link,
   Progress,
+  Spinner,
   Text,
 } from '@chakra-ui/react';
 import { useEffect, useMemo, useState } from 'react';
@@ -39,8 +40,8 @@ interface OGNFTUserData {
 const isOGNFTEligibleAtom = atomWithQuery((get) => {
   return {
     queryKey: ['isOGNFTEligibleAtom'],
-    queryFn: async ({ queryKey }: any): Promise<OGNFTUserData | null> => {
-      const address = get(addressAtom);
+    queryFn: async ({ _queryKey }: any): Promise<OGNFTUserData | null> => {
+      const address = get(addressAtom) || '0x0';
       if (!address) return null;
       const data = await fetch(`/api/users/ognft/${address}`);
       return data.json();
@@ -75,11 +76,12 @@ const CommunityPage = () => {
     process.env.NEXT_PUBLIC_OG_NFT_CONTRACT || '',
     provider,
   );
+
   const { writeAsync: claimOGNFT } = useContractWrite({
     calls: [
       ogNFTContract.populate('mint', {
         nftId: 1,
-        rewardEarned: 0,
+        points: 0,
         hash: isOGNFTEligible.data?.hash || '0',
         signature: isOGNFTEligible.data?.sig || [],
       }),
@@ -101,10 +103,14 @@ const CommunityPage = () => {
     if (ogNFTBalance && Number(ogNFTBalance.toLocaleString()) !== 0) {
       setHasNFT(true);
     }
-
-    console.log('ogNFTBalance', ogNFTBalance);
-    console.log('isOGNFTEligible', isOGNFTEligible);
   }, [ogNFTBalance, isOGNFTEligible]);
+
+  useEffect(() => {
+    if (address) {
+      isOGNFTEligible.refetch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [address]);
 
   function copyReferralLink() {
     if (window.location.origin.includes('app.strkfarm.xyz')) {
@@ -148,16 +154,16 @@ const CommunityPage = () => {
         <Box display="flex" flexDirection="column" gap="20px" flex="2">
           <Text
             fontSize={{ base: '28px', md: '48px' }}
-            lineHeight={'48px'}
-            textAlign={'left'}
-            color={'white'}
+            lineHeight="48px"
+            textAlign="left"
+            color="white"
           >
             <b className="">Community Program</b>
           </Text>
           <Text
             width="300px"
             color="white"
-            textAlign={'left'}
+            textAlign="left"
             fontSize={{ base: '16px', md: '12px' }}
           >
             Earn points to level up and collect NFTs that signal your loyalty.
@@ -264,7 +270,7 @@ const CommunityPage = () => {
         display="flex"
         margin="40px 0"
         gap={{ base: '15px', md: '30px' }}
-        padding="20px 20px"
+        padding={{ base: '10px 10px', md: '20px 20px' }}
         className="theme-gradient"
         borderRadius="10px"
       >
@@ -272,22 +278,26 @@ const CommunityPage = () => {
           <Text
             color="white"
             fontSize={{ base: '14px', md: '22px' }}
-            marginBottom="20px"
+            marginBottom={{ base: '10px', md: '20px' }}
           >
             <b>OG Farmer Limited edition NFT</b>
           </Text>
           <Box display="flex" flexDirection="column" marginBottom="15px">
-            <Text
-              fontSize={{ base: '12px', md: '16px' }}
+            <Box
+              display="flex"
+              gap="5px"
+              alignItems="center"
               alignSelf="flex-end"
-              color="white"
             >
-              <b>{`${progress}/100 Selected`}</b>
-            </Text>
+              {isOGNFTLoading && <Spinner size="sm" color="white" />}
+              <Text fontSize={{ base: '10px', md: '16px' }} color="white">
+                <b>{`${progress}/100 Selected`}</b>
+              </Text>
+            </Box>
 
             <Progress
               value={progress}
-              size={{ base: 'sm', md: 'md' }}
+              size={{ base: 'xs', md: 'md' }}
               bg="#E2E2E240"
               sx={{
                 '& > div': {
@@ -306,6 +316,7 @@ const CommunityPage = () => {
               background="purple"
               borderRadius="5px"
               marginRight={{ base: 'auto', md: '0' }}
+              height={{ base: '30px', md: '40px' }}
               _hover={{
                 bg: 'bg',
                 borderColor: 'purple',
@@ -316,11 +327,13 @@ const CommunityPage = () => {
               isDisabled={hasNFT || isOGNFTLoading || !isOGNFTEligible.data}
             >
               <Text fontSize={{ base: '10px', md: '14px' }} color="white">
-                {hasNFT
-                  ? 'Claimed'
-                  : !isEligible
-                    ? 'Check eligibility'
-                    : 'Claim'}
+                {!address
+                  ? 'Connect wallet to check eligibility'
+                  : hasNFT
+                    ? 'Claimed'
+                    : !isEligible
+                      ? 'Check eligibility'
+                      : 'Claim'}
               </Text>
             </Button>
 
@@ -350,7 +363,7 @@ const CommunityPage = () => {
           <ChakraImage
             src={og_nft.src}
             width={{ base: '200px', md: '250px' }}
-            height={{ base: '150px', md: '200px' }}
+            height={{ base: '120px', md: '200px' }}
             borderRadius="10px"
           />
         </Box>
@@ -360,11 +373,11 @@ const CommunityPage = () => {
         display="flex"
         flexDirection="column"
         gap="10px"
-        padding="10px 20px"
+        padding={{ base: '10px 10px', md: '20px 20px' }}
         className="theme-gradient"
         borderRadius="10px"
       >
-        <Text color="white">
+        <Text color="white" fontSize={{ base: '14px', md: '22px' }}>
           <b>Your Stats</b>
         </Text>
         <Box
@@ -395,13 +408,13 @@ const CommunityPage = () => {
             zIndex: -1,
           }}
         >
-          <Text color="white" fontSize={{ base: '14px', md: '16px' }}>
+          <Text color="white" fontSize={{ base: '12px', md: '16px' }}>
             Coming soon
           </Text>
         </Box>
         <Text
           color="white"
-          fontSize={{ base: '14px', md: '12px' }}
+          fontSize={{ base: '12px', md: '12px' }}
           marginBottom="30px"
         >
           You will be able to check your points and claim your NFTs here soon.
