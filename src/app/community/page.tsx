@@ -119,6 +119,12 @@ const CommunityPage = () => {
   }, []);
 
   function handleEligibility() {
+    mixpanel.track('Check OG NFT Eligibility', {
+      address,
+      isEligible,
+      isEligibilityChecked,
+      isOGNFTEligible: isOGNFTEligible.data?.isOgNFTUser,
+    })
     if (!address) {
       toast.error('Please connect wallet', {
         position: 'bottom-right',
