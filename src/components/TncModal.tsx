@@ -1,5 +1,6 @@
 'use client';
 
+import { SIGNING_DATA } from '@/constants';
 import {
   Button,
   Link,
@@ -10,11 +11,9 @@ import {
   ModalOverlay,
   Text,
 } from '@chakra-ui/react';
-import { useAccount, useSignTypedData } from '@starknet-react/core';
+import { useAccount } from '@starknet-react/core';
 import axios from 'axios';
 import React, { SetStateAction } from 'react';
-
-import { SIGNING_DATA } from '@/constants';
 
 interface TncModalProps {
   isOpen: boolean;
@@ -29,19 +28,23 @@ const TncModal: React.FC<TncModalProps> = ({
   setIsTncSigned,
   setIsSigningPending,
 }) => {
-  const { signTypedDataAsync } = useSignTypedData(SIGNING_DATA);
-  const { address } = useAccount();
+  // const { signTypedDataAsync } = useSignTypedData(SIGNING_DATA);
+  const { address, account } = useAccount();
 
   const handleSign = async () => {
+    if (!address || !account) {
+      return;
+    }
+
     setIsSigningPending(true);
 
-    const res = await signTypedDataAsync();
+    const signature = (await account.signMessage(SIGNING_DATA)) as string[];
 
-    if (res && res?.toString().length > 0) {
+    if (signature && signature.length > 0) {
       try {
         const res2 = await axios.post('/api/tnc/signUser', {
           address,
-          message: res?.toString(),
+          signature: JSON.stringify([signature[1], signature[2]]),
         });
 
         if (res2.data?.success) {

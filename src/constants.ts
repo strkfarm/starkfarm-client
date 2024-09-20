@@ -1,3 +1,4 @@
+import { TypedData } from 'starknet';
 import { NFTInfo, TokenInfo } from './strategies/IStrategy';
 import MyNumber from './utils/MyNumber';
 
@@ -191,7 +192,7 @@ export const NFTS: NFTInfo[] = [
   },
 ];
 
-export const SIGNING_DATA = {
+export const SIGNING_DATA: TypedData = {
   types: {
     StarkNetDomain: [
       { name: 'name', type: 'felt' },
