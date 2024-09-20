@@ -1,1 +1,1 @@
-yarn run lint:fix && yarn run format:fix
+yarn run lint:fix && yarn run format:fix && git add .

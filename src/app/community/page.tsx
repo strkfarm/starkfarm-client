@@ -5,6 +5,7 @@ import og_nft from '@/assets/og_nft.jpg';
 import illustration from '@/assets/illustration.svg';
 import { useAtomValue } from 'jotai';
 import { referralCodeAtom } from '@/store/referral.store';
+import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import {
   useContractRead,
@@ -16,6 +17,7 @@ import NFTAbi from '../../abi/nft.abi.json';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import { addressAtom } from '@/store/claims.atoms';
 import { copyReferralLink, getReferralUrl } from '@/utils';
+import mixpanel from 'mixpanel-browser';
 
 import {
   Box,
@@ -23,12 +25,16 @@ import {
   Image as ChakraImage,
   Container,
   Link,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalOverlay,
   Progress,
   Spinner,
   Text,
+  useDisclosure,
 } from '@chakra-ui/react';
-import mixpanel from 'mixpanel-browser';
-import { useEffect, useMemo, useState } from 'react';
 
 interface OGNFTUserData {
   address: string;
@@ -51,12 +57,12 @@ const isOGNFTEligibleAtom = atomWithQuery((get) => {
   };
 });
 
-
 const CommunityPage = () => {
   const [progress, setProgress] = useState(0);
   const [isEligible, setIsEligible] = useState(false);
   const [hasNFT, setHasNFT] = useState(false);
   const [isEligibilityChecked, setIsEligibilityChecked] = useState(false);
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const referralCode = useAtomValue(referralCodeAtom);
   const isOGNFTEligible = useAtomValue(isOGNFTEligibleAtom);
   const address = useAtomValue(addressAtom);
@@ -79,7 +85,12 @@ const CommunityPage = () => {
     provider,
   );
 
-  const { writeAsync: claimOGNFT } = useContractWrite({
+  const {
+    writeAsync: claimOGNFT,
+    isPending: isClaimOGNFTPending,
+    isError: isClaimOGNFTError,
+    error: claimOGTError,
+  } = useContractWrite({
     calls: [
       ogNFTContract.populate('mint', {
         nftId: 1,
@@ -90,7 +101,7 @@ const CommunityPage = () => {
     ],
   });
 
-  const { data: ogNFTBalance } = useContractRead({
+  const { data: ogNFTBalance, status: balanceQueryStatus } = useContractRead({
     abi: NFTAbi,
     address: process.env.NEXT_PUBLIC_OG_NFT_CONTRACT || '0',
     functionName: 'balanceOf',
@@ -118,7 +129,13 @@ const CommunityPage = () => {
     mixpanel.track('Community Page open');
   }, []);
 
-  function handleEligibility() {
+  async function handleEligibility() {
+    mixpanel.track('Check OG NFT Eligibility', {
+      address,
+      isEligible,
+      isEligibilityChecked,
+      isOGNFTEligible: isOGNFTEligible.data?.isOgNFTUser,
+    });
     if (!address) {
       toast.error('Please connect wallet', {
         position: 'bottom-right',
@@ -131,7 +148,17 @@ const CommunityPage = () => {
         setIsEligible(true);
       }
     } else {
-      claimOGNFT();
+      const result = await claimOGNFT();
+      if (result.transaction_hash) {
+        onOpen();
+      }
+
+      if (isClaimOGNFTError) {
+        console.error(claimOGTError);
+        toast.error('An error occurred during the claim', {
+          position: 'bottom-right',
+        });
+      }
     }
 
     setIsEligibilityChecked(true);
@@ -322,16 +349,31 @@ const CommunityPage = () => {
                 color: 'purple',
               }}
               onClick={handleEligibility}
-              isDisabled={hasNFT || isOGNFTLoading || !isOGNFTEligible.data}
+              isDisabled={
+                hasNFT ||
+                isOGNFTLoading ||
+                !isOGNFTEligible.data ||
+                isClaimOGNFTPending ||
+                !address
+              }
             >
               <Text fontSize={{ base: '10px', md: '14px' }} color="white">
-                {!address
-                  ? 'Connect wallet to check eligibility'
-                  : hasNFT
-                    ? 'Claimed'
-                    : !isEligible
-                      ? 'Check eligibility'
-                      : 'Claim'}
+                {isClaimOGNFTPending && !isClaimOGNFTError ? (
+                  <Box display="flex" alignItems="center">
+                    Claiming <Spinner size="sm" ml={2} />
+                  </Box>
+                ) : !address ? (
+                  'Connect wallet to check eligibility'
+                ) : isOGNFTEligible.isLoading ||
+                  balanceQueryStatus == 'pending' ? (
+                  <Spinner size="sm" />
+                ) : hasNFT ? (
+                  'Claimed'
+                ) : !isEligible ? (
+                  'Check eligibility'
+                ) : (
+                  'Claim'
+                )}
               </Text>
             </Button>
 
@@ -418,6 +460,74 @@ const CommunityPage = () => {
           You will be able to check your points and claim your NFTs here soon.
         </Text>
       </Box>
+
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
+        <ModalOverlay />
+        <ModalContent
+          display="flex"
+          alignItems="center"
+          backgroundColor="var(--chakra-colors-highlight)"
+          height={{ base: '260px', md: '250px' }}
+          margin="0 25px"
+          border="1px solid var(--chakra-colors-color2_65p)"
+        >
+          <ModalCloseButton color="white" />
+          <ModalBody
+            display="flex"
+            flexDirection="column"
+            gap="15px"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <Text fontSize="48px">🎉</Text>
+            <Text color="white" fontSize="20px" textAlign="center">
+              <b>Share your achievement on X</b>
+            </Text>
+
+            <Box>
+              <Link
+                href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('I just claimed my Limited Edition OG Farmer NFT on @STRKFarm! Have you gotten yours yet? You might still be eligible, don’t miss out!')}`}
+                isExternal={true}
+                _hover={{
+                  textDecoration: 'none',
+                }}
+              >
+                <Button
+                  display="flex"
+                  gap="5px"
+                  alignItems="center"
+                  padding={{ base: '5px 10px', md: '10px' }}
+                  fontSize={{ md: '14px' }}
+                  background="white"
+                  color="black"
+                  borderRadius="5px"
+                  _hover={{
+                    bg: 'color1_50p',
+                    color: 'white',
+                  }}
+                >
+                  <b>Share on</b>
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    xmlnsXlink="http://www.w3.org/1999/xlink"
+                    version="1.1"
+                    id="Layer_1"
+                    width="15px"
+                    height="15px"
+                    viewBox="0 0 24 24"
+                    xmlSpace="preserve"
+                  >
+                    <path
+                      fill="#7E49E5"
+                      d="M14.095479,10.316482L22.286354,1h-1.940718l-7.115352,8.087682L7.551414,1H1l8.589488,12.231093L1,23h1.940717  l7.509372-8.542861L16.448587,23H23L14.095479,10.316482z M11.436522,13.338465l-0.871624-1.218704l-6.924311-9.68815h2.981339  l5.58978,7.82155l0.867949,1.218704l7.26506,10.166271h-2.981339L11.436522,13.338465z"
+                    />
+                  </svg>
+                </Button>
+              </Link>
+            </Box>
+          </ModalBody>
+        </ModalContent>
+      </Modal>
     </Container>
   );
 };
