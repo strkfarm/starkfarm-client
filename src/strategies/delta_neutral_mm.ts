@@ -14,7 +14,7 @@ import DeltaNeutralAbi from '@/abi/deltraNeutral.abi.json';
 import MyNumber from '@/utils/MyNumber';
 import { Call, Contract, ProviderInterface, uint256 } from 'starknet';
 import { nostraLending } from '@/store/nostralending.store';
-import { getTokenInfoFromName, standariseAddress } from '@/utils';
+import { getPrice, getTokenInfoFromName, standariseAddress } from '@/utils';
 import {
   DUMMY_BAL_ATOM,
   getBalance,
@@ -22,7 +22,6 @@ import {
   getERC20Balance,
 } from '@/store/balance.atoms';
 import { atom } from 'jotai';
-import axios from 'axios';
 
 export class DeltaNeutralMM extends IStrategy {
   riskFactor = 0.75;
@@ -298,10 +297,7 @@ export class DeltaNeutralMM extends IStrategy {
         tokenInfo: this.token,
       };
     }
-    const priceInfo = await axios.get(
-      `https://api.coinbase.com/v2/prices/${balanceInfo.tokenInfo.name}-USDT/spot`,
-    );
-    const price = Number(priceInfo.data.data.amount);
+    const price = await getPrice(balanceInfo.tokenInfo);
     console.log('getUserTVL dnmm', price, balanceInfo.amount.toEtherStr());
     return {
       amount: balanceInfo.amount,
@@ -328,11 +324,7 @@ export class DeltaNeutralMM extends IStrategy {
       const discountFactor = this.stepAmountFactors[4];
       const amount = bal.amount.operate('div', 1 + discountFactor);
       console.log('getTVL1', amount.toString());
-      const priceInfo = await axios.get(
-        `https://api.coinbase.com/v2/prices/${mainTokenName}-USDT/spot`,
-      );
-      console.log('getTVL2', priceInfo);
-      const price = Number(priceInfo.data.data.amount);
+      const price = await getPrice(this.token);
       return {
         amount,
         usdValue: Number(amount.toEtherStr()) * price,
