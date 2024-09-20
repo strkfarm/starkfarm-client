@@ -46,10 +46,34 @@ const Strategy = ({ params }: StrategyParams) => {
   const { address } = useAccount();
   const strategies = useAtomValue(strategiesAtom);
   const transactions = useAtomValue(transactionsAtom);
-
   const [isMounted, setIsMounted] = useState(false);
+  const [strategyAddress, setStrategyAddress] = useState('');
 
   console.log('strategies', strategies);
+
+  function getStrategyAddress(strategyId: string): string {
+    let strategyAddress = '';
+
+    switch (strategyId) {
+      case 'usdc_sensei':
+        strategyAddress = CONSTANTS.CONTRACTS.DeltaNeutralMMUSDCETH;
+        break;
+      case 'eth_sensei':
+        strategyAddress = CONSTANTS.CONTRACTS.DeltaNeutralMMETHUSDC;
+        break;
+      case 'auto_token_usdc':
+        strategyAddress = CONSTANTS.CONTRACTS.AutoUsdcFarm;
+        break;
+      case 'auto_token_strk':
+        strategyAddress = CONSTANTS.CONTRACTS.AutoStrkFarm;
+        break;
+      case 'strk_sensei':
+        strategyAddress = CONSTANTS.CONTRACTS.DeltaNeutralMMSTRKETH;
+        break;
+    }
+
+    return strategyAddress;
+  }
 
   useEffect(() => {
     console.log('txs', transactions);
@@ -57,6 +81,8 @@ const Strategy = ({ params }: StrategyParams) => {
 
   const strategy: StrategyInfo | undefined = useMemo(() => {
     const id = params.strategyId;
+
+    setStrategyAddress(getStrategyAddress(id));
 
     console.log('id', id);
 
@@ -66,7 +92,7 @@ const Strategy = ({ params }: StrategyParams) => {
   console.log('strategy', strategy);
 
   const txHistoryAtom = useMemo(
-    () => TxHistoryAtom(strategy!.strategyAddress, address!),
+    () => TxHistoryAtom(strategyAddress, address!),
     [address],
   );
   const txHistory = useAtomValue(txHistoryAtom);
