@@ -101,7 +101,7 @@ const CommunityPage = () => {
     ],
   });
 
-  const { data: ogNFTBalance } = useContractRead({
+  const { data: ogNFTBalance, status: balanceQueryStatus } = useContractRead({
     abi: NFTAbi,
     address: process.env.NEXT_PUBLIC_OG_NFT_CONTRACT || '0',
     functionName: 'balanceOf',
@@ -353,7 +353,8 @@ const CommunityPage = () => {
                 hasNFT ||
                 isOGNFTLoading ||
                 !isOGNFTEligible.data ||
-                isClaimOGNFTPending
+                isClaimOGNFTPending ||
+                !address
               }
             >
               <Text fontSize={{ base: '10px', md: '14px' }} color="white">
@@ -363,6 +364,9 @@ const CommunityPage = () => {
                   </Box>
                 ) : !address ? (
                   'Connect wallet to check eligibility'
+                ) : isOGNFTEligible.isLoading ||
+                  balanceQueryStatus == 'pending' ? (
+                  <Spinner size="sm" />
                 ) : hasNFT ? (
                   'Claimed'
                 ) : !isEligible ? (
@@ -467,7 +471,7 @@ const CommunityPage = () => {
           margin="0 25px"
           border="1px solid var(--chakra-colors-color2_65p)"
         >
-          <ModalCloseButton color="white" onClick={onClose} />
+          <ModalCloseButton color="white" />
           <ModalBody
             display="flex"
             flexDirection="column"
