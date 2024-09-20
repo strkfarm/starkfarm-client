@@ -24,7 +24,7 @@ export function getStrategies() {
     'zSTRK',
     CONSTANTS.CONTRACTS.AutoStrkFarm,
     {
-      maxTVL: 50000,
+      maxTVL: 2000000,
     },
   );
   const autoUSDCStrategy = new AutoTokenStrategy(
@@ -34,7 +34,7 @@ export function getStrategies() {
     'zUSDC',
     CONSTANTS.CONTRACTS.AutoUsdcFarm,
     {
-      maxTVL: 500000,
+      maxTVL: 2000000,
     },
   );
 
