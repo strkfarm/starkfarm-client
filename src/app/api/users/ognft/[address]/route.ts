@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { ec, hash } from 'starknet';
-import { standariseAddress } from '@/utils';
-import OGNFTUsersJson from '@public/og_nft_eligible_users.json';
+import { standariseAddress } from '../../../../../utils';
+import OGNFTUsersJson from '../../../../../../public/og_nft_eligible_users.json';
 
 export const revalidate = 3600;
 
