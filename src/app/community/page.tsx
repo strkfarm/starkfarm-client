@@ -46,7 +46,7 @@ interface OGNFTUserData {
 
 const isOGNFTEligibleAtom = atomWithQuery((get) => {
   return {
-    queryKey: ['isOGNFTEligibleAtom'],
+    queryKey: ['isOGNFTEligibleAtom', get(addressAtom)],
     queryFn: async ({ _queryKey }: any): Promise<OGNFTUserData | null> => {
       const address = get(addressAtom) || '0x0';
       if (!address) return null;
