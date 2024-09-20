@@ -457,7 +457,7 @@ const CommunityPage = () => {
         </Text>
       </Box>
 
-      <Modal isOpen={true} onClose={onClose} isCentered>
+      <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent
           display="flex"
