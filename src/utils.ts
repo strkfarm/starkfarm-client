@@ -2,6 +2,8 @@ import { MenuItemProps, MenuListProps } from '@chakra-ui/react';
 import { num } from 'starknet';
 import { TOKENS } from './constants';
 import toast from 'react-hot-toast';
+import { TokenInfo } from './strategies/IStrategy';
+import axios from 'axios';
 
 export function getUniqueStrings(arr: Array<string>) {
   const _arr: string[] = [];
@@ -112,4 +114,44 @@ export function copyReferralLink(refCode: string) {
   toast.success('Referral link copied to clipboard', {
     position: 'bottom-right',
   });
+}
+
+// only meant for backend calls
+let redisClient: any = null;
+async function initRedis() {
+  if (typeof window === 'undefined') {
+    console.log('initRedis server');
+    // eslint-disable-next-line
+    const strkFarmSdk = require('strkfarm-sdk');
+    console.log('strkFarmSdk', strkFarmSdk);
+    const pricer = new strkFarmSdk.PricerRedis(null, []);
+    if (!process.env.REDIS_URL) {
+      console.warn('REDIS_URL not set');
+      return;
+    }
+    await pricer.initRedis(process.env.REDIS_URL);
+    redisClient = pricer;
+  }
+}
+
+initRedis();
+
+export async function getPrice(tokenInfo: TokenInfo) {
+  if (redisClient) {
+    const priceInfo = await redisClient.getPrice(tokenInfo.name);
+    console.log('getPrice redis', priceInfo, tokenInfo.name);
+    const now = new Date().getTime();
+    const priceTime = new Date(priceInfo.timestamp).getTime();
+    if (now - priceTime < 1000 * 60 * 5) {
+      return priceInfo.price as number;
+    }
+  } else if (typeof window === 'undefined') {
+    initRedis();
+  }
+  console.log('getPrice coinbase', tokenInfo.name);
+  const priceInfo = await axios.get(
+    `https://api.coinbase.com/v2/prices/${tokenInfo.name}-USDT/spot`,
+  );
+  const price = Number(priceInfo.data.data.amount);
+  return price;
 }
