@@ -451,13 +451,14 @@ const CommunityPage = () => {
         </Text>
       </Box>
 
-      <Modal isOpen={isOpen} onClose={onClose} isCentered>
+      <Modal isOpen={true} onClose={onClose} isCentered>
         <ModalOverlay />
         <ModalContent
           display="flex"
           alignItems="center"
           backgroundColor="var(--chakra-colors-highlight)"
-          height={{ md: '250px' }}
+          height={{ base: '260px', md: '250px' }}
+          margin="0 25px"
           border="1px solid var(--chakra-colors-color2_65p)"
         >
           <ModalCloseButton color="white" />
@@ -469,7 +470,7 @@ const CommunityPage = () => {
             justifyContent="center"
           >
             <Text fontSize="48px">🎉</Text>
-            <Text color="white" fontSize="20px">
+            <Text color="white" fontSize="20px" textAlign="center">
               <b>Share your achievement on X</b>
             </Text>
 
@@ -485,7 +486,7 @@ const CommunityPage = () => {
                   display="flex"
                   gap="5px"
                   alignItems="center"
-                  padding={{ base: '5px', md: '10px' }}
+                  padding={{ base: '5px 10px', md: '10px' }}
                   fontSize={{ md: '14px' }}
                   background="white"
                   color="black"
