@@ -8,6 +8,7 @@ import NostraDegenAtoms, { nostraDegen } from './nostradegen.store';
 import NostraLendingAtoms, { nostraLending } from './nostralending.store';
 import SithswapAtoms, { sithswap } from './sithswap.store';
 import StarkDefiAtoms, { starkDefi } from './starkdefi.store';
+import VesuAtoms, { vesu } from './vesu.store';
 import TenkSwapAtoms, { tenkswap } from './tenkswap.store';
 import ZkLendAtoms, { zkLend } from './zklend.store';
 import CarmineAtoms, { carmine } from './carmine.store';
@@ -82,6 +83,11 @@ export const PROTOCOLS = [
     name: hashstack.name,
     class: hashstack,
     atoms: HashstackAtoms,
+  },
+  {
+    name: vesu.name,
+    class: vesu,
+    atoms: VesuAtoms,
   },
   // {
   //   name: nimbora.name,
