@@ -153,40 +153,17 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
                   {harvestTimestamp?.minute ?? 0}
                 </Text>
               </Box>
-
-              {/* <Box
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                flexDirection="column"
-                gap="4px"
-                bgColor="#1B1D26"
-                width="53px"
-                height="53px"
-                borderRadius="8px"
-              >
-                <Text color="#AEAEAE" fontSize="12px" fontWeight="300">
-                  Secs
-                </Text>
-                <Text color="white" fontWeight="semi-bold">
-                  {harvestTimestamp?.second}
-                </Text>
-              </Box> */}
             </Box>
           </Box>
         </Box>
 
         <Box display="flex" py="20px">
           <Text color="white" fontSize="12px" fontWeight="normal">
-            Total rewards harvested:
+            Total rewards harvested:{' '}
+            {harvestTime?.data?.totalStrkHarvestedByContract.STRKAmount}
             <Text as="span">
-              <b>
-                {(
-                  BigInt(data?.amount.toString() ?? '') / BigInt(10 ** 18)
-                ).toString()}
-              </b>{' '}
-              | Total number of times harvested:{' '}
-              <b>{harvestTime?.data?.totalHarvests}</b>
+              <b>{}</b> | Total number of times harvested:{' '}
+              <b>{harvestTime?.data?.totalHarvestsByContract}</b>
             </Text>
           </Text>
         </Box>

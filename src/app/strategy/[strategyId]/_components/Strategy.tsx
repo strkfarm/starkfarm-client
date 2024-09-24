@@ -22,28 +22,28 @@ import {
 import { useAccount } from '@starknet-react/core';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 import Deposit from '@/components/Deposit';
 import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
 import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
-import {
-  StrategyTxPropsToMessageWithStrategies,
-  transactionsAtom,
-} from '@/store/transactions.atom';
-import { shortAddress } from '@/utils';
+import { transactionsAtom, TxHistoryAtom } from '@/store/transactions.atom';
 import { StrategyParams } from '../page';
 import HarvestTime from '@/components/HarvestTime';
+import {
+  capitalize,
+  getTokenInfoFromAddr,
+  shortAddress,
+  timeAgo,
+} from '@/utils';
+import MyNumber from '@/utils/MyNumber';
+import { ExternalLinkIcon } from '@chakra-ui/icons';
 
 const Strategy = ({ params }: StrategyParams) => {
   const { address } = useAccount();
   const strategies = useAtomValue(strategiesAtom);
   const transactions = useAtomValue(transactionsAtom);
   const [isMounted, setIsMounted] = useState(false);
-
-  useEffect(() => {
-    console.log('txs', transactions);
-  }, [transactions]);
 
   const strategy: StrategyInfo | undefined = useMemo(() => {
     const id = params.strategyId;
@@ -53,25 +53,92 @@ const Strategy = ({ params }: StrategyParams) => {
     return strategies.find((s) => s.id === id);
   }, [params.strategyId, strategies]);
 
+  console.log('strategy', strategy);
+
+  const strategyAddress = useMemo(() => {
+    const holdingTokens = strategy?.holdingTokens;
+    if (holdingTokens && holdingTokens.length) {
+      const holdingTokenInfo: any = holdingTokens[0];
+      return (holdingTokenInfo.address || holdingTokenInfo.token) as string;
+    }
+    return '';
+  }, [strategy]);
+
   const setBalQueryEnable = useSetAtom(strategy?.balEnabled || atom(false));
 
   useEffect(() => {
     setBalQueryEnable(true);
   }, []);
 
-  // const balAtom = getBalanceAtom(strategy?.holdingTokens[0]);
   const balData = useAtomValue(strategy?.balanceAtom || DUMMY_BAL_ATOM);
-  // cons{ balance, underlyingTokenInfo, isLoading, isError }
-  useEffect(() => {
+
+  // fetch tx history
+  const txHistoryAtom = useMemo(
+    () =>
+      TxHistoryAtom(
+        strategyAddress,
+        address!,
+        strategy?.balanceAtom || DUMMY_BAL_ATOM,
+      ),
+    [address, strategyAddress, balData],
+  );
+  const txHistoryResult = useAtomValue(txHistoryAtom);
+  const txHistory = useMemo(() => {
+    if (txHistoryResult.data) {
+      return {
+        findManyInvestment_flows: [
+          ...txHistoryResult.data.findManyInvestment_flows,
+        ].sort((a, b) => {
+          return b.timestamp - a.timestamp;
+        }),
+      };
+    }
     console.log(
-      'balData',
-      balData.isError,
-      balData.isLoading,
-      balData.isPending,
-      balData.data,
-      balData.error,
+      'TxHistoryAtom',
+      txHistoryResult.error,
+      txHistoryResult.isError,
+      txHistoryResult.isLoading,
     );
-  }, [balData]);
+    return txHistoryResult.data || { findManyInvestment_flows: [] };
+  }, [txHistoryResult.data]);
+
+  // compute profit
+  // profit doesnt change quickly in real time, but total deposit amount can change
+  // and it can impact the profit calc as txHistory may not be updated at the same time as balData
+  // So, we compute profit once only
+  const [profit, setProfit] = useState(0);
+  const computeProfit = useCallback(() => {
+    if (!txHistory.findManyInvestment_flows.length) return 0;
+    const tokenInfo = getTokenInfoFromAddr(
+      txHistory.findManyInvestment_flows[0].asset,
+    );
+    if (!tokenInfo) return 0;
+    const netDeposits = txHistory.findManyInvestment_flows.reduce((acc, tx) => {
+      const sign = tx.type === 'deposit' ? 1 : -1;
+      return (
+        acc +
+        sign *
+          Number(
+            new MyNumber(tx.amount, tokenInfo.decimals).toEtherToFixedDecimals(
+              4,
+            ),
+          )
+      );
+    }, 0);
+    const currentValue = Number(
+      balData.data?.amount.toEtherToFixedDecimals(4) || '0',
+    );
+    if (currentValue === 0) return 0;
+
+    if (netDeposits === 0) return 0;
+    setProfit(currentValue - netDeposits);
+  }, [txHistory, balData]);
+
+  useEffect(() => {
+    if (profit == 0) {
+      computeProfit();
+    }
+  }, [txHistory, balData]);
 
   useEffect(() => {
     mixpanel.track('Strategy page open', { name: params.strategyId });
@@ -258,94 +325,136 @@ const Strategy = ({ params }: StrategyParams) => {
               </Box>
             ))}
           </Card>
-
-          {/* Risks card */}
-          <Card width={'100%'} color="white" bg="highlight" padding={'15px'}>
-            <Text fontSize={'20px'} marginBottom={'10px'} fontWeight={'bold'}>
-              Risks
-            </Text>
-            <OrderedList>
-              {strategy.risks.map((r) => (
-                <ListItem
-                  color="light_grey"
-                  key={r}
-                  fontSize={'14px'}
-                  marginBottom={'5px'}
-                >
-                  {r}
-                </ListItem>
-              ))}
-            </OrderedList>
-          </Card>
-
-          {/* Transaction history card */}
-          <Card width={'100%'} color="white" bg="highlight" padding={'15px'}>
-            <Text fontSize={'20px'} marginBottom={'10px'} fontWeight={'bold'}>
-              Transaction history
-            </Text>
-
-            {/* If more than 1 filtered tx */}
-            {transactions.filter((tx) => tx.info.strategyId == strategy.id)
-              .length > 0 && (
-              <>
+          <Grid width={'100%'} templateColumns="repeat(5, 1fr)" gap={2}>
+            <GridItem colSpan={colSpan1} bg="highlight">
+              {/* Risks card */}
+              <Card
+                width={'100%'}
+                color="white"
+                bg="highlight"
+                padding={'15px'}
+              >
                 <Text
-                  fontSize={'14px'}
+                  fontSize={'20px'}
                   marginBottom={'10px'}
-                  color="light_grey"
+                  fontWeight={'bold'}
                 >
-                  Note: This feature saves and shows transactions made on this
-                  device since it was added. Clearing your browser cache will
-                  remove this data.
+                  Risks
+                </Text>
+                <OrderedList>
+                  {strategy.risks.map((r) => (
+                    <ListItem
+                      color="light_grey"
+                      key={r}
+                      fontSize={'14px'}
+                      marginBottom={'5px'}
+                      alignItems={'justify'}
+                    >
+                      {r}
+                    </ListItem>
+                  ))}
+                </OrderedList>
+              </Card>
+            </GridItem>
+            <GridItem colSpan={colSpan2} bg={'highlight'}>
+              {/* Transaction history card */}
+              <Card
+                width={'100%'}
+                color="white"
+                bg="highlight"
+                padding={'15px'}
+              >
+                <Text fontSize={'20px'} fontWeight={'bold'}>
+                  Transaction history
+                </Text>
+                <Text fontSize={'13px'} marginBottom={'10px'} color={'color2'}>
+                  There may be delays fetching data. If your transaction{' '}
+                  {`isn't`} found, try again later.
                 </Text>
 
-                {transactions
-                  .filter((tx) => tx.info.strategyId == strategy.id)
-                  .map((tx, index) => {
-                    return (
-                      <Box
-                        className="text-cell"
-                        key={index}
-                        width={'100%'}
-                        color="light_grey"
-                        fontSize={'14px'}
-                      >
-                        <Text width={'100%'} color="white" padding={'5px 10px'}>
-                          {/* The default msg contains strategy name, since this for a specific strategy, replace it */}
-                          {index + 1}){' '}
-                          {StrategyTxPropsToMessageWithStrategies(
-                            tx.info,
-                            strategies,
-                          ).replace(` in ${strategy.name}`, '')}
-                        </Text>
-                        <Text width={'100%'} padding={'5px 10px'}>
-                          {/* The default msg contains strategy name, since this for a specific strategy, replace it */}
-                          Transacted on {tx.createdAt.toLocaleDateString()} [
-                          <Link
-                            textDecoration={'underline'}
-                            href={`https://starkscan.co/tx/${tx.txHash}`}
-                            target="_blank"
-                          >
-                            {shortAddress(tx.txHash)}
-                          </Link>
-                          ]
-                        </Text>
-                      </Box>
-                    );
-                  })}
-              </>
-            )}
+                {txHistoryResult.isSuccess && (
+                  <>
+                    {txHistory.findManyInvestment_flows.map((tx, index) => {
+                      const token = getTokenInfoFromAddr(tx.asset);
+                      const decimals = token?.decimals;
 
-            {/* If no filtered tx */}
-            {transactions.filter((tx) => tx.info.strategyId == strategy.id)
-              .length == 0 && (
-              <Text fontSize={'14px'} textAlign={'center'} color="light_grey">
-                No transactions recorded since this feature was added. We use
-                your {"browser's"} storage to save your transaction history.
-                Make a deposit or withdrawal to see your transactions here.
-                Clearning browser cache will remove this data.
-              </Text>
-            )}
-          </Card>
+                      return (
+                        <Box
+                          className="text-cell"
+                          key={index}
+                          width={'100%'}
+                          color="light_grey"
+                          fontSize={'14px'}
+                          display={{ base: 'block', md: 'flex' }}
+                        >
+                          <Flex
+                            width={{ base: '100%' }}
+                            justifyContent={'space-between'}
+                          >
+                            <Text width={'10%'}>{index + 1}.</Text>
+                            <Box width={'40%'}>
+                              <Text
+                                textAlign={'right'}
+                                color={tx.type == 'deposit' ? 'cyan' : 'red'}
+                                fontWeight={'bold'}
+                              >
+                                {Number(
+                                  new MyNumber(
+                                    tx.amount,
+                                    decimals!,
+                                  ).toEtherToFixedDecimals(
+                                    token.displayDecimals,
+                                  ),
+                                ).toLocaleString()}{' '}
+                                {token?.name}
+                              </Text>
+                              <Text textAlign={'right'} color="color2_65p">
+                                {capitalize(tx.type)}
+                              </Text>
+                            </Box>
+
+                            <Box width={'50%'} justifyContent={'flex-end'}>
+                              <Text
+                                width={'100%'}
+                                textAlign={'right'}
+                                fontWeight={'bold'}
+                              >
+                                <Link
+                                  href={`https://starkscan.co/tx/${tx.txHash}`}
+                                  target="_blank"
+                                >
+                                  {shortAddress(tx.txHash)} <ExternalLinkIcon />
+                                </Link>
+                              </Text>
+                              <Text
+                                width={'100%'}
+                                textAlign={'right'}
+                                color="color2_65p"
+                              >
+                                {/* The default msg contains strategy name, since this for a specific strategy, replace it */}
+                                {timeAgo(new Date(tx.timestamp * 1000))}
+                              </Text>
+                            </Box>
+                          </Flex>
+                        </Box>
+                      );
+                    })}
+                  </>
+                )}
+
+                {/* If no filtered tx */}
+                {txHistory.findManyInvestment_flows.length === 0 && (
+                  <Text
+                    fontSize={'14px'}
+                    textAlign={'center'}
+                    color="light_grey"
+                  >
+                    No transactions found
+                  </Text>
+                )}
+              </Card>
+            </GridItem>
+          </Grid>
         </VStack>
       )}
     </>

@@ -10,8 +10,12 @@ interface HarvestTime {
 
 interface QueryResponse {
   findManyHarvests: HarvestTime[];
-  totalHarvests: number;
-  totalStrkHarvested: number;
+  totalHarvestsByContract: number;
+  totalStrkHarvestedByContract: {
+    STRKAmount: number;
+    USDValue: number;
+    rawSTRKAmount: string;
+  };
 }
 
 // GraphQL query
@@ -20,13 +24,19 @@ const GET_HARVESTS_QUERY = gql`
     $where: HarvestsWhereInput
     $take: Int
     $orderBy: [HarvestsOrderByWithRelationInput!]
+    $contract: String!
   ) {
     findManyHarvests(where: $where, take: $take, orderBy: $orderBy) {
       contract
       amount
       timestamp
     }
-    totalHarvests
+    totalHarvestsByContract(contract: $contract)
+    totalStrkHarvestedByContract(contract: $contract) {
+      STRKAmount
+      USDValue
+      rawSTRKAmount
+    }
   }
 `;
 
@@ -47,6 +57,7 @@ async function getHarvestData(
         },
         take,
         orderBy,
+        contract,
       },
     });
 

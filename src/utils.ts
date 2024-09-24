@@ -1,6 +1,9 @@
 import { MenuItemProps, MenuListProps } from '@chakra-ui/react';
 import { num } from 'starknet';
 import { TOKENS } from './constants';
+import toast from 'react-hot-toast';
+import { TokenInfo } from './strategies/IStrategy';
+import axios from 'axios';
 
 export function getUniqueStrings(arr: Array<string>) {
   const _arr: string[] = [];
@@ -92,6 +95,9 @@ export function generateReferralCode() {
 }
 
 export function getReferralUrl(referralCode: string) {
+  if (window.location.origin.includes('app.strkfarm.xyz')) {
+    return `https://strkfarm.xyz/r/${referralCode}`;
+  }
   return `${window.location.origin}/r/${referralCode}`;
 }
 
@@ -111,4 +117,67 @@ export function formatTimestamp(timestamp: string) {
     minute: date.getUTCMinutes(),
     second: date.getUTCSeconds(),
   };
+}
+
+export function copyReferralLink(refCode: string) {
+  navigator.clipboard.writeText(getReferralUrl(refCode));
+
+  toast.success('Referral link copied to clipboard', {
+    position: 'bottom-right',
+  });
+}
+
+export async function getPrice(tokenInfo: TokenInfo) {
+  try {
+    return await getPriceFromMyAPI(tokenInfo);
+  } catch (e) {
+    console.error('getPriceFromMyAPI error', e);
+  }
+  console.log('getPrice coinbase', tokenInfo.name);
+  const priceInfo = await axios.get(
+    `https://api.coinbase.com/v2/prices/${tokenInfo.name}-USDT/spot`,
+  );
+  const price = Number(priceInfo.data.data.amount);
+  return price;
+}
+
+export async function getPriceFromMyAPI(tokenInfo: TokenInfo) {
+  console.log('getPrice from redis', tokenInfo.name);
+
+  const endpoint =
+    typeof window === 'undefined'
+      ? process.env.HOSTNAME
+      : window.location.origin;
+  const priceInfo = await axios.get(`${endpoint}/api/price/${tokenInfo.name}`);
+  const now = new Date();
+  const priceTime = new Date(priceInfo.data.timestamp);
+  if (now.getTime() - priceTime.getTime() > 900000) {
+    // 15 mins
+    throw new Error('Price is stale');
+  }
+  const price = Number(priceInfo.data.price);
+  return price;
+}
+
+export function timeAgo(date: Date): string {
+  const now = new Date();
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
+  const months = Math.floor(days / 30);
+
+  if (hours < 1) return `${minutes}min ago`;
+  if (hours < 24) return `${hours}h ago`;
+  if (days < 7) return `${days}d ago`;
+  if (weeks < 4) return `${weeks}w ago`;
+  if (months < 3) return `${months}mon ago`;
+
+  // If more than 3 months, return in DD MMM, YY format
+  return date.toLocaleDateString('en-US', {
+    day: '2-digit',
+    month: 'short',
+    year: '2-digit',
+  });
 }
