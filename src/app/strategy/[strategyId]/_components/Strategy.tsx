@@ -28,7 +28,6 @@ import Deposit from '@/components/Deposit';
 import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
 import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
 import { transactionsAtom, TxHistoryAtom } from '@/store/transactions.atom';
-import { StrategyParams } from '../page';
 import HarvestTime from '@/components/HarvestTime';
 import {
   capitalize,
@@ -36,6 +35,7 @@ import {
   shortAddress,
   timeAgo,
 } from '@/utils';
+import { StrategyParams } from '../page';
 import MyNumber from '@/utils/MyNumber';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
 
