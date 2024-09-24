@@ -317,7 +317,7 @@ export default function Deposit(props: DepositProps) {
         <TxButton
           txInfo={txInfo}
           buttonText={props.buttonText}
-          text={`${props.buttonText}: ${amount.toEtherToFixedDecimals(2)} ${selectedMarket.name}`}
+          text={`${props.buttonText}: ${amount.toEtherToFixedDecimals(selectedMarket.displayDecimals)} ${selectedMarket.name}`}
           calls={calls}
           buttonProps={{
             isDisabled:

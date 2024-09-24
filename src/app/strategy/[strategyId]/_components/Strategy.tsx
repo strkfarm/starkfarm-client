@@ -259,10 +259,13 @@ const Strategy = ({ params }: StrategyParams) => {
                           <Text color="cyan">
                             {address
                               ? Number(
-                                  balData.data.amount.toEtherToFixedDecimals(4),
+                                  balData.data.amount.toEtherToFixedDecimals(
+                                    balData.data.tokenInfo?.displayDecimals ||
+                                      2,
+                                  ),
                                 ) == 0
                                 ? '-'
-                                : `${balData.data.amount.toEtherToFixedDecimals(4)} ${balData.data.tokenInfo?.name}`
+                                : `${balData.data.amount.toEtherToFixedDecimals(balData.data.tokenInfo?.displayDecimals || 2)} ${balData.data.tokenInfo?.name}`
                               : isMobile
                                 ? CONSTANTS.MOBILE_MSG
                                 : 'Connect wallet'}
@@ -278,7 +281,7 @@ const Strategy = ({ params }: StrategyParams) => {
                               color={profit >= 0 ? 'cyan' : 'red'}
                             >
                               {address && profit != 0
-                                ? `${profit?.toFixed(4)} ${balData.data.tokenInfo?.name}`
+                                ? `${profit?.toFixed(balData.data.tokenInfo?.displayDecimals || 2)} ${balData.data.tokenInfo?.name}`
                                 : '-'}
                             </Text>
                           </Box>
