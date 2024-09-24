@@ -147,3 +147,26 @@ export async function getPriceFromMyAPI(tokenInfo: TokenInfo) {
   const price = Number(priceInfo.data.price);
   return price;
 }
+
+export function timeAgo(date: Date): string {
+  const now = new Date();
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
+  const months = Math.floor(days / 30);
+
+  if (hours < 1) return `${minutes}min ago`;
+  if (hours < 24) return `${hours}h ago`;
+  if (days < 7) return `${days}d ago`;
+  if (weeks < 4) return `${weeks}w ago`;
+  if (months < 3) return `${months}mon ago`;
+
+  // If more than 3 months, return in DD MMM, YY format
+  return date.toLocaleDateString('en-US', {
+    day: '2-digit',
+    month: 'short',
+    year: '2-digit',
+  });
+}
