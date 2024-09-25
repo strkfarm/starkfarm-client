@@ -30,6 +30,8 @@
     "@nikolovlazar/chakra-ui-prose": "1.2.1",
     "@prisma/client": "5.18.0",
     "@starknet-react/chains": "0.1.7",
+    "@apollo/client": "^3.11.8",
+    "graphql": "^16.9.0",
     "@starknet-react/core": "2.8.0",
     "@tanstack/query-core": "5.28.0",
     "@types/mixpanel-browser": "2.49.0",

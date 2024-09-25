@@ -108,6 +108,17 @@ export function getDisplayCurrencyAmount(
   return Number(Number(amount).toFixed(decimals)).toLocaleString();
 }
 
+export function formatTimestamp(timestamp: string) {
+  const date = new Date(parseInt(timestamp, 10) * 1000);
+  return {
+    day: date.getUTCDate(),
+    month: date.getUTCMonth() + 1,
+    hour: date.getUTCHours(),
+    minute: date.getUTCMinutes(),
+    second: date.getUTCSeconds(),
+  };
+}
+
 export function copyReferralLink(refCode: string) {
   navigator.clipboard.writeText(getReferralUrl(refCode));
 
