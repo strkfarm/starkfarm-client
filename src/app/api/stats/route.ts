@@ -1,7 +1,7 @@
 import { getStrategies } from '@/store/strategies.atoms';
 import { NextResponse } from 'next/server';
 
-export const revalidate = 60;
+export const revalidate = 1800;
 
 export async function GET(_req: Request) {
   const strategies = getStrategies();
@@ -28,7 +28,13 @@ export async function GET(_req: Request) {
 
   const result = await Promise.all(values);
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     tvl: result.reduce((a, b) => a + b, 0),
   });
+
+  response.headers.set(
+    'Cache-Control',
+    's-maxage=1800, stale-while-revalidate=120',
+  );
+  return response;
 }

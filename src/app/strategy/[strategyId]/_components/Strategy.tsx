@@ -17,7 +17,6 @@ import {
   TabPanels,
   Tabs,
   Text,
-  Tooltip,
   VStack,
 } from '@chakra-ui/react';
 import { useAccount } from '@starknet-react/core';
