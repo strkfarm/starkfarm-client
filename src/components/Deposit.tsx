@@ -317,7 +317,7 @@ export default function Deposit(props: DepositProps) {
         <TxButton
           txInfo={txInfo}
           buttonText={props.buttonText}
-          text={`${props.buttonText}: ${amount.toEtherToFixedDecimals(2)} ${selectedMarket.name}`}
+          text={`${props.buttonText}: ${amount.toEtherToFixedDecimals(selectedMarket.displayDecimals)} ${selectedMarket.name}`}
           calls={calls}
           buttonProps={{
             isDisabled:
@@ -328,6 +328,15 @@ export default function Deposit(props: DepositProps) {
           resetDepositForm={resetDepositForm}
         />
       </Center>
+
+      <Text
+        textAlign="center"
+        color="disabled_bg"
+        fontSize="12px"
+        marginTop="20px"
+      >
+        No additional fees by STRKFarm
+      </Text>
 
       <Box width="100%" marginTop={'15px'}>
         <Flex justifyContent="space-between">

@@ -40,7 +40,7 @@ const theme = extendTheme({
     color2_65p: 'rgba(132, 132, 195, 0.65)',
     color2_50p: 'rgba(132, 132, 195, 0.15)',
     highlight: '#1a1a27', // light grey
-    light_grey: '#9d9d9d',
+    light_grey: '#9ca9ad',
     disabled_text: '#818181',
     disabled_bg: '#5f5f5f',
     purple: '#6e53dc',
@@ -48,6 +48,7 @@ const theme = extendTheme({
     bg: '#111119', // dark blue
     grey_text: '#B6B6B6',
     yellow: '#EFDB72',
+    red: '#e18787',
   },
   fontSizes: {
     large: '50px',

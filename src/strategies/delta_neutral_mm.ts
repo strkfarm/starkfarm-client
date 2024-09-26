@@ -14,7 +14,7 @@ import DeltaNeutralAbi from '@/abi/deltraNeutral.abi.json';
 import MyNumber from '@/utils/MyNumber';
 import { Call, Contract, ProviderInterface, uint256 } from 'starknet';
 import { nostraLending } from '@/store/nostralending.store';
-import { getTokenInfoFromName, standariseAddress } from '@/utils';
+import { getPrice, getTokenInfoFromName, standariseAddress } from '@/utils';
 import {
   DUMMY_BAL_ATOM,
   getBalance,
@@ -22,7 +22,6 @@ import {
   getERC20Balance,
 } from '@/store/balance.atoms';
 import { atom } from 'jotai';
-import axios from 'axios';
 
 export class DeltaNeutralMM extends IStrategy {
   riskFactor = 0.75;
@@ -31,7 +30,6 @@ export class DeltaNeutralMM extends IStrategy {
   readonly strategyAddress: string;
   // Factor of Amount to be deposited/borrowed at each step relative to the previous step
   readonly stepAmountFactors: number[];
-  fee_factor = 0.1; // 10% fee
 
   constructor(
     token: TokenInfo,
@@ -150,21 +148,10 @@ export class DeltaNeutralMM extends IStrategy {
     const _amount = (
       Number(amount) * this.stepAmountFactors[actions.length]
     ).toFixed(2);
-    const pool = { ...eligiblePools[0] };
-    const isDeposit = actions.length == 0 || actions.length == 2;
-    const effectiveAPR = pool.aprSplits.reduce((a, b) => {
-      if (b.apr == 'Err') return a;
-      if (!isDeposit) return a + Number(b.apr);
-      if (b.title.includes('STRK rewards')) {
-        return a + Number(b.apr) * (1 - this.fee_factor);
-      }
-      return a + Number(b.apr);
-    }, 0);
-    pool.apr = isDeposit ? effectiveAPR : pool.borrow.apr;
     return [
       ...actions,
       {
-        pool,
+        pool: eligiblePools[0],
         amount: _amount,
         isDeposit: actions.length == 0 || actions.length == 2,
       },
@@ -310,10 +297,7 @@ export class DeltaNeutralMM extends IStrategy {
         tokenInfo: this.token,
       };
     }
-    const priceInfo = await axios.get(
-      `https://api.coinbase.com/v2/prices/${balanceInfo.tokenInfo.name}-USDT/spot`,
-    );
-    const price = Number(priceInfo.data.data.amount);
+    const price = await getPrice(balanceInfo.tokenInfo);
     console.log('getUserTVL dnmm', price, balanceInfo.amount.toEtherStr());
     return {
       amount: balanceInfo.amount,
@@ -340,11 +324,7 @@ export class DeltaNeutralMM extends IStrategy {
       const discountFactor = this.stepAmountFactors[4];
       const amount = bal.amount.operate('div', 1 + discountFactor);
       console.log('getTVL1', amount.toString());
-      const priceInfo = await axios.get(
-        `https://api.coinbase.com/v2/prices/${mainTokenName}-USDT/spot`,
-      );
-      console.log('getTVL2', priceInfo);
-      const price = Number(priceInfo.data.data.amount);
+      const price = await getPrice(this.token);
       return {
         amount,
         usdValue: Number(amount.toEtherStr()) * price,
