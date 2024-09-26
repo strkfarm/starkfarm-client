@@ -1,6 +1,7 @@
 import { gql } from '@apollo/client';
 import apolloClient from '@/utils/apolloClient';
 import { atomWithQuery } from 'jotai-tanstack-query';
+import { standariseAddress } from '@/utils';
 
 interface HarvestTime {
   contract: string;
@@ -52,12 +53,12 @@ async function getHarvestData(
       variables: {
         where: {
           contract: {
-            equals: contract,
+            equals: standariseAddress(contract),
           },
         },
         take,
         orderBy,
-        contract,
+        contract: standariseAddress(contract),
       },
     });
 

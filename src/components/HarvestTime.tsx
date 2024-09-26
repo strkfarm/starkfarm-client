@@ -17,7 +17,11 @@ import { useAccount } from '@starknet-react/core';
 import { StrategyInfo } from '@/store/strategies.atoms';
 import { HarvestTimeAtom } from '@/store/harvest.atom';
 import { useAtomValue } from 'jotai';
-import { formatTimestamp, getUniqueById } from '@/utils';
+import {
+  formatTimestamp,
+  getDisplayCurrencyAmount,
+  getUniqueById,
+} from '@/utils';
 import CONSTANTS from '@/constants';
 import { isMobile } from 'react-device-detect';
 
@@ -160,9 +164,12 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
         <Box display="flex" py="20px">
           <Text color="white" fontSize="12px" fontWeight="normal">
             Total rewards harvested:{' '}
-            {harvestTime?.data?.totalStrkHarvestedByContract.STRKAmount}
+            {getDisplayCurrencyAmount(
+              harvestTime?.data?.totalStrkHarvestedByContract.STRKAmount || 0,
+            )}{' '}
+            STRK
             <Text as="span">
-              <b>{}</b> | Total number of times harvested:{' '}
+              <b>{}</b> | Times harvested:{' '}
               <b>{harvestTime?.data?.totalHarvestsByContract}</b>
             </Text>
           </Text>
