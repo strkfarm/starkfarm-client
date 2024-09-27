@@ -4,12 +4,14 @@ import {
   Avatar,
   Box,
   Card,
+  Center,
   Flex,
   Grid,
   GridItem,
   Link,
   ListItem,
   OrderedList,
+  Spinner,
   Tab,
   TabIndicator,
   TabList,
@@ -18,6 +20,8 @@ import {
   Tabs,
   Text,
   VStack,
+  Wrap,
+  WrapItem,
 } from '@chakra-ui/react';
 import { useAccount } from '@starknet-react/core';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
@@ -32,12 +36,15 @@ import HarvestTime from '@/components/HarvestTime';
 import {
   capitalize,
   getTokenInfoFromAddr,
+  getUniqueById,
   shortAddress,
   timeAgo,
 } from '@/utils';
 import { StrategyParams } from '../page';
 import MyNumber from '@/utils/MyNumber';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
+import { isMobile } from 'react-device-detect';
+import CONSTANTS from '@/constants';
 
 const Strategy = ({ params }: StrategyParams) => {
   const { address } = useAccount();
@@ -171,7 +178,89 @@ const Strategy = ({ params }: StrategyParams) => {
         <VStack width={'100%'}>
           <Grid width={'100%'} templateColumns="repeat(5, 1fr)" gap={2}>
             <GridItem display="flex" colSpan={colSpan1}>
-              <HarvestTime strategy={strategy} balData={balData} />
+              <Card width="100%" padding={'15px'} color="white" bg="highlight">
+                <HarvestTime strategy={strategy} balData={balData} />
+                <Box display={{ base: 'block', md: 'flex' }} marginTop={'10px'}>
+                  <Box width={{ base: '100%', md: '100%' }}>
+                    <Text
+                      fontSize={'20px'}
+                      marginBottom={'0px'}
+                      fontWeight={'bold'}
+                    >
+                      How does it work?
+                    </Text>
+                    <Text
+                      color="light_grey"
+                      marginBottom="5px"
+                      fontSize={'15px'}
+                    >
+                      {strategy.description}
+                    </Text>
+                    <Wrap>
+                      {getUniqueById(
+                        strategy.actions.map((p) => ({
+                          id: p.pool.protocol.name,
+                          logo: p.pool.protocol.logo,
+                        })),
+                      ).map((p) => (
+                        <WrapItem marginRight={'10px'} key={p.id}>
+                          <Center>
+                            <Avatar
+                              size="2xs"
+                              bg={'black'}
+                              src={p.logo}
+                              marginRight={'2px'}
+                            />
+                            <Text marginTop={'2px'}>{p.id}</Text>
+                          </Center>
+                        </WrapItem>
+                      ))}
+                    </Wrap>
+                  </Box>
+                </Box>
+
+                <Box
+                  padding={'10px'}
+                  borderRadius={'10px'}
+                  bg={'bg'}
+                  color="cyan"
+                  marginTop={'20px'}
+                >
+                  {!balData.isLoading &&
+                    !balData.isError &&
+                    !balData.isPending &&
+                    balData.data &&
+                    balData.data.tokenInfo && (
+                      <Text>
+                        <b>Your Holdings: </b>
+                        {address
+                          ? `${balData.data.amount.toEtherToFixedDecimals(4)} ${balData.data.tokenInfo?.name}`
+                          : isMobile
+                            ? CONSTANTS.MOBILE_MSG
+                            : 'Connect wallet'}
+                      </Text>
+                    )}
+                  {(balData.isLoading ||
+                    balData.isPending ||
+                    !balData.data?.tokenInfo) && (
+                    <Text>
+                      <b>Your Holdings: </b>
+                      {address ? (
+                        <Spinner size="sm" marginTop={'5px'} />
+                      ) : isMobile ? (
+                        CONSTANTS.MOBILE_MSG
+                      ) : (
+                        'Connect wallet'
+                      )}
+                    </Text>
+                  )}
+                  {balData.isError && (
+                    <Text>
+                      <b>Your Holdings: Error</b>
+                    </Text>
+                  )}
+                </Box>
+              </Card>
             </GridItem>
 
             <GridItem display="flex" colSpan={colSpan2}>
