@@ -19,6 +19,7 @@ import {
   TabPanels,
   Tabs,
   Text,
+  Tooltip,
   VStack,
   Wrap,
   WrapItem,
@@ -218,12 +219,10 @@ const Strategy = ({ params }: StrategyParams) => {
                     </Wrap>
                   </Box>
                 </Box>
-
                 <Box
                   padding={'10px'}
                   borderRadius={'10px'}
                   bg={'bg'}
-                  color="cyan"
                   marginTop={'20px'}
                 >
                   {!balData.isLoading &&
@@ -231,14 +230,42 @@ const Strategy = ({ params }: StrategyParams) => {
                     !balData.isPending &&
                     balData.data &&
                     balData.data.tokenInfo && (
-                      <Text>
-                        <b>Your Holdings: </b>
-                        {address
-                          ? `${balData.data.amount.toEtherToFixedDecimals(4)} ${balData.data.tokenInfo?.name}`
-                          : isMobile
-                            ? CONSTANTS.MOBILE_MSG
-                            : 'Connect wallet'}
-                      </Text>
+                      <Flex width={'100%'} justifyContent={'space-between'}>
+                        <Box>
+                          <Text>
+                            <b>Your Holdings </b>
+                          </Text>
+                          <Text color="cyan">
+                            {address
+                              ? Number(
+                                  balData.data.amount.toEtherToFixedDecimals(
+                                    balData.data.tokenInfo?.displayDecimals ||
+                                      2,
+                                  ),
+                                ) == 0
+                                ? '-'
+                                : `${balData.data.amount.toEtherToFixedDecimals(balData.data.tokenInfo?.displayDecimals || 2)} ${balData.data.tokenInfo?.name}`
+                              : isMobile
+                                ? CONSTANTS.MOBILE_MSG
+                                : 'Connect wallet'}
+                          </Text>
+                        </Box>
+                        <Tooltip label="Life time earnings">
+                          <Box>
+                            <Text textAlign={'right'} fontWeight={'none'}>
+                              <b>Net earnings</b>
+                            </Text>
+                            <Text
+                              textAlign={'right'}
+                              color={profit >= 0 ? 'cyan' : 'red'}
+                            >
+                              {address && profit != 0
+                                ? `${profit?.toFixed(balData.data.tokenInfo?.displayDecimals || 2)} ${balData.data.tokenInfo?.name}`
+                                : '-'}
+                            </Text>
+                          </Box>
+                        </Tooltip>
+                      </Flex>
                     )}
                   {(balData.isLoading ||
                     balData.isPending ||

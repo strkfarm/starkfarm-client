@@ -99,7 +99,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
           </Flex>
         </Flex>
 
-        {isMobile && (
+        {!isMobile && (
           <Tooltip
             label={`This is when your investment increases as STRK rewards are automatically claimed and reinvested into the strategy's tokens.`}
           >

@@ -163,9 +163,9 @@ export async function getPriceFromMyAPI(tokenInfo: TokenInfo) {
   console.log('getPrice from redis', tokenInfo.name);
 
   const endpoint =
-    typeof window === 'undefined'
+    (typeof window === 'undefined'
       ? process.env.HOSTNAME
-      : window.location.origin;
+      : window.location.origin) || 'https://app.strkfarm.xyz';
   const priceInfo = await axios.get(`${endpoint}/api/price/${tokenInfo.name}`);
   const now = new Date();
   const priceTime = new Date(priceInfo.data.timestamp);
