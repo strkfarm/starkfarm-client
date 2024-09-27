@@ -12,10 +12,6 @@ import {
   ListItem,
   OrderedList,
   Spinner,
-  Stat,
-  StatHelpText,
-  StatLabel,
-  StatNumber,
   Tab,
   TabIndicator,
   TabList,
@@ -32,13 +28,12 @@ import { useAccount } from '@starknet-react/core';
 import { atom, useAtomValue, useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { isMobile } from 'react-device-detect';
 
 import Deposit from '@/components/Deposit';
-import CONSTANTS from '@/constants';
 import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
 import { StrategyInfo, strategiesAtom } from '@/store/strategies.atoms';
 import { transactionsAtom, TxHistoryAtom } from '@/store/transactions.atom';
+import HarvestTime from '@/components/HarvestTime';
 import {
   capitalize,
   getTokenInfoFromAddr,
@@ -49,6 +44,8 @@ import {
 import { StrategyParams } from '../page';
 import MyNumber from '@/utils/MyNumber';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
+import { isMobile } from 'react-device-detect';
+import CONSTANTS from '@/constants';
 
 const Strategy = ({ params }: StrategyParams) => {
   const { address } = useAccount();
@@ -177,13 +174,15 @@ const Strategy = ({ params }: StrategyParams) => {
           {strategy ? strategy.name : 'Strategy Not found'}
         </Text>
       </Flex>
+
       {strategy && (
         <VStack width={'100%'}>
           <Grid width={'100%'} templateColumns="repeat(5, 1fr)" gap={2}>
             <GridItem display="flex" colSpan={colSpan1}>
               <Card width="100%" padding={'15px'} color="white" bg="highlight">
-                <Box display={{ base: 'block', md: 'flex' }}>
-                  <Box width={{ base: '100%', md: '80%' }} float={'left'}>
+                <HarvestTime strategy={strategy} balData={balData} />
+                <Box display={{ base: 'block', md: 'flex' }} marginTop={'10px'}>
+                  <Box width={{ base: '100%', md: '100%' }}>
                     <Text
                       fontSize={'20px'}
                       marginBottom={'0px'}
@@ -218,26 +217,6 @@ const Strategy = ({ params }: StrategyParams) => {
                         </WrapItem>
                       ))}
                     </Wrap>
-                  </Box>
-                  <Box
-                    width={{ base: '100%', md: '20%' }}
-                    float={'left'}
-                    marginTop={{ base: '10px' }}
-                  >
-                    <Stat>
-                      <StatLabel textAlign={{ base: 'left', md: 'right' }}>
-                        APY
-                      </StatLabel>
-                      <StatNumber
-                        color="cyan"
-                        textAlign={{ base: 'left', md: 'right' }}
-                      >
-                        {(strategy.netYield * 100).toFixed(2)}%
-                      </StatNumber>
-                      <StatHelpText textAlign={{ base: 'left', md: 'right' }}>
-                        {strategy.leverage.toFixed(2)}x boosted
-                      </StatHelpText>
-                    </Stat>
                   </Box>
                 </Box>
                 <Box
@@ -310,6 +289,7 @@ const Strategy = ({ params }: StrategyParams) => {
                 </Box>
               </Card>
             </GridItem>
+
             <GridItem display="flex" colSpan={colSpan2}>
               <Card width="100%" padding={'15px'} color="white" bg="highlight">
                 <Tabs position="relative" variant="unstyled" width={'100%'}>
@@ -370,6 +350,7 @@ const Strategy = ({ params }: StrategyParams) => {
               </Card>
             </GridItem>
           </Grid>
+
           <Card width={'100%'} color="white" bg="highlight" padding={'15px'}>
             <Text fontSize={'20px'} marginBottom={'0px'} fontWeight={'bold'}>
               Behind the scenes
