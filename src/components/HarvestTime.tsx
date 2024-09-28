@@ -68,7 +68,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
     }
 
     return formatTimediff(nextHarvest);
-  }, [data?.timestamp]);
+  }, [data?.timestamp, lastHarvest]);
 
   return (
     <Box>
