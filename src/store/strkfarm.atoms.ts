@@ -31,9 +31,8 @@ export interface STRKFarmStrategyAPIResult {
 
 export class STRKFarm extends IDapp<STRKFarmStrategyAPIResult> {
   name = 'STRKFarm';
-  link = strkfarmLogo.src;
-  logo = 'https://app.jediswap.xyz/favicon/favicon-32x32.png';
-  incentiveDataKey = 'Jediswap_v1';
+  logo = strkfarmLogo.src;
+  incentiveDataKey = '';
 
   _computePoolsInfo(data: any) {
     const rawPools: STRKFarmStrategyAPIResult[] = data.strategies;
@@ -55,10 +54,10 @@ export class STRKFarm extends IDapp<STRKFarmStrategyAPIResult> {
         },
         protocol: {
           name: this.name,
-          link: this.link,
+          link: `/strategy/${rawPool.id}`,
           logo: this.logo,
         },
-        apr: rawPool.apy,
+        apr: 0,
         tvl: rawPool.tvlUsd,
         aprSplits: [],
         category,
