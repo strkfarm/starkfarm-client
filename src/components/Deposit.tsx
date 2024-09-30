@@ -90,7 +90,10 @@ export default function Deposit(props: DepositProps) {
 
   // constructs tx calls
   const { calls, actions } = useMemo(() => {
-    const amountParam = isMaxClicked && !isDeposit ? new MyNumber(uint256.UINT_256_MAX.toString(), amount.decimals) : amount;
+    const amountParam =
+      isMaxClicked && !isDeposit
+        ? new MyNumber(uint256.UINT_256_MAX.toString(), amount.decimals)
+        : amount;
     const actions = props.callsInfo(amountParam, address || '0x0', provider);
     const hook = actions.find((a) => a.tokenInfo.name === selectedMarket.name);
     if (!hook) return { calls: [], actions };
