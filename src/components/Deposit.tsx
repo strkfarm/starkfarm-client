@@ -31,7 +31,7 @@ import { useAccount, useProvider } from '@starknet-react/core';
 import { useAtomValue } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useEffect, useMemo, useState } from 'react';
-import { ProviderInterface } from 'starknet';
+import { ProviderInterface, uint256 } from 'starknet';
 import LoadingWrap from './LoadingWrap';
 import TxButton from './TxButton';
 
@@ -69,11 +69,13 @@ export default function Deposit(props: DepositProps) {
   // This is used to store the raw amount entered by the user
   const [rawAmount, setRawAmount] = useState('');
 
+  const isDeposit = useMemo(() => props.buttonText === 'Deposit', [props]);
+
   // use to maintain tx history and show toasts
   const txInfo: StrategyTxProps = useMemo(() => {
     return {
       strategyId: props.strategy.id,
-      actionType: props.buttonText === 'Deposit' ? 'deposit' : 'withdraw',
+      actionType: isDeposit ? 'deposit' : 'withdraw',
       amount,
       tokenAddr: selectedMarket.token,
     };
@@ -88,11 +90,12 @@ export default function Deposit(props: DepositProps) {
 
   // constructs tx calls
   const { calls, actions } = useMemo(() => {
-    const actions = props.callsInfo(amount, address || '0x0', provider);
+    const amountParam = isMaxClicked && !isDeposit ? new MyNumber(uint256.UINT_256_MAX.toString(), amount.decimals) : amount;
+    const actions = props.callsInfo(amountParam, address || '0x0', provider);
     const hook = actions.find((a) => a.tokenInfo.name === selectedMarket.name);
     if (!hook) return { calls: [], actions };
     return { calls: hook.calls, actions };
-  }, [selectedMarket, amount, address, provider]);
+  }, [selectedMarket, amount, address, provider, isMaxClicked]);
 
   const balData = useAtomValue(
     actions.find((a) => a.tokenInfo.name === selectedMarket.name)
