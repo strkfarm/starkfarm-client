@@ -108,14 +108,32 @@ export function getDisplayCurrencyAmount(
   return Number(Number(amount).toFixed(decimals)).toLocaleString();
 }
 
-export function formatTimestamp(timestamp: string) {
-  const date = new Date(parseInt(timestamp, 10) * 1000);
+// returns time to endtime in days, hours, minutes
+export function formatTimediff(endTime: Date) {
+  const now = new Date();
+  if (now.getTime() >= endTime.getTime()) {
+    return {
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      isZero: true,
+    };
+  }
+
+  // else return number of days, months, weeks, hours, minutrs, seconds to endtime
+  const diff = endTime.getTime() - now.getTime();
+  // get days floor
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  // after accounting days, get remaining hours
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  // after accounting days and hours, get remaining minutes
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
   return {
-    day: date.getUTCDate(),
-    month: date.getUTCMonth() + 1,
-    hour: date.getUTCHours(),
-    minute: date.getUTCMinutes(),
-    second: date.getUTCSeconds(),
+    days,
+    hours,
+    minutes,
+    isZero: false,
   };
 }
 
@@ -145,9 +163,9 @@ export async function getPriceFromMyAPI(tokenInfo: TokenInfo) {
   console.log('getPrice from redis', tokenInfo.name);
 
   const endpoint =
-    typeof window === 'undefined'
+    (typeof window === 'undefined'
       ? process.env.HOSTNAME
-      : window.location.origin;
+      : window.location.origin) || 'https://app.strkfarm.xyz';
   const priceInfo = await axios.get(`${endpoint}/api/price/${tokenInfo.name}`);
   const now = new Date();
   const priceTime = new Date(priceInfo.data.timestamp);
