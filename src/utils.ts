@@ -116,37 +116,11 @@ export function copyReferralLink(refCode: string) {
   });
 }
 
-// only meant for backend calls
-let redisClient: any = null;
-async function initRedis() {
-  if (typeof window === 'undefined') {
-    console.log('initRedis server');
-    // eslint-disable-next-line
-    const strkFarmSdk = require('strkfarm-sdk');
-    console.log('strkFarmSdk', strkFarmSdk);
-    const pricer = new strkFarmSdk.PricerRedis(null, []);
-    if (!process.env.REDIS_URL) {
-      console.warn('REDIS_URL not set');
-      return;
-    }
-    await pricer.initRedis(process.env.REDIS_URL);
-    redisClient = pricer;
-  }
-}
-
-initRedis();
-
 export async function getPrice(tokenInfo: TokenInfo) {
-  if (redisClient) {
-    const priceInfo = await redisClient.getPrice(tokenInfo.name);
-    console.log('getPrice redis', priceInfo, tokenInfo.name);
-    const now = new Date().getTime();
-    const priceTime = new Date(priceInfo.timestamp).getTime();
-    if (now - priceTime < 1000 * 60 * 5) {
-      return priceInfo.price as number;
-    }
-  } else if (typeof window === 'undefined') {
-    initRedis();
+  try {
+    return await getPriceFromMyAPI(tokenInfo);
+  } catch (e) {
+    console.error('getPriceFromMyAPI error', e);
   }
   console.log('getPrice coinbase', tokenInfo.name);
   const priceInfo = await axios.get(
@@ -154,4 +128,45 @@ export async function getPrice(tokenInfo: TokenInfo) {
   );
   const price = Number(priceInfo.data.data.amount);
   return price;
+}
+
+export async function getPriceFromMyAPI(tokenInfo: TokenInfo) {
+  console.log('getPrice from redis', tokenInfo.name);
+
+  const endpoint =
+    typeof window === 'undefined'
+      ? process.env.HOSTNAME
+      : window.location.origin;
+  const priceInfo = await axios.get(`${endpoint}/api/price/${tokenInfo.name}`);
+  const now = new Date();
+  const priceTime = new Date(priceInfo.data.timestamp);
+  if (now.getTime() - priceTime.getTime() > 900000) {
+    // 15 mins
+    throw new Error('Price is stale');
+  }
+  const price = Number(priceInfo.data.price);
+  return price;
+}
+
+export function timeAgo(date: Date): string {
+  const now = new Date();
+  const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+  const minutes = Math.floor(seconds / 60);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+  const weeks = Math.floor(days / 7);
+  const months = Math.floor(days / 30);
+
+  if (hours < 1) return `${minutes}min ago`;
+  if (hours < 24) return `${hours}h ago`;
+  if (days < 7) return `${days}d ago`;
+  if (weeks < 4) return `${weeks}w ago`;
+  if (months < 3) return `${months}mon ago`;
+
+  // If more than 3 months, return in DD MMM, YY format
+  return date.toLocaleDateString('en-US', {
+    day: '2-digit',
+    month: 'short',
+    year: '2-digit',
+  });
 }
