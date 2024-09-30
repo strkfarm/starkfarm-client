@@ -14,7 +14,6 @@ import ZkLendAtoms, { zkLend } from './zklend.store';
 import CarmineAtoms, { carmine } from './carmine.store';
 import { atom } from 'jotai';
 import { Category, PoolInfo, PoolType } from './pools';
-import { strategiesAtom } from './strategies.atoms';
 import strkfarmLogo from '@public/logo.png';
 import { IStrategyProps } from '@/strategies/IStrategy';
 import STRKFarmAtoms, { strkfarm } from './strkfarm.atoms';
@@ -202,12 +201,13 @@ export function getPoolInfoFromStrategy(
 
 export const allPoolsAtomWithStrategiesUnSorted = atom((get) => {
   const pools: PoolInfo[] = get(allPoolsAtomUnSorted);
-  const strategies = get(strategiesAtom);
-  const strategyPools: PoolInfo[] = strategies.map((strategy) => {
-    const tvlInfo = get(strategy.tvlAtom);
-    return getPoolInfoFromStrategy(strategy, tvlInfo.data?.usdValue || 0);
-  });
-  return strategyPools.concat(pools);
+  // const strategies = get(strategiesAtom);
+  // const strategyPools: PoolInfo[] = strategies.map((strategy) => {
+  //   const tvlInfo = get(strategy.tvlAtom);
+  //   return getPoolInfoFromStrategy(strategy, tvlInfo.data?.usdValue || 0);
+  // });
+  // return strategyPools.concat(pools);
+  return pools;
 });
 
 // const allPoolsAtom = atom<PoolInfo[]>([]);
