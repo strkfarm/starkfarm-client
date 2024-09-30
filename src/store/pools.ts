@@ -4,6 +4,7 @@ import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { CustomAtomWithQueryResult } from '@/utils/customAtomWithQuery';
 import { customAtomWithFetch } from '@/utils/customAtomWithFetch';
 import { StrategyLiveStatus } from '@/strategies/IStrategy';
+import fetchWithRetry from '@/utils/fetchWithRetry';
 
 export enum Category {
   Stable = 'Stable Pools',
@@ -107,7 +108,12 @@ export const StrkIncentivesAtom = atomWithQuery((get) => ({
   queryKey: get(StrkIncentivesQueryKeyAtom),
   queryFn: async ({ queryKey }): Promise<NostraPools | NostraPoolData[]> => {
     try {
-      const res = await fetch(CONSTANTS.NOSTRA_DEGEN_INCENTIVE_URL);
+      const res = await fetchWithRetry(
+        CONSTANTS.NOSTRA_DEGEN_INCENTIVE_URL,
+        {},
+        'Error fetching nostra incentives',
+      );  
+      if (!res) return [];
       let data = await res.text();
       data = data.replaceAll('NaN', '0');
       const parsedData: NostraPools = JSON.parse(data);

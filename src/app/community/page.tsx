@@ -35,6 +35,7 @@ import {
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
+import fetchWithRetry from '@/utils/fetchWithRetry';
 
 interface OGNFTUserData {
   address: string;
@@ -50,8 +51,13 @@ const isOGNFTEligibleAtom = atomWithQuery((get) => {
     queryFn: async ({ _queryKey }: any): Promise<OGNFTUserData | null> => {
       const address = get(addressAtom) || '0x0';
       if (!address) return null;
-      const data = await fetch(`/api/users/ognft/${address}`);
-      return data.json();
+      const data = await fetchWithRetry(
+        `/api/users/ognft/${address}`,
+        {},
+        'Error fetching OG NFT eligibility',
+      );
+      if (!data) return null;
+      return await data.json();
     },
     refetchInterval: 5000,
   };

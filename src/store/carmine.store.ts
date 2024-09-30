@@ -5,6 +5,7 @@ import { PoolInfo, ProtocolAtoms } from './pools';
 import { Jediswap } from './jedi.store';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import { StrategyLiveStatus } from '@/strategies/IStrategy';
+import fetchWithRetry from '@/utils/fetchWithRetry';
 
 type CarminePoolData = {
   week: number;
@@ -138,16 +139,13 @@ export const CarmineAtom = atomWithQuery((get) => ({
     const fetchPool = async (
       endpoint: string,
     ): Promise<{ data: CarminePoolData }> => {
-      try {
-        const res = await fetch(`${CONSTANTS.CARMINE_URL}/${endpoint}/apy`);
-        let data = await res.text();
-        data = data.replaceAll('NaN', '0');
-        return JSON.parse(data);
-      } catch (error) {
-        console.error(
-          `Error fetching pool data for endpoint ${endpoint}:`,
-          error,
-        );
+      const res = await fetchWithRetry(
+        `${CONSTANTS.CARMINE_URL}/${endpoint}/apy`,
+        {},
+        'Failed to fetch Carmine data',
+      );
+
+      if (!res) {
         return {
           data: {
             week_annualized: 0,
@@ -157,18 +155,24 @@ export const CarmineAtom = atomWithQuery((get) => ({
           },
         };
       }
+      let data = await res.text();
+      data = data.replaceAll('NaN', '0');
+      return JSON.parse(data);
     };
 
     const fetchRewardApr = async (): Promise<{ data: CarmineAPRData }> => {
-      try {
-        const res = await fetch(CONSTANTS.CARMINE_INCENTIVES_URL);
-        let data = await res.text();
-        data = data.replaceAll('NaN', '0');
-        return JSON.parse(data);
-      } catch (error) {
-        console.error('Error fetching reward APR data:', error);
+      const res = await fetchWithRetry(
+        CONSTANTS.CARMINE_INCENTIVES_URL,
+        {},
+        'Failed to fetch Carmine incentives data',
+      );
+
+      if (!res) {
         return { data: { apy: 0, tvl: 0, allocation: 0 } };
       }
+      let data = await res.text();
+      data = data.replaceAll('NaN', '0');
+      return JSON.parse(data);
     };
 
     const rewardAprData = await fetchRewardApr();
