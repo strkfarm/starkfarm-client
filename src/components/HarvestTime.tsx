@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import {
   Box,
   Flex,
+  Spinner,
   Stat,
   StatLabel,
   StatNumber,
@@ -15,6 +16,9 @@ import { HarvestTimeAtom } from '@/store/harvest.atom';
 import { useAtomValue } from 'jotai';
 import { formatTimediff, getDisplayCurrencyAmount, timeAgo } from '@/utils';
 import { isMobile } from 'react-device-detect';
+import STRKFarmAtoms, {
+  STRKFarmStrategyAPIResult,
+} from '@/store/strkfarm.atoms';
 
 interface HarvestTimeProps {
   strategy: StrategyInfo;
@@ -70,6 +74,24 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
     return formatTimediff(nextHarvest);
   }, [data?.timestamp, lastHarvest]);
 
+  const strategiesInfo = useAtomValue(STRKFarmAtoms.baseAPRs!);
+
+  const strategyInfo = useMemo(() => {
+    if (!strategiesInfo || !strategiesInfo.data) return null;
+
+    const strategiesList: STRKFarmStrategyAPIResult[] =
+      strategiesInfo.data.strategies;
+    const strategyInfo = strategiesList.find(
+      (strat) => strat.id == strategy.id,
+    );
+    return strategyInfo ? strategyInfo : null;
+  }, [strategiesInfo]);
+
+  const leverage = useMemo(() => {
+    if (!strategyInfo) return 0;
+    return strategyInfo.leverage || 0;
+  }, [strategyInfo]);
+
   return (
     <Box>
       <Flex justifyContent="space-between">
@@ -82,7 +104,7 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
           >
             <StatLabel>APY</StatLabel>
             <StatNumber color="cyan" lineHeight="24px">
-              {(strategy.netYield * 100).toFixed(2)}%
+              {((strategyInfo?.apy || 0) * 100).toFixed(2)}%
             </StatNumber>
           </Stat>
           <Flex flexDirection={'column'} justifyContent={'flex-end'}>
@@ -93,7 +115,10 @@ const HarvestTime: React.FC<HarvestTimeProps> = ({ strategy, balData }) => {
                 fontSize={'12px'}
                 padding={'2px 5px'}
               >
-                🔥{strategy.leverage.toFixed(2)}x boosted
+                🔥{leverage.toFixed(2)}x boosted
+                {leverage == 0 && (
+                  <Spinner size="xs" color="white" ml={'5px'} />
+                )}
               </Tag>
             </Tooltip>
           </Flex>

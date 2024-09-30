@@ -440,6 +440,11 @@ const Strategy = ({ params }: StrategyParams) => {
                 </Text>
               </Box>
             ))}
+            {strategy.actions.length == 0 && (
+              <Center width={'100%'} padding={'10px'}>
+                <Spinner size={'xs'} color="white" />
+              </Center>
+            )}
           </Card>
           <Grid width={'100%'} templateColumns="repeat(5, 1fr)" gap={2}>
             <GridItem colSpan={colSpan1} bg="highlight">

@@ -4,7 +4,7 @@ import ZkLendAtoms from '@/store/zklend.store';
 import { PoolInfo } from '@/store/pools';
 import NostraLendingAtoms from '@/store/nostralending.store';
 import { RpcProvider } from 'starknet';
-import { getStrategies } from '@/store/strategies.atoms';
+import { getLiveStatusNumber, getStrategies } from '@/store/strategies.atoms';
 import { MY_STORE } from '@/store';
 import MyNumber from '@/utils/MyNumber';
 import { IStrategy, NFTInfo, TokenInfo } from '@/strategies/IStrategy';
@@ -42,7 +42,12 @@ async function getStrategyInfo(strategy: IStrategy) {
     id: strategy.id,
     apy: strategy.netYield,
     depositToken: strategy
-      .depositMethods(MyNumber.fromZero(), '', provider)
+      .depositMethods({
+        amount: MyNumber.fromZero(),
+        address: '',
+        provider,
+        isMax: false,
+      })
       .map((t) => t.tokenInfo.token),
     leverage: strategy.leverage,
     contract: strategy.holdingTokens.map((t) => ({
@@ -50,7 +55,12 @@ async function getStrategyInfo(strategy: IStrategy) {
       address: (<any>t).token ? (<TokenInfo>t).token : (<NFTInfo>t).address,
     })),
     tvlUsd: tvl.usdValue || 0,
-    status: strategy.liveStatus,
+    status: {
+      number: getLiveStatusNumber(strategy.liveStatus),
+      value: strategy.liveStatus,
+    },
+    riskFactor: strategy.riskFactor,
+    logo: strategy.holdingTokens[0].logo,
   };
 }
 

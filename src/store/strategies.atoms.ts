@@ -110,7 +110,7 @@ export const strategiesAtom = atom<StrategyInfo[]>((get) => {
   return strategies;
 });
 
-function getLiveStatusNumber(status: StrategyLiveStatus) {
+export function getLiveStatusNumber(status: StrategyLiveStatus) {
   if (status == StrategyLiveStatus.NEW) {
     return 1;
   } else if (status == StrategyLiveStatus.ACTIVE) {
@@ -119,4 +119,15 @@ function getLiveStatusNumber(status: StrategyLiveStatus) {
     return 3;
   }
   return 4;
+}
+
+export function getLiveStatusEnum(status: number) {
+  if (status == 1) {
+    return StrategyLiveStatus.NEW;
+  } else if (status == 2) {
+    return StrategyLiveStatus.ACTIVE;
+  } else if (status == 3) {
+    return StrategyLiveStatus.COMING_SOON;
+  }
+  return StrategyLiveStatus.RETIRED;
 }

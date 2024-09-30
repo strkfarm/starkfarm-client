@@ -25,6 +25,7 @@ export interface TokenInfo {
   token: string;
   decimals: number;
   displayDecimals: number;
+  address?: string;
   name: string;
   logo: any;
   minAmount: MyNumber;
@@ -79,6 +80,15 @@ export interface AmountInfo {
   tokenInfo: TokenInfo;
 }
 
+export interface DepositActionInputs {
+  amount: MyNumber;
+  address: string;
+  provider: ProviderInterface;
+  isMax: boolean;
+}
+
+export interface WithdrawActionInputs extends DepositActionInputs {}
+
 export class IStrategyProps {
   readonly liveStatus: StrategyLiveStatus;
   readonly id: string;
@@ -114,19 +124,11 @@ export class IStrategyProps {
     return `Risk factor: ${this.riskFactor}/5 (${factorLevel} risk)`;
   }
 
-  depositMethods = (
-    amount: MyNumber,
-    address: string,
-    provider: ProviderInterface,
-  ): IStrategyActionHook[] => {
+  depositMethods = (inputs: DepositActionInputs): IStrategyActionHook[] => {
     return [];
   };
 
-  withdrawMethods = (
-    amount: MyNumber,
-    address: string,
-    provider: ProviderInterface,
-  ): IStrategyActionHook[] => {
+  withdrawMethods = (inputs: WithdrawActionInputs): IStrategyActionHook[] => {
     return [];
   };
 
