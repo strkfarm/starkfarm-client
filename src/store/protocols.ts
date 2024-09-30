@@ -17,8 +17,14 @@ import { Category, PoolInfo, PoolType } from './pools';
 import { strategiesAtom } from './strategies.atoms';
 import strkfarmLogo from '@public/logo.png';
 import { IStrategyProps } from '@/strategies/IStrategy';
+import STRKFarmAtoms, { strkfarm } from './strkfarm.atoms';
 
 export const PROTOCOLS = [
+  {
+    name: strkfarm.name,
+    class: strkfarm,
+    atoms: STRKFarmAtoms,
+  },
   {
     name: ekubo.name,
     class: ekubo,
@@ -98,16 +104,10 @@ export const PROTOCOLS = [
 
 export const ALL_FILTER = 'All';
 
-const allProtocols = [
-  {
-    name: 'STRKFarm',
-    logo: strkfarmLogo.src,
-  },
-  ...PROTOCOLS.map((p) => ({
-    name: p.name,
-    logo: p.class.logo,
-  })),
-];
+const allProtocols = PROTOCOLS.map((p) => ({
+  name: p.name,
+  logo: p.class.logo,
+}));
 export const filters = {
   categories: [...Object.values(Category)],
   types: [...Object.values(PoolType)],

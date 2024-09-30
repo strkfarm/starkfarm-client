@@ -13,7 +13,7 @@ import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import strkfarmLogo from '@public/logo.png';
 import { getLiveStatusEnum } from './strategies.atoms';
 
-interface MyBaseAprDoc {
+export interface STRKFarmStrategyAPIResult {
   name: string;
   id: string;
   apy: number;
@@ -29,19 +29,19 @@ interface MyBaseAprDoc {
   logo: string;
 }
 
-export class STRKFarm extends IDapp<MyBaseAprDoc> {
+export class STRKFarm extends IDapp<STRKFarmStrategyAPIResult> {
   name = 'STRKFarm';
   link = strkfarmLogo.src;
   logo = 'https://app.jediswap.xyz/favicon/favicon-32x32.png';
   incentiveDataKey = 'Jediswap_v1';
 
   _computePoolsInfo(data: any) {
-    const rawPools: MyBaseAprDoc[] = data.strategies;
+    const rawPools: STRKFarmStrategyAPIResult[] = data.strategies;
     const pools: PoolInfo[] = [];
     return rawPools.map((rawPool) => {
       let category = Category.Others;
       const poolName = rawPool.name;
-      const riskFactor = 0.75; // todo
+      const riskFactor = rawPool.riskFactor;
       if (poolName.includes('USDC') || poolName.includes('USDT')) {
         category = Category.Stable;
       } else if (poolName.includes('STRK')) {
@@ -81,7 +81,7 @@ export class STRKFarm extends IDapp<MyBaseAprDoc> {
   }
 
   getBaseAPY(p: PoolInfo, data: AtomWithQueryResult<any, Error>) {
-    const aprData: MyBaseAprDoc[] = data.data.strategies;
+    const aprData: STRKFarmStrategyAPIResult[] = data.data.strategies;
     let baseAPY: number | 'Err' = 'Err';
     let splitApr: APRSplit | null = null;
     const metadata: PoolMetadata | null = null;
@@ -108,7 +108,11 @@ export const strkfarm = new STRKFarm();
 const STRKFarmAtoms: ProtocolAtoms = {
   baseAPRs: atomWithQuery((get) => ({
     queryKey: ['strkfarm_base_aprs'],
-    queryFn: async ({ queryKey }) => {
+    queryFn: async ({
+      queryKey,
+    }): Promise<{
+      strategies: STRKFarmStrategyAPIResult[];
+    }> => {
       const response = await fetch(`${CONSTANTS.STRKFarm.BASE_APR_API}`);
       const data = await response.json();
       return data;
