@@ -32,9 +32,5 @@ export async function GET(_req: Request) {
     tvl: result.reduce((a, b) => a + b, 0),
   });
 
-  response.headers.set(
-    'Cache-Control',
-    's-maxage=1800, stale-while-revalidate=120',
-  );
   return response;
 }
