@@ -31,7 +31,12 @@ function GetCardSimple(strat: StrategyInfo) {
   const [amount, setAmount] = useState(MyNumber.fromZero());
   const address = useAtomValue(addressAtom);
   const { provider } = useProvider();
-  const depositMethods = strat.depositMethods(amount, address || '', provider);
+  const depositMethods = strat.depositMethods({
+    amount,
+    address: address || '',
+    provider,
+    isMax: false,
+  });
 
   const balData = useAtomValue(depositMethods[0].balanceAtom);
 
