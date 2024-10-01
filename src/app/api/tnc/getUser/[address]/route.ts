@@ -21,6 +21,9 @@ export async function GET(_req: Request, context: any) {
     where: {
       address: parsedAddress,
     },
+    include: {
+      Signatures: true,
+    },
   });
 
   if (!user) {
