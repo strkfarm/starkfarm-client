@@ -25,14 +25,17 @@ import { useSearchParams } from 'next/navigation';
 import { generateReferralCode } from '@/utils';
 import { ExternalLinkIcon } from '@chakra-ui/icons';
 import mixpanel from 'mixpanel-browser';
+import toast from 'react-hot-toast';
 
 interface TncModalProps {}
 
 export const UserTnCAtom = atomWithQuery((get) => {
   return {
-    queryKey: ['tnc', get(addressAtom)],
+    // we use referral code atom as key to ensure user exisits in db by then
+    queryKey: ['tnc', get(addressAtom), get(referralCodeAtom)],
     queryFn: async (): Promise<null | UserTncInfo> => {
       const address: string | undefined = get(addressAtom);
+      console.log(`address tnc`, address);
       if (!address) return null;
       const res = await axios.get(`/api/tnc/getUser/${address}`);
       return res.data;
@@ -109,6 +112,8 @@ const TncModal: React.FC<TncModalProps> = (props) => {
 
         if (res2.data?.success) {
           onClose();
+        } else {
+          toast.error(res2.data?.message || 'Error verifying T&C');
         }
       }
     } catch (error) {
@@ -201,6 +206,9 @@ const TncModal: React.FC<TncModalProps> = (props) => {
               Disconnect
             </Button>
           </Center>
+          <Text textAlign={'center'} color={'light_grey'} fontSize={'12px'}>
+            Note: Only deployed accounts can sign
+          </Text>
         </ModalBody>
       </ModalContent>
     </Modal>

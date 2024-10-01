@@ -54,7 +54,7 @@ export async function POST(req: Request) {
   if (!isValid) {
     return NextResponse.json({
       success: false,
-      message: 'Invalid signature',
+      message: 'Invalid signature. Ensure account is deployed.',
       user: null,
     });
   }
@@ -81,6 +81,14 @@ export async function POST(req: Request) {
       message: signature,
       isTncSigned: true,
       tncDocVersion: LATEST_TNC_DOC_VERSION,
+      Signatures: {
+        create: [
+          {
+            signature,
+            tncDocVersion: LATEST_TNC_DOC_VERSION,
+          },
+        ],
+      },
     },
   });
 
