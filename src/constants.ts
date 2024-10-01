@@ -1,6 +1,6 @@
-import { TypedData } from 'starknet';
 import { NFTInfo, TokenInfo } from './strategies/IStrategy';
 import MyNumber from './utils/MyNumber';
+import { getEndpoint } from './utils';
 
 const LOGOS = {
   USDT: '/zklend/icons/tokens/usdt.svg?w=20',
@@ -195,7 +195,11 @@ export const NFTS: NFTInfo[] = [
   },
 ];
 
-export const SIGNING_DATA: TypedData = {
+// ? When updating this, ensure there is redirect available for this route
+// ? to respect version of doc in github
+export const LATEST_TNC_DOC_VERSION = 'tnc/v1';
+
+export const SIGNING_DATA = {
   types: {
     StarkNetDomain: [
       { name: 'name', type: 'felt' },
@@ -215,10 +219,8 @@ export const SIGNING_DATA: TypedData = {
   },
   message: {
     message: 'Read and Agree T&C',
-    document: 'github.com/strkfarm/tncdoc',
+    document: `${getEndpoint()}/${LATEST_TNC_DOC_VERSION}`,
   },
 };
-
-export const LATEST_TNC_DOC_VERSION = '1.0';
 
 export default CONSTANTS;

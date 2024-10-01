@@ -1,76 +1,136 @@
 'use client';
 
-import { SIGNING_DATA } from '@/constants';
+import { LATEST_TNC_DOC_VERSION, SIGNING_DATA } from '@/constants';
+import { addressAtom } from '@/store/claims.atoms';
 import {
   Button,
+  Center,
   Link,
   Modal,
   ModalBody,
-  ModalCloseButton,
   ModalContent,
   ModalOverlay,
+  Spinner,
   Text,
+  useDisclosure,
 } from '@chakra-ui/react';
-import { useAccount } from '@starknet-react/core';
+import { useAccount, useDisconnect } from '@starknet-react/core';
 import axios from 'axios';
-import React, { SetStateAction } from 'react';
+import { atomWithQuery } from 'jotai-tanstack-query';
+import React, { useEffect, useMemo, useState } from 'react';
+import { UserTncInfo } from '@/app/api/interfaces';
+import { useAtomValue, useSetAtom } from 'jotai';
+import { referralCodeAtom } from '@/store/referral.store';
+import { useSearchParams } from 'next/navigation';
+import { generateReferralCode } from '@/utils';
+import { ExternalLinkIcon } from '@chakra-ui/icons';
+import mixpanel from 'mixpanel-browser';
 
-interface TncModalProps {
-  isOpen: boolean;
-  setIsTncSigned: React.Dispatch<SetStateAction<boolean>>;
-  setIsSigningPending: React.Dispatch<SetStateAction<boolean>>;
-  onClose: () => void;
-}
+interface TncModalProps {}
 
-const TncModal: React.FC<TncModalProps> = ({
-  isOpen,
-  onClose,
-  setIsTncSigned,
-  setIsSigningPending,
-}) => {
-  // const { signTypedDataAsync } = useSignTypedData(SIGNING_DATA);
+export const UserTnCAtom = atomWithQuery((get) => {
+  return {
+    queryKey: ['tnc', get(addressAtom)],
+    queryFn: async (): Promise<null | UserTncInfo> => {
+      const address: string | undefined = get(addressAtom);
+      if (!address) return null;
+      const res = await axios.get(`/api/tnc/getUser/${address}`);
+      return res.data;
+    },
+  };
+});
+
+const TncModal: React.FC<TncModalProps> = (props) => {
   const { address, account } = useAccount();
+  const setReferralCode = useSetAtom(referralCodeAtom);
+  const searchParams = useSearchParams();
+  const userTncInfoRes = useAtomValue(UserTnCAtom);
+  const userTncInfo = useMemo(() => userTncInfoRes.data, [userTncInfoRes]);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isSigningPending, setIsSigningPending] = useState(false);
+  const { disconnectAsync } = useDisconnect();
+
+  // set ref code of the user if it exists
+  useEffect(() => {
+    if (!userTncInfo) return;
+    (async () => {
+      if (userTncInfo.success && userTncInfo.user) {
+        setReferralCode(userTncInfo.user.referralCode);
+        if (
+          (userTncInfo.user.isTncSigned &&
+            userTncInfo.user.tncDocVersion !== LATEST_TNC_DOC_VERSION) ||
+          !userTncInfo.user.isTncSigned
+        ) {
+          onOpen();
+        }
+        return;
+      }
+
+      if (!userTncInfo.success) {
+        try {
+          let referrer = searchParams.get('referrer');
+
+          if (address && referrer && address === referrer) {
+            referrer = null;
+          }
+
+          const res = await axios.post('/api/referral/createUser', {
+            address,
+            myReferralCode: generateReferralCode(),
+            referrerAddress: referrer,
+          });
+          if (res.data.success && res.data.user) {
+            setReferralCode(res.data.user.referralCode);
+          }
+        } catch (error) {
+          console.error('Error while creating user', error);
+        }
+      }
+    })();
+  }, [userTncInfo]);
 
   const handleSign = async () => {
     if (!address || !account) {
       return;
     }
 
+    mixpanel.track('TnC agreed', { address });
     setIsSigningPending(true);
 
-    const signature = (await account.signMessage(SIGNING_DATA)) as string[];
+    try {
+      const signature = (await account.signMessage(SIGNING_DATA)) as string[];
 
-    if (signature && signature.length > 0) {
-      try {
+      console.log('signature', signature);
+      if (signature && signature.length > 0) {
         const res2 = await axios.post('/api/tnc/signUser', {
           address,
-          signature: JSON.stringify([signature[1], signature[2]]),
+          signature: JSON.stringify(signature),
         });
 
         if (res2.data?.success) {
           onClose();
-          setIsTncSigned(true);
         }
-      } catch (error) {
-        console.error(error);
-        setIsSigningPending(false);
-      } finally {
-        setIsSigningPending(false);
       }
+    } catch (error) {
+      console.error('signature', error);
+      mixpanel.track('TnC signing failed', { address });
     }
-
     setIsSigningPending(false);
   };
 
   return (
-    <Modal onClose={onClose} isOpen={isOpen} isCentered>
+    <Modal
+      onClose={onClose}
+      isOpen={isOpen}
+      isCentered
+      closeOnOverlayClick={false}
+    >
       <ModalOverlay />
       <ModalContent borderRadius=".5rem" maxW="32rem">
-        <ModalCloseButton color="#7F49E5" />
+        {/* <ModalCloseButton color="#7F49E5"/> */}
         <ModalBody
           backgroundColor="#1A1C26"
-          pt="4rem"
-          pb="3rem"
+          padding="3rem"
           border="1px solid #7F49E5"
           borderRadius=".5rem"
           color="white"
@@ -84,28 +144,63 @@ const TncModal: React.FC<TncModalProps> = ({
             Terms and Conditions
           </Text>
 
-          <Text textAlign="center">
-            You agree to STRKFarm terms and conditions as stated in{' '}
-            <Link href="#" color="purple" _hover={{ textDecor: 'underline' }}>
-              github link
+          <Text textAlign="justify" color="white" width={'100%'}>
+            Please read the following terms and conditions carefully before
+            signing. You are required to sign this to continue using the App.
+          </Text>
+
+          <Text textAlign="left" width={'100%'} fontWeight={'bold'}>
+            <Link
+              href={SIGNING_DATA.message.document}
+              color="white"
+              target="_blank"
+              _hover={{ textDecor: 'underline' }}
+            >
+              T&C Document link <ExternalLinkIcon />
             </Link>
           </Text>
 
-          <Button
-            bg="#7F49E5"
-            borderRadius=".5rem"
-            px="1rem"
-            py=".5rem"
-            color="white"
-            cursor="pointer"
-            _hover={{
-              opacity: 0.9,
-              backgroundColor: '#7F49E5',
-            }}
-            onClick={handleSign}
-          >
-            Agree
-          </Button>
+          <Text textAlign="left" width={'100%'}>
+            By clicking agree, you agree to STRKFarm terms and conditions as
+            stated in above document.
+          </Text>
+
+          <Center>
+            <Button
+              bg="purple"
+              borderRadius=".5rem"
+              px="1rem"
+              py=".5rem"
+              color="white"
+              cursor="pointer"
+              _hover={{
+                opacity: 0.9,
+                backgroundColor: '#7F49E5',
+              }}
+              onClick={handleSign}
+            >
+              Agree{' '}
+              {isSigningPending && (
+                <Spinner size={'xs'} color="white" ml={'5px'} />
+              )}
+            </Button>
+            <Button
+              bg="bg"
+              borderRadius=".5rem"
+              px="1rem"
+              py=".5rem"
+              color="color2"
+              cursor="pointer"
+              onClick={() => {
+                mixpanel.track('TnC declined', { address });
+                disconnectAsync();
+                onClose();
+              }}
+              ml={'10px'}
+            >
+              Disconnect
+            </Button>
+          </Center>
         </ModalBody>
       </ModalContent>
     </Modal>

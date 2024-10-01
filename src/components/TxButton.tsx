@@ -1,4 +1,4 @@
-import CONSTANTS, { LATEST_TNC_DOC_VERSION } from '@/constants';
+import CONSTANTS from '@/constants';
 import { referralCodeAtom } from '@/store/referral.store';
 import { StrategyTxProps, monitorNewTxAtom } from '@/store/transactions.atom';
 import { IStrategyProps, TokenInfo } from '@/strategies/IStrategy';
@@ -17,14 +17,12 @@ import {
   useDisclosure,
 } from '@chakra-ui/react';
 import { useAccount, useContractWrite } from '@starknet-react/core';
-import axios from 'axios';
 import { useAtomValue, useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 import { isMobile } from 'react-device-detect';
 import { TwitterShareButton } from 'react-share';
 import { Call } from 'starknet';
-import TncModal from './TncModal';
 
 interface TxButtonProps {
   txInfo: StrategyTxProps;
@@ -43,10 +41,6 @@ export default function TxButton(props: TxButtonProps) {
   const monitorNewTx = useSetAtom(monitorNewTxAtom);
   const { isOpen, onOpen, onClose } = useDisclosure();
   const referralCode = useAtomValue(referralCodeAtom);
-
-  const [showTncModal, setShowTncModal] = useState(false);
-  const [isTncSigned, setIsTncSigned] = useState(false);
-  const [isSigningPending, setIsSigningPending] = useState(false);
 
   const disabledStyle = {
     bg: 'var(--chakra-colors-disabled_bg)',
@@ -105,20 +99,18 @@ export default function TxButton(props: TxButtonProps) {
     return '';
   }, [isMobile, address, props]);
 
-  useEffect(() => {
-    if (isTncSigned) {
-      writeAsync().then((tx) => {
-        if (props.buttonText === 'Deposit') onOpen();
-        mixpanel.track('Submitted tx', {
-          strategyId: props.txInfo.strategyId,
-          txHash: tx.transaction_hash,
-          text: props.text,
-          address,
-          buttonText: props.buttonText,
-        });
+  async function handleButton() {
+    writeAsync().then((tx) => {
+      if (props.buttonText === 'Deposit') onOpen();
+      mixpanel.track('Submitted tx', {
+        strategyId: props.txInfo.strategyId,
+        txHash: tx.transaction_hash,
+        text: props.text,
+        address,
+        buttonText: props.buttonText,
       });
-    }
-  }, [isTncSigned]);
+    });
+  }
 
   if (disabledText) {
     return (
@@ -140,23 +132,6 @@ export default function TxButton(props: TxButtonProps) {
       </Button>
     );
   }
-
-  const getUser = async () => {
-    if (props.buttonText === 'Deposit') {
-      const data = await axios.get(`/api/tnc/getUser/${address}`);
-
-      if (
-        (data.data.user.isTncSigned &&
-          data.data.user.tncDocVersion !== LATEST_TNC_DOC_VERSION) ||
-        !data.data.user.isTncSigned
-      ) {
-        setShowTncModal(true);
-        return true;
-      }
-
-      return false;
-    }
-  };
 
   return (
     <>
@@ -229,15 +204,6 @@ export default function TxButton(props: TxButtonProps) {
         </ModalContent>
       </Modal>
 
-      {showTncModal && (
-        <TncModal
-          isOpen={showTncModal}
-          setIsTncSigned={setIsTncSigned}
-          setIsSigningPending={setIsSigningPending}
-          onClose={() => setShowTncModal(false)}
-        />
-      )}
-
       <Box width={'100%'} textAlign={'center'}>
         <Button
           color={'white'}
@@ -257,26 +223,11 @@ export default function TxButton(props: TxButtonProps) {
               address,
             });
 
-            const res = await getUser();
-
-            if (!res) {
-              writeAsync().then((tx) => {
-                if (props.buttonText === 'Deposit') onOpen();
-                mixpanel.track('Submitted tx', {
-                  strategyId: props.txInfo.strategyId,
-                  txHash: tx.transaction_hash,
-                  text: props.text,
-                  address,
-                  buttonText: props.buttonText,
-                });
-              });
-            }
+            handleButton();
           }}
           {...props.buttonProps}
         >
-          {(isPending || isSigningPending) && (
-            <Spinner size={'sm'} marginRight={'5px'} />
-          )}{' '}
+          {isPending && <Spinner size={'sm'} marginRight={'5px'} />}{' '}
           {props.text}
         </Button>
       </Box>

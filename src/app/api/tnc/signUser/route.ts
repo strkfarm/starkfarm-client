@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-import { SIGNING_DATA } from '@/constants';
+import { LATEST_TNC_DOC_VERSION, SIGNING_DATA } from '@/constants';
 import { db } from '@/db';
 import { standariseAddress } from '@/utils';
 import { Account, RpcProvider } from 'starknet';
@@ -39,14 +39,11 @@ export async function POST(req: Request) {
     nodeUrl: process.env.NEXT_PUBLIC_RPC_URL!,
   });
 
-  const myAccount = new Account(
-    provider,
-    address,
-    process.env.NEXT_PUBLIC_PRIVATE_KEY!,
-  );
+  const myAccount = new Account(provider, address, '');
 
   let isValid;
 
+  console.log(`Verifying signature for address: ${parsedAddress}`);
   try {
     isValid = await myAccount.verifyMessage(SIGNING_DATA, parsedSignature);
     console.log('isValid', isValid);
@@ -83,6 +80,7 @@ export async function POST(req: Request) {
     data: {
       message: signature,
       isTncSigned: true,
+      tncDocVersion: LATEST_TNC_DOC_VERSION,
     },
   });
 
