@@ -159,13 +159,18 @@ export async function getPrice(tokenInfo: TokenInfo) {
   return price;
 }
 
+export function getEndpoint() {
+  return (
+    (typeof window === 'undefined'
+      ? process.env.HOSTNAME
+      : window.location.origin) || 'https://app.strkfarm.xyz'
+  );
+}
+
 export async function getPriceFromMyAPI(tokenInfo: TokenInfo) {
   console.log('getPrice from redis', tokenInfo.name);
 
-  const endpoint =
-    (typeof window === 'undefined'
-      ? process.env.HOSTNAME
-      : window.location.origin) || 'https://app.strkfarm.xyz';
+  const endpoint = getEndpoint();
   const priceInfo = await axios.get(`${endpoint}/api/price/${tokenInfo.name}`);
   const now = new Date();
   const priceTime = new Date(priceInfo.data.timestamp);
