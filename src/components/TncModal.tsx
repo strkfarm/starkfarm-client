@@ -1,7 +1,6 @@
 'use client';
 
-import React from 'react';
-
+import { SIGNING_DATA } from '@/constants';
 import {
   Button,
   Link,
@@ -12,102 +11,55 @@ import {
   ModalOverlay,
   Text,
 } from '@chakra-ui/react';
-import { useAccount, useSignTypedData } from '@starknet-react/core';
-
+import { useAccount } from '@starknet-react/core';
 import axios from 'axios';
-
-const exampleData = {
-  types: {
-    StarkNetDomain: [
-      { name: 'name', type: 'felt' },
-      { name: 'version', type: 'felt' },
-      { name: 'chainId', type: 'felt' },
-    ],
-    Person: [
-      { name: 'name', type: 'felt' },
-      { name: 'wallet', type: 'felt' },
-    ],
-    Mail: [
-      { name: 'from', type: 'Person' },
-      { name: 'to', type: 'Person' },
-      { name: 'contents', type: 'felt' },
-    ],
-  },
-  primaryType: 'Mail',
-  domain: {
-    name: 'Starknet Mail',
-    version: '1',
-    chainId: 1,
-  },
-  message: {
-    from: {
-      name: 'Cow',
-      wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-    },
-    to: {
-      name: 'Bob',
-      wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-    },
-    contents: 'Hello, Bob!',
-  },
-};
-
-const signingData = {
-  types: {
-    StarkNetDomain: [
-      { name: 'name', type: 'felt' },
-      { name: 'version', type: 'felt' },
-      { name: 'chainId', type: 'felt' },
-    ],
-    Person: [
-      { name: 'name', type: 'felt' },
-      { name: 'wallet', type: 'felt' },
-    ],
-    Felt: [
-      { name: 'from', type: 'Person' },
-      { name: 'to', type: 'Person' },
-      { name: 'contents', type: 'felt' },
-    ],
-  },
-  primaryType: 'felt',
-  domain: {
-    name: 'STRKFarm',
-    version: '1',
-    chainId: '0x534e5f4d41494e',
-  },
-  message: {
-    from: {
-      name: 'Test1',
-      wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-    },
-    to: {
-      name: 'Test2',
-      wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-    },
-    contents:
-      'You confirm that you have read and agree to our Terms & Conditions, which can be found at https://github.com/strkfarm/static-assets/src/tnc.md.\n\nPlease note, this message is solely for verifying your agreement to our T&C and does not authorize any transaction or movement of your assets.',
-  },
-};
+import React, { SetStateAction } from 'react';
 
 interface TncModalProps {
   isOpen: boolean;
+  setIsTncSigned: React.Dispatch<SetStateAction<boolean>>;
+  setIsSigningPending: React.Dispatch<SetStateAction<boolean>>;
   onClose: () => void;
 }
 
-const TncModal: React.FC<TncModalProps> = ({ isOpen, onClose }) => {
-  const { signTypedDataAsync } = useSignTypedData(signingData);
-  const { address } = useAccount();
+const TncModal: React.FC<TncModalProps> = ({
+  isOpen,
+  onClose,
+  setIsTncSigned,
+  setIsSigningPending,
+}) => {
+  // const { signTypedDataAsync } = useSignTypedData(SIGNING_DATA);
+  const { address, account } = useAccount();
 
   const handleSign = async () => {
-    const res = await signTypedDataAsync();
-
-    if (res && res?.toString().length > 0) {
-      onClose();
-      await axios.post('/api/tnc/signUser', {
-        address,
-        message: res?.toString(),
-      });
+    if (!address || !account) {
+      return;
     }
+
+    setIsSigningPending(true);
+
+    const signature = (await account.signMessage(SIGNING_DATA)) as string[];
+
+    if (signature && signature.length > 0) {
+      try {
+        const res2 = await axios.post('/api/tnc/signUser', {
+          address,
+          signature: JSON.stringify([signature[1], signature[2]]),
+        });
+
+        if (res2.data?.success) {
+          onClose();
+          setIsTncSigned(true);
+        }
+      } catch (error) {
+        console.error(error);
+        setIsSigningPending(false);
+      } finally {
+        setIsSigningPending(false);
+      }
+    }
+
+    setIsSigningPending(false);
   };
 
   return (
@@ -135,7 +87,7 @@ const TncModal: React.FC<TncModalProps> = ({ isOpen, onClose }) => {
           <Text textAlign="center">
             You agree to STRKFarm terms and conditions as stated in{' '}
             <Link href="#" color="purple" _hover={{ textDecor: 'underline' }}>
-              githublink
+              github link
             </Link>
           </Text>
 

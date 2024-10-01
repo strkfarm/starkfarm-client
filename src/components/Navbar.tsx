@@ -59,7 +59,7 @@ interface NavbarProps {
 }
 
 export default function Navbar(props: NavbarProps) {
-  const { address, connector } = useAccount();
+  const { address, connector, account } = useAccount();
   const { connect, connectors } = useConnect();
   const searchParams = useSearchParams();
   const { disconnectAsync } = useDisconnect();
@@ -91,6 +91,8 @@ export default function Navbar(props: NavbarProps) {
 
     return balance.amount.toEtherToFixedDecimals(6);
   };
+
+  console.log(account, 'account');
 
   useEffect(() => {
     (async () => {
