@@ -103,20 +103,22 @@ export class STRKFarm extends IDapp<STRKFarmStrategyAPIResult> {
   }
 }
 
+export const STRKFarmBaseAPYsAtom = atomWithQuery((get) => ({
+  queryKey: ['strkfarm_base_aprs'],
+  queryFn: async ({
+    queryKey,
+  }): Promise<{
+    strategies: STRKFarmStrategyAPIResult[];
+  }> => {
+    const response = await fetch(`${CONSTANTS.STRKFarm.BASE_APR_API}`);
+    const data = await response.json();
+    return data;
+  },
+}));
+
 export const strkfarm = new STRKFarm();
 const STRKFarmAtoms: ProtocolAtoms = {
-  baseAPRs: atomWithQuery((get) => ({
-    queryKey: ['strkfarm_base_aprs'],
-    queryFn: async ({
-      queryKey,
-    }): Promise<{
-      strategies: STRKFarmStrategyAPIResult[];
-    }> => {
-      const response = await fetch(`${CONSTANTS.STRKFarm.BASE_APR_API}`);
-      const data = await response.json();
-      return data;
-    },
-  })),
+  baseAPRs: STRKFarmBaseAPYsAtom,
   pools: atom((get) => {
     const empty: PoolInfo[] = [];
     if (!STRKFarmAtoms.baseAPRs) return empty;

@@ -18,7 +18,7 @@ import axios from 'axios';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import React, { useEffect, useMemo, useState } from 'react';
 import { UserTncInfo } from '@/app/api/interfaces';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { referralCodeAtom } from '@/store/referral.store';
 import { useSearchParams } from 'next/navigation';
 import { generateReferralCode } from '@/utils';
@@ -44,10 +44,13 @@ export const UserTnCAtom = atomWithQuery((get) => {
 
 const TncModal: React.FC<TncModalProps> = (props) => {
   const { address, account } = useAccount();
-  const setReferralCode = useSetAtom(referralCodeAtom);
+  const [refCode, setReferralCode] = useAtom(referralCodeAtom);
   const searchParams = useSearchParams();
   const userTncInfoRes = useAtomValue(UserTnCAtom);
-  const userTncInfo = useMemo(() => userTncInfoRes.data, [userTncInfoRes]);
+  const userTncInfo = useMemo(
+    () => userTncInfoRes.data,
+    [userTncInfoRes, refCode],
+  );
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isSigningPending, setIsSigningPending] = useState(false);
   const { disconnectAsync } = useDisconnect();
@@ -64,6 +67,8 @@ const TncModal: React.FC<TncModalProps> = (props) => {
           !userTncInfo.user.isTncSigned
         ) {
           onOpen();
+        } else {
+          onClose();
         }
         return;
       }
