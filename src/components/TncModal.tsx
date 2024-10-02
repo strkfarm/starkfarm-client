@@ -5,7 +5,6 @@ import { addressAtom } from '@/store/claims.atoms';
 import {
   Button,
   Center,
-  Link,
   Modal,
   ModalBody,
   ModalContent,
@@ -101,9 +100,12 @@ const TncModal: React.FC<TncModalProps> = (props) => {
     setIsSigningPending(true);
 
     try {
-      const signature = (await account.signMessage(SIGNING_DATA)) as string[];
+      const _signature = (await account.signMessage(SIGNING_DATA)) as string[];
 
-      console.log('signature', signature);
+      console.log('signature', _signature);
+      const sig_len = _signature.length;
+      const signature =
+        sig_len > 2 ? _signature.slice(sig_len - 2, sig_len) : _signature;
       if (signature && signature.length > 0) {
         const res2 = await axios.post('/api/tnc/signUser', {
           address,
@@ -154,15 +156,17 @@ const TncModal: React.FC<TncModalProps> = (props) => {
             signing. You are required to sign this to continue using the App.
           </Text>
 
-          <Text textAlign="left" width={'100%'} fontWeight={'bold'}>
-            <Link
-              href={SIGNING_DATA.message.document}
-              color="white"
-              target="_blank"
-              _hover={{ textDecor: 'underline' }}
-            >
-              T&C Document link <ExternalLinkIcon />
-            </Link>
+          <Text
+            textAlign="left"
+            as={'a'}
+            width={'100%'}
+            fontWeight={'bold'}
+            href={SIGNING_DATA.message.document}
+            color="white"
+            target="_blank"
+            _hover={{ textDecor: 'underline' }}
+          >
+            T&C Document link <ExternalLinkIcon />
           </Text>
 
           <Text textAlign="left" width={'100%'}>

@@ -3,7 +3,8 @@ import { NextResponse } from 'next/server';
 import { LATEST_TNC_DOC_VERSION, SIGNING_DATA } from '@/constants';
 import { db } from '@/db';
 import { standariseAddress } from '@/utils';
-import { Account, RpcProvider } from 'starknet';
+import { Account, CallData, RpcProvider, stark } from 'starknet';
+import { toBigInt } from 'ethers';
 
 export async function POST(req: Request) {
   const { address, signature } = await req.json();
@@ -45,7 +46,8 @@ export async function POST(req: Request) {
 
   console.log(`Verifying signature for address: ${parsedAddress}`);
   try {
-    isValid = await myAccount.verifyMessage(SIGNING_DATA, parsedSignature);
+    const hash = await myAccount.hashMessage(SIGNING_DATA);
+    isValid = await verifyMessageHash(myAccount, hash, parsedSignature);
     console.log('isValid', isValid);
   } catch (error) {
     console.log('verification failed:', error);
@@ -97,4 +99,45 @@ export async function POST(req: Request) {
     message: 'Tnc signed successfully',
     user: updatedUser,
   });
+}
+
+async function verifyMessageHash(
+  account: Account,
+  hash: string,
+  signature: string[],
+  entrypoint = 'isValidSignature',
+) {
+  try {
+    const resp = await account.callContract({
+      contractAddress: account.address,
+      entrypoint,
+      calldata: CallData.compile({
+        hash: toBigInt(hash).toString(),
+        signature: stark.formatSignature(signature),
+      }),
+    });
+    if (Number(resp[0]) == 0) {
+      return false;
+    }
+    return true;
+  } catch (err: any) {
+    if (entrypoint === 'isValidSignature') {
+      console.warn(
+        'could be Invalid message selector, trying with is_valid_signature',
+      );
+      return verifyMessageHash(account, hash, signature, 'is_valid_signature');
+    }
+
+    if (
+      [
+        'argent/invalid-signature',
+        'is invalid, with respect to the public key',
+      ].some((errMessage) => err.message.includes(errMessage))
+    ) {
+      return false;
+    }
+    throw Error(
+      `Signature verification request is rejected by the network: ${err}`,
+    );
+  }
 }
