@@ -1,7 +1,6 @@
 import EkuboAtoms, { ekubo } from './ekobu.store';
 import HaikoAtoms, { haiko } from './haiko.store';
 import HashstackAtoms, { hashstack } from './hashstack.store';
-import JediAtoms, { jedi } from './jedi.store';
 import MySwapAtoms, { mySwap } from './myswap.store';
 import NostraDexAtoms, { nostraDex } from './nostradex.store';
 import NostraDegenAtoms, { nostraDegen } from './nostradegen.store';
@@ -29,11 +28,11 @@ export const PROTOCOLS = [
     class: ekubo,
     atoms: EkuboAtoms,
   },
-  {
-    name: jedi.name,
-    class: jedi,
-    atoms: JediAtoms,
-  },
+  // {
+  //   name: jedi.name,
+  //   class: jedi,
+  //   atoms: JediAtoms,
+  // },
   {
     name: mySwap.name,
     class: mySwap,

@@ -235,6 +235,24 @@ export default function Navbar(props: NavbarProps) {
             </Button>
           </Link> */}
 
+          <Link href="/" margin="0">
+            <Button
+              bg="transparent"
+              color="color2"
+              variant="outline"
+              border="none"
+              padding={'0'}
+              _hover={{
+                bg: 'color2_50p',
+              }}
+              display={{ base: 'none !important', md: 'flex !important' }}
+              onClick={() => {
+                mixpanel.track('home_clicked');
+              }}
+            >
+              Home
+            </Button>
+          </Link>
           <Link href="/community" margin="0 10px 0 0">
             <Button
               bg="transparent"
