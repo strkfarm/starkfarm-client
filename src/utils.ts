@@ -105,7 +105,9 @@ export function getDisplayCurrencyAmount(
   amount: string | number,
   decimals: number,
 ) {
-  return Number(Number(amount).toFixed(decimals)).toLocaleString();
+  return Number(Number(amount).toFixed(decimals)).toLocaleString(undefined, {
+    minimumFractionDigits: decimals,
+  });
 }
 
 // returns time to endtime in days, hours, minutes
@@ -149,7 +151,7 @@ export async function getPrice(tokenInfo: TokenInfo) {
   try {
     return await getPriceFromMyAPI(tokenInfo);
   } catch (e) {
-    console.error('getPriceFromMyAPI error', e);
+    console.warn('getPriceFromMyAPI error', e);
   }
   console.log('getPrice coinbase', tokenInfo.name);
   const priceInfo = await axios.get(
@@ -171,6 +173,9 @@ export async function getPriceFromMyAPI(tokenInfo: TokenInfo) {
   console.log('getPrice from redis', tokenInfo.name);
 
   const endpoint = getEndpoint();
+  if (endpoint.includes('localhost')) {
+    throw new Error('getEndpoint: skip redis');
+  }
   const priceInfo = await axios.get(`${endpoint}/api/price/${tokenInfo.name}`);
   const now = new Date();
   const priceTime = new Date(priceInfo.data.timestamp);
