@@ -165,6 +165,15 @@ const TncModal: React.FC<TncModalProps> = (props) => {
             color="white"
             target="_blank"
             _hover={{ textDecor: 'underline' }}
+            autoFocus={false}
+            _focus={{
+              boxShadow: 'none',
+              outline: 'none',
+            }}
+            _focusVisible={{
+              boxShadow: 'none',
+              outline: 'none',
+            }}
           >
             T&C Document link <ExternalLinkIcon />
           </Text>
