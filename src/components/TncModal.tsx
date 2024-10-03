@@ -1,6 +1,6 @@
 'use client';
 
-import { LATEST_TNC_DOC_VERSION, SIGNING_DATA } from '@/constants';
+import { LATEST_TNC_DOC_VERSION, SIGNING_DATA, TnC_DOC_URL } from '@/constants';
 import { addressAtom } from '@/store/claims.atoms';
 import {
   Button,
@@ -61,6 +61,7 @@ const TncModal: React.FC<TncModalProps> = (props) => {
     (async () => {
       if (userTncInfo.success && userTncInfo.user) {
         setReferralCode(userTncInfo.user.referralCode);
+        console.log(`tncinfo`, userTncInfo.user);
         if (
           (userTncInfo.user.isTncSigned &&
             userTncInfo.user.tncDocVersion !== LATEST_TNC_DOC_VERSION) ||
@@ -166,7 +167,7 @@ const TncModal: React.FC<TncModalProps> = (props) => {
             as={'a'}
             width={'100%'}
             fontWeight={'bold'}
-            href={SIGNING_DATA.message.document}
+            href={TnC_DOC_URL}
             color="white"
             target="_blank"
             _hover={{ textDecor: 'underline' }}

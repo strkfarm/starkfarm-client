@@ -198,7 +198,7 @@ export const NFTS: NFTInfo[] = [
 // ? When updating this, ensure there is redirect available for this route
 // ? to respect version of doc in github
 export const LATEST_TNC_DOC_VERSION = 'tnc/v1';
-
+export const TnC_DOC_URL = `${getEndpoint()}/${LATEST_TNC_DOC_VERSION}`;
 export const SIGNING_DATA = {
   types: {
     StarkNetDomain: [
@@ -219,7 +219,7 @@ export const SIGNING_DATA = {
   },
   message: {
     message: 'Read and Agree T&C',
-    document: `${getEndpoint().replace('https://', '').replace('http://', '')}/${LATEST_TNC_DOC_VERSION}`,
+    document: `${TnC_DOC_URL.replace('https://', '').replace('http://', '')}`,
   },
 };
 

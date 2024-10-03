@@ -160,6 +160,7 @@ export default function Navbar(props: NavbarProps) {
 
   // set address atom
   useEffect(() => {
+    console.log('tncinfo address', address);
     setAddress(address);
   }, [address]);
 
