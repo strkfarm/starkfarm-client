@@ -71,6 +71,22 @@ async function getStrategyInfo(
     },
     riskFactor: strategy.riskFactor,
     logo: strategy.holdingTokens[0].logo,
+    actions: strategy.actions.map((action) => {
+      return {
+        name: action.name || '',
+        protocol: {
+          name: action.pool.protocol.name,
+          logo: action.pool.protocol.logo,
+        },
+        token: {
+          name: action.pool.pool.name,
+          logo: action.pool.pool.logos[0],
+        },
+        amount: action.amount,
+        isDeposit: action.isDeposit,
+        apy: action.isDeposit ? action.pool.apr : -action.pool.borrow.apr,
+      };
+    }),
   };
 }
 

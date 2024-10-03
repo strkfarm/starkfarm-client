@@ -325,7 +325,7 @@ export class IStrategy extends IStrategyProps {
       return;
     }
 
-    console.debug('Completed solving actions');
+    console.debug('Completed solving actions', this.actions.length);
     this.actions.forEach((action) => {
       const sign = action.isDeposit ? 1 : -1;
       const apr = action.isDeposit ? action.pool.apr : action.pool.borrow.apr;
@@ -333,7 +333,7 @@ export class IStrategy extends IStrategyProps {
       console.debug('netYield1', sign, apr, action.amount, netYield);
     });
     this.netYield = netYield / Number(amount);
-    console.debug('netYield', netYield, this.netYield);
+    console.debug('netYield', netYield, this.netYield, Number(amount));
     this.leverage = this.netYield / this.actions[0].pool.apr;
 
     this.postSolve();
