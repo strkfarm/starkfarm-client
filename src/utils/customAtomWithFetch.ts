@@ -9,20 +9,25 @@ export const customAtomWithFetch = (args: {
   return customAtomWithQuery({
     queryKey,
     queryFn: async () => {
+      const urlPrefix =
+        typeof window === 'undefined' && !url.includes('http')
+          ? process.env.HOSTNAME || 'https://app.strkfarm.xyz'
+          : '';
+
       try {
-        const urlPrefix =
-          typeof window === 'undefined' && !url.includes('http')
-            ? 'http://localhost:3000'
-            : '';
         const options = args.fetchOptions || { method: 'GET' };
         const res = await fetch(`${urlPrefix}${url}`, options);
         if (!res.ok) {
-          console.error('Error fetching url', res.statusText);
+          console.error(
+            'Error fetching url',
+            `${urlPrefix}${url}`,
+            res.statusText,
+          );
           throw new Error('Error fetching url');
         }
         return res.json();
       } catch (err) {
-        console.error('Error fetching url', err);
+        console.error('Error fetching url', `${urlPrefix}${url}`, err);
         throw err;
       }
     },
