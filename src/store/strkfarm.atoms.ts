@@ -27,6 +27,21 @@ export interface STRKFarmStrategyAPIResult {
   };
   riskFactor: number;
   logo: string;
+
+  actions: {
+    name: string;
+    protocol: {
+      name: string;
+      logo: string;
+    };
+    token: {
+      name: string;
+      logo: string;
+    };
+    amount: string;
+    isDeposit: boolean;
+    apy: number;
+  }[];
 }
 
 export class STRKFarm extends IDapp<STRKFarmStrategyAPIResult> {
