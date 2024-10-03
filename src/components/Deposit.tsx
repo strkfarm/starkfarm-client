@@ -1,7 +1,11 @@
 import { DUMMY_BAL_ATOM } from '@/store/balance.atoms';
 import { StrategyInfo } from '@/store/strategies.atoms';
 import { StrategyTxProps } from '@/store/transactions.atom';
-import { IStrategyActionHook, TokenInfo } from '@/strategies/IStrategy';
+import {
+  DepositActionInputs,
+  IStrategyActionHook,
+  TokenInfo,
+} from '@/strategies/IStrategy';
 import { MyMenuItemProps, MyMenuListProps } from '@/utils';
 import MyNumber from '@/utils/MyNumber';
 import { ChevronDownIcon } from '@chakra-ui/icons';
@@ -31,7 +35,6 @@ import { useAccount, useProvider } from '@starknet-react/core';
 import { useAtomValue } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useEffect, useMemo, useState } from 'react';
-import { ProviderInterface } from 'starknet';
 import LoadingWrap from './LoadingWrap';
 import TxButton from './TxButton';
 
@@ -40,11 +43,7 @@ interface DepositProps {
   // ? If you want to add more button text, you can add here
   // ? @dev ensure below actionType is updated accordingly
   buttonText: 'Deposit' | 'Redeem';
-  callsInfo: (
-    amount: MyNumber,
-    address: string,
-    provider: ProviderInterface,
-  ) => IStrategyActionHook[];
+  callsInfo: (inputs: DepositActionInputs) => IStrategyActionHook[];
 }
 
 export default function Deposit(props: DepositProps) {
@@ -57,8 +56,12 @@ export default function Deposit(props: DepositProps) {
 
   // This is the selected market token
   const [selectedMarket, setSelectedMarket] = useState(
-    props.callsInfo(MyNumber.fromZero(), address || '0x0', provider)[0]
-      .tokenInfo,
+    props.callsInfo({
+      amount: MyNumber.fromZero(),
+      address: address || '0x0',
+      provider,
+      isMax: isMaxClicked,
+    })[0].tokenInfo,
   );
 
   // This is processed amount stored in MyNumber format and meant for sending tx
@@ -69,11 +72,13 @@ export default function Deposit(props: DepositProps) {
   // This is used to store the raw amount entered by the user
   const [rawAmount, setRawAmount] = useState('');
 
+  const isDeposit = useMemo(() => props.buttonText === 'Deposit', [props]);
+
   // use to maintain tx history and show toasts
   const txInfo: StrategyTxProps = useMemo(() => {
     return {
       strategyId: props.strategy.id,
-      actionType: props.buttonText === 'Deposit' ? 'deposit' : 'withdraw',
+      actionType: isDeposit ? 'deposit' : 'withdraw',
       amount,
       tokenAddr: selectedMarket.token,
     };
@@ -88,11 +93,16 @@ export default function Deposit(props: DepositProps) {
 
   // constructs tx calls
   const { calls, actions } = useMemo(() => {
-    const actions = props.callsInfo(amount, address || '0x0', provider);
+    const actions = props.callsInfo({
+      amount,
+      address: address || '0x0',
+      provider,
+      isMax: isMaxClicked,
+    });
     const hook = actions.find((a) => a.tokenInfo.name === selectedMarket.name);
     if (!hook) return { calls: [], actions };
     return { calls: hook.calls, actions };
-  }, [selectedMarket, amount, address, provider]);
+  }, [selectedMarket, amount, address, provider, isMaxClicked]);
 
   const balData = useAtomValue(
     actions.find((a) => a.tokenInfo.name === selectedMarket.name)

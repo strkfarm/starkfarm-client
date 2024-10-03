@@ -16,13 +16,15 @@ Starkfarm Client is a web application built using [Next.js](https://nextjs.org/)
 
 To run the project locally and start using Starkfarm Client, follow these steps:
 
-1. Clone the repository:
+1. Fork the repository:
+
+**Note: If you already forked, first sync your dev to this repo's dev. This is to ensure, the commit history is exactly same. We often use squash and merge, so if u start with ur old history, unnecessary commits may creep in.**
+
+2. Clone your repo and Navigate to the project directory:
 
 ```bash
 git clone https://github.com/yourusername/starkfarm-client.git
 ```
-
-2. Navigate to the project directory:
 
 ```bash
 cd starkfarm-client

@@ -29,10 +29,8 @@ import tg from '@/assets/tg.svg';
 import CONSTANTS from '@/constants';
 import { getERC20Balance } from '@/store/balance.atoms';
 import { addressAtom } from '@/store/claims.atoms';
-import { referralCodeAtom } from '@/store/referral.store';
 import { lastWalletAtom } from '@/store/utils.atoms';
 import {
-  generateReferralCode,
   getTokenInfoFromName,
   MyMenuItemProps,
   MyMenuListProps,
@@ -47,11 +45,10 @@ import {
   useDisconnect,
   useStarkProfile,
 } from '@starknet-react/core';
-import axios from 'axios';
 import mixpanel from 'mixpanel-browser';
-import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { isMobile } from 'react-device-detect';
+import TncModal from './TncModal';
 
 interface NavbarProps {
   hideTg?: boolean;
@@ -59,11 +56,9 @@ interface NavbarProps {
 }
 
 export default function Navbar(props: NavbarProps) {
-  const { address, connector } = useAccount();
+  const { address, connector, account } = useAccount();
   const { connect, connectors } = useConnect();
-  const searchParams = useSearchParams();
   const { disconnectAsync } = useDisconnect();
-  const setReferralCode = useSetAtom(referralCodeAtom);
   const setAddress = useSetAtom(addressAtom);
   const { data: starkProfile } = useStarkProfile({
     address,
@@ -91,6 +86,8 @@ export default function Navbar(props: NavbarProps) {
 
     return balance.amount.toEtherToFixedDecimals(6);
   };
+
+  console.log(account, 'account');
 
   useEffect(() => {
     (async () => {
@@ -163,45 +160,8 @@ export default function Navbar(props: NavbarProps) {
 
   // set address atom
   useEffect(() => {
+    console.log('tncinfo address', address);
     setAddress(address);
-  }, [address]);
-
-  useEffect(() => {
-    (async () => {
-      if (address) {
-        try {
-          const { data } = await axios.get(`/api/tnc/getUser/${address}`);
-
-          if (data.success && data.user) {
-            setReferralCode(data.user.referralCode);
-          }
-
-          if (!data.success) {
-            try {
-              let referrer = searchParams.get('referrer');
-
-              if (address && referrer && address === referrer) {
-                referrer = null;
-              }
-
-              const res = await axios.post('/api/referral/createUser', {
-                address,
-                myReferralCode: generateReferralCode(),
-                referrerAddress: referrer,
-              });
-
-              if (res.data.success && res.data.user) {
-                setReferralCode(res.data.user.referralCode);
-              }
-            } catch (error) {
-              console.error('Error while creating user', error);
-            }
-          }
-        } catch (error) {
-          console.error('Error while getting signed user', error);
-        }
-      }
-    })();
   }, [address]);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -215,6 +175,7 @@ export default function Navbar(props: NavbarProps) {
       zIndex={999}
       top="0"
     >
+      <TncModal />
       <Center bg="bg" color="gray" padding={0}>
         <Text
           fontSize="12px"
@@ -275,6 +236,24 @@ export default function Navbar(props: NavbarProps) {
             </Button>
           </Link> */}
 
+          <Link href="/" margin="0">
+            <Button
+              bg="transparent"
+              color="color2"
+              variant="outline"
+              border="none"
+              padding={'0'}
+              _hover={{
+                bg: 'color2_50p',
+              }}
+              display={{ base: 'none !important', md: 'flex !important' }}
+              onClick={() => {
+                mixpanel.track('home_clicked');
+              }}
+            >
+              Home
+            </Button>
+          </Link>
           <Link href="/community" margin="0 10px 0 0">
             <Button
               bg="transparent"

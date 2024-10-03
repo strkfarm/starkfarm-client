@@ -105,7 +105,38 @@ export function getDisplayCurrencyAmount(
   amount: string | number,
   decimals: number,
 ) {
-  return Number(Number(amount).toFixed(decimals)).toLocaleString();
+  return Number(Number(amount).toFixed(decimals)).toLocaleString(undefined, {
+    minimumFractionDigits: decimals,
+  });
+}
+
+// returns time to endtime in days, hours, minutes
+export function formatTimediff(endTime: Date) {
+  const now = new Date();
+  if (now.getTime() >= endTime.getTime()) {
+    return {
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      isZero: true,
+    };
+  }
+
+  // else return number of days, months, weeks, hours, minutrs, seconds to endtime
+  const diff = endTime.getTime() - now.getTime();
+  // get days floor
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  // after accounting days, get remaining hours
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  // after accounting days and hours, get remaining minutes
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+
+  return {
+    days,
+    hours,
+    minutes,
+    isZero: false,
+  };
 }
 
 export function copyReferralLink(refCode: string) {
@@ -120,7 +151,7 @@ export async function getPrice(tokenInfo: TokenInfo) {
   try {
     return await getPriceFromMyAPI(tokenInfo);
   } catch (e) {
-    console.error('getPriceFromMyAPI error', e);
+    console.warn('getPriceFromMyAPI error', e);
   }
   console.log('getPrice coinbase', tokenInfo.name);
   const priceInfo = await axios.get(
@@ -130,13 +161,21 @@ export async function getPrice(tokenInfo: TokenInfo) {
   return price;
 }
 
+export function getEndpoint() {
+  return (
+    (typeof window === 'undefined'
+      ? process.env.HOSTNAME
+      : window.location.origin) || 'https://app.strkfarm.xyz'
+  );
+}
+
 export async function getPriceFromMyAPI(tokenInfo: TokenInfo) {
   console.log('getPrice from redis', tokenInfo.name);
 
-  const endpoint =
-    typeof window === 'undefined'
-      ? process.env.HOSTNAME
-      : window.location.origin;
+  const endpoint = getEndpoint();
+  if (endpoint.includes('localhost')) {
+    throw new Error('getEndpoint: skip redis');
+  }
   const priceInfo = await axios.get(`${endpoint}/api/price/${tokenInfo.name}`);
   const now = new Date();
   const priceTime = new Date(priceInfo.data.timestamp);

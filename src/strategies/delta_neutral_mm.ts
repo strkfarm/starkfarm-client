@@ -1,18 +1,20 @@
 import CONSTANTS, { NFTS, TokenName } from '@/constants';
 import { PoolInfo } from '@/store/pools';
 import {
+  DepositActionInputs,
   IStrategy,
   IStrategySettings,
   NFTInfo,
   StrategyAction,
   StrategyLiveStatus,
   TokenInfo,
+  WithdrawActionInputs,
 } from './IStrategy';
 import { zkLend } from '@/store/zklend.store';
 import ERC20Abi from '@/abi/erc20.abi.json';
 import DeltaNeutralAbi from '@/abi/deltraNeutral.abi.json';
 import MyNumber from '@/utils/MyNumber';
-import { Call, Contract, ProviderInterface, uint256 } from 'starknet';
+import { Call, Contract, uint256 } from 'starknet';
 import { nostraLending } from '@/store/nostralending.store';
 import { getPrice, getTokenInfoFromName, standariseAddress } from '@/utils';
 import {
@@ -91,7 +93,7 @@ export class DeltaNeutralMM extends IStrategy {
       {
         name: `Re-invest your STRK Rewards every 7 days (Compound)`,
         optimizer: this.compounder,
-        filter: [this.filterStrkzkLend],
+        filter: [this.filterZkLend('STRK')],
       },
     ];
 
@@ -233,11 +235,8 @@ export class DeltaNeutralMM extends IStrategy {
     ];
   }
 
-  depositMethods = (
-    amount: MyNumber,
-    address: string,
-    provider: ProviderInterface,
-  ) => {
+  depositMethods = (inputs: DepositActionInputs) => {
+    const { amount, address, provider } = inputs;
     const baseTokenInfo = this.token;
 
     if (!address || address == '0x0') {
@@ -336,11 +335,8 @@ export class DeltaNeutralMM extends IStrategy {
     }
   };
 
-  withdrawMethods = (
-    amount: MyNumber,
-    address: string,
-    provider: ProviderInterface,
-  ) => {
+  withdrawMethods = (inputs: WithdrawActionInputs) => {
+    const { amount, address, provider, isMax } = inputs;
     const mainToken = { ...this.token };
 
     // removing max amount restrictions on withdrawal
@@ -365,8 +361,11 @@ export class DeltaNeutralMM extends IStrategy {
       provider,
     );
 
+    const finalAmount = isMax
+      ? new MyNumber(uint256.UINT_256_MAX.toString(), amount.decimals)
+      : amount;
     const call = strategyContract.populate('withdraw', [
-      uint256.bnToUint256(amount.toString()),
+      uint256.bnToUint256(finalAmount.toString()),
       address,
       500, // 5% max slippage
     ]);

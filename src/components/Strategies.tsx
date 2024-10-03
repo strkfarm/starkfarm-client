@@ -1,7 +1,5 @@
 import CONSTANTS from '@/constants';
-import { strategiesAtom } from '@/store/strategies.atoms';
 import {
-  Box,
   Container,
   Link,
   Skeleton,
@@ -15,16 +13,20 @@ import {
 } from '@chakra-ui/react';
 import { useAtomValue } from 'jotai';
 import React, { useMemo } from 'react';
-import { userStatsAtom } from '@/store/utils.atoms';
-import { allPoolsAtomUnSorted, filteredPools } from '@/store/protocols';
-import { addressAtom } from '@/store/claims.atoms';
+import { filteredPools } from '@/store/protocols';
 import { usePagination } from '@ajna/pagination';
 import { YieldStrategyCard } from './YieldCard';
+import {
+  STRKFarmBaseAPYsAtom,
+  STRKFarmStrategyAPIResult,
+} from '@/store/strkfarm.atoms';
 export default function Strategies() {
-  const allPools = useAtomValue(allPoolsAtomUnSorted);
-  const strategies = useAtomValue(strategiesAtom);
-  const { data: userData } = useAtomValue(userStatsAtom);
-  const address = useAtomValue(addressAtom);
+  const strkFarmPoolsRes = useAtomValue(STRKFarmBaseAPYsAtom);
+  const strkFarmPools = useMemo(() => {
+    if (!strkFarmPoolsRes || !strkFarmPoolsRes.data)
+      return [] as STRKFarmStrategyAPIResult[];
+    return strkFarmPoolsRes.data.strategies.sort((a, b) => b.apy - a.apy);
+  }, [strkFarmPoolsRes]);
 
   const _filteredPools = useAtomValue(filteredPools);
   const ITEMS_PER_PAGE = 15;
@@ -57,29 +59,18 @@ export default function Strategies() {
           </Tr>
         </Thead>
         <Tbody>
-          {allPools.length > 0 && strategies.length > 0 && (
+          {strkFarmPools.length > 0 && (
             <>
-              {strategies.map((strat, index) => {
+              {strkFarmPools.map((pool, index) => {
                 return (
-                  <YieldStrategyCard
-                    key={strat.id}
-                    strat={strat}
-                    index={index}
-                  />
+                  <YieldStrategyCard key={pool.id} strat={pool} index={index} />
                 );
               })}
             </>
           )}
         </Tbody>
       </Table>
-      {allPools.length > 0 && strategies.length === 0 && (
-        <Box padding="10px 0" width={'100%'} float={'left'}>
-          <Text color="light_grey" textAlign={'center'}>
-            No strategies. Check back soon.
-          </Text>
-        </Box>
-      )}
-      {allPools.length === 0 && (
+      {strkFarmPools.length === 0 && (
         <Stack>
           <Skeleton height="70px" />
           <Skeleton height="70px" />
