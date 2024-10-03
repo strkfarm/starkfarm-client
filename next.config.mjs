@@ -3,7 +3,7 @@ const nextConfig = {
   // output: 'export',
   compiler: {
     removeConsole: {
-      exclude: ['error'],
+      exclude: ['error', 'debug'],
     },
   },
   async rewrites() {
