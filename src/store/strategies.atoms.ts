@@ -74,7 +74,7 @@ export function getStrategies() {
     [1, 0.384615, 1, 0.492308, 0.233276], // precomputed factors based on strategy math, last is the excess deposit1 that is happening
     StrategyLiveStatus.NEW,
     {
-      maxTVL: 339467,
+      maxTVL: 339500,
     },
   );
 
