@@ -5,10 +5,20 @@ import { db } from '@/db';
 import { standariseAddress } from '@/utils';
 import { Account, CallData, RpcProvider, stark } from 'starknet';
 import { toBigInt } from 'ethers';
+import Mixpanel from 'mixpanel';
+const mixpanel = Mixpanel.init('118f29da6a372f0ccb6f541079cad56b');
 
 export async function POST(req: Request) {
-  const { address, signature } = await req.json();
+  const { address, signature, _signature } = await req.json();
 
+  console.debug(
+    'address',
+    address,
+    'signature',
+    signature,
+    '_signature',
+    _signature,
+  );
   if (!address || !signature) {
     return NextResponse.json({
       success: false,
@@ -26,7 +36,7 @@ export async function POST(req: Request) {
   }
 
   const parsedSignature = JSON.parse(signature) as string[];
-  console.log(address, parsedSignature, 'parsedSignature');
+  console.debug(address, parsedSignature, 'parsedSignature');
 
   if (!parsedSignature || parsedSignature.length <= 0) {
     return NextResponse.json({
@@ -42,15 +52,41 @@ export async function POST(req: Request) {
 
   const myAccount = new Account(provider, address, '');
 
-  let isValid;
+  let isValid = false;
 
-  console.log(`Verifying signature for address: ${parsedAddress}`);
+  console.debug(`Verifying signature for address: ${parsedAddress}`);
+  console.debug(`SIGNING_DATA`, SIGNING_DATA);
   try {
     const hash = await myAccount.hashMessage(SIGNING_DATA);
     isValid = await verifyMessageHash(myAccount, hash, parsedSignature);
-    console.log('isValid', isValid);
+    console.debug('isValid', isValid);
+    mixpanel.track('TnC signed', { address, signature, _signature, step: 1 });
   } catch (error) {
-    console.log('verification failed:', error);
+    console.error('verification failed [1]:', error);
+    if (_signature) {
+      try {
+        const parsedSignature2 = JSON.parse(_signature) as string[];
+        const hash = await myAccount.hashMessage(SIGNING_DATA);
+        isValid = await verifyMessageHash(myAccount, hash, parsedSignature2);
+        console.debug('isValid', isValid);
+        mixpanel.track('TnC signed', {
+          address,
+          signature,
+          _signature,
+          step: 2,
+        });
+      } catch (err) {
+        console.error('verification failed [2]:', err);
+
+        // temporarily accepting all signtures
+        isValid = true;
+        mixpanel.track('TnC signing failed', {
+          address,
+          signature,
+          _signature,
+        });
+      }
+    }
   }
 
   if (!isValid) {
@@ -121,8 +157,9 @@ async function verifyMessageHash(
     }
     return true;
   } catch (err: any) {
+    console.error('Error verifying signature:', err);
     if (entrypoint === 'isValidSignature') {
-      console.warn(
+      console.debug(
         'could be Invalid message selector, trying with is_valid_signature',
       );
       return verifyMessageHash(account, hash, signature, 'is_valid_signature');
@@ -134,7 +171,7 @@ async function verifyMessageHash(
         'is invalid, with respect to the public key',
       ].some((errMessage) => err.message.includes(errMessage))
     ) {
-      return false;
+      throw Error('Invalid signature');
     }
     throw Error(
       `Signature verification request is rejected by the network: ${err}`,

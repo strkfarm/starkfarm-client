@@ -219,7 +219,7 @@ export const SIGNING_DATA = {
   },
   message: {
     message: 'Read and Agree T&C',
-    document: `${TnC_DOC_URL.replace('https://', '').replace('http://', '')}`,
+    document: `${TnC_DOC_URL.replace('https://', '').replace('http://', '').slice(0, 25)}`,
   },
 };
 
