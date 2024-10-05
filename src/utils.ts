@@ -33,9 +33,9 @@ export function capitalize(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function shortAddress(_address: string) {
+export function shortAddress(_address: string, startChars = 4, endChars = 4) {
   const x = num.toHex(num.getDecimalString(_address));
-  return truncate(x, 4, 4);
+  return truncate(x, startChars, endChars);
 }
 
 export function truncate(str: string, startChars: number, endChars: number) {

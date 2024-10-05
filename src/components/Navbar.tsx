@@ -204,11 +204,11 @@ export default function Navbar(props: NavbarProps) {
         padding={'20px 20px 10px'}
       >
         <Flex width={'100%'}>
-          <Link href="/" margin="0 auto 0 0" textAlign={'left'}>
+          <Link href="/" margin="auto auto auto 0" textAlign={'left'}>
             <Image
               src={fulllogo.src}
               alt="logo"
-              height={{ base: '40px', md: '50px' }}
+              height={{ base: '35px', md: '50px' }}
             />
           </Link>
           {/* <Link href={'/claims'} isExternal>
@@ -317,7 +317,7 @@ export default function Navbar(props: NavbarProps) {
             </Link>
           )}
 
-          {(!isMobile || props.forceShowConnect) && (
+          {true && (
             <Menu>
               <MenuButton
                 as={Button}
@@ -356,14 +356,14 @@ export default function Navbar(props: NavbarProps) {
                           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQa5dG19ABS0ge6iFAgpsvE_ULDUa4fJyT7hg&s'
                         }
                         alt="pfp"
-                        width={30}
-                        height={30}
+                        width={{ base: '20px', sm: '30px' }}
+                        height={{ base: '20px', sm: '30px' }}
                         rounded="full"
                       />{' '}
                       <Text as="h3" marginTop={'3px !important'}>
                         {starkProfile && starkProfile.name
-                          ? truncate(starkProfile.name, 6, 6)
-                          : shortAddress(address)}
+                          ? truncate(starkProfile.name, 6, isMobile ? 0 : 6)
+                          : shortAddress(address, 4, isMobile ? 0 : 4)}
                       </Text>
                     </Center>
                   ) : (

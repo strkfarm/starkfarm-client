@@ -62,7 +62,7 @@
     "react-share": "5.1.0",
     "sharp": "0.33.4",
     "starknet": "6.4.1",
-    "starknetkit": "1.1.9",
+    "starknetkit": "2.3.2",
     "strkfarm-sdk": "git+https://github.com/strkfarm/sdk-ts.git#main",
     "swr": "2.2.5",
     "wonka": "6.3.4"
