@@ -22,6 +22,13 @@ export async function GET(_req: Request, context: any) {
     return {
       id: strategy.id,
       usdValue: balanceInfo.usdValue,
+      tokenInfo: {
+        name: balanceInfo.tokenInfo.name,
+        symbol: balanceInfo.tokenInfo.name,
+        logo: balanceInfo.tokenInfo.logo,
+        decimals: balanceInfo.tokenInfo.decimals,
+        displayDecimals: balanceInfo.tokenInfo.displayDecimals,
+      },
       amount: balanceInfo.amount.toEtherStr(),
     };
   });

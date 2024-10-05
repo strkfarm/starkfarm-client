@@ -93,7 +93,7 @@ export class DeltaNeutralMM extends IStrategy {
       {
         name: `Re-invest your STRK Rewards every 7 days (Compound)`,
         optimizer: this.compounder,
-        filter: [this.filterStrkzkLend],
+        filter: [this.filterZkLend('STRK')],
       },
     ];
 

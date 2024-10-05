@@ -73,12 +73,12 @@ export class AutoTokenStrategy extends IStrategy {
       {
         name: `Supplies your ${token} to zkLend`,
         optimizer: this.optimizer,
-        filter: [this.filterStrkzkLend],
+        filter: [this.filterZkLend(this.token.name)],
       },
       {
         name: `Re-invest your STRK Rewards every 7 days`,
         optimizer: this.compounder,
-        filter: [this.filterStrkzkLend],
+        filter: [this.filterZkLend('STRK')],
       },
     ];
     const _risks = [...this.risks];

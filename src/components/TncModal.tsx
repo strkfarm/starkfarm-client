@@ -1,11 +1,10 @@
 'use client';
 
-import { LATEST_TNC_DOC_VERSION, SIGNING_DATA } from '@/constants';
+import { LATEST_TNC_DOC_VERSION, SIGNING_DATA, TnC_DOC_URL } from '@/constants';
 import { addressAtom } from '@/store/claims.atoms';
 import {
   Button,
   Center,
-  Link,
   Modal,
   ModalBody,
   ModalContent,
@@ -19,7 +18,7 @@ import axios from 'axios';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import React, { useEffect, useMemo, useState } from 'react';
 import { UserTncInfo } from '@/app/api/interfaces';
-import { useAtomValue, useSetAtom } from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 import { referralCodeAtom } from '@/store/referral.store';
 import { useSearchParams } from 'next/navigation';
 import { generateReferralCode } from '@/utils';
@@ -45,10 +44,13 @@ export const UserTnCAtom = atomWithQuery((get) => {
 
 const TncModal: React.FC<TncModalProps> = (props) => {
   const { address, account } = useAccount();
-  const setReferralCode = useSetAtom(referralCodeAtom);
+  const [refCode, setReferralCode] = useAtom(referralCodeAtom);
   const searchParams = useSearchParams();
   const userTncInfoRes = useAtomValue(UserTnCAtom);
-  const userTncInfo = useMemo(() => userTncInfoRes.data, [userTncInfoRes]);
+  const userTncInfo = useMemo(
+    () => userTncInfoRes.data,
+    [userTncInfoRes, refCode],
+  );
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [isSigningPending, setIsSigningPending] = useState(false);
   const { disconnectAsync } = useDisconnect();
@@ -59,12 +61,15 @@ const TncModal: React.FC<TncModalProps> = (props) => {
     (async () => {
       if (userTncInfo.success && userTncInfo.user) {
         setReferralCode(userTncInfo.user.referralCode);
+        console.log(`tncinfo`, userTncInfo.user);
         if (
           (userTncInfo.user.isTncSigned &&
             userTncInfo.user.tncDocVersion !== LATEST_TNC_DOC_VERSION) ||
           !userTncInfo.user.isTncSigned
         ) {
           onOpen();
+        } else {
+          onClose();
         }
         return;
       }
@@ -101,9 +106,12 @@ const TncModal: React.FC<TncModalProps> = (props) => {
     setIsSigningPending(true);
 
     try {
-      const signature = (await account.signMessage(SIGNING_DATA)) as string[];
+      const _signature = (await account.signMessage(SIGNING_DATA)) as string[];
 
-      console.log('signature', signature);
+      console.log('signature', _signature);
+      const sig_len = _signature.length;
+      const signature =
+        sig_len > 2 ? _signature.slice(sig_len - 2, sig_len) : _signature;
       if (signature && signature.length > 0) {
         const res2 = await axios.post('/api/tnc/signUser', {
           address,
@@ -154,15 +162,26 @@ const TncModal: React.FC<TncModalProps> = (props) => {
             signing. You are required to sign this to continue using the App.
           </Text>
 
-          <Text textAlign="left" width={'100%'} fontWeight={'bold'}>
-            <Link
-              href={SIGNING_DATA.message.document}
-              color="white"
-              target="_blank"
-              _hover={{ textDecor: 'underline' }}
-            >
-              T&C Document link <ExternalLinkIcon />
-            </Link>
+          <Text
+            textAlign="left"
+            as={'a'}
+            width={'100%'}
+            fontWeight={'bold'}
+            href={TnC_DOC_URL}
+            color="white"
+            target="_blank"
+            _hover={{ textDecor: 'underline' }}
+            autoFocus={false}
+            _focus={{
+              boxShadow: 'none',
+              outline: 'none',
+            }}
+            _focusVisible={{
+              boxShadow: 'none',
+              outline: 'none',
+            }}
+          >
+            T&C Document link <ExternalLinkIcon />
           </Text>
 
           <Text textAlign="left" width={'100%'}>

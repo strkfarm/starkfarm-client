@@ -22,7 +22,7 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import shield from '@/assets/shield.svg';
-import { IStrategyProps, StrategyLiveStatus } from '@/strategies/IStrategy';
+import { StrategyLiveStatus } from '@/strategies/IStrategy';
 import { useAtomValue } from 'jotai';
 import { getDisplayCurrencyAmount } from '@/utils';
 import { addressAtom } from '@/store/claims.atoms';
@@ -32,6 +32,7 @@ import { getPoolInfoFromStrategy } from '@/store/protocols';
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons';
 import { useState } from 'react';
 import mixpanel from 'mixpanel-browser';
+import { STRKFarmStrategyAPIResult } from '@/store/strkfarm.atoms';
 
 interface YieldCardProps {
   pool: PoolInfo;
@@ -206,18 +207,37 @@ function isLive(status: StrategyLiveStatus) {
   );
 }
 
-function getStrategyWiseInfo(
+function getStrategyWiseHoldingsInfo(
   userData: UserStats | null | undefined,
   id: string,
 ) {
   const amount = userData?.strategyWise.find((item) => item.id === id);
-  return amount?.usdValue ? amount?.usdValue : 0;
+  if (!amount) {
+    return {
+      usdValue: 0,
+      amount: 0,
+      tokenInfo: {
+        symbol: '',
+        decimals: 0,
+        displayDecimals: 0,
+        logo: '',
+        name: '',
+      },
+    };
+  }
+  return {
+    usdValue: amount.usdValue,
+    amount: Number(amount.amount),
+    tokenInfo: amount.tokenInfo,
+  };
 }
 
 function StrategyTVL(props: YieldCardProps) {
   const { pool } = props;
   const address = useAtomValue(addressAtom);
   const { data: userData } = useAtomValue(userStatsAtom);
+
+  const holdingsInfo = getStrategyWiseHoldingsInfo(userData, pool.pool.id);
 
   const isPoolLive =
     pool.additional &&
@@ -247,17 +267,44 @@ function StrategyTVL(props: YieldCardProps) {
           borderRadius={'20px'}
           color="grey_text"
           fontSize={'12px'}
+          width={'100%'}
+          mt="5px"
         >
-          <>
-            <Tooltip label="Your deposits in this STRKFarm strategy">
-              <Text width={'100%'} textAlign={'right'} fontWeight={600}>
-                <Icon as={FaWallet} marginRight={'5px'} marginTop={'-2px'} />$
-                {Math.round(
-                  getStrategyWiseInfo(userData, pool.pool.id),
-                ).toLocaleString()}
-              </Text>
-            </Tooltip>
-          </>
+          <Tooltip label="Your deposits in this STRKFarm strategy">
+            <Box width={'100%'} fontWeight={600}>
+              <Flex>
+                <Text width={'100%'} justifyContent={'flex-end'}>
+                  ${getDisplayCurrencyAmount(holdingsInfo.usdValue, 0)}
+                </Text>
+                <Box>
+                  <Icon as={FaWallet} marginLeft={'3px'} mt={'-3px'} />
+                </Box>
+              </Flex>
+              {holdingsInfo.amount != 0 && (
+                <Flex
+                  justifyContent={'flex-end'}
+                  marginTop={'-5px'}
+                  width={'100%'}
+                  opacity={0.5}
+                >
+                  {/* <Avatar size={'2xs'} src={holdingsInfo.tokenInfo.logo} mr={'2px'}/> */}
+                  <Text textAlign={'right'} fontSize={'11px'}>
+                    {getDisplayCurrencyAmount(
+                      holdingsInfo.amount,
+                      holdingsInfo.tokenInfo.displayDecimals,
+                    ).toLocaleString()}
+                  </Text>
+                  <Image
+                    width={'10px'}
+                    src={holdingsInfo.tokenInfo.logo}
+                    ml={'4px'}
+                    mr={'1px'}
+                    filter={'grayscale(1)'}
+                  />
+                </Flex>
+              )}
+            </Box>
+          </Tooltip>
         </Box>
       )}
     </Box>
@@ -470,16 +517,11 @@ export default function YieldCard(props: YieldCardProps) {
 }
 
 export function YieldStrategyCard(props: {
-  strat: IStrategyProps;
+  strat: STRKFarmStrategyAPIResult;
   index: number;
 }) {
-  const tvlInfo = useAtomValue(props.strat.tvlAtom);
-  const pool = getPoolInfoFromStrategy(
-    props.strat,
-    tvlInfo.data?.usdValue || 0,
-  );
-
-  return <YieldCard pool={pool} index={props.index} showProtocolName={false} />;
+  const strat = getPoolInfoFromStrategy(props.strat);
+  return <YieldCard pool={strat} index={props.index} showProtocolName={true} />;
 }
 
 export function HeaderSorter(props: {

@@ -32,7 +32,7 @@ const PairInfo: any = {
 
 export class Jediswap extends IDapp<string> {
   name = 'Jediswap (v1)';
-  link = 'https://app.jediswap.xyz/#/pool';
+  link = 'https://app.v1.jediswap.xyz/#/pool';
   logo = 'https://app.jediswap.xyz/favicon/favicon-32x32.png';
   incentiveDataKey = 'Jediswap_v1';
   _computePoolsInfo(data: any) {

@@ -1,7 +1,6 @@
 import EkuboAtoms, { ekubo } from './ekobu.store';
 import HaikoAtoms, { haiko } from './haiko.store';
 import HashstackAtoms, { hashstack } from './hashstack.store';
-import JediAtoms, { jedi } from './jedi.store';
 import MySwapAtoms, { mySwap } from './myswap.store';
 import NostraDexAtoms, { nostraDex } from './nostradex.store';
 import NostraDegenAtoms, { nostraDegen } from './nostradegen.store';
@@ -15,8 +14,11 @@ import CarmineAtoms, { carmine } from './carmine.store';
 import { atom } from 'jotai';
 import { Category, PoolInfo, PoolType } from './pools';
 import strkfarmLogo from '@public/logo.png';
-import { IStrategyProps } from '@/strategies/IStrategy';
-import STRKFarmAtoms, { strkfarm } from './strkfarm.atoms';
+import STRKFarmAtoms, {
+  strkfarm,
+  STRKFarmStrategyAPIResult,
+} from './strkfarm.atoms';
+import { getLiveStatusEnum } from './strategies.atoms';
 
 export const PROTOCOLS = [
   {
@@ -29,11 +31,11 @@ export const PROTOCOLS = [
     class: ekubo,
     atoms: EkuboAtoms,
   },
-  {
-    name: jedi.name,
-    class: jedi,
-    atoms: JediAtoms,
-  },
+  // {
+  //   name: jedi.name,
+  //   class: jedi,
+  //   atoms: JediAtoms,
+  // },
   {
     name: mySwap.name,
     class: mySwap,
@@ -152,8 +154,7 @@ export const allPoolsAtomUnSorted = atom((get) => {
 });
 
 export function getPoolInfoFromStrategy(
-  strat: IStrategyProps,
-  tvlInfo: number,
+  strat: STRKFarmStrategyAPIResult,
 ): PoolInfo {
   let category = Category.Others;
   if (strat.name.includes('STRK')) {
@@ -165,18 +166,18 @@ export function getPoolInfoFromStrategy(
     pool: {
       id: strat.id,
       name: strat.name,
-      logos: [strat.holdingTokens[0].logo],
+      logos: [strat.logo],
     },
     protocol: {
       name: 'STRKFarm',
       link: `/strategy/${strat.id}`,
       logo: strkfarmLogo.src,
     },
-    tvl: tvlInfo,
-    apr: strat.netYield,
+    tvl: strat.tvlUsd,
+    apr: strat.apy,
     aprSplits: [
       {
-        apr: strat.netYield,
+        apr: strat.apy,
         title: 'Net Yield',
         description: 'Includes fees & Defi spring rewards',
       },
@@ -192,7 +193,7 @@ export function getPoolInfoFromStrategy(
     },
     additional: {
       riskFactor: strat.riskFactor,
-      tags: [strat.liveStatus],
+      tags: [getLiveStatusEnum(strat.status.number)],
       isAudited: true,
       leverage: strat.leverage,
     },
