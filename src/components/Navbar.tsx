@@ -24,7 +24,7 @@ import {
 import { useAtom, useSetAtom } from 'jotai';
 import { useStarknetkitConnectModal } from 'starknetkit';
 
-import { CONNECTOR_NAMES, MYCONNECTORS } from '@/app/template';
+import { CONNECTOR_NAMES } from '@/app/template';
 import tg from '@/assets/tg.svg';
 import CONSTANTS from '@/constants';
 import { getERC20Balance } from '@/store/balance.atoms';
@@ -40,6 +40,7 @@ import {
 } from '@/utils';
 import fulllogo from '@public/fulllogo.png';
 import {
+  InjectedConnector,
   useAccount,
   useConnect,
   useDisconnect,
@@ -49,6 +50,35 @@ import mixpanel from 'mixpanel-browser';
 import { useEffect } from 'react';
 import { isMobile } from 'react-device-detect';
 import TncModal from './TncModal';
+import {
+  ArgentMobileConnector,
+  isInArgentMobileAppBrowser,
+} from 'starknetkit/argentMobile';
+import { WebWalletConnector } from 'starknetkit/webwallet';
+
+export const MYCONNECTORS: any[] = isInArgentMobileAppBrowser()
+  ? [
+      ArgentMobileConnector.init({
+        options: {
+          dappName: 'STRKFarm',
+          projectId: 'strkfarm',
+          url: 'https://app.strkfarm.xyz',
+        },
+        inAppBrowserOptions: {},
+      }),
+    ]
+  : [
+      new InjectedConnector({ options: { id: 'braavos', name: 'Braavos' } }),
+      new InjectedConnector({ options: { id: 'argentX', name: 'Argent X' } }),
+      new WebWalletConnector({ url: 'https://web.argent.xyz' }),
+      ArgentMobileConnector.init({
+        options: {
+          dappName: 'STRKFarm',
+          projectId: 'strkfarm',
+          url: 'https://app.strkfarm.xyz',
+        },
+      }),
+    ];
 
 interface NavbarProps {
   hideTg?: boolean;
@@ -64,6 +94,7 @@ export default function Navbar(props: NavbarProps) {
     address,
     useDefaultPfp: true,
   });
+
   const [lastWallet, setLastWallet] = useAtom(lastWalletAtom);
   const { starknetkitConnectModal: starknetkitConnectModal1 } =
     useStarknetkitConnectModal({
@@ -110,12 +141,18 @@ export default function Navbar(props: NavbarProps) {
   const connectWallet = async () => {
     try {
       const result = await starknetkitConnectModal1();
+      if (!result.connector) {
+        throw new Error('No connector found');
+      }
 
       connect({ connector: result.connector });
     } catch (error) {
       console.warn('connectWallet error', error);
       try {
         const result = await starknetkitConnectModal2();
+        if (!result.connector) {
+          throw new Error('No connector found');
+        }
         connect({ connector: result.connector });
       } catch (error) {
         console.error('connectWallet error', error);

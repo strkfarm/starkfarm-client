@@ -1,6 +1,6 @@
 'use client';
 
-import Navbar from '@/components/Navbar';
+import Navbar, { MYCONNECTORS } from '@/components/Navbar';
 import { MY_STORE } from '@/store';
 import {
   Center,
@@ -18,13 +18,8 @@ import { usePathname } from 'next/navigation';
 import * as React from 'react';
 import { Toaster } from 'react-hot-toast';
 import { RpcProviderOptions, constants } from 'starknet';
-import {
-  ArgentMobileConnector,
-  isInArgentMobileAppBrowser,
-} from 'starknetkit/argentMobile';
-import { InjectedConnector } from 'starknetkit/injected';
+
 import { Inter } from 'next/font/google';
-import { WebWalletConnector } from 'starknetkit/webwallet';
 const inter = Inter({ subsets: ['latin'] });
 
 mixpanel.init('118f29da6a372f0ccb6f541079cad56b');
@@ -85,35 +80,6 @@ BigInt.prototype.toJSON = function () {
 };
 
 export const CONNECTOR_NAMES = ['Braavos', 'Argent X', 'Argent (mobile)']; // 'Argent Web Wallet'];
-export const MYCONNECTORS = isInArgentMobileAppBrowser()
-  ? [
-      ArgentMobileConnector.init({
-        options: {
-          dappName: 'STRKFarm',
-          projectId: 'strkfarm',
-          url: 'https://app.strkfarm.xyz',
-        },
-        inAppBrowserOptions: {},
-      }),
-    ]
-  : [
-      new InjectedConnector({ options: { id: 'braavos', name: 'Braavos' } }),
-      new InjectedConnector({ options: { id: 'argentX', name: 'Argent X' } }),
-      new WebWalletConnector({ url: 'https://web.argent.xyz' }),
-      ArgentMobileConnector.init({
-        options: {
-          dappName: 'STRKFarm',
-          projectId: 'strkfarm',
-          url: 'https://app.strkfarm.xyz',
-        },
-      }),
-    ];
-// [
-//   new InjectedConnector({ options: { id: 'braavos', name: 'Braavos' } }),
-//   new InjectedConnector({ options: { id: 'argentX', name: 'Argent X' } }),
-//   new ArgentMobileConnector(),
-//   new WebWalletConnector({ url: 'https://web.argent.xyz' }),
-// ];
 
 export default function Template({ children }: { children: React.ReactNode }) {
   const chains = [mainnet];

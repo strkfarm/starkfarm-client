@@ -8,8 +8,8 @@ import { referralCodeAtom } from '@/store/referral.store';
 import { useEffect, useMemo, useState } from 'react';
 import toast from 'react-hot-toast';
 import {
-  useContractRead,
-  useContractWrite,
+  useReadContract,
+  useSendTransaction,
   useProvider,
 } from '@starknet-react/core';
 import { Contract } from 'starknet';
@@ -86,11 +86,11 @@ const CommunityPage = () => {
   );
 
   const {
-    writeAsync: claimOGNFT,
+    sendAsync: claimOGNFT,
     isPending: isClaimOGNFTPending,
     isError: isClaimOGNFTError,
     error: claimOGTError,
-  } = useContractWrite({
+  } = useSendTransaction({
     calls: [
       ogNFTContract.populate('mint', {
         nftId: 1,
@@ -101,9 +101,11 @@ const CommunityPage = () => {
     ],
   });
 
-  const { data: ogNFTBalance, status: balanceQueryStatus } = useContractRead({
+  const ogNFTAddr: `0x${string}` = (process.env.NEXT_PUBLIC_OG_NFT_CONTRACT ||
+    '0x0') as `0x${string}`;
+  const { data: ogNFTBalance, status: balanceQueryStatus } = useReadContract({
     abi: NFTAbi,
-    address: process.env.NEXT_PUBLIC_OG_NFT_CONTRACT || '0',
+    address: ogNFTAddr,
     functionName: 'balanceOf',
     args: [address || '0x0', 1],
   });
