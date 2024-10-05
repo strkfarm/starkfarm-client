@@ -57,7 +57,7 @@ export function getStrategies() {
     StrategyLiveStatus.NEW,
     {
       maxTVL: 1500000,
-      alerts,
+      // alerts,
     },
   );
 
@@ -70,7 +70,7 @@ export function getStrategies() {
     [1, 0.609886, 1, 0.920975, 0.510078], // precomputed factors based on strategy math
     StrategyLiveStatus.NEW,
     {
-      maxTVL: 500,
+      maxTVL: 1000,
     },
   );
   const deltaNeutralMMSTRKETH = new DeltaNeutralMM(
@@ -83,7 +83,7 @@ export function getStrategies() {
     StrategyLiveStatus.NEW,
     {
       maxTVL: 1500000,
-      alerts,
+      // alerts,
     },
   );
 
