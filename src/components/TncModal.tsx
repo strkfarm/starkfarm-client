@@ -116,6 +116,7 @@ const TncModal: React.FC<TncModalProps> = (props) => {
         const res2 = await axios.post('/api/tnc/signUser', {
           address,
           signature: JSON.stringify(signature),
+          _signature: JSON.stringify(_signature),
         });
 
         if (res2.data?.success) {

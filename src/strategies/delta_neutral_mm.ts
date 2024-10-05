@@ -107,7 +107,7 @@ export class DeltaNeutralMM extends IStrategy {
     const _risks = [...this.risks];
     this.risks = [
       this.getSafetyFactorLine(),
-      `For upto 2 weeks, your position value may reduce due to high borrow APR. This will be compensated by STRK rewards.`,
+      `For upto a week, your position value may reduce due to high borrow APR. This will be compensated by STRK rewards.`,
       `Your original investment is safe. If you deposit 100 tokens, you will always get at least 100 tokens back, unless due to below reasons.`,
       `Technical failures in rebalancing positions to maintain healthy health factor may result in liquidations.`,
       ..._risks.slice(1),
