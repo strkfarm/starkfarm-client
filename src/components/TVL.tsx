@@ -30,11 +30,11 @@ const TVL: React.FC = () => {
 
   const formattedTvlData = (tvlData: number) => {
     if (tvlData >= 1000000) {
-      return `${(tvlData / 1000000).toFixed(2)}m`;
+      return `$${(tvlData / 1000000).toFixed(2)}m`;
     } else if (tvlData >= 1000) {
-      return `${(tvlData / 1000).toFixed(2)}k`;
+      return `$${(tvlData / 1000).toFixed(2)}k`;
     }
-    return tvlData.toString();
+    return `$${tvlData.toString()}`;
   };
 
   return (
