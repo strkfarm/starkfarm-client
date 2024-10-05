@@ -72,6 +72,7 @@ export interface IStrategyActionHook {
 
 export interface IStrategySettings {
   maxTVL: number;
+  alerts?: { type: 'warning'; text: string }[];
 }
 
 export interface AmountInfo {
