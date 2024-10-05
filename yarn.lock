@@ -2669,6 +2669,13 @@ aes-js@4.0.0-beta.5:
   resolved "https://registry.yarnpkg.com/aes-js/-/aes-js-4.0.0-beta.5.tgz#8d2452c52adedebc3a3e28465d858c11ca315873"
   integrity sha512-G965FqalsNyrPqgEGON7nIx1e/OVENSgiEIzyC63haUMuvNnwIgIjMs52hlTCKhkBny7A2ORNlfY9Zu+jmGk1Q==
 
+agent-base@6:
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/agent-base/-/agent-base-6.0.2.tgz#49fff58577cfee3f37176feab4c22e00f86d7f77"
+  integrity sha512-RZNwNclF7+MS/8bDg70amg32dyeZGZxiDuQmZxKLAlQjr3jGyLx+4Kkk58UO7D2QdgFIQCovuSuZESne6RG6XQ==
+  dependencies:
+    debug "4"
+
 ajv@^6.12.4:
   version "6.12.6"
   resolved "https://registry.yarnpkg.com/ajv/-/ajv-6.12.6.tgz#baf5a62e802b07d977034586f8c3baf5adf26df4"
@@ -3538,6 +3545,13 @@ data-view-byte-offset@^1.0.0:
     es-errors "^1.3.0"
     is-data-view "^1.0.1"
 
+debug@4, debug@^4.3.1, debug@^4.3.2, debug@^4.3.4, debug@^4.3.5:
+  version "4.3.7"
+  resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.7.tgz#87945b4151a011d76d95a198d7111c865c360a52"
+  integrity sha512-Er2nc/H7RrMXZBFCEim6TCmMk02Z8vLC2Rbi1KEBggpo0fS6l0S1nnapwmIi3yW/+GOJap1Krg4w0Hg80oCqgQ==
+  dependencies:
+    ms "^2.1.3"
+
 debug@^2.1.3:
   version "2.6.9"
   resolved "https://registry.yarnpkg.com/debug/-/debug-2.6.9.tgz#5d128515df134ff327e90a4c93f4e077a536341f"
@@ -3551,13 +3565,6 @@ debug@^3.2.7:
   integrity sha512-CFjzYYAi4ThfiQvizrFQevTTXHtnCqWfe7x1AhgEscTz6ZbLbfoLRLPugTQyBth6f8ZERVUSyWHFD/7Wu4t1XQ==
   dependencies:
     ms "^2.1.1"
-
-debug@^4.3.1, debug@^4.3.2, debug@^4.3.4, debug@^4.3.5:
-  version "4.3.7"
-  resolved "https://registry.yarnpkg.com/debug/-/debug-4.3.7.tgz#87945b4151a011d76d95a198d7111c865c360a52"
-  integrity sha512-Er2nc/H7RrMXZBFCEim6TCmMk02Z8vLC2Rbi1KEBggpo0fS6l0S1nnapwmIi3yW/+GOJap1Krg4w0Hg80oCqgQ==
-  dependencies:
-    ms "^2.1.3"
 
 decode-uri-component@^0.2.2:
   version "0.2.2"
@@ -4812,6 +4819,14 @@ http-signature@~1.4.0:
     jsprim "^2.0.2"
     sshpk "^1.18.0"
 
+https-proxy-agent@5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/https-proxy-agent/-/https-proxy-agent-5.0.0.tgz#e2a90542abb68a762e0a0850f6c9edadfd8506b2"
+  integrity sha512-EkYm5BcKUGiduxzSt3Eppko+PiNWNEpa4ySk9vTC6wDsQJW9rHSa+UhGNJoRYp7bz6Ht1eaRIa6QaJqO5rCFbA==
+  dependencies:
+    agent-base "6"
+    debug "4"
+
 human-signals@^5.0.0:
   version "5.0.0"
   resolved "https://registry.yarnpkg.com/human-signals/-/human-signals-5.0.0.tgz#42665a284f9ae0dade3ba41ebc37eb4b852f3a28"
@@ -5606,6 +5621,13 @@ mixpanel-browser@2.49.0:
   version "2.49.0"
   resolved "https://registry.yarnpkg.com/mixpanel-browser/-/mixpanel-browser-2.49.0.tgz#de3f4f2d0f3a32b4babf6d827ef983a9fd48a711"
   integrity sha512-RZJCO7XXuuHBAWG5fd9Mavz994M7v7W3Qiaq8NzmN631pa4BQ0vNZQtRFqKcCCOBn4xqOZbX2GkuC7ZkQoL4cQ==
+
+mixpanel@^0.18.0:
+  version "0.18.0"
+  resolved "https://registry.yarnpkg.com/mixpanel/-/mixpanel-0.18.0.tgz#f010f2622902d0d4b434de238446ec8e5966ee32"
+  integrity sha512-VyUoiLB/S/7abYYHGD5x0LijeuJCUabG8Hb+FvYU3Y99xHf1Qh+s4/pH9lt50fRitAHncWbU1FE01EknUfVVjQ==
+  dependencies:
+    https-proxy-agent "5.0.0"
 
 mlly@^1.7.1:
   version "1.7.1"

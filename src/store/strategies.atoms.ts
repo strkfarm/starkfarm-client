@@ -38,6 +38,13 @@ export function getStrategies() {
     },
   );
 
+  const alerts: any[] = [
+    {
+      type: 'warning',
+      text: 'Deposits may fail due to debt limit on zkLend. We are working with them to increase the limit. Please check back later.',
+    },
+  ];
+
   const DNMMDescription = `Deposit your {{token1}} to automatically loop your funds between zkLend and Nostra to create a delta neutral position. This strategy is designed to maximize your yield on {{token1}}. Your position is automatically adjusted periodically to maintain a healthy health factor. You receive a NFT as representation for your stake on STRKFarm. You can withdraw anytime by redeeming your NFT for {{token1}}.`;
   const usdcTokenInfo = getTokenInfoFromName('USDC');
   const deltaNeutralMMUSDCETH = new DeltaNeutralMM(
@@ -50,6 +57,7 @@ export function getStrategies() {
     StrategyLiveStatus.NEW,
     {
       maxTVL: 1500000,
+      alerts,
     },
   );
 
@@ -75,6 +83,7 @@ export function getStrategies() {
     StrategyLiveStatus.NEW,
     {
       maxTVL: 1500000,
+      alerts,
     },
   );
 

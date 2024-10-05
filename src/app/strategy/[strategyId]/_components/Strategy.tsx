@@ -1,6 +1,8 @@
 'use client';
 
 import {
+  Alert,
+  AlertIcon,
   Avatar,
   Box,
   Card,
@@ -332,6 +334,24 @@ const Strategy = ({ params }: StrategyParams) => {
                         buttonText="Deposit"
                         callsInfo={strategy.depositMethods}
                       />
+                      {strategy.settings.alerts != undefined && (
+                        <VStack mt={'20px'}>
+                          {strategy.settings.alerts.map((alert, index) => (
+                            <Alert
+                              status="warning"
+                              fontSize={'12px'}
+                              color={'orange'}
+                              borderRadius={'10px'}
+                              bg="color2_50p"
+                              padding={'10px'}
+                              key={index}
+                            >
+                              <AlertIcon />
+                              {alert.text}
+                            </Alert>
+                          ))}
+                        </VStack>
+                      )}
                     </TabPanel>
                     <TabPanel
                       bg="highlight"
