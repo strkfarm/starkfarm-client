@@ -16,7 +16,7 @@ import {
   Text,
   useDisclosure,
 } from '@chakra-ui/react';
-import { useAccount, useContractWrite } from '@starknet-react/core';
+import { useAccount, useSendTransaction } from '@starknet-react/core';
 import { useAtomValue, useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useEffect, useMemo } from 'react';
@@ -49,10 +49,17 @@ export default function TxButton(props: TxButtonProps) {
     borderWidth: '1px',
   };
 
-  const { writeAsync, data, status, isSuccess, isPending, error, isError } =
-    useContractWrite({
-      calls: props.calls,
-    });
+  const {
+    sendAsync: writeAsync,
+    data,
+    status,
+    isSuccess,
+    isPending,
+    error,
+    isError,
+  } = useSendTransaction({
+    calls: props.calls,
+  });
 
   useEffect(() => {
     if (data && data.transaction_hash) {

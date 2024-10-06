@@ -24,7 +24,7 @@ import {
 import { useAtom, useSetAtom } from 'jotai';
 import { useStarknetkitConnectModal } from 'starknetkit';
 
-import { CONNECTOR_NAMES, MYCONNECTORS } from '@/app/template';
+import { CONNECTOR_NAMES } from '@/app/template';
 import tg from '@/assets/tg.svg';
 import CONSTANTS from '@/constants';
 import { getERC20Balance } from '@/store/balance.atoms';
@@ -40,6 +40,7 @@ import {
 } from '@/utils';
 import fulllogo from '@public/fulllogo.png';
 import {
+  InjectedConnector,
   useAccount,
   useConnect,
   useDisconnect,
@@ -49,6 +50,35 @@ import mixpanel from 'mixpanel-browser';
 import { useEffect } from 'react';
 import { isMobile } from 'react-device-detect';
 import TncModal from './TncModal';
+import {
+  ArgentMobileConnector,
+  isInArgentMobileAppBrowser,
+} from 'starknetkit/argentMobile';
+import { WebWalletConnector } from 'starknetkit/webwallet';
+
+export const MYCONNECTORS: any[] = isInArgentMobileAppBrowser()
+  ? [
+      ArgentMobileConnector.init({
+        options: {
+          dappName: 'STRKFarm',
+          projectId: 'strkfarm',
+          url: 'https://app.strkfarm.xyz',
+        },
+        inAppBrowserOptions: {},
+      }),
+    ]
+  : [
+      new InjectedConnector({ options: { id: 'braavos', name: 'Braavos' } }),
+      new InjectedConnector({ options: { id: 'argentX', name: 'Argent X' } }),
+      new WebWalletConnector({ url: 'https://web.argent.xyz' }),
+      ArgentMobileConnector.init({
+        options: {
+          dappName: 'STRKFarm',
+          projectId: 'strkfarm',
+          url: 'https://app.strkfarm.xyz',
+        },
+      }),
+    ];
 
 interface NavbarProps {
   hideTg?: boolean;
@@ -64,6 +94,7 @@ export default function Navbar(props: NavbarProps) {
     address,
     useDefaultPfp: true,
   });
+
   const [lastWallet, setLastWallet] = useAtom(lastWalletAtom);
   const { starknetkitConnectModal: starknetkitConnectModal1 } =
     useStarknetkitConnectModal({
@@ -110,12 +141,18 @@ export default function Navbar(props: NavbarProps) {
   const connectWallet = async () => {
     try {
       const result = await starknetkitConnectModal1();
+      if (!result.connector) {
+        throw new Error('No connector found');
+      }
 
       connect({ connector: result.connector });
     } catch (error) {
       console.warn('connectWallet error', error);
       try {
         const result = await starknetkitConnectModal2();
+        if (!result.connector) {
+          throw new Error('No connector found');
+        }
         connect({ connector: result.connector });
       } catch (error) {
         console.error('connectWallet error', error);
@@ -204,11 +241,11 @@ export default function Navbar(props: NavbarProps) {
         padding={'20px 20px 10px'}
       >
         <Flex width={'100%'}>
-          <Link href="/" margin="0 auto 0 0" textAlign={'left'}>
+          <Link href="/" margin="auto auto auto 0" textAlign={'left'}>
             <Image
               src={fulllogo.src}
               alt="logo"
-              height={{ base: '40px', md: '50px' }}
+              height={{ base: '35px', md: '50px' }}
             />
           </Link>
           {/* <Link href={'/claims'} isExternal>
@@ -317,7 +354,7 @@ export default function Navbar(props: NavbarProps) {
             </Link>
           )}
 
-          {(!isMobile || props.forceShowConnect) && (
+          {true && (
             <Menu>
               <MenuButton
                 as={Button}
@@ -356,14 +393,14 @@ export default function Navbar(props: NavbarProps) {
                           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQa5dG19ABS0ge6iFAgpsvE_ULDUa4fJyT7hg&s'
                         }
                         alt="pfp"
-                        width={30}
-                        height={30}
+                        width={{ base: '20px', sm: '30px' }}
+                        height={{ base: '20px', sm: '30px' }}
                         rounded="full"
                       />{' '}
                       <Text as="h3" marginTop={'3px !important'}>
                         {starkProfile && starkProfile.name
-                          ? truncate(starkProfile.name, 6, 6)
-                          : shortAddress(address)}
+                          ? truncate(starkProfile.name, 6, isMobile ? 0 : 6)
+                          : shortAddress(address, 4, isMobile ? 0 : 4)}
                       </Text>
                     </Center>
                   ) : (

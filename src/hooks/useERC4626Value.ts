@@ -1,7 +1,7 @@
 import ERC4626Abi from '@/abi/erc4626.abi.json';
 import { TokenInfo } from '@/strategies/IStrategy';
 import MyNumber from '@/utils/MyNumber';
-import { useAccount, useContractRead } from '@starknet-react/core';
+import { useAccount, useReadContract } from '@starknet-react/core';
 import { useEffect, useMemo } from 'react';
 import { useERC20Balance } from './useERC20Balance';
 import { TOKENS } from '@/constants';
@@ -21,13 +21,13 @@ export function useERC4626Value(token: TokenInfo | undefined) {
     isError: isErrorConvert,
     isLoading: isLoadingConvert,
     error: errorBal,
-  } = useContractRead({
+  } = useReadContract({
     functionName: 'convert_to_assets',
     args: [uint256.bnToUint256(balance.toString())],
     abi: ERC4626Abi,
-    address: token?.token || '0x0',
+    address: token?.token || ('0x0' as any),
     watch: true,
-    blockIdentifier: BlockTag.pending,
+    blockIdentifier: BlockTag.PENDING,
   });
 
   const {
@@ -35,11 +35,11 @@ export function useERC4626Value(token: TokenInfo | undefined) {
     isError: isErrorAsset,
     isLoading: isLoadingAsset,
     error: errorAsset,
-  } = useContractRead({
+  } = useReadContract({
     functionName: 'asset',
     args: [],
     abi: ERC4626Abi,
-    address: token?.token || '0x0',
+    address: token?.token || ('0x0' as any),
     watch: false,
   });
 
