@@ -29,12 +29,14 @@ import {
   filteredPools,
   sortAtom,
 } from '@/store/protocols';
-import YieldCard from './YieldCard';
+import YieldCard, { HeaderSorter } from './YieldCard';
 
 export default function Pools() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
   const _filteredPools = useAtomValue(filteredPools);
   const ITEMS_PER_PAGE = 15;
+  const setSort = useSetAtom(sortAtom);
+  const sort = useAtomValue(sortAtom);
   const { currentPage, setCurrentPage, pagesCount, pages } = usePagination({
     pagesCount: Math.floor(_filteredPools.length / ITEMS_PER_PAGE) + 1,
     initialState: { currentPage: 1 },
@@ -43,9 +45,17 @@ export default function Pools() {
   const pools = useMemo(() => {
     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
     return _filteredPools.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [_filteredPools, currentPage]);
+  }, [_filteredPools, currentPage, sort]);
 
-  const setSortingOption = useSetAtom(sortAtom);
+  const handleSortChange = (field: string) => (order: 'asc' | 'desc') => {
+    setSort((prev) => {
+      const exist = prev.find((s) => s.field === field);
+      if (exist) {
+        return prev.map((s) => (s.field === field ? { ...s, order } : s));
+      }
+      return [...prev, { field, order }];
+    });
+  };
 
   return (
     <Box float="left" width={'100%'}>
@@ -101,17 +111,29 @@ export default function Pools() {
             <Tr fontSize={'18px'} color={'white'} bg="bg">
               <Th>Pool name</Th>
               <Th textAlign={'right'}>
-                {/* <HeaderSorter
-                  heading='APY' 
-                  mainColor='color2Text' inActiveColor='#d9d9f726'
-                  onClick={(order: 'asc' | 'desc') => {
-                    setSortingOption({field: 'APR', order});
-                  }}
-                /> */}
-                APY
+                <HeaderSorter
+                  heading="APY"
+                  mainColor="color2Text"
+                  inActiveColor="#d9d9f726"
+                  onClick={handleSortChange('APR')}
+                />
               </Th>
-              <Th textAlign={'right'}>Risk</Th>
-              <Th textAlign={'right'}>TVL</Th>
+              <Th textAlign={'right'}>
+                <HeaderSorter
+                  heading="Risk"
+                  mainColor="color2Text"
+                  inActiveColor="#d9d9f726"
+                  onClick={handleSortChange('RISK')}
+                />
+              </Th>
+              <Th textAlign={'right'}>
+                <HeaderSorter
+                  heading="TVL"
+                  mainColor="color2Text"
+                  inActiveColor="#d9d9f726"
+                  onClick={handleSortChange('TVL')}
+                />
+              </Th>
             </Tr>
           </Thead>
           <Tbody>
