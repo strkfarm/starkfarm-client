@@ -4,6 +4,7 @@ import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { CustomAtomWithQueryResult } from '@/utils/customAtomWithQuery';
 import { customAtomWithFetch } from '@/utils/customAtomWithFetch';
 import { StrategyLiveStatus } from '@/strategies/IStrategy';
+import fetchWithRetry from '@/utils/fetchWithRetry';
 
 export enum Category {
   Stable = 'Stable Pools',
@@ -59,6 +60,25 @@ export interface PoolInfo extends PoolMetadata {
   };
 }
 
+type NostraPoolData = {
+  id?: string;
+  address?: string;
+  isDegen?: boolean;
+  tokenA?: string;
+  tokenAAddress?: string;
+  tokenB?: string;
+  tokenBAddress?: string;
+  volume?: string;
+  fee?: string;
+  swap?: number;
+  tvl?: string;
+  baseApr?: string;
+  rewardApr?: string;
+  rewardAllocation?: string;
+};
+
+type NostraPools = Record<string, NostraPoolData>;
+
 export interface ProtocolAtoms {
   pools: Atom<PoolInfo[]>;
   baseAPRs?: Atom<AtomWithQueryResult<any, Error>>;
@@ -86,20 +106,30 @@ export const StrkDexIncentivesAtom = atom((get) => {
 
 export const StrkIncentivesAtom = atomWithQuery((get) => ({
   queryKey: get(StrkIncentivesQueryKeyAtom),
-  queryFn: async ({ queryKey }) => {
-    const res = await fetch(CONSTANTS.NOSTRA_DEGEN_INCENTIVE_URL);
-    let data = await res.text();
-    data = data.replaceAll('NaN', '0');
-    const parsedData = JSON.parse(data);
+  queryFn: async ({ queryKey }): Promise<NostraPools | NostraPoolData[]> => {
+    try {
+      const res = await fetchWithRetry(
+        CONSTANTS.NOSTRA_DEGEN_INCENTIVE_URL,
+        {},
+        'Error fetching nostra incentives',
+      );  
+      if (!res) return [];
+      let data = await res.text();
+      data = data.replaceAll('NaN', '0');
+      const parsedData: NostraPools = JSON.parse(data);
 
-    if (queryKey[1] === 'isNostraDex') {
-      // Filter the data to include only the specific nostra dex pools we are tracking
-      return Object.values(parsedData).filter((item: any) => {
-        const id = item.id;
-        return id === 'ETH-USDC' || id === 'STRK-ETH' || id === 'STRK-USDC';
-      });
+      if (queryKey[1] === 'isNostraDex') {
+        // Filter the data to include only the specific nostra dex pools we are tracking
+        return Object.values(parsedData).filter((item: any) => {
+          const id = item.id;
+          return id === 'ETH-USDC' || id === 'STRK-ETH' || id === 'STRK-USDC';
+        });
+      }
+      return parsedData;
+    } catch (error) {
+      console.error('Error fetching nostra incentives: ', error);
+      return [];
     }
-    return parsedData;
   },
 }));
 

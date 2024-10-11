@@ -12,11 +12,8 @@ import {
   StrkDexIncentivesAtom,
 } from './pools';
 import { StrategyLiveStatus } from '@/strategies/IStrategy';
+import fetchWithRetry from '@/utils/fetchWithRetry';
 import { getPrice } from '@/utils';
-
-const _fetcher = async (...args: any[]) => {
-  return fetch(args[0], args[1]).then((res) => res.json());
-};
 
 interface EkuboBaseAprDoc {
   tokens: Token[];
@@ -309,7 +306,6 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
     });
 
     const [ethPrice, strkPrice, usdcPrice] = await Promise.all(pricePromises);
-
     return {
       tokens,
       defiSpringData,

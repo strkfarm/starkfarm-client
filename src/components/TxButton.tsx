@@ -21,6 +21,7 @@ import { useAtomValue, useSetAtom } from 'jotai';
 import mixpanel from 'mixpanel-browser';
 import { useEffect, useMemo } from 'react';
 import { isMobile } from 'react-device-detect';
+import toast from 'react-hot-toast';
 import { TwitterShareButton } from 'react-share';
 import { Call } from 'starknet';
 

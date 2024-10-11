@@ -1,8 +1,8 @@
 import CONSTANTS from '@/constants';
-import axios from 'axios';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import { atomWithStorage, createJSONStorage } from 'jotai/utils';
 import { addressAtom } from './claims.atoms';
+import fetchWithRetry from '@/utils/fetchWithRetry';
 
 export interface BlockInfo {
   data: {
@@ -71,8 +71,9 @@ interface DAppStats {
 export const dAppStatsAtom = atomWithQuery((get) => ({
   queryKey: ['stats'],
   queryFn: async (): Promise<DAppStats> => {
-    const res = await axios.get('/api/stats');
-    return res.data;
+    const res = await fetchWithRetry('/api/stats', {}, 'Error fetching dApp stats');
+    if (!res) return { tvl: 0 };
+    return await res.json();
   },
 }));
 
@@ -102,8 +103,9 @@ export const userStatsAtom = atomWithQuery((get) => ({
     if (!addr) {
       return null;
     }
-    const res = await axios.get(`/api/stats/${addr}`);
-    return res.data;
+    const res = await fetchWithRetry(`/api/stats/${addr}`, {}, 'Error fetching user stats');
+    if (!res) return null;
+    return await res.json();
   },
 }));
 
@@ -171,16 +173,18 @@ export const blockInfoMinus1DAtom = atomWithQuery((get) => ({
       variables: {},
     });
     console.log('jedi base', 'data', data);
-    const res = await fetch(CONSTANTS.JEDI.BASE_API, {
+
+    const res = await fetchWithRetry(CONSTANTS.JEDI.BASE_API, {
       method: 'POST',
       headers: {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
       body: data,
-    });
+    }, 'Error fetching block minus 1d');
+    if (!res) return { data: { blocks: [] } };
     console.log('jedi base', 'data2', res.json());
-    return res.json();
+    return await res.json();
   },
 }));
 
