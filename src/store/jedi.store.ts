@@ -13,6 +13,7 @@ import { IDapp } from './IDapp.store';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { BlockInfo, getBlock } from './utils.atoms';
 import { StrategyLiveStatus } from '@/strategies/IStrategy';
+import fetchWithRetry from '@/utils/fetchWithRetry';
 
 interface MyBaseAprDoc {
   id: string;
@@ -147,15 +148,17 @@ async function getVolumes(block: number) {
     variables: {},
   });
 
-  const res = await fetch(CONSTANTS.JEDI.BASE_API, {
+  const res = await fetchWithRetry(CONSTANTS.JEDI.BASE_API, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
     body: data,
-  });
-  return res.json();
+  }, 'Error fetching jedi volumes');
+  
+  if (!res) return { data: { pairs: [] } };
+  return await res.json();
 }
 
 export const jedi = new Jediswap();
