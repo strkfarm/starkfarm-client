@@ -101,6 +101,9 @@ Thanks goes to these wonderful people.
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Ayoazeez26"><img src="https://avatars.githubusercontent.com/u/44169294?v=4?s=100" width="100px;" alt="Abdulhakeem Abdulazeez Ayodeji"/><br /><sub><b>Abdulhakeem Abdulazeez Ayodeji</b></sub></a><br /><a href="#code-Ayoazeez26" title="Code">💻</a></td>
       <td align="center" valign="top" width="14.28%"><a href="https://github.com/Gift-Naomi"><img src="https://avatars.githubusercontent.com/u/149405096?v=4?s=100" width="100px;" alt="Mystic"/><br /><sub><b>Mystic</b></sub></a><br /><a href="#code-Gift-Naomi" title="Code">💻</a></td>
     </tr>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://nnaji-benjamin-portfolio.vercel.app/"><img src="https://avatars.githubusercontent.com/u/60315147?v=4?s=100" width="100px;" alt="Nnaji Benjamin"/><br /><sub><b>Nnaji Benjamin</b></sub></a><br /><a href="#code-Benjtalkshow" title="Code">💻</a></td>
+    </tr>
   </tbody>
 </table>
 
