@@ -12,6 +12,7 @@ import { IDapp } from './IDapp.store';
 import CONSTANTS, { TokenName } from '@/constants';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { StrategyLiveStatus } from '@/strategies/IStrategy';
+import fetchWithRetry from '@/utils/fetchWithRetry';
 
 interface Token {
   symbol: string;
@@ -181,8 +182,13 @@ export class MySwap extends IDapp<IndexedPoolData> {
   }
 }
 
-const fetch_pools = async () => {
-  const response = await fetch(`${CONSTANTS.MY_SWAP.POOLS_API}`);
+const fetch_pools = async (): Promise<Pools> => {
+  const response = await fetchWithRetry(
+    `${CONSTANTS.MY_SWAP.POOLS_API}`,
+    {},
+    'Error fetching myswap pools',
+  );
+  if (!response) return { pools: [] };
   const data = await response.json();
   return data;
 };
@@ -213,14 +219,16 @@ const fetchAprData = async (
       if (pool_keys.length) {
         const pools = await Promise.all(
           pool_keys.map(async (pool_key) => {
-            const response = await fetch(
+            const response = await fetchWithRetry(
               `${CONSTANTS.MY_SWAP.BASE_APR_API}/${pool_key}/overview.json`,
+              {},
+              'Error fetching myswap apr data',
             );
-
+            if (!response) return null;
             const data = await response.json();
             return data;
           }),
-        );
+        ).then((results) => results.filter((result) => result !== null));
 
         return [pool_name, pools];
       }

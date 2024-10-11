@@ -329,9 +329,13 @@ export class DeltaNeutralMM extends IStrategy {
         usdValue: Number(amount.toEtherStr()) * price,
         tokenInfo: this.token,
       };
-    } catch (e) {
-      console.log('getTVL err', e);
-      throw e;
+    } catch (error) {
+      console.error('Error fetching TVL:', error);
+      return {
+        amount: MyNumber.fromEther('0', this.token.decimals),
+        usdValue: 0,
+        tokenInfo: this.token,
+      };
     }
   };
 

@@ -5,6 +5,20 @@ import { PoolInfo, ProtocolAtoms } from './pools';
 import { Jediswap } from './jedi.store';
 import { atomWithQuery } from 'jotai-tanstack-query';
 import { StrategyLiveStatus } from '@/strategies/IStrategy';
+import fetchWithRetry from '@/utils/fetchWithRetry';
+
+type CarminePoolData = {
+  week: number;
+  week_annualized: number;
+  launch: number;
+  launch_annualized: number;
+};
+
+type CarmineAPRData = {
+  tvl: number;
+  allocation: number;
+  apy: number;
+};
 
 const poolConfigs = [
   { name: 'STRK/USDC Call Pool (STRK)', tokenA: 'STRK', tokenB: 'USDC' },
@@ -122,15 +136,40 @@ const poolEndpoints = [
 export const CarmineAtom = atomWithQuery((get) => ({
   queryKey: ['isCarmine'],
   queryFn: async ({ queryKey }) => {
-    const fetchPool = async (endpoint: any) => {
-      const res = await fetch(`${CONSTANTS.CARMINE_URL}/${endpoint}/apy`);
+    const fetchPool = async (
+      endpoint: string,
+    ): Promise<{ data: CarminePoolData }> => {
+      const res = await fetchWithRetry(
+        `${CONSTANTS.CARMINE_URL}/${endpoint}/apy`,
+        {},
+        'Failed to fetch Carmine data',
+      );
+
+      if (!res) {
+        return {
+          data: {
+            week_annualized: 0,
+            week: 0,
+            launch_annualized: 0,
+            launch: 0,
+          },
+        };
+      }
       let data = await res.text();
       data = data.replaceAll('NaN', '0');
       return JSON.parse(data);
     };
 
-    const fetchRewardApr = async () => {
-      const res = await fetch(CONSTANTS.CARMINE_INCENTIVES_URL);
+    const fetchRewardApr = async (): Promise<{ data: CarmineAPRData }> => {
+      const res = await fetchWithRetry(
+        CONSTANTS.CARMINE_INCENTIVES_URL,
+        {},
+        'Failed to fetch Carmine incentives data',
+      );
+
+      if (!res) {
+        return { data: { apy: 0, tvl: 0, allocation: 0 } };
+      }
       let data = await res.text();
       data = data.replaceAll('NaN', '0');
       return JSON.parse(data);

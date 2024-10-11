@@ -12,6 +12,7 @@ import { atom } from 'jotai';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { IDapp } from './IDapp.store';
 import { StrategyLiveStatus } from '@/strategies/IStrategy';
+import fetchWithRetry from '@/utils/fetchWithRetry';
 
 type Token = {
   address: string;
@@ -187,13 +188,19 @@ export const haiko = new Haiko();
 const HaikoAtoms: ProtocolAtoms = {
   baseAPRs: atomWithQuery((get) => ({
     queryKey: ['haiko_base_aprs'],
-    queryFn: async ({ queryKey }) => {
-      const response = await fetch(`${CONSTANTS.HAIKO.BASE_APR_API}`);
-      const data = await response.json();
+    queryFn: async ({ queryKey }): Promise<Pool[]> => {
+        const response = await fetchWithRetry(`${CONSTANTS.HAIKO.BASE_APR_API}`, {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }, 'Error fetching haiko base APRs');
+        if (!response) return [];
+        const data = await response.json();
 
-      return data;
+        return data;
     },
   })),
+
   pools: atom((get) => {
     const poolsInfo = get(StrkDexIncentivesAtom);
     const empty: PoolInfo[] = [];
