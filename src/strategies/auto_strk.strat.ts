@@ -1,17 +1,19 @@
 import CONSTANTS, { TOKENS, TokenName } from '@/constants';
 import { PoolInfo } from '@/store/pools';
 import {
+  DepositActionInputs,
   IStrategy,
   IStrategySettings,
   StrategyAction,
   StrategyLiveStatus,
   TokenInfo,
+  WithdrawActionInputs,
 } from './IStrategy';
 import ERC20Abi from '@/abi/erc20.abi.json';
 import AutoStrkAbi from '@/abi/autoStrk.abi.json';
 import MasterAbi from '@/abi/master.abi.json';
 import MyNumber from '@/utils/MyNumber';
-import { Contract, ProviderInterface, uint256 } from 'starknet';
+import { Contract, uint256 } from 'starknet';
 import { atom } from 'jotai';
 import {
   DUMMY_BAL_ATOM,
@@ -71,12 +73,12 @@ export class AutoTokenStrategy extends IStrategy {
       {
         name: `Supplies your ${token} to zkLend`,
         optimizer: this.optimizer,
-        filter: [this.filterStrkzkLend],
+        filter: [this.filterZkLend(this.token.name)],
       },
       {
         name: `Re-invest your STRK Rewards every 7 days`,
         optimizer: this.compounder,
-        filter: [this.filterStrkzkLend],
+        filter: [this.filterZkLend('STRK')],
       },
     ];
     const _risks = [...this.risks];
@@ -165,11 +167,8 @@ export class AutoTokenStrategy extends IStrategy {
   //     this.leverage = this.netYield / normalYield;
   // }
 
-  depositMethods = (
-    amount: MyNumber,
-    address: string,
-    provider: ProviderInterface,
-  ) => {
+  depositMethods = (inputs: DepositActionInputs) => {
+    const { amount, address, provider } = inputs;
     const baseTokenInfo: TokenInfo = TOKENS.find(
       (t) => t.name == this.token.name,
     ) as TokenInfo; //
@@ -247,11 +246,8 @@ export class AutoTokenStrategy extends IStrategy {
     ];
   };
 
-  withdrawMethods = (
-    amount: MyNumber,
-    address: string,
-    provider: ProviderInterface,
-  ) => {
+  withdrawMethods = (inputs: WithdrawActionInputs) => {
+    const { amount, address, provider } = inputs;
     const frmToken: TokenInfo = TOKENS.find(
       (t) => t.token == this.strategyAddress,
     ) as TokenInfo;

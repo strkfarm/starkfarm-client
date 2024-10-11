@@ -25,6 +25,7 @@ export interface TokenInfo {
   token: string;
   decimals: number;
   displayDecimals: number;
+  address?: string;
   name: string;
   logo: any;
   minAmount: MyNumber;
@@ -71,6 +72,7 @@ export interface IStrategyActionHook {
 
 export interface IStrategySettings {
   maxTVL: number;
+  alerts?: { type: 'warning'; text: string }[];
 }
 
 export interface AmountInfo {
@@ -78,6 +80,15 @@ export interface AmountInfo {
   usdValue: number;
   tokenInfo: TokenInfo;
 }
+
+export interface DepositActionInputs {
+  amount: MyNumber;
+  address: string;
+  provider: ProviderInterface;
+  isMax: boolean;
+}
+
+export interface WithdrawActionInputs extends DepositActionInputs {}
 
 export class IStrategyProps {
   readonly liveStatus: StrategyLiveStatus;
@@ -114,19 +125,11 @@ export class IStrategyProps {
     return `Risk factor: ${this.riskFactor}/5 (${factorLevel} risk)`;
   }
 
-  depositMethods = (
-    amount: MyNumber,
-    address: string,
-    provider: ProviderInterface,
-  ): IStrategyActionHook[] => {
+  depositMethods = (inputs: DepositActionInputs): IStrategyActionHook[] => {
     return [];
   };
 
-  withdrawMethods = (
-    amount: MyNumber,
-    address: string,
-    provider: ProviderInterface,
-  ): IStrategyActionHook[] => {
+  withdrawMethods = (inputs: WithdrawActionInputs): IStrategyActionHook[] => {
     return [];
   };
 
@@ -250,14 +253,16 @@ export class IStrategy extends IStrategyProps {
     return eligiblePools;
   }
 
-  filterStrkzkLend(
-    pools: PoolInfo[],
-    amount: string,
-    prevActions: StrategyAction[],
-  ) {
-    return pools.filter(
-      (p) => p.pool.name == 'STRK' && p.protocol.name == zkLend.name,
-    );
+  filterZkLend(tokenName: string) {
+    return (
+      pools: PoolInfo[],
+      amount: string,
+      prevActions: StrategyAction[],
+    ) => {
+      return pools.filter(
+        (p) => p.pool.name == tokenName && p.protocol.name == zkLend.name,
+      );
+    };
   }
 
   optimizerDeposit(
@@ -288,9 +293,18 @@ export class IStrategy extends IStrategyProps {
           _pools = filter.bind(this)(_pools, amount, this.actions);
         }
 
-        console.log('solve', i, _pools, pools.length, this.actions, _amount);
+        console.log(
+          'solve',
+          {
+            i,
+            poolsLen: pools.length,
+            _amount,
+          },
+          this.actions,
+        );
 
         if (_pools.length > 0) {
+          console.log('solving', step.name);
           this.actions = step.optimizer.bind(this)(
             _pools,
             _amount,
@@ -307,10 +321,11 @@ export class IStrategy extends IStrategyProps {
         }
       }
     } catch (err) {
-      console.warn(`${this.tag} - unsolved`, err);
+      console.error(`${this.tag} - unsolved`, err);
       return;
     }
 
+    console.log('Completed solving actions', this.actions.length);
     this.actions.forEach((action) => {
       const sign = action.isDeposit ? 1 : -1;
       const apr = action.isDeposit ? action.pool.apr : action.pool.borrow.apr;
@@ -318,7 +333,7 @@ export class IStrategy extends IStrategyProps {
       console.log('netYield1', sign, apr, action.amount, netYield);
     });
     this.netYield = netYield / Number(amount);
-    console.log('netYield', netYield, this.netYield);
+    console.log('netYield', netYield, this.netYield, Number(amount));
     this.leverage = this.netYield / this.actions[0].pool.apr;
 
     this.postSolve();

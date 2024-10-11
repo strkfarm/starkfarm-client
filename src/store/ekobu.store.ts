@@ -1,4 +1,4 @@
-import CONSTANTS, { TokenName } from '@/constants';
+import CONSTANTS, { TokenName, TOKENS } from '@/constants';
 import { atom } from 'jotai';
 import { AtomWithQueryResult, atomWithQuery } from 'jotai-tanstack-query';
 import { IDapp } from './IDapp.store';
@@ -13,16 +13,15 @@ import {
 } from './pools';
 import { StrategyLiveStatus } from '@/strategies/IStrategy';
 import fetchWithRetry from '@/utils/fetchWithRetry';
+import { getPrice } from '@/utils';
 
 interface EkuboBaseAprDoc {
   tokens: Token[];
   defiSpringData: DefiSpringData;
   pairData: PairData;
-  pricesETH: PricesOfToken;
-  pricesSTRK: PricesOfToken;
-  pricesUSDC: PricesOfToken;
   priceOfStrk: PriceOfToken;
   priceOfEth: PriceOfToken;
+  priceOfUsdc: PriceOfToken;
 }
 
 type Token = {
@@ -69,17 +68,6 @@ type PairData = {
       tvl1_total: string;
       tvl0_delta_24h: string;
       tvl1_delta_24h: string;
-    },
-  ];
-};
-
-type PricesOfToken = {
-  timestamp: number;
-  prices: [
-    {
-      token: string;
-      price: string;
-      k_volume: string;
     },
   ];
 };
@@ -189,7 +177,6 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
       'STRK',
     ];
     console.log('filter2', poolName, supportedPools.includes(poolName));
-    // return !poolName.includes('DAI') && !poolName.includes('WSTETH') && !poolName.includes('BTC');
     return supportedPools.includes(poolName);
   }
 
@@ -206,14 +193,25 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
         tokens,
         defiSpringData,
         pairData,
-        pricesETH,
-        pricesSTRK,
-        pricesUSDC,
         priceOfStrk,
         priceOfEth,
+        priceOfUsdc,
       } = data.data;
 
       const strkToken = tokens.find((t) => t.symbol === 'STRK');
+
+      const getTokenPrice = (symbol: string): number => {
+        switch (symbol) {
+          case 'ETH':
+            return Number(priceOfEth.price);
+          case 'STRK':
+            return Number(priceOfStrk.price);
+          case 'USDC':
+            return Number(priceOfUsdc.price);
+          default:
+            return 0;
+        }
+      };
 
       const pools = pairData.topPairs
         .map((p) => {
@@ -230,28 +228,9 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
               BigInt(pair.token1.l2_token_address) === t1,
           );
 
-          const price0 =
-            token0.symbol === 'USDC'
-              ? 1
-              : getPrice({
-                  t: t0,
-                  pricesETH,
-                  pricesUSDC,
-                  pricesSTRK,
-                  priceOfEth,
-                  priceOfStrk,
-                });
-          const price1 =
-            token1.symbol === 'USDC'
-              ? 1
-              : getPrice({
-                  t: t1,
-                  pricesETH,
-                  pricesUSDC,
-                  pricesSTRK,
-                  priceOfEth,
-                  priceOfStrk,
-                });
+          const price0 = getTokenPrice(token0.symbol);
+          const price1 = getTokenPrice(token1.symbol);
+
           const tvlUsd =
             ((price0 ?? 0) * Number(p.tvl0_total)) /
               Math.pow(10, token0.decimals) +
@@ -304,147 +283,55 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
       metadata,
     };
   }
+
+  async getData(): Promise<EkuboBaseAprDoc> {
+    const [tokens, defiSpringData, pairData] = await Promise.all([
+      fetch(`${CONSTANTS.EKUBO.BASE_API}/tokens`).then((response) =>
+        response.json(),
+      ),
+      fetch(`${CONSTANTS.EKUBO.BASE_API}/defi-spring-incentives`).then(
+        (response) => response.json(),
+      ),
+      fetch(`${CONSTANTS.EKUBO.BASE_API}/overview/pairs`).then((response) =>
+        response.json(),
+      ),
+    ]);
+
+    const pricePromises = ['ETH', 'STRK', 'USDC'].map(async (symbol) => {
+      const tokenInfo = TOKENS.find((t) => t.name === symbol);
+      if (!tokenInfo) {
+        throw new Error(`Token info not found for ${symbol}`);
+      }
+      return getPrice(tokenInfo);
+    });
+
+    const [ethPrice, strkPrice, usdcPrice] = await Promise.all(pricePromises);
+    return {
+      tokens,
+      defiSpringData,
+      pairData,
+      priceOfEth: {
+        price: ethPrice.toString(),
+        timestamp: new Date().toISOString(),
+      },
+      priceOfStrk: {
+        price: strkPrice.toString(),
+        timestamp: new Date().toISOString(),
+      },
+      priceOfUsdc: {
+        price: usdcPrice.toString(),
+        timestamp: new Date().toISOString(),
+      },
+    };
+  }
 }
-
-const getPrice = ({
-  t,
-  pricesUSDC,
-  pricesETH,
-  pricesSTRK,
-  priceOfEth,
-  priceOfStrk,
-}: {
-  t: bigint;
-  pricesUSDC: PricesOfToken;
-  pricesETH: PricesOfToken;
-  pricesSTRK: PricesOfToken;
-  priceOfEth: PriceOfToken;
-  priceOfStrk: PriceOfToken;
-}) => {
-  let p = pricesUSDC.prices.find(({ token }) => BigInt(token) === t);
-  if (p) return Number(p.price);
-  p = pricesETH.prices.find(({ token }) => BigInt(token) === t);
-  if (p && priceOfEth) {
-    return Number(p.price) * Number(priceOfEth.price);
-  }
-  p = pricesSTRK.prices.find(({ token }) => BigInt(token) === t);
-  if (p && priceOfStrk) {
-    return Number(p.price) * Number(priceOfStrk);
-  }
-};
-
-const getData = async (): Promise<EkuboBaseAprDoc> => {
-  const [
-    tokens,
-    defiSpringData,
-    pairData,
-    pricesETH,
-    pricesSTRK,
-    pricesUSDC,
-    priceOfStrk,
-    priceOfEth,
-  ] = await Promise.all([
-    fetchWithRetry(`${CONSTANTS.EKUBO.BASE_API}/tokens`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }, 'Error fetching ekubo tokens')
-      .then((response) => response?.json() ?? [])
-      .catch((err) => {
-        console.error('Error fetching ekubo tokens: ', err);
-        return [];
-      }),
-
-    fetchWithRetry(`${CONSTANTS.EKUBO.BASE_API}/defi-spring-incentives`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }, 'Error fetching ekubo defi spring incentives')
-      .then((response) => response?.json() ?? { strkPrice: 0, totalStrk: 0, pairs: [] })
-      .catch((err) => {
-        console.error('Error fetching ekubo defi spring incentives: ', err);
-        return { strkPrice: 0, totalStrk: 0, pairs: [] };
-      }),
-    fetchWithRetry(`${CONSTANTS.EKUBO.BASE_API}/overview/pairs`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }, 'Error fetching ekubo pair overview')
-      .then((response) => response?.json() ?? { topPairs: [] })
-      .catch((err) => {
-        console.error('Error fetching ekubo pair overview: ', err);
-        return { topPairs: [] };
-      }),
-    fetchWithRetry(`${CONSTANTS.EKUBO.BASE_API}/price/ETH?period=21600`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }, 'Error fetching ETH prices')
-      .then((response) => response?.json() ?? { timestamp: 0, prices: [] })
-      .catch((err) => {
-        console.error('Error fetching ETH prices', err);
-        return { timestamp: 0, prices: [] };
-      }),
-    fetchWithRetry(`${CONSTANTS.EKUBO.BASE_API}/price/STRK?period=21600`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }, 'Error fetching STRK prices')
-      .then((response) => response?.json() ?? { timestamp: 0, prices: [] })
-      .catch((err) => {
-        console.error('Error fetching STRK prices', err);
-        return { timestamp: 0, prices: [] };
-      }),
-    fetchWithRetry(`${CONSTANTS.EKUBO.BASE_API}/price/USDC?period=21600`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }, 'Error fetching USDC prices')
-      .then((response) => response?.json() ?? { timestamp: 0, prices: [] })
-      .catch((err) => {
-        console.error('Error fetching USDC prices', err);
-        return { timestamp: 0, prices: [] };
-      }),
-    fetchWithRetry(`${CONSTANTS.EKUBO.BASE_API}/price/STRK/USDC?period=21600`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }, 'Error fetching STRK/USDC price')
-      .then((response) => response?.json() ?? { timestamp: 0, price: 0 })
-      .catch((err) => {
-        console.error('Error fetching STRK/USDC price', err);
-        return { timestamp: 0, price: 0 };
-      }),
-    fetchWithRetry(`${CONSTANTS.EKUBO.BASE_API}/price/ETH/USDC?period=21600`, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    }, 'Error fetching ETH/USDC price')
-      .then((response) => response?.json() ?? { timestamp: 0, price: 0 })
-      .catch((err) => {
-        console.error('Error fetching ETH/USDC price', err);
-        return { timestamp: 0, price: 0 };
-      }),
-  ]);
-
-  return {
-    tokens,
-    defiSpringData,
-    pairData,
-    pricesETH,
-    pricesSTRK,
-    pricesUSDC,
-    priceOfStrk,
-    priceOfEth,
-  };
-};
 
 export const ekubo = new Ekubo();
 const EkuboAtoms: ProtocolAtoms = {
   baseAPRs: atomWithQuery((_get) => ({
     queryKey: ['ekubo_base_aprs'],
     queryFn: async ({ queryKey: _ }) => {
-      return await getData();
+      return await ekubo.getData();
     },
   })),
   pools: atom((get) => {

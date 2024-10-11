@@ -81,6 +81,13 @@ interface StrategyWise {
   id: string;
   usdValue: number;
   amount: string;
+  tokenInfo: {
+    name: string;
+    symbol: string;
+    logo: string;
+    decimals: number;
+    displayDecimals: number;
+  };
 }
 
 export interface UserStats {

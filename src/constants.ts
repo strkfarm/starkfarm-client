@@ -1,5 +1,6 @@
 import { NFTInfo, TokenInfo } from './strategies/IStrategy';
 import MyNumber from './utils/MyNumber';
+import { getEndpoint } from './utils';
 
 const LOGOS = {
   USDT: '/zklend/icons/tokens/usdt.svg?w=20',
@@ -41,6 +42,9 @@ const CONSTANTS = {
   },
   HAIKO: {
     BASE_APR_API: 'haiko/markets?network=mainnet',
+  },
+  STRKFarm: {
+    BASE_APR_API: '/api/strategies',
   },
   MY_SWAP: {
     POOLS_API: '/myswap/data/pools/all.json',
@@ -191,6 +195,32 @@ export const NFTS: NFTInfo[] = [
   },
 ];
 
-export const LATEST_TNC_DOC_VERSION = '1.0';
+// ? When updating this, ensure there is redirect available for this route
+// ? to respect version of doc in github
+export const LATEST_TNC_DOC_VERSION = 'tnc/v1';
+export const TnC_DOC_URL = `${getEndpoint()}/${LATEST_TNC_DOC_VERSION}`;
+export const SIGNING_DATA = {
+  types: {
+    StarkNetDomain: [
+      { name: 'name', type: 'felt' },
+      { name: 'version', type: 'felt' },
+      { name: 'chainId', type: 'felt' },
+    ],
+    Tnc: [
+      { name: 'message', type: 'felt' },
+      { name: 'document', type: 'felt' },
+    ],
+  },
+  primaryType: 'Tnc',
+  domain: {
+    name: 'STRKFarm',
+    version: '1',
+    chainId: '0x534e5f4d41494e',
+  },
+  message: {
+    message: 'Read and Agree T&C',
+    document: `${TnC_DOC_URL.replace('https://', '').replace('http://', '').slice(0, 25)}`,
+  },
+};
 
 export default CONSTANTS;

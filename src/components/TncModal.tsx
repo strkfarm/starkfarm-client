@@ -1,130 +1,150 @@
 'use client';
 
-import React from 'react';
-
+import { LATEST_TNC_DOC_VERSION, SIGNING_DATA, TnC_DOC_URL } from '@/constants';
+import { addressAtom } from '@/store/claims.atoms';
 import {
   Button,
-  Link,
+  Center,
   Modal,
   ModalBody,
-  ModalCloseButton,
   ModalContent,
   ModalOverlay,
+  Spinner,
   Text,
+  useDisclosure,
 } from '@chakra-ui/react';
-import { useAccount, useSignTypedData } from '@starknet-react/core';
-
+import { useAccount, useDisconnect } from '@starknet-react/core';
 import axios from 'axios';
+import { atomWithQuery } from 'jotai-tanstack-query';
+import React, { useEffect, useMemo, useState } from 'react';
+import { UserTncInfo } from '@/app/api/interfaces';
+import { useAtom, useAtomValue } from 'jotai';
+import { referralCodeAtom } from '@/store/referral.store';
+import { useSearchParams } from 'next/navigation';
+import { generateReferralCode } from '@/utils';
+import { ExternalLinkIcon } from '@chakra-ui/icons';
+import mixpanel from 'mixpanel-browser';
 import toast from 'react-hot-toast';
 
-const exampleData = {
-  types: {
-    StarkNetDomain: [
-      { name: 'name', type: 'felt' },
-      { name: 'version', type: 'felt' },
-      { name: 'chainId', type: 'felt' },
-    ],
-    Person: [
-      { name: 'name', type: 'felt' },
-      { name: 'wallet', type: 'felt' },
-    ],
-    Mail: [
-      { name: 'from', type: 'Person' },
-      { name: 'to', type: 'Person' },
-      { name: 'contents', type: 'felt' },
-    ],
-  },
-  primaryType: 'Mail',
-  domain: {
-    name: 'Starknet Mail',
-    version: '1',
-    chainId: 1,
-  },
-  message: {
-    from: {
-      name: 'Cow',
-      wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-    },
-    to: {
-      name: 'Bob',
-      wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-    },
-    contents: 'Hello, Bob!',
-  },
-};
+interface TncModalProps {}
 
-const signingData = {
-  types: {
-    StarkNetDomain: [
-      { name: 'name', type: 'felt' },
-      { name: 'version', type: 'felt' },
-      { name: 'chainId', type: 'felt' },
-    ],
-    Person: [
-      { name: 'name', type: 'felt' },
-      { name: 'wallet', type: 'felt' },
-    ],
-    Felt: [
-      { name: 'from', type: 'Person' },
-      { name: 'to', type: 'Person' },
-      { name: 'contents', type: 'felt' },
-    ],
-  },
-  primaryType: 'felt',
-  domain: {
-    name: 'STRKFarm',
-    version: '1',
-    chainId: '0x534e5f4d41494e',
-  },
-  message: {
-    from: {
-      name: 'Test1',
-      wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+export const UserTnCAtom = atomWithQuery((get) => {
+  return {
+    // we use referral code atom as key to ensure user exisits in db by then
+    queryKey: ['tnc', get(addressAtom), get(referralCodeAtom)],
+    queryFn: async (): Promise<null | UserTncInfo> => {
+      const address: string | undefined = get(addressAtom);
+      console.log(`address tnc`, address);
+      if (!address) return null;
+      const res = await axios.get(`/api/tnc/getUser/${address}`);
+      return res.data;
     },
-    to: {
-      name: 'Test2',
-      wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-    },
-    contents:
-      'You confirm that you have read and agree to our Terms & Conditions, which can be found at https://github.com/strkfarm/static-assets/src/tnc.md.\n\nPlease note, this message is solely for verifying your agreement to our T&C and does not authorize any transaction or movement of your assets.',
-  },
-};
+  };
+});
 
-interface TncModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+const TncModal: React.FC<TncModalProps> = (props) => {
+  const { address, account } = useAccount();
+  const [refCode, setReferralCode] = useAtom(referralCodeAtom);
+  const searchParams = useSearchParams();
+  const userTncInfoRes = useAtomValue(UserTnCAtom);
+  const userTncInfo = useMemo(
+    () => userTncInfoRes.data,
+    [userTncInfoRes, refCode],
+  );
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isSigningPending, setIsSigningPending] = useState(false);
+  const { disconnectAsync } = useDisconnect();
 
-const TncModal: React.FC<TncModalProps> = ({ isOpen, onClose }) => {
-  const { signTypedDataAsync } = useSignTypedData(signingData);
-  const { address } = useAccount();
+  // set ref code of the user if it exists
+  useEffect(() => {
+    if (!userTncInfo) return;
+    (async () => {
+      if (userTncInfo.success && userTncInfo.user) {
+        setReferralCode(userTncInfo.user.referralCode);
+        console.log(`tncinfo`, userTncInfo.user);
+        if (
+          (userTncInfo.user.isTncSigned &&
+            userTncInfo.user.tncDocVersion !== LATEST_TNC_DOC_VERSION) ||
+          !userTncInfo.user.isTncSigned
+        ) {
+          onOpen();
+        } else {
+          onClose();
+        }
+        return;
+      }
+
+      if (!userTncInfo.success) {
+        try {
+          let referrer = searchParams.get('referrer');
+
+          if (address && referrer && address === referrer) {
+            referrer = null;
+          }
+
+          const res = await axios.post('/api/referral/createUser', {
+            address,
+            myReferralCode: generateReferralCode(),
+            referrerAddress: referrer,
+          });
+          if (res.data.success && res.data.user) {
+            setReferralCode(res.data.user.referralCode);
+          }
+        } catch (error) {
+          console.error('Error while creating user', error);
+        }
+      }
+    })();
+  }, [userTncInfo]);
 
   const handleSign = async () => {
-    const res = await signTypedDataAsync();
-
-    if (res && res?.toString().length > 0) {
-      onClose();
-      try {
-        await axios.post('/api/tnc/signUser', {
-          address,
-          message: res?.toString(),
-        });
-      } catch (error: any) {
-        console.error('Error signing user: ', error);
-        toast.error('Error signing user: ', error.message);
-      }
+    if (!address || !account) {
+      return;
     }
+
+    mixpanel.track('TnC agreed', { address });
+    setIsSigningPending(true);
+
+    try {
+      const _signature = (await account.signMessage(SIGNING_DATA)) as string[];
+
+      console.log('signature', _signature);
+      const sig_len = _signature.length;
+      const signature =
+        sig_len > 2 ? _signature.slice(sig_len - 2, sig_len) : _signature;
+      if (signature && signature.length > 0) {
+        const res2 = await axios.post('/api/tnc/signUser', {
+          address,
+          signature: JSON.stringify(signature),
+          _signature: JSON.stringify(_signature),
+        });
+
+        if (res2.data?.success) {
+          onClose();
+        } else {
+          toast.error(res2.data?.message || 'Error verifying T&C');
+        }
+      }
+    } catch (error) {
+      console.error('signature', error);
+      mixpanel.track('TnC signing failed', { address });
+    }
+    setIsSigningPending(false);
   };
 
   return (
-    <Modal onClose={onClose} isOpen={isOpen} isCentered>
+    <Modal
+      onClose={onClose}
+      isOpen={isOpen}
+      isCentered
+      closeOnOverlayClick={false}
+    >
       <ModalOverlay />
       <ModalContent borderRadius=".5rem" maxW="32rem">
-        <ModalCloseButton color="#7F49E5" />
+        {/* <ModalCloseButton color="#7F49E5"/> */}
         <ModalBody
           backgroundColor="#1A1C26"
-          pt="4rem"
-          pb="3rem"
+          padding="3rem"
           border="1px solid #7F49E5"
           borderRadius=".5rem"
           color="white"
@@ -138,28 +158,77 @@ const TncModal: React.FC<TncModalProps> = ({ isOpen, onClose }) => {
             Terms and Conditions
           </Text>
 
-          <Text textAlign="center">
-            You agree to STRKFarm terms and conditions as stated in{' '}
-            <Link href="#" color="purple" _hover={{ textDecor: 'underline' }}>
-              githublink
-            </Link>
+          <Text textAlign="justify" color="white" width={'100%'}>
+            Please read the following terms and conditions carefully before
+            signing. You are required to sign this to continue using the App.
           </Text>
 
-          <Button
-            bg="#7F49E5"
-            borderRadius=".5rem"
-            px="1rem"
-            py=".5rem"
+          <Text
+            textAlign="left"
+            as={'a'}
+            width={'100%'}
+            fontWeight={'bold'}
+            href={TnC_DOC_URL}
             color="white"
-            cursor="pointer"
-            _hover={{
-              opacity: 0.9,
-              backgroundColor: '#7F49E5',
+            target="_blank"
+            _hover={{ textDecor: 'underline' }}
+            autoFocus={false}
+            _focus={{
+              boxShadow: 'none',
+              outline: 'none',
             }}
-            onClick={handleSign}
+            _focusVisible={{
+              boxShadow: 'none',
+              outline: 'none',
+            }}
           >
-            Agree
-          </Button>
+            T&C Document link <ExternalLinkIcon />
+          </Text>
+
+          <Text textAlign="left" width={'100%'}>
+            By clicking agree, you agree to STRKFarm terms and conditions as
+            stated in above document.
+          </Text>
+
+          <Center>
+            <Button
+              bg="purple"
+              borderRadius=".5rem"
+              px="1rem"
+              py=".5rem"
+              color="white"
+              cursor="pointer"
+              _hover={{
+                opacity: 0.9,
+                backgroundColor: '#7F49E5',
+              }}
+              onClick={handleSign}
+            >
+              Agree{' '}
+              {isSigningPending && (
+                <Spinner size={'xs'} color="white" ml={'5px'} />
+              )}
+            </Button>
+            <Button
+              bg="bg"
+              borderRadius=".5rem"
+              px="1rem"
+              py=".5rem"
+              color="color2"
+              cursor="pointer"
+              onClick={() => {
+                mixpanel.track('TnC declined', { address });
+                disconnectAsync();
+                onClose();
+              }}
+              ml={'10px'}
+            >
+              Disconnect
+            </Button>
+          </Center>
+          <Text textAlign={'center'} color={'light_grey'} fontSize={'12px'}>
+            Note: Only deployed accounts can sign
+          </Text>
         </ModalBody>
       </ModalContent>
     </Modal>

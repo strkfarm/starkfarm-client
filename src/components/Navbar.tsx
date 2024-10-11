@@ -24,15 +24,13 @@ import {
 import { useAtom, useSetAtom } from 'jotai';
 import { useStarknetkitConnectModal } from 'starknetkit';
 
-import { CONNECTOR_NAMES, MYCONNECTORS } from '@/app/template';
+import { CONNECTOR_NAMES } from '@/app/template';
 import tg from '@/assets/tg.svg';
 import CONSTANTS from '@/constants';
 import { getERC20Balance } from '@/store/balance.atoms';
 import { addressAtom } from '@/store/claims.atoms';
-import { referralCodeAtom } from '@/store/referral.store';
 import { lastWalletAtom } from '@/store/utils.atoms';
 import {
-  generateReferralCode,
   getTokenInfoFromName,
   MyMenuItemProps,
   MyMenuListProps,
@@ -42,16 +40,45 @@ import {
 } from '@/utils';
 import fulllogo from '@public/fulllogo.png';
 import {
+  InjectedConnector,
   useAccount,
   useConnect,
   useDisconnect,
   useStarkProfile,
 } from '@starknet-react/core';
-import axios from 'axios';
 import mixpanel from 'mixpanel-browser';
-import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { isMobile } from 'react-device-detect';
+import TncModal from './TncModal';
+import {
+  ArgentMobileConnector,
+  isInArgentMobileAppBrowser,
+} from 'starknetkit/argentMobile';
+import { WebWalletConnector } from 'starknetkit/webwallet';
+
+export const MYCONNECTORS: any[] = isInArgentMobileAppBrowser()
+  ? [
+      ArgentMobileConnector.init({
+        options: {
+          dappName: 'STRKFarm',
+          projectId: 'strkfarm',
+          url: 'https://app.strkfarm.xyz',
+        },
+        inAppBrowserOptions: {},
+      }),
+    ]
+  : [
+      new InjectedConnector({ options: { id: 'braavos', name: 'Braavos' } }),
+      new InjectedConnector({ options: { id: 'argentX', name: 'Argent X' } }),
+      new WebWalletConnector({ url: 'https://web.argent.xyz' }),
+      ArgentMobileConnector.init({
+        options: {
+          dappName: 'STRKFarm',
+          projectId: 'strkfarm',
+          url: 'https://app.strkfarm.xyz',
+        },
+      }),
+    ];
 
 interface NavbarProps {
   hideTg?: boolean;
@@ -59,16 +86,15 @@ interface NavbarProps {
 }
 
 export default function Navbar(props: NavbarProps) {
-  const { address, connector } = useAccount();
+  const { address, connector, account } = useAccount();
   const { connect, connectors } = useConnect();
-  const searchParams = useSearchParams();
   const { disconnectAsync } = useDisconnect();
-  const setReferralCode = useSetAtom(referralCodeAtom);
   const setAddress = useSetAtom(addressAtom);
   const { data: starkProfile } = useStarkProfile({
     address,
     useDefaultPfp: true,
   });
+
   const [lastWallet, setLastWallet] = useAtom(lastWalletAtom);
   const { starknetkitConnectModal: starknetkitConnectModal1 } =
     useStarknetkitConnectModal({
@@ -92,6 +118,8 @@ export default function Navbar(props: NavbarProps) {
     return balance.amount.toEtherToFixedDecimals(6);
   };
 
+  console.log(account, 'account');
+
   useEffect(() => {
     (async () => {
       if (address) {
@@ -113,12 +141,18 @@ export default function Navbar(props: NavbarProps) {
   const connectWallet = async () => {
     try {
       const result = await starknetkitConnectModal1();
+      if (!result.connector) {
+        throw new Error('No connector found');
+      }
 
       connect({ connector: result.connector });
     } catch (error) {
       console.warn('connectWallet error', error);
       try {
         const result = await starknetkitConnectModal2();
+        if (!result.connector) {
+          throw new Error('No connector found');
+        }
         connect({ connector: result.connector });
       } catch (error) {
         console.error('connectWallet error', error);
@@ -163,45 +197,8 @@ export default function Navbar(props: NavbarProps) {
 
   // set address atom
   useEffect(() => {
+    console.log('tncinfo address', address);
     setAddress(address);
-  }, [address]);
-
-  useEffect(() => {
-    (async () => {
-      if (address) {
-        try {
-          const { data } = await axios.get(`/api/tnc/getUser/${address}`);
-
-          if (data.success && data.user) {
-            setReferralCode(data.user.referralCode);
-          }
-
-          if (!data.success) {
-            try {
-              let referrer = searchParams.get('referrer');
-
-              if (address && referrer && address === referrer) {
-                referrer = null;
-              }
-
-              const res = await axios.post('/api/referral/createUser', {
-                address,
-                myReferralCode: generateReferralCode(),
-                referrerAddress: referrer,
-              });
-
-              if (res.data.success && res.data.user) {
-                setReferralCode(res.data.user.referralCode);
-              }
-            } catch (error) {
-              console.error('Error while creating user', error);
-            }
-          }
-        } catch (error) {
-          console.error('Error while getting signed user', error);
-        }
-      }
-    })();
   }, [address]);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -215,6 +212,7 @@ export default function Navbar(props: NavbarProps) {
       zIndex={999}
       top="0"
     >
+      <TncModal />
       <Center bg="bg" color="gray" padding={0}>
         <Text
           fontSize="12px"
@@ -243,11 +241,11 @@ export default function Navbar(props: NavbarProps) {
         padding={'20px 20px 10px'}
       >
         <Flex width={'100%'}>
-          <Link href="/" margin="0 auto 0 0" textAlign={'left'}>
+          <Link href="/" margin="auto auto auto 0" textAlign={'left'}>
             <Image
               src={fulllogo.src}
               alt="logo"
-              height={{ base: '40px', md: '50px' }}
+              height={{ base: '35px', md: '50px' }}
             />
           </Link>
           {/* <Link href={'/claims'} isExternal>
@@ -275,6 +273,24 @@ export default function Navbar(props: NavbarProps) {
             </Button>
           </Link> */}
 
+          <Link href="/" margin="0">
+            <Button
+              bg="transparent"
+              color="color2"
+              variant="outline"
+              border="none"
+              padding={'0'}
+              _hover={{
+                bg: 'color2_50p',
+              }}
+              display={{ base: 'none !important', md: 'flex !important' }}
+              onClick={() => {
+                mixpanel.track('home_clicked');
+              }}
+            >
+              Home
+            </Button>
+          </Link>
           <Link href="/community" margin="0 10px 0 0">
             <Button
               bg="transparent"
@@ -338,7 +354,7 @@ export default function Navbar(props: NavbarProps) {
             </Link>
           )}
 
-          {(!isMobile || props.forceShowConnect) && (
+          {true && (
             <Menu>
               <MenuButton
                 as={Button}
@@ -377,14 +393,14 @@ export default function Navbar(props: NavbarProps) {
                           'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQa5dG19ABS0ge6iFAgpsvE_ULDUa4fJyT7hg&s'
                         }
                         alt="pfp"
-                        width={30}
-                        height={30}
+                        width={{ base: '20px', sm: '30px' }}
+                        height={{ base: '20px', sm: '30px' }}
                         rounded="full"
                       />{' '}
                       <Text as="h3" marginTop={'3px !important'}>
                         {starkProfile && starkProfile.name
-                          ? truncate(starkProfile.name, 6, 6)
-                          : shortAddress(address)}
+                          ? truncate(starkProfile.name, 6, isMobile ? 0 : 6)
+                          : shortAddress(address, 4, isMobile ? 0 : 4)}
                       </Text>
                     </Center>
                   ) : (

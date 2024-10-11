@@ -28,6 +28,15 @@ const TVL: React.FC = () => {
   const address = useAtomValue(addressAtom);
   const referralCode = useAtomValue(referralCodeAtom);
 
+  const formattedTvlData = (tvlData: number) => {
+    if (tvlData >= 1000000) {
+      return `${(tvlData / 1000000).toFixed(2)}m`;
+    } else if (tvlData >= 1000) {
+      return `${(tvlData / 1000).toFixed(2)}k`;
+    }
+    return `${tvlData.toString()}`;
+  };
+
   return (
     <Grid
       templateColumns={{ base: 'repeat(1, 1, 1fr)', md: 'repeat(3, 1fr)' }}
@@ -42,8 +51,10 @@ const TVL: React.FC = () => {
               $
               {isPending ? (
                 <Spinner size="sm" color="white" marginLeft={'5px'} />
+              ) : data != undefined ? (
+                formattedTvlData(Number(data.tvl))
               ) : (
-                Number(data?.tvl.toFixed(2)).toLocaleString()
+                '0'
               )}
             </StatNumber>
           </Stat>

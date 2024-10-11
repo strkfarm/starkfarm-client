@@ -1,7 +1,6 @@
 import EkuboAtoms, { ekubo } from './ekobu.store';
 import HaikoAtoms, { haiko } from './haiko.store';
 import HashstackAtoms, { hashstack } from './hashstack.store';
-import JediAtoms, { jedi } from './jedi.store';
 import MySwapAtoms, { mySwap } from './myswap.store';
 import NostraDexAtoms, { nostraDex } from './nostradex.store';
 import NostraDegenAtoms, { nostraDegen } from './nostradegen.store';
@@ -14,21 +13,29 @@ import ZkLendAtoms, { zkLend } from './zklend.store';
 import CarmineAtoms, { carmine } from './carmine.store';
 import { atom } from 'jotai';
 import { Category, PoolInfo, PoolType } from './pools';
-import { strategiesAtom } from './strategies.atoms';
 import strkfarmLogo from '@public/logo.png';
-import { IStrategyProps } from '@/strategies/IStrategy';
+import STRKFarmAtoms, {
+  strkfarm,
+  STRKFarmStrategyAPIResult,
+} from './strkfarm.atoms';
+import { getLiveStatusEnum } from './strategies.atoms';
 
 export const PROTOCOLS = [
+  {
+    name: strkfarm.name,
+    class: strkfarm,
+    atoms: STRKFarmAtoms,
+  },
   {
     name: ekubo.name,
     class: ekubo,
     atoms: EkuboAtoms,
   },
-  {
-    name: jedi.name,
-    class: jedi,
-    atoms: JediAtoms,
-  },
+  // {
+  //   name: jedi.name,
+  //   class: jedi,
+  //   atoms: JediAtoms,
+  // },
   {
     name: mySwap.name,
     class: mySwap,
@@ -98,16 +105,10 @@ export const PROTOCOLS = [
 
 export const ALL_FILTER = 'All';
 
-const allProtocols = [
-  {
-    name: 'STRKFarm',
-    logo: strkfarmLogo.src,
-  },
-  ...PROTOCOLS.map((p) => ({
-    name: p.name,
-    logo: p.class.logo,
-  })),
-];
+const allProtocols = PROTOCOLS.map((p) => ({
+  name: p.name,
+  logo: p.class.logo,
+}));
 export const filters = {
   categories: [...Object.values(Category)],
   types: [...Object.values(PoolType)],
@@ -153,8 +154,7 @@ export const allPoolsAtomUnSorted = atom((get) => {
 });
 
 export function getPoolInfoFromStrategy(
-  strat: IStrategyProps,
-  tvlInfo: number,
+  strat: STRKFarmStrategyAPIResult,
 ): PoolInfo {
   let category = Category.Others;
   if (strat.name.includes('STRK')) {
@@ -166,18 +166,18 @@ export function getPoolInfoFromStrategy(
     pool: {
       id: strat.id,
       name: strat.name,
-      logos: [strat.holdingTokens[0].logo],
+      logos: [strat.logo],
     },
     protocol: {
       name: 'STRKFarm',
       link: `/strategy/${strat.id}`,
       logo: strkfarmLogo.src,
     },
-    tvl: tvlInfo,
-    apr: strat.netYield,
+    tvl: strat.tvlUsd,
+    apr: strat.apy,
     aprSplits: [
       {
-        apr: strat.netYield,
+        apr: strat.apy,
         title: 'Net Yield',
         description: 'Includes fees & Defi spring rewards',
       },
@@ -193,7 +193,7 @@ export function getPoolInfoFromStrategy(
     },
     additional: {
       riskFactor: strat.riskFactor,
-      tags: [strat.liveStatus],
+      tags: [getLiveStatusEnum(strat.status.number)],
       isAudited: true,
       leverage: strat.leverage,
     },
@@ -202,12 +202,13 @@ export function getPoolInfoFromStrategy(
 
 export const allPoolsAtomWithStrategiesUnSorted = atom((get) => {
   const pools: PoolInfo[] = get(allPoolsAtomUnSorted);
-  const strategies = get(strategiesAtom);
-  const strategyPools: PoolInfo[] = strategies.map((strategy) => {
-    const tvlInfo = get(strategy.tvlAtom);
-    return getPoolInfoFromStrategy(strategy, tvlInfo.data?.usdValue || 0);
-  });
-  return strategyPools.concat(pools);
+  // const strategies = get(strategiesAtom);
+  // const strategyPools: PoolInfo[] = strategies.map((strategy) => {
+  //   const tvlInfo = get(strategy.tvlAtom);
+  //   return getPoolInfoFromStrategy(strategy, tvlInfo.data?.usdValue || 0);
+  // });
+  // return strategyPools.concat(pools);
+  return pools;
 });
 
 // const allPoolsAtom = atom<PoolInfo[]>([]);

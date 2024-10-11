@@ -19,6 +19,20 @@ model User {
 
   createdAt    DateTime      @default(now())
   og_nft_users og_nft_users?
+  updatedAt    DateTime      @updatedAt @default(now())
+  Signatures   Signatures[]
+}
+
+model Signatures {
+  id            Int      @id @default(autoincrement())
+  signature     String
+  tncDocVersion String
+  createdAt     DateTime @default(now())
+
+  userId Int
+  User   User @relation(fields: [userId], references: [id])
+
+  @@unique([userId, tncDocVersion], name: "unique_signature")
 }
 
 model Referral {

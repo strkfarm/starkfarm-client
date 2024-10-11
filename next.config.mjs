@@ -3,7 +3,7 @@ const nextConfig = {
   // output: 'export',
   compiler: {
     removeConsole: {
-      exclude: ['error'],
+      exclude: ['error', 'debug'],
     },
   },
   async rewrites() {
@@ -58,6 +58,11 @@ const nextConfig = {
       {
         source: '/eth',
         destination: '/strategy/eth_sensei',
+        permanent: true,
+      },
+      {
+        source: '/tnc/v1',
+        destination: 'https://github.com/strkfarm/static-assets/blob/177389cad715d69245c1b125df87f90318ac2d7b/tnc.pdf',
         permanent: true,
       },
     ];
