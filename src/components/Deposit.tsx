@@ -113,6 +113,9 @@ export default function Deposit(props: DepositProps) {
   }, [balData]);
   // const { balance, isLoading, isError } = useERC20Balance(selectedMarket);
   const maxAmount: MyNumber = useMemo(() => {
+    if (props.buttonText === 'Deposit' && props.strategy.depositsDisabled) {
+      return MyNumber.fromZero();
+    }
     const currentTVl = tvlInfo.data?.amount || MyNumber.fromZero();
     const maxAllowed =
       props.strategy.settings.maxTVL - Number(currentTVl.toEtherStr());
@@ -135,7 +138,7 @@ export default function Deposit(props: DepositProps) {
     console.log('Deposit:: reducedBalance2', reducedBalance.toEtherStr());
     const min = MyNumber.min(reducedBalance, adjustedMaxAllowed);
     return MyNumber.max(min, MyNumber.fromEther('0', selectedMarket.decimals));
-  }, [balance, props.strategy, selectedMarket]);
+  }, [balance, props.strategy, selectedMarket, props.buttonText]);
 
   useEffect(() => {
     if (isMaxClicked) {
@@ -300,7 +303,7 @@ export default function Deposit(props: DepositProps) {
         keepWithinRange={false}
         clampValueOnBlur={false}
         value={rawAmount}
-        isDisabled={maxAmount.isZero()}
+        isDisabled={maxAmount.isZero() || (props.buttonText === 'Deposit' && props.strategy.depositsDisabled)}
       >
         <NumberInputField
           border={'0px'}
@@ -331,7 +334,10 @@ export default function Deposit(props: DepositProps) {
           calls={calls}
           buttonProps={{
             isDisabled:
-              amount.isZero() || amount.compare(maxAmount.toEtherStr(), 'gt'),
+              amount.isZero() || 
+              amount.compare(maxAmount.toEtherStr(), 'gt') ||
+              (props.buttonText === 'Deposit' && props.strategy.depositsDisabled) ||
+              (props.buttonText === 'Redeem' && !props.strategy.withdrawalsEnabled),
           }}
           selectedMarket={selectedMarket}
           strategy={props.strategy}
@@ -375,7 +381,11 @@ export default function Deposit(props: DepositProps) {
           }
           isIndeterminate={!tvlInfo || !tvlInfo?.data}
         />
-        {/* {tvlInfo.isError ? 1 : 0}{tvlInfo.isLoading ? 1 : 0} {JSON.stringify(tvlInfo.error)} */}
+        {props.strategy.depositsDisabled && props.buttonText === 'Deposit' && (
+          <Text color="red" fontSize="12px" marginTop="5px">
+            Deposits are currently disabled due to TVL limit
+          </Text>
+        )}
       </Box>
     </Box>
   );

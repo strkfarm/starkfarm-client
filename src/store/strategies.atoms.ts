@@ -109,6 +109,12 @@ export const strategiesAtom = atom<StrategyInfo[]>((get) => {
 
   for (const s of strategies) {
     s.solve(requiredPools, '1000');
+    
+    // Add a new property to track if deposits are disabled
+    s.depositsDisabled = s.tvl >= s.maxTVL;
+    
+    // Ensure withdrawals are always possible
+    s.withdrawalsEnabled = true;
   }
 
   strategies.sort((a, b) => {

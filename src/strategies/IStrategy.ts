@@ -118,6 +118,11 @@ export class IStrategyProps {
     'APYs shown are just indicative and do not promise exact returns',
   ];
 
+  depositsDisabled: boolean = false;
+  withdrawalsEnabled: boolean = true;
+  tvl: number = 0;
+  maxTVL: number = 0;
+
   getSafetyFactorLine() {
     let factorLevel = 'Low';
     if (this.riskFactor > 2) factorLevel = 'Medium';
