@@ -189,15 +189,19 @@ const HaikoAtoms: ProtocolAtoms = {
   baseAPRs: atomWithQuery((get) => ({
     queryKey: ['haiko_base_aprs'],
     queryFn: async ({ queryKey }): Promise<Pool[]> => {
-        const response = await fetchWithRetry(`${CONSTANTS.HAIKO.BASE_APR_API}`, {
+      const response = await fetchWithRetry(
+        `${CONSTANTS.HAIKO.BASE_APR_API}`,
+        {
           headers: {
             'Content-Type': 'application/json',
           },
-        }, 'Error fetching haiko base APRs');
-        if (!response) return [];
-        const data = await response.json();
+        },
+        'Error fetching haiko APYs',
+      );
+      if (!response) return [];
+      const data = await response.json();
 
-        return data;
+      return data;
     },
   })),
 
