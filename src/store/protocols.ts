@@ -229,7 +229,9 @@ export const sortPoolsAtom = atom((get) => {
   const sortedPools = [...pools].sort((a, b) => {
     for (const sortItem of sortCriteria) {
       let result = 0;
-      if (sortItem.field === SORT_OPTIONS[2]) {
+      if (sortItem.field === SORT_OPTIONS[1]) {
+        result = sortItem.order === 'asc' ? a.apr - b.apr : b.apr - a.apr;
+      } else if (sortItem.field === SORT_OPTIONS[2]) {
         result = sortItem.order === 'asc' ? a.tvl - b.tvl : b.tvl - a.tvl;
       } else if (sortItem.field === SORT_OPTIONS[3]) {
         result =
@@ -238,13 +240,12 @@ export const sortPoolsAtom = atom((get) => {
               Math.round(b.additional.riskFactor)
             : Math.round(b.additional.riskFactor) -
               Math.round(a.additional.riskFactor);
-      } else if (sortItem.field === SORT_OPTIONS[1]) {
-        result = sortItem.order === 'asc' ? a.apr - b.apr : b.apr - a.apr;
       }
       if (result !== 0) return result;
     }
     return 0;
   });
+  // localStorage.setItem('sort', JSON.stringify(sortCriteria));
 
   return sortedPools;
 });
