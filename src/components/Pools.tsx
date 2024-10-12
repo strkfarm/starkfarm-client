@@ -49,11 +49,8 @@ export default function Pools() {
 
   const handleSortChange = (field: string) => (order: 'asc' | 'desc') => {
     setSort((prev) => {
-      const exist = prev.find((s) => s.field === field);
-      if (exist) {
-        return prev.map((s) => (s.field === field ? { ...s, order } : s));
-      }
-      return [...prev, { field, order }];
+      const updatedSort = prev.filter((s) => s.field !== field);
+      return [...updatedSort, { field, order }];
     });
   };
 
