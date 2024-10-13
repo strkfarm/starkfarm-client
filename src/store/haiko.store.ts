@@ -144,6 +144,8 @@ export class Haiko extends IDapp<Pool[]> {
       const poolName = p.pool.name;
       const pools = filterMarkets(POOL_NAMES, data.data);
       const pool = pools[poolName];
+      if (!pool) return { baseAPY, splitApr, metadata };
+
       baseAPY = pool.feeApy;
 
       splitApr = {
