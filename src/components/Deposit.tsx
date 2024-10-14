@@ -113,8 +113,8 @@ export default function Deposit(props: DepositProps) {
   }, [balData]);
   // const { balance, isLoading, isError } = useERC20Balance(selectedMarket);
   const maxAmount: MyNumber = useMemo(() => {
-    const currentTVl = tvlInfo.data?.amount || MyNumber.fromZero();
-    const maxAllowed =
+    const currentTVl = tvlInfo.data?.amount || MyNumber.fromZero(); // current tvl value
+    const maxAllowed = // max allowed value
       props.strategy.settings.maxTVL - Number(currentTVl.toEtherStr());
     const adjustedMaxAllowed = MyNumber.fromEther(
       maxAllowed.toFixed(6),
@@ -134,7 +134,7 @@ export default function Deposit(props: DepositProps) {
     }
     console.log('Deposit:: reducedBalance2', reducedBalance.toEtherStr());
     const min = MyNumber.min(reducedBalance, adjustedMaxAllowed);
-    return MyNumber.max(min, MyNumber.fromEther('0', selectedMarket.decimals));
+    return MyNumber.max(min, MyNumber.fromEther('0', selectedMarket.decimals)); // look at this
   }, [balance, props.strategy, selectedMarket]);
 
   useEffect(() => {
@@ -208,6 +208,7 @@ export default function Deposit(props: DepositProps) {
       </Box>
     );
   }
+
   return (
     <Box>
       <Grid templateColumns="repeat(5, 1fr)" gap={6}>
@@ -300,7 +301,6 @@ export default function Deposit(props: DepositProps) {
         keepWithinRange={false}
         clampValueOnBlur={false}
         value={rawAmount}
-        isDisabled={maxAmount.isZero()}
       >
         <NumberInputField
           border={'0px'}
@@ -345,7 +345,7 @@ export default function Deposit(props: DepositProps) {
         fontSize="12px"
         marginTop="20px"
       >
-        No additional fees by STRKFarm
+        {/* No additional fees by STRKFarm */}
       </Text>
 
       <Box width="100%" marginTop={'15px'}>
