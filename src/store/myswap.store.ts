@@ -186,7 +186,7 @@ const fetch_pools = async (): Promise<Pools> => {
   const response = await fetchWithRetry(
     `${CONSTANTS.MY_SWAP.POOLS_API}`,
     {},
-    'Error fetching myswap pools',
+    'Error fetching mySwap pools',
   );
   if (!response) return { pools: [] };
   const data = await response.json();
@@ -222,7 +222,7 @@ const fetchAprData = async (
             const response = await fetchWithRetry(
               `${CONSTANTS.MY_SWAP.BASE_APR_API}/${pool_key}/overview.json`,
               {},
-              'Error fetching myswap apr data',
+              'Error fetching mySwap apr data',
             );
             if (!response) return null;
             const data = await response.json();

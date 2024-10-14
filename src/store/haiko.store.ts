@@ -144,6 +144,8 @@ export class Haiko extends IDapp<Pool[]> {
       const poolName = p.pool.name;
       const pools = filterMarkets(POOL_NAMES, data.data);
       const pool = pools[poolName];
+      if (!pool) return { baseAPY, splitApr, metadata };
+
       baseAPY = pool.feeApy;
 
       splitApr = {
@@ -189,15 +191,19 @@ const HaikoAtoms: ProtocolAtoms = {
   baseAPRs: atomWithQuery((get) => ({
     queryKey: ['haiko_base_aprs'],
     queryFn: async ({ queryKey }): Promise<Pool[]> => {
-        const response = await fetchWithRetry(`${CONSTANTS.HAIKO.BASE_APR_API}`, {
+      const response = await fetchWithRetry(
+        `${CONSTANTS.HAIKO.BASE_APR_API}`,
+        {
           headers: {
             'Content-Type': 'application/json',
           },
-        }, 'Error fetching haiko base APRs');
-        if (!response) return [];
-        const data = await response.json();
+        },
+        'Error fetching haiko APYs',
+      );
+      if (!response) return [];
+      const data = await response.json();
 
-        return data;
+      return data;
     },
   })),
 

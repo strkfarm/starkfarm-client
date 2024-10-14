@@ -142,7 +142,7 @@ export const CarmineAtom = atomWithQuery((get) => ({
       const res = await fetchWithRetry(
         `${CONSTANTS.CARMINE_URL}/${endpoint}/apy`,
         {},
-        'Failed to fetch Carmine data',
+        'Failed to fetch Carmine options data',
       );
 
       if (!res) {

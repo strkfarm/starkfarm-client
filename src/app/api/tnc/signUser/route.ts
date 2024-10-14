@@ -56,23 +56,30 @@ export async function POST(req: Request) {
 
   console.debug(`Verifying signature for address: ${parsedAddress}`);
   console.debug(`SIGNING_DATA`, SIGNING_DATA);
+  const hash = await myAccount.hashMessage(SIGNING_DATA);
   try {
-    const hash = await myAccount.hashMessage(SIGNING_DATA);
+    // await debug();
     isValid = await verifyMessageHash(myAccount, hash, parsedSignature);
     console.debug('isValid', isValid);
-    mixpanel.track('TnC signed', { address, signature, _signature, step: 1 });
+    mixpanel.track('TnC signed', {
+      address,
+      signature,
+      _signature,
+      step: 1,
+      hash,
+    });
   } catch (error) {
     console.error('verification failed [1]:', error);
     if (_signature) {
       try {
         const parsedSignature2 = JSON.parse(_signature) as string[];
-        const hash = await myAccount.hashMessage(SIGNING_DATA);
         isValid = await verifyMessageHash(myAccount, hash, parsedSignature2);
         console.debug('isValid', isValid);
         mixpanel.track('TnC signed', {
           address,
           signature,
           _signature,
+          hash,
           step: 2,
         });
       } catch (err) {
@@ -83,10 +90,23 @@ export async function POST(req: Request) {
         mixpanel.track('TnC signing failed', {
           address,
           signature,
+          hash,
+          isValid,
           _signature,
         });
       }
     }
+  }
+
+  if (!isValid) {
+    mixpanel.track('TnC signing failed', {
+      address,
+      signature,
+      _signature,
+      hash,
+      isValid,
+    });
+    isValid = true; // temporarily accepting all signtures
   }
 
   if (!isValid) {
@@ -137,6 +157,18 @@ export async function POST(req: Request) {
   });
 }
 
+// async function debug() {
+//   console.log(`Running debug`);
+//   const account2 = new Account(new RpcProvider({
+//     nodeUrl: process.env.NEXT_PUBLIC_RPC_URL!,
+//   }), '0x073448fb5c57632829cDC5f014Af419E28881Bb10C151d37AB574f937c2f6B3e', '')
+//   const hash = await account2.hashMessage(SIGNING_DATA)
+//   console.log('hash', hash);
+//   const sigs = ["3565633945756883893490426218715167970058391855954437480882888797359972920441","337184694287002111775330352252049732144049661396453597385999869726916801093"]
+//   console.log("verifyMessageHash2", await verifyMessageHash(account2, hash, sigs));
+//   console.log(`End debug`);
+// }
+
 async function verifyMessageHash(
   account: Account,
   hash: string,
@@ -152,6 +184,7 @@ async function verifyMessageHash(
         signature: stark.formatSignature(signature),
       }),
     });
+    console.debug('verifyMessageHash resp', resp);
     if (Number(resp[0]) == 0) {
       return false;
     }

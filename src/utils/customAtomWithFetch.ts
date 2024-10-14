@@ -1,4 +1,5 @@
 import { customAtomWithQuery } from './customAtomWithQuery';
+import fetchWithRetry from './fetchWithRetry';
 
 export const customAtomWithFetch = (args: {
   url: string;
@@ -16,12 +17,16 @@ export const customAtomWithFetch = (args: {
 
       try {
         const options = args.fetchOptions || { method: 'GET' };
-        const res = await fetch(`${urlPrefix}${url}`, options);
-        if (!res.ok) {
+        const res = await fetchWithRetry(
+          `${urlPrefix}${url}`,
+          options,
+          'Error fetching url',
+        );
+        if (!res?.ok) {
           console.error(
             'Error fetching url',
             `${urlPrefix}${url}`,
-            res.statusText,
+            res?.statusText,
           );
           throw new Error('Error fetching url');
         }

@@ -111,8 +111,8 @@ export const StrkIncentivesAtom = atomWithQuery((get) => ({
       const res = await fetchWithRetry(
         CONSTANTS.NOSTRA_DEGEN_INCENTIVE_URL,
         {},
-        'Error fetching nostra incentives',
-      );  
+        'Error fetching Nostra incentives information',
+      );
       if (!res) return [];
       let data = await res.text();
       data = data.replaceAll('NaN', '0');

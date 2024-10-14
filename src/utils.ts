@@ -4,6 +4,7 @@ import { TOKENS } from './constants';
 import toast from 'react-hot-toast';
 import { TokenInfo } from './strategies/IStrategy';
 import axios from 'axios';
+import fetchWithRetry from './utils/fetchWithRetry';
 
 export function getUniqueStrings(arr: Array<string>) {
   const _arr: string[] = [];
@@ -148,16 +149,22 @@ export function copyReferralLink(refCode: string) {
 }
 
 export async function getPrice(tokenInfo: TokenInfo) {
-  try {
-    return await getPriceFromMyAPI(tokenInfo);
-  } catch (e) {
-    console.warn('getPriceFromMyAPI error', e);
-  }
+  // try {
+  //   return await getPriceFromMyAPI(tokenInfo);
+  // } catch (e) {
+  //   console.warn('getPriceFromMyAPI error', e);
+  // }
   console.log('getPrice coinbase', tokenInfo.name);
-  const priceInfo = await axios.get(
+  const priceInfo = await fetchWithRetry(
     `https://api.coinbase.com/v2/prices/${tokenInfo.name}-USDT/spot`,
+    {},
+    `Error fetching price for ${tokenInfo.name}`,
   );
-  const price = Number(priceInfo.data.data.amount);
+  if (!priceInfo) {
+    throw new Error('Failed to fetch price');
+  }
+  const data = await priceInfo.json();
+  const price = Number(data.data.amount);
   return price;
 }
 
