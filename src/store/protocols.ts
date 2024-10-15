@@ -215,7 +215,7 @@ export const allPoolsAtomWithStrategiesUnSorted = atom((get) => {
 
 const SORT_OPTIONS = ['DEFAULT', 'APR', 'TVL', 'RISK'] as const;
 
-export const sortAtom = atom<Array<{ field: string; order: 'asc' | 'desc' }>>([
+const defaultSortAtom = atom<Array<{ field: string; order: 'asc' | 'desc' }>>([
   {
     field: SORT_OPTIONS[1],
     order: 'desc',
@@ -226,10 +226,19 @@ export const sortAtom = atom<Array<{ field: string; order: 'asc' | 'desc' }>>([
   },
 ]);
 
+export const sortAtom = atom<Array<{ field: string; order: 'asc' | 'desc' }>>([
+  // {
+  //   field: SORT_OPTIONS[0],
+  //   order: 'asc',
+  // },
+]);
+
 export const sortPoolsAtom = atom((get) => {
   const sort = get(sortAtom);
+  const default_sort = get(defaultSortAtom);
   const pools = get(allPoolsAtomWithStrategiesUnSorted);
-  const sortCriteria = [...sort].reverse();
+  const sortCriteria =
+    sort.length > 0 ? [...sort].reverse() : [...default_sort].reverse();
   const sortedPools = [...pools].sort((a, b) => {
     for (const sortItem of sortCriteria) {
       let result = 0;
@@ -245,18 +254,10 @@ export const sortPoolsAtom = atom((get) => {
             : Math.round(b.additional.riskFactor) -
               Math.round(a.additional.riskFactor);
       }
-      //  else {
-      //   result =
-      //     sortItem.order === 'asc'
-      //       ? b.apr - a.apr
-      //       : a.additional.riskFactor - b.additional.riskFactor;
-      // }
       if (result !== 0) return result;
     }
     return 0;
   });
-  // localStorage.setItem('sort', JSON.stringify(sortCriteria));
-
   return sortedPools;
 });
 
