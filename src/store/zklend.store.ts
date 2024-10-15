@@ -6,9 +6,6 @@ import { IDapp } from './IDapp.store';
 import { StrategyAction } from '@/strategies/IStrategy';
 import { LendingSpace } from './lending.base';
 import { customAtomWithFetch } from '@/utils/customAtomWithFetch';
-const fetcher = (...args: any[]) => {
-  return fetch(args[0], args[1]).then((res) => res.json());
-};
 
 export class ZkLend extends IDapp<LendingSpace.MyBaseAprDoc[]> {
   name = 'zkLend';

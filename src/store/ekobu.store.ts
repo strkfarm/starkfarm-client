@@ -286,15 +286,21 @@ export class Ekubo extends IDapp<EkuboBaseAprDoc> {
 
   async getData(): Promise<EkuboBaseAprDoc> {
     const [tokens, defiSpringData, pairData] = await Promise.all([
-      fetch(`${CONSTANTS.EKUBO.BASE_API}/tokens`).then((response) =>
-        response.json(),
-      ),
-      fetch(`${CONSTANTS.EKUBO.BASE_API}/defi-spring-incentives`).then(
-        (response) => response.json(),
-      ),
-      fetch(`${CONSTANTS.EKUBO.BASE_API}/overview/pairs`).then((response) =>
-        response.json(),
-      ),
+      fetchWithRetry(
+        `${CONSTANTS.EKUBO.BASE_API}/tokens`,
+        {},
+        'Error fetching Ekubo APYs',
+      ).then((response) => response?.json()),
+      fetchWithRetry(
+        `${CONSTANTS.EKUBO.BASE_API}/defi-spring-incentives`,
+        {},
+        'Error fetching Ekubo incentives',
+      ).then((response) => response?.json()),
+      fetchWithRetry(
+        `${CONSTANTS.EKUBO.BASE_API}/overview/pairs`,
+        {},
+        'Error fetching Ekubo pairs info',
+      ).then((response) => response?.json()),
     ]);
 
     const pricePromises = ['ETH', 'STRK', 'USDC'].map(async (symbol) => {

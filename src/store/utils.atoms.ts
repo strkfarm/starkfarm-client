@@ -32,15 +32,19 @@ export async function getBlock(
       variables: {},
     });
     console.log('jedi base', 'data', data);
-    const res = await fetch(CONSTANTS.JEDI.BASE_API, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
+    const res = await fetchWithRetry(
+      CONSTANTS.JEDI.BASE_API,
+      {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: data,
       },
-      body: data,
-    });
-    const blockInfo = await res.json();
+      `Error fetching block info`,
+    );
+    const blockInfo = await res?.json();
     console.log('jedi base data', blockInfo, tSeconds);
     return blockInfo;
   } catch (err) {
@@ -71,7 +75,11 @@ interface DAppStats {
 export const dAppStatsAtom = atomWithQuery((get) => ({
   queryKey: ['stats'],
   queryFn: async (): Promise<DAppStats> => {
-    const res = await fetchWithRetry('/api/stats', {}, 'Error fetching dApp stats');
+    const res = await fetchWithRetry(
+      '/api/stats',
+      {},
+      'Error fetching TVL info',
+    );
     if (!res) return { tvl: 0 };
     return await res.json();
   },
@@ -103,7 +111,11 @@ export const userStatsAtom = atomWithQuery((get) => ({
     if (!addr) {
       return null;
     }
-    const res = await fetchWithRetry(`/api/stats/${addr}`, {}, 'Error fetching user stats');
+    const res = await fetchWithRetry(
+      `/api/stats/${addr}`,
+      {},
+      'Error fetching user stats',
+    );
     if (!res) return null;
     return await res.json();
   },
@@ -174,14 +186,18 @@ export const blockInfoMinus1DAtom = atomWithQuery((get) => ({
     });
     console.log('jedi base', 'data', data);
 
-    const res = await fetchWithRetry(CONSTANTS.JEDI.BASE_API, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
+    const res = await fetchWithRetry(
+      CONSTANTS.JEDI.BASE_API,
+      {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/json',
+        },
+        body: data,
       },
-      body: data,
-    }, 'Error fetching block minus 1d');
+      'Error fetching block minus 1d',
+    );
     if (!res) return { data: { blocks: [] } };
     console.log('jedi base', 'data2', res.json());
     return await res.json();
