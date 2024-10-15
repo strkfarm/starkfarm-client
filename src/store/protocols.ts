@@ -217,7 +217,11 @@ const SORT_OPTIONS = ['DEFAULT', 'APR', 'TVL', 'RISK'] as const;
 
 export const sortAtom = atom<Array<{ field: string; order: 'asc' | 'desc' }>>([
   {
-    field: SORT_OPTIONS[0],
+    field: SORT_OPTIONS[1],
+    order: 'desc',
+  },
+  {
+    field: SORT_OPTIONS[3],
     order: 'asc',
   },
 ]);
@@ -241,6 +245,12 @@ export const sortPoolsAtom = atom((get) => {
             : Math.round(b.additional.riskFactor) -
               Math.round(a.additional.riskFactor);
       }
+      //  else {
+      //   result =
+      //     sortItem.order === 'asc'
+      //       ? b.apr - a.apr
+      //       : a.additional.riskFactor - b.additional.riskFactor;
+      // }
       if (result !== 0) return result;
     }
     return 0;
