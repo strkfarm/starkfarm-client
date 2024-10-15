@@ -48,12 +48,22 @@ export default function Pools() {
   }, [_filteredPools, currentPage, sort]);
 
   const handleSortChange = (field: string) => (order: 'asc' | 'desc') => {
-    setSort((prev) => {
-      const updatedSort = prev.filter((s) => s.field !== field);
-      return [...updatedSort, { field, order }];
-    });
+    if (field == 'RISK') {
+      setSort((prev) => {
+        const updatedSort = prev.filter((s) => s.field !== field);
+        return [...updatedSort, { field, order }];
+      });
+    } else if (field == 'APR' || field == 'TVL') {
+      const riskIndex = sort.findIndex((s) => s.field === 'RISK');
+      const new_sort: any = [];
+      if (riskIndex >= 0) {
+        new_sort.push({ field: 'RISK', order: sort[riskIndex].order });
+      }
+      new_sort.push({ field, order });
+      setSort(new_sort);
+    }
+    localStorage.setItem('sort', JSON.stringify(sort));
   };
-
   return (
     <Box float="left" width={'100%'}>
       <ProtocolFilters />
@@ -113,6 +123,7 @@ export default function Pools() {
                   mainColor="color2Text"
                   inActiveColor="#d9d9f726"
                   onClick={handleSortChange('APR')}
+                  // disabled={false}
                 />
               </Th>
               <Th textAlign={'right'}>
@@ -121,6 +132,7 @@ export default function Pools() {
                   mainColor="color2Text"
                   inActiveColor="#d9d9f726"
                   onClick={handleSortChange('RISK')}
+                  // disabled={false}
                 />
               </Th>
               <Th textAlign={'right'}>
@@ -129,6 +141,7 @@ export default function Pools() {
                   mainColor="color2Text"
                   inActiveColor="#d9d9f726"
                   onClick={handleSortChange('TVL')}
+                  // disabled={false}
                 />
               </Th>
             </Tr>

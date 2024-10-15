@@ -529,6 +529,7 @@ export function HeaderSorter(props: {
   mainColor: string;
   inActiveColor: string;
   onClick: (order: 'asc' | 'desc') => void;
+  disabled?: boolean;
 }) {
   const [isAscending, setIsAscending] = useState(false);
   const [isDescending, setIsDescending] = useState(false);
@@ -555,10 +556,18 @@ export function HeaderSorter(props: {
       <Text color={props.mainColor}>{props.heading.toUpperCase()}</Text>
       <VStack gap={0} spacing={0}>
         <TriangleUpIcon
-          color={isAscending ? props.mainColor : props.inActiveColor}
+          color={
+            isAscending && !props.disabled
+              ? props.mainColor
+              : props.inActiveColor
+          }
         />
         <TriangleDownIcon
-          color={isDescending ? props.mainColor : props.inActiveColor}
+          color={
+            isDescending && !props.disabled
+              ? props.mainColor
+              : props.inActiveColor
+          }
         />
       </VStack>
     </HStack>
