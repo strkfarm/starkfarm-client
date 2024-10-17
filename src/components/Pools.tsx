@@ -13,7 +13,7 @@ import {
   Tr,
 } from '@chakra-ui/react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Pagination,
   PaginationContainer,
@@ -37,6 +37,9 @@ export default function Pools() {
   const ITEMS_PER_PAGE = 15;
   const setSort = useSetAtom(sortAtom);
   const sort = useAtomValue(sortAtom);
+  const [aprStatus, setAprStatus] = useState(true);
+  const [riskStatus, setRiskStatus] = useState(true);
+  const [tvlStatus, setTvlStatus] = useState(true);
   const { currentPage, setCurrentPage, pagesCount, pages } = usePagination({
     pagesCount: Math.floor(_filteredPools.length / ITEMS_PER_PAGE) + 1,
     initialState: { currentPage: 1 },
@@ -48,21 +51,31 @@ export default function Pools() {
   }, [_filteredPools, currentPage, sort]);
 
   const handleSortChange = (field: string) => (order: 'asc' | 'desc') => {
-    if (field == 'RISK') {
+    if (field === 'RISK') {
+      setRiskStatus(true);
       setSort((prev) => {
         const updatedSort = prev.filter((s) => s.field !== field);
         return [...updatedSort, { field, order }];
       });
     } else if (field == 'APR' || field == 'TVL') {
+      setRiskStatus(false);
       const riskIndex = sort.findIndex((s) => s.field === 'RISK');
       const new_sort: any = [];
       if (riskIndex >= 0) {
+        setRiskStatus(true);
         new_sort.push({ field: 'RISK', order: sort[riskIndex].order });
+      }
+      if (field == 'APR') {
+        setTvlStatus(false);
+        setAprStatus(true);
+      }
+      if (field == 'TVL') {
+        setTvlStatus(true);
+        setAprStatus(false);
       }
       new_sort.push({ field, order });
       setSort(new_sort);
     }
-    localStorage.setItem('sort', JSON.stringify(sort));
   };
   return (
     <Box float="left" width={'100%'}>
@@ -123,7 +136,7 @@ export default function Pools() {
                   mainColor="color2Text"
                   inActiveColor="#d9d9f726"
                   onClick={handleSortChange('APR')}
-                  // disabled={false}
+                  active={aprStatus}
                 />
               </Th>
               <Th textAlign={'right'}>
@@ -132,7 +145,7 @@ export default function Pools() {
                   mainColor="color2Text"
                   inActiveColor="#d9d9f726"
                   onClick={handleSortChange('RISK')}
-                  // disabled={false}
+                  active={riskStatus}
                 />
               </Th>
               <Th textAlign={'right'}>
@@ -141,7 +154,7 @@ export default function Pools() {
                   mainColor="color2Text"
                   inActiveColor="#d9d9f726"
                   onClick={handleSortChange('TVL')}
-                  // disabled={false}
+                  active={tvlStatus}
                 />
               </Th>
             </Tr>
