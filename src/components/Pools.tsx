@@ -53,18 +53,33 @@ export default function Pools() {
   const handleSortChange = (field: string) => (order: 'asc' | 'desc') => {
     if (field === 'RISK') {
       setRiskStatus(true);
-      setSort((prev) => {
-        const updatedSort = prev.filter((s) => s.field !== field);
-        return [...updatedSort, { field, order }];
-      });
+      const riskIndex = sort.findIndex((s) => s.field === 'RISK');
+      if (riskIndex >= 0) {
+        setSort((prev) => {
+          const updatedSort = prev.filter((s) => s.field !== 'RISK');
+          return [
+            ...updatedSort,
+            { field, order: sort[riskIndex].order == 'desc' ? 'asc' : 'desc' },
+          ];
+        });
+      } else {
+        setSort((prev) => {
+          const updatedSort = prev.filter((s) => s.field !== field);
+          return [...updatedSort, { field, order: 'asc' }];
+        });
+      }
     } else if (field == 'APR' || field == 'TVL') {
       setRiskStatus(false);
-      const riskIndex = sort.findIndex((s) => s.field === 'RISK');
+      // const riskIndex = sort.findIndex((s) => s.field === 'RISK');
+      // if (riskIndex >= 0) {
+      //   setRiskStatus(true);
+      //   new_sort.push({
+      //     field: 'RISK',
+      //     order:
+      //       sort[riskIndex].order == 'desc' ? 'asc' : sort[riskIndex].order,
+      //   });
+      // }
       const new_sort: any = [];
-      if (riskIndex >= 0) {
-        setRiskStatus(true);
-        new_sort.push({ field: 'RISK', order: sort[riskIndex].order });
-      }
       if (field == 'APR') {
         setTvlStatus(false);
         setAprStatus(true);
@@ -73,7 +88,16 @@ export default function Pools() {
         setTvlStatus(true);
         setAprStatus(false);
       }
-      new_sort.push({ field, order });
+      const currentFieldIndex = sort.findIndex((s) => s.field === field);
+      new_sort.push({
+        field,
+        order:
+          sort[currentFieldIndex]?.order &&
+          sort[currentFieldIndex]?.order == 'desc'
+            ? 'asc'
+            : 'desc',
+      });
+      setSort([]);
       setSort(new_sort);
     }
   };
