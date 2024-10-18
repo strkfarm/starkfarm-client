@@ -13,7 +13,7 @@ import {
   Tr,
 } from '@chakra-ui/react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Pagination,
   PaginationContainer,
@@ -37,6 +37,9 @@ export default function Pools() {
   const ITEMS_PER_PAGE = 15;
   const setSort = useSetAtom(sortAtom);
   const sort = useAtomValue(sortAtom);
+  const [aprStatus, setAprStatus] = useState(true);
+  const [riskStatus, setRiskStatus] = useState(true);
+  const [tvlStatus, setTvlStatus] = useState(true);
   const { currentPage, setCurrentPage, pagesCount, pages } = usePagination({
     pagesCount: Math.floor(_filteredPools.length / ITEMS_PER_PAGE) + 1,
     initialState: { currentPage: 1 },
@@ -48,12 +51,56 @@ export default function Pools() {
   }, [_filteredPools, currentPage, sort]);
 
   const handleSortChange = (field: string) => (order: 'asc' | 'desc') => {
-    setSort((prev) => {
-      const updatedSort = prev.filter((s) => s.field !== field);
-      return [...updatedSort, { field, order }];
-    });
+    if (field === 'RISK') {
+      setRiskStatus(true);
+      const riskIndex = sort.findIndex((s) => s.field === 'RISK');
+      if (riskIndex >= 0) {
+        setSort((prev) => {
+          const updatedSort = prev.filter((s) => s.field !== 'RISK');
+          return [
+            ...updatedSort,
+            { field, order: sort[riskIndex].order == 'desc' ? 'asc' : 'desc' },
+          ];
+        });
+      } else {
+        setSort((prev) => {
+          const updatedSort = prev.filter((s) => s.field !== field);
+          return [...updatedSort, { field, order: 'asc' }];
+        });
+      }
+    } else if (field == 'APR' || field == 'TVL') {
+      setRiskStatus(false);
+      // const riskIndex = sort.findIndex((s) => s.field === 'RISK');
+      // if (riskIndex >= 0) {
+      //   setRiskStatus(true);
+      //   new_sort.push({
+      //     field: 'RISK',
+      //     order:
+      //       sort[riskIndex].order == 'desc' ? 'asc' : sort[riskIndex].order,
+      //   });
+      // }
+      const new_sort: any = [];
+      if (field == 'APR') {
+        setTvlStatus(false);
+        setAprStatus(true);
+      }
+      if (field == 'TVL') {
+        setTvlStatus(true);
+        setAprStatus(false);
+      }
+      const currentFieldIndex = sort.findIndex((s) => s.field === field);
+      new_sort.push({
+        field,
+        order:
+          sort[currentFieldIndex]?.order &&
+          sort[currentFieldIndex]?.order == 'desc'
+            ? 'asc'
+            : 'desc',
+      });
+      setSort([]);
+      setSort(new_sort);
+    }
   };
-
   return (
     <Box float="left" width={'100%'}>
       <ProtocolFilters />
@@ -113,6 +160,7 @@ export default function Pools() {
                   mainColor="color2Text"
                   inActiveColor="#d9d9f726"
                   onClick={handleSortChange('APR')}
+                  active={aprStatus}
                 />
               </Th>
               <Th textAlign={'right'}>
@@ -121,6 +169,7 @@ export default function Pools() {
                   mainColor="color2Text"
                   inActiveColor="#d9d9f726"
                   onClick={handleSortChange('RISK')}
+                  active={riskStatus}
                 />
               </Th>
               <Th textAlign={'right'}>
@@ -129,6 +178,7 @@ export default function Pools() {
                   mainColor="color2Text"
                   inActiveColor="#d9d9f726"
                   onClick={handleSortChange('TVL')}
+                  active={tvlStatus}
                 />
               </Th>
             </Tr>
