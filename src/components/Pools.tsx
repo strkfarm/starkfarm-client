@@ -37,9 +37,9 @@ export default function Pools() {
   const ITEMS_PER_PAGE = 15;
   const setSort = useSetAtom(sortAtom);
   const sort = useAtomValue(sortAtom);
-  const [aprStatus, setAprStatus] = useState(true);
-  const [riskStatus, setRiskStatus] = useState(true);
-  const [tvlStatus, setTvlStatus] = useState(true);
+  const [aprStatus, setAprStatus] = useState(false);
+  const [riskStatus, setRiskStatus] = useState(false);
+  const [tvlStatus, setTvlStatus] = useState(false);
   const { currentPage, setCurrentPage, pagesCount, pages } = usePagination({
     pagesCount: Math.floor(_filteredPools.length / ITEMS_PER_PAGE) + 1,
     initialState: { currentPage: 1 },
@@ -70,15 +70,6 @@ export default function Pools() {
       }
     } else if (field == 'APR' || field == 'TVL') {
       setRiskStatus(false);
-      // const riskIndex = sort.findIndex((s) => s.field === 'RISK');
-      // if (riskIndex >= 0) {
-      //   setRiskStatus(true);
-      //   new_sort.push({
-      //     field: 'RISK',
-      //     order:
-      //       sort[riskIndex].order == 'desc' ? 'asc' : sort[riskIndex].order,
-      //   });
-      // }
       const new_sort: any = [];
       if (field == 'APR') {
         setTvlStatus(false);

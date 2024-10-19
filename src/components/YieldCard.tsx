@@ -28,7 +28,7 @@ import { getDisplayCurrencyAmount } from '@/utils';
 import { addressAtom } from '@/store/claims.atoms';
 import { FaWallet } from 'react-icons/fa';
 import { UserStats, userStatsAtom } from '@/store/utils.atoms';
-import { getPoolInfoFromStrategy } from '@/store/protocols';
+import { getPoolInfoFromStrategy, sortAtom } from '@/store/protocols';
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons';
 import { useState } from 'react';
 import mixpanel from 'mixpanel-browser';
@@ -310,7 +310,12 @@ function StrategyTVL(props: YieldCardProps) {
     </Box>
   );
 }
-
+function sortHeading(field: string) {
+  if (field == 'APY') {
+    return 'APR';
+  }
+  return field.toUpperCase();
+}
 function GetRiskLevel(riskFactor: number) {
   let color = '';
   let bgColor = '';
@@ -533,21 +538,33 @@ export function HeaderSorter(props: {
 }) {
   const [isAscending, setIsAscending] = useState(false);
   const [isDescending, setIsDescending] = useState(false);
+  const sort = useAtomValue(sortAtom);
+  const currentFieldIndex = sort.findIndex(
+    (s) => s.field === sortHeading(props.heading),
+  );
+  const order: 'asc' | 'desc' =
+    currentFieldIndex >= 0 ? sort[currentFieldIndex].order : 'desc';
   return (
     <HStack
       as="button"
       onClick={() => {
-        let order: 'asc' | 'desc' = 'desc';
-        if (!isAscending && !isDescending) {
-          setIsDescending(true);
-        } else if (isDescending) {
-          setIsAscending(true);
-          setIsDescending(false);
-          order = 'asc';
-        } else {
-          setIsAscending(false);
-          setIsDescending(true);
-        }
+        // if (!isAscending && !isDescending) {
+        //   setIsDescending(true);
+        // } else if (isDescending) {
+        //   setIsAscending(true);
+        //   setIsDescending(false);
+        //   order = 'asc';
+        // } else {
+        //   setIsAscending(false);
+        //   setIsDescending(true);
+        // }
+        // if (order == 'asc') {
+        //   setIsAscending(true);
+        //   setIsDescending(false);
+        // } else {
+        //   setIsAscending(false);
+        //   setIsDescending(true);
+        // }
         props.onClick(order);
       }}
       float={'right'}
@@ -556,12 +573,16 @@ export function HeaderSorter(props: {
       <VStack gap={0} spacing={0}>
         <TriangleUpIcon
           color={
-            isAscending && props.active ? props.mainColor : props.inActiveColor
+            order == 'asc' && props.active
+              ? props.mainColor
+              : props.inActiveColor
           }
         />
         <TriangleDownIcon
           color={
-            isDescending && props.active ? props.mainColor : props.inActiveColor
+            order == 'desc' && props.active
+              ? props.mainColor
+              : props.inActiveColor
           }
         />
       </VStack>
