@@ -30,7 +30,6 @@ import { FaWallet } from 'react-icons/fa';
 import { UserStats, userStatsAtom } from '@/store/utils.atoms';
 import { getPoolInfoFromStrategy, sortAtom } from '@/store/protocols';
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons';
-import { useState } from 'react';
 import mixpanel from 'mixpanel-browser';
 import { STRKFarmStrategyAPIResult } from '@/store/strkfarm.atoms';
 
@@ -310,6 +309,7 @@ function StrategyTVL(props: YieldCardProps) {
     </Box>
   );
 }
+// return sort heading text to match with sort options heading text
 function sortHeading(field: string) {
   if (field == 'APY') {
     return 'APR';
@@ -534,37 +534,22 @@ export function HeaderSorter(props: {
   mainColor: string;
   inActiveColor: string;
   onClick: (order: 'asc' | 'desc') => void;
+  // added active? boolean to handle sort status...
   active?: boolean;
 }) {
-  const [isAscending, setIsAscending] = useState(false);
-  const [isDescending, setIsDescending] = useState(false);
+  // get the current sort atom
   const sort = useAtomValue(sortAtom);
+  // get corrent index for a particular sort option from the current sort atom
   const currentFieldIndex = sort.findIndex(
     (s) => s.field === sortHeading(props.heading),
   );
+  // get the order of the clicked sort option
   const order: 'asc' | 'desc' =
     currentFieldIndex >= 0 ? sort[currentFieldIndex].order : 'desc';
   return (
     <HStack
       as="button"
       onClick={() => {
-        // if (!isAscending && !isDescending) {
-        //   setIsDescending(true);
-        // } else if (isDescending) {
-        //   setIsAscending(true);
-        //   setIsDescending(false);
-        //   order = 'asc';
-        // } else {
-        //   setIsAscending(false);
-        //   setIsDescending(true);
-        // }
-        // if (order == 'asc') {
-        //   setIsAscending(true);
-        //   setIsDescending(false);
-        // } else {
-        //   setIsAscending(false);
-        //   setIsDescending(true);
-        // }
         props.onClick(order);
       }}
       float={'right'}
