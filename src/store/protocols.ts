@@ -41,11 +41,11 @@ export const PROTOCOLS = [
     class: mySwap,
     atoms: MySwapAtoms,
   },
-  {
-    name: tenkswap.name,
-    class: tenkswap,
-    atoms: TenkSwapAtoms,
-  },
+  // {
+  //   name: tenkswap.name,
+  //   class: tenkswap,
+  //   atoms: TenkSwapAtoms,
+  // },
   {
     name: haiko.name,
     class: haiko,
@@ -66,16 +66,16 @@ export const PROTOCOLS = [
     class: carmine,
     atoms: CarmineAtoms,
   },
-  {
-    name: starkDefi.name,
-    class: starkDefi,
-    atoms: StarkDefiAtoms,
-  },
-  {
-    name: sithswap.name,
-    class: sithswap,
-    atoms: SithswapAtoms,
-  },
+  // {
+  //   name: starkDefi.name,
+  //   class: starkDefi,
+  //   atoms: StarkDefiAtoms,
+  // },
+  // {
+  //   name: sithswap.name,
+  //   class: sithswap,
+  //   atoms: SithswapAtoms,
+  // },
   {
     name: zkLend.name,
     class: zkLend,
