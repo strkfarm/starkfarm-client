@@ -5,10 +5,7 @@ import MySwapAtoms, { mySwap } from './myswap.store';
 import NostraDexAtoms, { nostraDex } from './nostradex.store';
 import NostraDegenAtoms, { nostraDegen } from './nostradegen.store';
 import NostraLendingAtoms, { nostraLending } from './nostralending.store';
-import SithswapAtoms, { sithswap } from './sithswap.store';
-import StarkDefiAtoms, { starkDefi } from './starkdefi.store';
 import VesuAtoms, { vesu } from './vesu.store';
-import TenkSwapAtoms, { tenkswap } from './tenkswap.store';
 import ZkLendAtoms, { zkLend } from './zklend.store';
 import CarmineAtoms, { carmine } from './carmine.store';
 import { atom } from 'jotai';
@@ -41,11 +38,11 @@ export const PROTOCOLS = [
     class: mySwap,
     atoms: MySwapAtoms,
   },
-  {
-    name: tenkswap.name,
-    class: tenkswap,
-    atoms: TenkSwapAtoms,
-  },
+  // {
+  //   name: tenkswap.name,
+  //   class: tenkswap,
+  //   atoms: TenkSwapAtoms,
+  // },
   {
     name: haiko.name,
     class: haiko,
@@ -66,16 +63,16 @@ export const PROTOCOLS = [
     class: carmine,
     atoms: CarmineAtoms,
   },
-  {
-    name: starkDefi.name,
-    class: starkDefi,
-    atoms: StarkDefiAtoms,
-  },
-  {
-    name: sithswap.name,
-    class: sithswap,
-    atoms: SithswapAtoms,
-  },
+  // {
+  //   name: starkDefi.name,
+  //   class: starkDefi,
+  //   atoms: StarkDefiAtoms,
+  // },
+  // {
+  //   name: sithswap.name,
+  //   class: sithswap,
+  //   atoms: SithswapAtoms,
+  // },
   {
     name: zkLend.name,
     class: zkLend,
