@@ -35,8 +35,11 @@ export default function Pools() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
   const _filteredPools = useAtomValue(filteredPools);
   const ITEMS_PER_PAGE = 15;
+  // set sort atom declared
   const setSort = useSetAtom(sortAtom);
+  // get current sort atom
   const sort = useAtomValue(sortAtom);
+  // declare react states for apr,risk,tvl to manage active? states
   const [aprStatus, setAprStatus] = useState(false);
   const [riskStatus, setRiskStatus] = useState(false);
   const [tvlStatus, setTvlStatus] = useState(false);
@@ -50,10 +53,14 @@ export default function Pools() {
     return _filteredPools.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   }, [_filteredPools, currentPage, sort]);
 
+  // handle sort click function
   const handleSortChange = (field: string) => (order: 'asc' | 'desc') => {
+    // if RISK is click
     if (field === 'RISK') {
       setRiskStatus(true);
+      // check if risk exists in sort atom
       const riskIndex = sort.findIndex((s) => s.field === 'RISK');
+      // if risk exist update the order else set risk with selected order
       if (riskIndex >= 0) {
         setSort((prev) => {
           const updatedSort = prev.filter((s) => s.field !== 'RISK');
@@ -69,6 +76,7 @@ export default function Pools() {
         });
       }
     } else if (field == 'APR' || field == 'TVL') {
+      // if APR or TVL is clicked clear sort atom, check if exist in sort atom if exist then set order else clear sort atom and set
       setRiskStatus(false);
       const new_sort: any = [];
       if (field == 'APR') {
