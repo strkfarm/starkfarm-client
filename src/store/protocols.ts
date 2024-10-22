@@ -212,17 +212,34 @@ export const allPoolsAtomWithStrategiesUnSorted = atom((get) => {
 
 const SORT_OPTIONS = ['DEFAULT', 'APR', 'TVL', 'RISK'] as const;
 
-export const sortAtom = atom<Array<{ field: string; order: 'asc' | 'desc' }>>([
+// default sort atom with default options APR: high to low, RISK: low to high
+const defaultSortAtom = atom<Array<{ field: string; order: 'asc' | 'desc' }>>([
   {
-    field: SORT_OPTIONS[0],
+    field: SORT_OPTIONS[1],
+    order: 'desc',
+  },
+  {
+    field: SORT_OPTIONS[3],
     order: 'asc',
   },
 ]);
 
+// sort atom declared
+export const sortAtom = atom<Array<{ field: string; order: 'asc' | 'desc' }>>(
+  [],
+);
+// sort pool results function
 export const sortPoolsAtom = atom((get) => {
+  // get current sort atom
   const sort = get(sortAtom);
+  // get default sort atom
+  const default_sort = get(defaultSortAtom);
+  // get unsort pool data
   const pools = get(allPoolsAtomWithStrategiesUnSorted);
-  const sortCriteria = [...sort].reverse();
+  // if current sort atom exist then reverse the atom else reverse default sort
+  const sortCriteria =
+    sort.length > 0 ? [...sort].reverse() : [...default_sort].reverse();
+  // loop through unsort pools and apply sort
   const sortedPools = [...pools].sort((a, b) => {
     for (const sortItem of sortCriteria) {
       let result = 0;
@@ -242,8 +259,6 @@ export const sortPoolsAtom = atom((get) => {
     }
     return 0;
   });
-  // localStorage.setItem('sort', JSON.stringify(sortCriteria));
-
   return sortedPools;
 });
 

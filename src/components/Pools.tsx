@@ -13,7 +13,7 @@ import {
   Tr,
 } from '@chakra-ui/react';
 import { useAtomValue, useSetAtom } from 'jotai';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Pagination,
   PaginationContainer,
@@ -35,8 +35,14 @@ export default function Pools() {
   const allPools = useAtomValue(allPoolsAtomUnSorted);
   const _filteredPools = useAtomValue(filteredPools);
   const ITEMS_PER_PAGE = 15;
+  // set sort atom declared
   const setSort = useSetAtom(sortAtom);
+  // get current sort atom
   const sort = useAtomValue(sortAtom);
+  // declare react states for apr,risk,tvl to manage active? states
+  const [aprStatus, setAprStatus] = useState(false);
+  const [riskStatus, setRiskStatus] = useState(false);
+  const [tvlStatus, setTvlStatus] = useState(false);
   const { currentPage, setCurrentPage, pagesCount, pages } = usePagination({
     pagesCount: Math.floor(_filteredPools.length / ITEMS_PER_PAGE) + 1,
     initialState: { currentPage: 1 },
@@ -47,13 +53,53 @@ export default function Pools() {
     return _filteredPools.slice(startIndex, startIndex + ITEMS_PER_PAGE);
   }, [_filteredPools, currentPage, sort]);
 
+  // handle sort click function
   const handleSortChange = (field: string) => (order: 'asc' | 'desc') => {
-    setSort((prev) => {
-      const updatedSort = prev.filter((s) => s.field !== field);
-      return [...updatedSort, { field, order }];
-    });
+    // if RISK is click
+    if (field === 'RISK') {
+      setRiskStatus(true);
+      // check if risk exists in sort atom
+      const riskIndex = sort.findIndex((s) => s.field === 'RISK');
+      // if risk exist update the order else set risk with selected order
+      if (riskIndex >= 0) {
+        setSort((prev) => {
+          const updatedSort = prev.filter((s) => s.field !== 'RISK');
+          return [
+            ...updatedSort,
+            { field, order: sort[riskIndex].order == 'desc' ? 'asc' : 'desc' },
+          ];
+        });
+      } else {
+        setSort((prev) => {
+          const updatedSort = prev.filter((s) => s.field !== field);
+          return [...updatedSort, { field, order: 'asc' }];
+        });
+      }
+    } else if (field == 'APR' || field == 'TVL') {
+      // if APR or TVL is clicked clear sort atom, check if exist in sort atom if exist then set order else clear sort atom and set
+      setRiskStatus(false);
+      const new_sort: any = [];
+      if (field == 'APR') {
+        setTvlStatus(false);
+        setAprStatus(true);
+      }
+      if (field == 'TVL') {
+        setTvlStatus(true);
+        setAprStatus(false);
+      }
+      const currentFieldIndex = sort.findIndex((s) => s.field === field);
+      new_sort.push({
+        field,
+        order:
+          sort[currentFieldIndex]?.order &&
+          sort[currentFieldIndex]?.order == 'desc'
+            ? 'asc'
+            : 'desc',
+      });
+      setSort([]);
+      setSort(new_sort);
+    }
   };
-
   return (
     <Box float="left" width={'100%'}>
       <ProtocolFilters />
@@ -113,6 +159,7 @@ export default function Pools() {
                   mainColor="color2Text"
                   inActiveColor="#d9d9f726"
                   onClick={handleSortChange('APR')}
+                  active={aprStatus}
                 />
               </Th>
               <Th textAlign={'right'}>
@@ -121,6 +168,7 @@ export default function Pools() {
                   mainColor="color2Text"
                   inActiveColor="#d9d9f726"
                   onClick={handleSortChange('RISK')}
+                  active={riskStatus}
                 />
               </Th>
               <Th textAlign={'right'}>
@@ -129,6 +177,7 @@ export default function Pools() {
                   mainColor="color2Text"
                   inActiveColor="#d9d9f726"
                   onClick={handleSortChange('TVL')}
+                  active={tvlStatus}
                 />
               </Th>
             </Tr>
